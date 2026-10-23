@@ -1,5 +1,5 @@
-// 島嶼檢視的議題區清單與標記圖例。桌面在島的右側，800px 以下由 CSS 改為底部抽屜。
-// 清單的標記狀態與島上的標記同樣來自 island-layout.js，不呈現政見數量。
+// 島嶼檢視的索引面板：議題區清單、標記圖例與候選人分頁。桌面在畫面右側，800px 以下由 CSS 改為底部抽屜。
+// 清單的編號與標記狀態與島上的名牌、標記同樣來自 island-layout.js，不呈現政見數量。
 
 import { el } from './dom.js';
 import { NO_MATCH_TEXT } from './filter.js';
@@ -25,7 +25,23 @@ export function renderLegend(container, vm) {
   );
 }
 
-// filtered 是篩選後的檢視模型（未篩選時就是 vm）。被篩掉的議題區不列出。
+// 候選人分頁：三人同尺寸，依排序列出形狀、姓名與政黨。候選人資料卡由候選人資料票接手。
+export function renderCandidateIndex(container, vm) {
+  container.replaceChildren(
+    ...markerLegend(vm).map((entry) => {
+      const candidate = vm.candidates.find((c) => c.id === entry.candidateId);
+      return el(
+        'li',
+        { class: 'candidate-index-item', 'data-candidate': candidate.id },
+        el('span', { class: 'marker-badge is-lit', 'aria-hidden': 'true' }, entry.symbol),
+        el('span', { class: 'candidate-name' }, candidate.name),
+        el('span', { class: 'candidate-meta' }, candidate.party),
+      );
+    }),
+  );
+}
+
+// filtered 是篩選後的檢視模型（未篩選時就是 vm）。被篩掉的議題區不列出，其餘議題區保留原編號。
 export function renderIslandList(container, vm, filtered, { selectedId, onPick }) {
   const shown = new Set(filtered.rows.map((row) => row.issueArea.id));
   const offText = filtered.filter?.active ? NO_MATCH_TEXT : NO_POLICY_LABEL;
@@ -35,6 +51,7 @@ export function renderIslandList(container, vm, filtered, { selectedId, onPick }
       const button = el(
         'button',
         { type: 'button', class: 'island-item', 'data-area': tile.id, 'aria-current': tile.id === selectedId ? 'true' : null },
+        el('span', { class: 'area-number' }, tile.number),
         el('span', { class: 'island-item-name' }, tile.name),
         el('span', { class: 'island-item-markers' }, tile.markers.map((m) => markerBadge(m, offText))),
       );

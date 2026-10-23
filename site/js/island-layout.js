@@ -89,6 +89,7 @@ export function islandLayout(vm, { filtered = null } = {}) {
     ...vm.rows.map((row) => ({
       kind: 'area',
       id: row.issueArea.id,
+      number: row.number,
       name: row.issueArea.name,
       axial: row.issueArea.axial,
       position: axialToPosition(row.issueArea.axial),
@@ -99,6 +100,7 @@ export function islandLayout(vm, { filtered = null } = {}) {
     ...vm.decorativeTiles.map((tile) => ({
       kind: 'decorative',
       id: tile.id,
+      number: null,
       name: null,
       axial: tile.axial,
       position: axialToPosition(tile.axial),
@@ -186,6 +188,21 @@ export function cameraLimits(bounds, fit) {
 export function orbitCenter(focus, center, distance, { near, far }) {
   const t = Math.min(1, Math.max(0, (distance - near) / (far - near)));
   return { x: focus.x + (center.x - focus.x) * t, z: focus.z + (center.z - focus.z) * t };
+}
+
+// 全螢幕畫布的邊緣被浮動元件（索引面板、工具列）遮住時，投影中心改到沒被遮住的區域正中。
+// insets 是四邊被遮住的像素寬度。回傳值給 camera.setViewOffset：在較大的虛擬畫布上取畫布大小的一塊，
+// 鏡頭的 aspect 要設成 fullWidth / fullHeight；構圖（frameIsland）用 visibleAspect。
+export function viewOffset({ width, height, insets }) {
+  const dx = (insets.left - insets.right) / 2;
+  const dy = (insets.top - insets.bottom) / 2;
+  return {
+    fullWidth: width + 2 * Math.abs(dx),
+    fullHeight: height + 2 * Math.abs(dy),
+    x: dx < 0 ? -2 * dx : 0,
+    y: dy < 0 ? -2 * dy : 0,
+    visibleAspect: (width - insets.left - insets.right) / (height - insets.top - insets.bottom),
+  };
 }
 
 // 800px 以下或觸控裝置降為中畫質：像素比上限 1.4、關閉陰影。
