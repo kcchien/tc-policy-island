@@ -25,7 +25,7 @@ export function renderLegend(container, vm) {
   );
 }
 
-// 候選人分頁：三人同尺寸，依排序列出形狀、姓名與政黨。候選人資料卡由候選人資料票接手。
+// 候選人分頁：三人同尺寸，依排序列出形狀、姓名與政黨。候選人資料卡加入後由資料卡取代。
 export function renderCandidateIndex(container, vm) {
   container.replaceChildren(
     ...markerLegend(vm).map((entry) => {

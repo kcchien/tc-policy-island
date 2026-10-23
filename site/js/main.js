@@ -138,12 +138,19 @@ function startApp(vm, state, initialView) {
   document.body.append(card.element);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
-  const setPanelOpen = (open) => {
+  // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
+  const indexClose = document.getElementById('index-close');
+  const setPanelOpen = (open, { returnFocus = false } = {}) => {
     panel.classList.toggle('is-open', open);
     indexToggle.setAttribute('aria-expanded', String(open));
+    if (open) indexClose.focus();
+    else if (returnFocus) indexToggle.focus();
   };
   indexToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
-  document.getElementById('index-close').addEventListener('click', () => setPanelOpen(false));
+  indexClose.addEventListener('click', () => setPanelOpen(false, { returnFocus: true }));
+  panel.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel.classList.contains('is-open')) setPanelOpen(false, { returnFocus: true });
+  });
 
   // 畫布四邊被浮動元件遮住的寬度：桌面是上方工具列與右側索引面板，手機是標題卡與底部膠囊列。
   const stageInsets = () => {

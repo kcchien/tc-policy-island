@@ -19,9 +19,9 @@
   </head>
   <body data-view="table">
     <!-- 島嶼檢視的 3D 畫布填滿視窗，其餘元件浮在畫布上。 -->
-    <div class="island-stage" id="island-stage" aria-label="島嶼檢視">
+    <section class="island-stage" id="island-stage" aria-label="島嶼檢視">
       <p class="status island-status" id="island-status">載入島嶼中⋯</p>
-    </div>
+    </section>
 
     <header class="title-card">
       <h1 class="site-title">台中政見島</h1>
@@ -53,23 +53,23 @@
         </button>
       </div>
       <div class="tool-group" role="group" aria-label="島嶼" data-island-only>
-        <button type="button" class="tool-button time-cycle" id="tool-time-cycle" data-island-only aria-label="切換時段，目前白天">
+        <button type="button" class="tool-button time-cycle" id="tool-time-cycle" aria-label="切換時段，目前白天">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2" /></svg>
           <span class="tool-label" id="tool-time-cycle-label">白天</span>
         </button>
-        <button type="button" class="tool-button" id="tool-pause" data-island-only aria-pressed="false">
+        <button type="button" class="tool-button" id="tool-pause" aria-pressed="false">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-pause" d="M9 6v12M15 6v12" /><path class="icon-play" d="M8 5.5v13l10-6.5Z" /></svg>
           <span class="tool-label" id="tool-pause-label">暫停</span>
         </button>
-        <button type="button" class="tool-button" id="tool-labels" data-island-only aria-pressed="true">
+        <button type="button" class="tool-button" id="tool-labels" aria-pressed="true">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="9" rx="3" /><path d="M12 16v4" /></svg>
           <span class="tool-label">名牌</span>
         </button>
-        <button type="button" class="tool-button" id="tool-overview" data-island-only>
+        <button type="button" class="tool-button" id="tool-overview">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
           <span class="tool-label">全景</span>
         </button>
-        <button type="button" class="tool-button index-toggle" id="tool-index" data-island-only aria-expanded="false" aria-controls="index-panel">
+        <button type="button" class="tool-button index-toggle" id="tool-index" aria-expanded="false" aria-controls="index-panel">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1" /></svg>
           <span class="tool-label">索引</span>
         </button>
@@ -129,7 +129,7 @@
           <ul class="legend" id="island-legend" aria-label="標記圖例"></ul>
           <ol class="island-list" id="island-list" aria-label="議題區"></ol>
         </section>
-        <!-- 候選人分頁的內容由候選人資料票填入；目前只放排序規則與標記對照。 -->
+        <!-- 候選人分頁：候選人資料卡加入前，先放排序規則與標記對照。 -->
         <section class="index-tabpanel" id="index-candidates" role="tabpanel" aria-labelledby="index-tab-candidates" hidden>
           <p class="order-note" id="panel-order-note"></p>
           <ul class="candidate-index" id="candidate-index"></ul>
