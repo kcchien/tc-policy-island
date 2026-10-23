@@ -16,7 +16,7 @@
 | `node scripts/build.js [--raw data/raw] [--out site/data/dataset.json]` | 原始資料 → 公開資料集；驗證失敗列出全部錯誤並以結束碼 1 退出 |
 | `node scripts/gates.js [site]` | 對建置後的網站目錄跑上線關卡，任一項失敗結束碼 1 |
 | `node scripts/preview.js [--port 8000] [--dir site]` | 本機預覽網站目錄 |
-| `node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--brand-terms data/rules/brand-terms.json] [--model claude-opus-5-5] [--claude claude] [--date YYYY-MM-DD]` | 兩層核對（ADR 0002），結果寫回 `policies/*.json`；第一層不過不送第二層，`--skip-passed` 只跑未核對、已退回或以舊版檢核表通過的政見。第二層每筆開一個全新 `claude -p` session，會花費用；提示詞中的候選人姓名與政黨以「○○」遮蔽 |
+| `node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--jobs 1] [--brand-terms data/rules/brand-terms.json] [--model claude-opus-5-5] [--claude claude] [--date YYYY-MM-DD]` | 兩層核對（ADR 0002），結果寫回 `policies/*.json`；第一層不過不送第二層，`--skip-passed` 只跑未核對、已退回或以舊版檢核表通過的政見。第二層每筆開一個全新 `claude -p` session，會花費用，`--jobs` 是同時執行的 session 數；提示詞中的候選人姓名與政黨以「○○」遮蔽 |
 | `node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型> [--title <標題>] [--html <本機 HTML 檔>] [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]` | 擷取一個出處：頁面可見文字存成 `data/snapshots/<sourceId>.txt`、送 Wayback Machine 存檔（失敗只記原因）、出處紀錄寫進 `sources/<candidateId>.json`（同識別碼取代）。要登入或瀏覽器渲染的頁面先另存 HTML 再用 `--html` |
 | `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
 

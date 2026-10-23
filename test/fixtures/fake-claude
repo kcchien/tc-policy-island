@@ -2,9 +2,23 @@
 // 核對指令測試用的假 claude（沒有 .js 副檔名，node --test 不會當成測試檔執行）。
 // 讀 stdin 的提示詞，把參數、工作目錄與提示詞逐行附加到 FAKE_CLAUDE_LOG，
 // 依 FAKE_CLAUDE_VERDICT（通過、退回、malformed）輸出 claude -p --output-format json 格式的結果。
+// 設了 FAKE_CLAUDE_BARRIER=<n> 時，先等到累計 n 個假 claude 啟動才回覆（最多 5 秒），用來確認同時執行。
 import { appendFileSync, readFileSync } from 'node:fs';
 
 const prompt = readFileSync(0, 'utf8');
+const barrier = Number(process.env.FAKE_CLAUDE_BARRIER ?? 0);
+if (barrier > 0) {
+  const starts = `${process.env.FAKE_CLAUDE_LOG}.starts`;
+  appendFileSync(starts, '.');
+  const deadline = Date.now() + 5000;
+  while (readFileSync(starts, 'utf8').length < barrier && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  if (readFileSync(starts, 'utf8').length < barrier) {
+    process.stdout.write(JSON.stringify({ type: 'result', subtype: 'error_during_execution', is_error: true, result: '等不到同時執行的其他假 claude' }));
+    process.exit(0);
+  }
+}
 appendFileSync(process.env.FAKE_CLAUDE_LOG, `${JSON.stringify({ args: process.argv.slice(2), cwd: process.cwd(), prompt })}\n`);
 
 const verdict = process.env.FAKE_CLAUDE_VERDICT ?? '通過';
