@@ -37,6 +37,14 @@ export const policy = (id, candidateId, verification = passedVerification(), iss
   verification,
 });
 
+export const localElement = (id, category = '自然景觀') => ({
+  id,
+  name: `元素${id}`,
+  category,
+  place: '測試地點',
+  reason: '測試用元素，與任何市長任期的政績無關',
+});
+
 // 合法的最小原始資料。各測試在複本上改出要驗證的情境。
 // 候選人刻意不依筆畫順序列出，排序測試才有意義。
 export function makeRaw() {
@@ -65,6 +73,7 @@ export function makeRaw() {
         localElementId: null,
       },
     ],
+    localElements: [],
     sources: ['cand-a', 'cand-b', 'cand-c'].map((candidateId) => ({
       id: `src-${candidateId}`,
       candidateId,

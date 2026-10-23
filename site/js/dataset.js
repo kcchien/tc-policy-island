@@ -16,6 +16,9 @@ export const TAICHUNG_DISTRICTS = [
   '外埔區', '大安區', '新社區', '石岡區', '和平區', '大肚區', '霧峰區',
 ];
 
+// 在地感元素只收這三類，見 ADR 0001 與 docs/rules/local-elements.md。
+export const LOCAL_ELEMENT_CATEGORIES = ['自然景觀', '小吃', '老建築'];
+
 // 核對狀態：pending 未核對、pass 通過、fail 不通過（第二層稱退回）。
 export const VERIFICATION_STATUSES = ['pending', 'pass', 'fail'];
 
@@ -54,6 +57,7 @@ const TYPES = {
   axial: { desc: '[q, r] 整數座標', ok: (v) => Array.isArray(v) && v.length === 2 && v.every(Number.isInteger) },
   sourceType: { desc: `其中之一：${Object.keys(SOURCE_TYPES).join('、')}`, ok: (v) => typeof v === 'string' && Object.hasOwn(SOURCE_TYPES, v) },
   status: { desc: `其中之一：${VERIFICATION_STATUSES.join('、')}`, ok: (v) => VERIFICATION_STATUSES.includes(v) },
+  elementCategory: { desc: `其中之一：${LOCAL_ELEMENT_CATEGORIES.join('、')}`, ok: (v) => LOCAL_ELEMENT_CATEGORIES.includes(v) },
   array: { desc: '陣列', ok: Array.isArray },
   object: { desc: '物件', ok: (v) => v !== null && typeof v === 'object' && !Array.isArray(v) },
 };
@@ -81,6 +85,13 @@ const SCHEMAS = {
     description: 'string',
     axial: 'axial',
     localElementId: 'string?',
+  },
+  localElement: {
+    id: 'string',
+    name: 'string',
+    category: 'elementCategory',
+    place: 'string',
+    reason: 'string',
   },
   source: {
     id: 'string',
@@ -119,7 +130,7 @@ const SCHEMAS = {
   },
 };
 
-const LABELS = { meta: '中繼資料', candidate: '候選人', issueArea: '議題區', source: '出處', policy: '政見' };
+const LABELS = { meta: '中繼資料', candidate: '候選人', issueArea: '議題區', localElement: '元素', source: '出處', policy: '政見' };
 
 function lookup(record, path) {
   let value = record;
@@ -196,12 +207,18 @@ function checkCandidates(candidates, sourcesById, errors) {
   }
 }
 
-function checkIssueAreas(issueAreas, errors) {
+function checkIssueAreas(issueAreas, elementIds, errors) {
   const seen = new Map();
+  const elementOwner = new Map();
   for (const area of issueAreas) {
     const key = area.axial.join(',');
     if (seen.has(key)) errors.push(`議題區 ${area.id}：軸向座標 [${key}] 與 ${seen.get(key)} 重複`);
     seen.set(key, area.id);
+    const elementId = area.localElementId;
+    if (elementId === null) continue;
+    if (!elementIds.has(elementId)) errors.push(`議題區 ${area.id}：localElementId 指向不存在的元素 ${elementId}`);
+    else if (elementOwner.has(elementId)) errors.push(`議題區 ${area.id}：在地感元素 ${elementId} 已配給議題區 ${elementOwner.get(elementId)}，每個元素只配一區`);
+    else elementOwner.set(elementId, area.id);
   }
 }
 
@@ -247,6 +264,7 @@ export function validateRawData(raw) {
   else checkFields(raw.meta, SCHEMAS.meta, LABELS.meta, errors);
   const candidates = checkList(raw, 'candidates', 'candidate', errors);
   const issueAreas = checkList(raw, 'issueAreas', 'issueArea', errors);
+  const localElements = checkList(raw, 'localElements', 'localElement', errors);
   const sources = checkList(raw, 'sources', 'source', errors);
   const policies = checkList(raw, 'policies', 'policy', errors);
 
@@ -260,7 +278,7 @@ export function validateRawData(raw) {
   }
   if (Array.isArray(raw?.candidates) && raw.candidates.length === 0) errors.push('候選人：至少要有一位候選人');
   checkCandidates(candidates.valid, refs.sourcesById, errors);
-  checkIssueAreas(issueAreas.valid, errors);
+  checkIssueAreas(issueAreas.valid, new Set(localElements.byId.keys()), errors);
   for (const policy of policies.valid) checkPolicy(policy, refs, errors);
   return errors;
 }
@@ -300,6 +318,7 @@ export function buildPublicDataset(raw, { builtAt = null } = {}) {
     meta: { ...copy.meta, candidateOrder, builtAt },
     candidates,
     issueAreas: copy.issueAreas,
+    localElements: copy.localElements,
     sources: copy.sources.filter((s) => sourceIds.has(s.id)),
     policies,
   };
