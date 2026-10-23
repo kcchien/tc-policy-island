@@ -4,15 +4,10 @@
 // 分頁隱藏時暫停，回來後若原本開著就接著播。音量記在 localStorage（讀寫失敗就不記）。
 
 import { createBgmPlayer } from './bgm-player.js';
+import { MUSIC_TEXT } from './ui-text.js';
 
 const VOLUME_KEY = 'policy-island:music-volume';
 export const DEFAULT_VOLUME = 0.4;
-
-// 開關用 aria-pressed 表示開或關，名稱固定。
-const MUSIC_TEXT = {
-  button: '背景音樂',
-  volume: '音樂音量',
-};
 
 export function parseVolume(stored) {
   if (stored === null || stored === undefined || stored === '') return DEFAULT_VOLUME;
