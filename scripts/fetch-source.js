@@ -6,7 +6,10 @@
 // 頁面要登入或由瀏覽器渲染時，先在瀏覽器另存 HTML，用 --html 指定，--url 仍填原網址。
 // PDF 出處（例如選舉公報）先下載，用 --pdf 指定，以 pdftotext 轉出 --page 那一頁的文字；
 // 有字形抽不出文字時，用 --glyph-map 指定字型對照檔還原（見 scripts/lib/pdf-text.js），出處紀錄的 snapshotNote 會註明。
-// 存檔失敗只記錄原因，不中止；--no-archive 不送存檔（已有存檔網址時保留原紀錄的存檔欄位）。
+// 存檔失敗先依 60、120、240、480 秒退避重試，仍失敗只記錄原因，不中止；--no-archive 不送存檔（已有存檔網址時保留原紀錄的存檔欄位）。
+// 存檔流程以跨程序鎖檔排隊，同一時間只有一個在送，兩次送出至少隔 20 秒（scripts/lib/archive-queue.js）。
+// 補送存檔：node scripts/fetch-source.js --retry-archive [--candidate <id>] [--raw data/raw]
+// 對 <raw>/sources/*.json 中 archiveUrl 為 null 的出處逐一補送並寫回；仍有失敗時結束碼 1。
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -16,7 +19,8 @@ import { SOURCE_TYPES } from '../site/js/dataset.js';
 import { GLYPH_RESTORED_MARK } from '../site/js/ui-text.js';
 import { readJson } from './lib/raw-data.js';
 import { pdfPageText } from './lib/pdf-text.js';
-import { htmlToSnapshotText, pageTitle, requestArchive } from './lib/source-capture.js';
+import { htmlToSnapshotText, pageTitle } from './lib/source-capture.js';
+import { createArchiver, retryMissingArchives } from './lib/archive-queue.js';
 
 // snapshotPath 相對於 repo 根目錄，與 build.js、verify.js 相同。
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,11 +40,18 @@ const { values } = parseArgs({
     'glyph-map': { type: 'string' },
     pdftotext: { type: 'string', default: 'pdftotext' },
     'no-archive': { type: 'boolean', default: false },
+    'retry-archive': { type: 'boolean', default: false },
     raw: { type: 'string', default: 'data/raw' },
     snapshots: { type: 'string', default: 'data/snapshots' },
     date: { type: 'string', default: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }) },
   },
 });
+
+// 補送存檔只用 --raw 與 --candidate（可省略），其餘擷取參數不能同時給。
+function checkRetryArgs() {
+  const extra = ['id', 'url', 'type', 'title', 'html', 'pdf', 'glyph-map', 'no-archive'].filter((name) => values[name]);
+  if (extra.length > 0) throw new Error(`--retry-archive 不能和 ${extra.map((n) => `--${n}`).join('、')} 一起用`);
+}
 
 function checkArgs() {
   for (const name of ['candidate', 'id', 'url', 'type']) {
@@ -83,7 +94,19 @@ async function fetchHtml(url) {
   return new TextDecoder(charset).decode(await response.arrayBuffer());
 }
 
-async function main() {
+async function retryArchives(archiver) {
+  checkRetryArgs();
+  const { attempted, archived, failed } = await retryMissingArchives({ rawDir: resolve(values.raw), candidate: values.candidate ?? null, archiver });
+  if (attempted === 0) {
+    console.log('沒有缺存檔網址的出處');
+    return;
+  }
+  console.log(`補送存檔 ${attempted} 筆：成功 ${archived} 筆${failed.length > 0 ? `，仍失敗 ${failed.length} 筆（${failed.join('、')}）` : ''}`);
+  if (failed.length > 0) process.exitCode = 1;
+}
+
+async function main(archiver) {
+  if (values['retry-archive']) return retryArchives(archiver);
   checkArgs();
   let text;
   let title = values.title;
@@ -102,7 +125,7 @@ async function main() {
   const previous = sources.find((s) => s.id === values.id);
   const archive = values['no-archive']
     ? (previous?.archiveUrl ? { archiveUrl: previous.archiveUrl, archiveError: null } : { archiveUrl: null, archiveError: '未送存檔（--no-archive）' })
-    : await requestArchive(values.url);
+    : await archiver.archive(values.url);
 
   const snapshotFile = join(resolve(values.snapshots), `${values.id}.txt`);
   mkdirSync(dirname(snapshotFile), { recursive: true });
@@ -127,9 +150,17 @@ async function main() {
   console.log(`出處 ${record.id}：快照 ${record.snapshotPath}（${text.split('\n').length - 1} 行），${archiveNote}`);
 }
 
+const archiver = createArchiver();
+// 退避等待時按 Ctrl+C 也要釋放鎖檔，別讓下一個存檔流程空等。
+process.once('SIGINT', () => {
+  archiver.close();
+  process.exit(130);
+});
 try {
-  await main();
+  await main(archiver);
 } catch (error) {
   console.error(`擷取出處失敗：${error.message}`);
   process.exitCode = 1;
+} finally {
+  archiver.close();
 }
