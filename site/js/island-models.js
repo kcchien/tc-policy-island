@@ -46,9 +46,12 @@ export const PALETTE = {
   // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
   lampGlow: 0xe8d488,
   lampPost: 0x4f4a45,
-  // 候選人廣場：人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
+  // 候選人廣場：人物腳下的形狀底座、人物（身體、頭、髮殼、眼睛）。三位候選人人物同一組中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
+  figureHead: 0xd3c4b0,
+  figureHair: 0x5b524b,
+  figureEye: 0x3a332e,
 };
 
 const materials = new Map();
@@ -525,13 +528,18 @@ export function setMarkerLit(marker, lit) {
 // 回傳 { model, body, hit }：body 是待機動畫伸縮擺動的部分，hit 是點選用的隱形圓柱（比人物略大，手機好點）。
 // 人物會動，不用零件庫的共用幾何，instancify 不會合批。
 export function figureModel(figure) {
-  const color = PALETTE[figure.color];
   const body = new THREE.Group();
+  const n = figure.segments;
   for (const part of figure.parts) {
-    const geometry = part.shape === 'sphere'
-      ? new THREE.IcosahedronGeometry(part.radius, figure.sphereDetail)
-      : new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, figure.segments);
-    const m = new THREE.Mesh(geometry, material(color));
+    const geometry = {
+      sphere: () => new THREE.SphereGeometry(part.radius, n * 2, n),
+      capsule: () => new THREE.CapsuleGeometry(part.radius, part.length, n / 2, n * 2),
+      // 半球殼略多蓋一點到頭的側面，像短髮。
+      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * 0.56),
+      cylinder: () => new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, n),
+    }[part.shape]();
+    // Q 版人物用平滑著色，圓頭才不會一面一面。
+    const m = new THREE.Mesh(geometry, material(PALETTE[part.color], { flatShading: false }));
     m.position.set(...part.at);
     m.castShadow = true;
     body.add(m);
