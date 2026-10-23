@@ -19,7 +19,24 @@ export function resolveDocLink(fromPath, href) {
 
 export const dataStatusItems = (candidates) => candidates
   .filter((c) => c.dataStatus !== null)
-  .map((c) => `${c.name}（${c.party}）：${c.dataStatus}`);
+  .map((c) => `${c.name}：${c.dataStatus}`);
+
+// 檢核表與品牌用語清單（JSON）排成清單與表格時的內容。欄位值照原檔，不換字、不省略。
+export const checklistView = ({ version, items }) => ({
+  version,
+  items: items.map(({ id, title, rule }) => ({ id, title, rule })),
+});
+
+export const BRAND_TERM_TIERS = { brand: '品牌用語', frequent: '陣營高頻詞' };
+
+export const brandTermsView = (list) => ({
+  version: list.version,
+  tiers: Object.entries(BRAND_TERM_TIERS).map(([tier, label]) => ({
+    tier,
+    label,
+    rows: list[tier].map(({ term, candidate, note }) => [term, candidate, note ?? '']),
+  })),
+});
 
 export const candidateOrderItems = (candidateOrder) => Object.entries(CANDIDATE_ORDER_RULES)
   .map(([id, rule]) => ({ text: rule.note, current: id === candidateOrder }));

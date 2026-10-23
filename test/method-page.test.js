@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { candidateOrderItems, dataStatusItems, resolveDocLink } from '../site/js/method-content.js';
+import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from '../site/js/method-content.js';
 import { REPO_DOCUMENTS } from '../site/js/repo-documents.js';
 import { candidate } from './fixtures/make-raw.js';
 
@@ -22,7 +22,28 @@ test('只列出有資料狀態說明的候選人，附姓名與政黨', () => {
     { ...candidate('cand-c', '候選人丙', 9), dataStatus: '尚無一手來源' },
   ];
 
-  assert.deepEqual(dataStatusItems(candidates), ['候選人丙（候選人丙所屬政黨）：尚無一手來源']);
+  assert.deepEqual(dataStatusItems(candidates), ['候選人丙：尚無一手來源']);
+});
+
+// JSON 原檔中的每個字串與數字值（不含欄位名）。
+const leafValues = (value) => (value !== null && typeof value === 'object'
+  ? Object.values(value).flatMap(leafValues)
+  : [String(value)]);
+const repoJson = (path) => JSON.parse(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
+
+test('檢核表照原檔呈現：每個值都出現，不多不少', () => {
+  const checklist = repoJson('data/verification/checklist.json');
+
+  assert.deepEqual(leafValues(checklistView(checklist)).toSorted(), leafValues(checklist).toSorted());
+});
+
+test('品牌用語清單照原檔呈現：每個值都出現，候選人欄照原檔的識別碼', () => {
+  const list = repoJson('data/rules/brand-terms.json');
+  const view = brandTermsView(list);
+  const shown = [view.version, ...view.tiers.flatMap((t) => t.rows.flat())].filter((v) => v !== '');
+
+  assert.deepEqual(shown.toSorted(), leafValues(list).toSorted());
+  assert.deepEqual(view.tiers.map((t) => t.label), ['品牌用語', '陣營高頻詞']);
 });
 
 test('排序規則說明列出兩種規則，標出目前採用的那一種', () => {

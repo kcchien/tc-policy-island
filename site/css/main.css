@@ -716,7 +716,8 @@ select {
 }
 
 .repo-document-title {
-  font-weight: bold;
+  margin: 0;
+  font-size: 1rem;
 }
 
 .repo-document-path,

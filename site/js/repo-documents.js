@@ -3,7 +3,6 @@
 // 品牌用語掃描不掃這些檔案，改由上線關卡「引用 repo 文件」驗證與 repo 檔案逐字相同，見 docs/rules/brand-terms.md。
 
 export const REPO_URL = 'https://github.com/kcchien/tc-policy-island';
-export const ISSUES_URL = `${REPO_URL}/issues`;
 
 // 引用 repo 文件放在公開資料集旁（網站目錄的 data/repo-files/），與出處快照的 snapshots/ 同一層。
 export const REPO_FILES_DIR = 'repo-files';

@@ -2,12 +2,11 @@
 import { orderCandidates } from './dataset.js';
 import { el } from './dom.js';
 import { parseMarkdown } from './markdown.js';
-import { candidateOrderItems, dataStatusItems, resolveDocLink } from './method-content.js';
+import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from './method-content.js';
 import { REPO_FILES_MANIFEST, repoDocumentByPath, repoFileSitePath, repoFileUrl } from './repo-documents.js';
 
 const DATASET_URL = './data/dataset.json';
 const MANIFEST_URL = `./data/${REPO_FILES_MANIFEST}`;
-const TIER_LABELS = { brand: '品牌用語', frequent: '陣營高頻詞' };
 
 async function fetchOk(url, as) {
   const response = await fetch(url);
@@ -30,7 +29,7 @@ function inlineNodes(inlines, docPath) {
   });
 }
 
-// 文件內的標題降兩級，接在頁面的 h3 文件標題之下。
+// 文件內的標題降三級（# 成為 h4），接在 summary 裡的 h3 文件標題之下。
 function blockNodes(blocks, docPath) {
   return blocks.map((block) => {
     switch (block.type) {
@@ -53,43 +52,41 @@ function blockNodes(blocks, docPath) {
   });
 }
 
-function checklistNodes(checklist) {
+function checklistNodes({ version, items }) {
   return [
-    el('p', {}, `版本 ${checklist.version}`),
-    el('ol', {}, checklist.items.map((item) => el('li', {},
+    el('p', {}, `版本 ${version}`),
+    el('ol', {}, items.map((item) => el('li', {},
       el('strong', {}, item.title), el('code', { class: 'repo-id' }, item.id), el('br'), item.rule))),
   ];
 }
 
-function brandTermNodes(list, candidateNames) {
+// 欄名照原檔的欄位名，候選人欄是原檔的候選人識別碼。
+function brandTermNodes({ version, tiers }) {
   return [
-    el('p', {}, `版本 ${list.version}`),
-    ...Object.entries(TIER_LABELS).flatMap(([tier, label]) => [
-      el('h4', {}, `${label}（${list[tier].length} 個）`),
+    el('p', {}, `版本 ${version}`),
+    ...tiers.flatMap(({ label, rows }) => [
+      el('h4', {}, `${label}（${rows.length} 個）`),
       el('div', { class: 'method-table-wrap' }, el('table', { class: 'method-table' },
-        el('thead', {}, el('tr', {}, el('th', { scope: 'col' }, '詞'), el('th', { scope: 'col' }, '使用的候選人'), el('th', { scope: 'col' }, '說明'))),
-        el('tbody', {}, list[tier].map((entry) => el('tr', {},
-          el('td', {}, entry.term),
-          el('td', {}, candidateNames.get(entry.candidate) ?? entry.candidate),
-          el('td', {}, entry.note ?? '')))))),
+        el('thead', {}, el('tr', {}, ['term', 'candidate', 'note'].map((key) => el('th', { scope: 'col' }, el('code', {}, key))))),
+        el('tbody', {}, rows.map((row) => el('tr', {}, row.map((value) => el('td', {}, value))))))),
     ]),
   ];
 }
 
-function documentNodes(doc, text, candidateNames) {
+function documentNodes(doc, text) {
   switch (doc.format) {
     case 'markdown':
       return blockNodes(parseMarkdown(text), doc.path);
     case 'checklist':
-      return checklistNodes(JSON.parse(text));
+      return checklistNodes(checklistView(JSON.parse(text)));
     case 'brand-terms':
-      return brandTermNodes(JSON.parse(text), candidateNames);
+      return brandTermNodes(brandTermsView(JSON.parse(text)));
     default:
       return [el('pre', { class: 'repo-text' }, text)];
   }
 }
 
-async function renderRepoDocument(container, available, candidateNames) {
+async function renderRepoDocument(container, available) {
   const doc = repoDocumentByPath(container.dataset.repoFile);
   const sitePath = `./${repoFileSitePath(doc.path)}`;
   const body = el('div', { class: 'repo-document-body' });
@@ -97,7 +94,7 @@ async function renderRepoDocument(container, available, candidateNames) {
   const details = el('details', { class: 'repo-document', id: `doc-${doc.id}`, open: container.hasAttribute('data-open') },
     el('summary', {},
       el('span', { class: 'repo-document-label' }, '引用 repo 文件'),
-      el('span', { class: 'repo-document-title' }, doc.title),
+      el('h3', { class: 'repo-document-title' }, doc.title),
       el('code', { class: 'repo-document-path' }, doc.path)),
     present
       ? el('p', { class: 'repo-document-links' }, el('a', { href: sitePath }, '原檔'), el('a', { href: repoFileUrl(doc.path) }, '在 GitHub 查看'))
@@ -109,7 +106,7 @@ async function renderRepoDocument(container, available, candidateNames) {
     return;
   }
   try {
-    body.replaceChildren(...documentNodes(doc, await fetchOk(sitePath, 'text'), candidateNames));
+    body.replaceChildren(...documentNodes(doc, await fetchOk(sitePath, 'text')));
   } catch (error) {
     body.replaceChildren(el('p', { class: 'status status-error' }, `文件載入失敗（${error.message}），可改看原檔。`));
   }
@@ -138,18 +135,19 @@ function fillRows(tableId, rows) {
 }
 
 async function start() {
-  let dataset = null;
-  let manifest = { documents: [] };
-  try {
-    [dataset, manifest] = await Promise.all([fetchOk(DATASET_URL, 'json'), fetchOk(MANIFEST_URL, 'json')]);
-    fillDataset(dataset);
-  } catch (error) {
-    document.getElementById('data-cutoff-date').textContent = `資料載入失敗（${error.message}）`;
+  const [datasetResult, manifestResult] = await Promise.allSettled([fetchOk(DATASET_URL, 'json'), fetchOk(MANIFEST_URL, 'json')]);
+  const dataset = datasetResult.status === 'fulfilled' ? datasetResult.value : null;
+  if (dataset) fillDataset(dataset);
+  else document.getElementById('data-cutoff-date').textContent = `資料載入失敗（${datasetResult.reason.message}）`;
+  const containers = [...document.querySelectorAll('[data-repo-file]')];
+  // 文件清單載入失敗時說明載入失敗，不誤報成「尚未產生」。
+  if (manifestResult.status === 'rejected') {
+    const message = `文件清單載入失敗（${manifestResult.reason.message}），請稍後重新整理。`;
+    for (const container of containers) container.replaceChildren(el('p', { class: 'status status-error' }, message));
+    return;
   }
-  const candidateNames = new Map((dataset?.candidates ?? []).map((c) => [c.id, c.name]));
-  const available = new Set(manifest.documents);
-  await Promise.all([...document.querySelectorAll('[data-repo-file]')]
-    .map((container) => renderRepoDocument(container, available, candidateNames)));
+  const available = new Set(manifestResult.value.documents);
+  await Promise.all(containers.map((container) => renderRepoDocument(container, available)));
   openHashTarget();
   window.addEventListener('hashchange', openHashTarget);
 }
