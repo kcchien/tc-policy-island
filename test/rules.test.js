@@ -103,7 +103,7 @@ test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用�
   const { ranges } = loadForbiddenColors();
   const files = [
     'site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js',
-    'site/js/island-selection.js', 'site/js/island-terrain.js', 'site/js/island-outskirts.js',
+    'site/js/island-selection.js', 'site/js/island-motion-view.js', 'site/js/island-terrain.js', 'site/js/island-outskirts.js',
   ];
   let scanned = 0;
   for (const file of files) {

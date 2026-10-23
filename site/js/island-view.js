@@ -16,6 +16,7 @@ import { createEnvironment } from './island-environment.js';
 import { instancify } from './island-kit.js';
 import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
+import { createMotion } from './island-motion-view.js';
 import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE } from './island-models.js';
 import { el } from './dom.js';
 
@@ -115,6 +116,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     scene.add(g);
   }
   scene.add(streetLamps(tileCorners(layout)));
+  // 每格的循環道具、市民、環線車輛與路網（island-motion-view.js），配置不讀政見。
+  const motion = createMotion(scene, layout, { level: quality.level, groupOf: (id) => tiles.get(id)?.group, glowMaterial: environment.glowMaterial });
+  animator.add(motion.update);
   // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
   const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
   pickable.push(...kit.meshes);

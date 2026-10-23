@@ -123,6 +123,8 @@ const rockGeo = (r) => form('dodeca', () => new THREE.DodecahedronGeometry(1, 0)
 const ico = (r) => form('ico', () => new THREE.IcosahedronGeometry(1, 0), [r, r, r]);
 const sphere = (r, widthSegments, heightSegments) =>
   form(`sphere${widthSegments}x${heightSegments}`, () => new THREE.SphereGeometry(1, widthSegments, heightSegments), [r, r, r]);
+// 給其他場景模組（island-motion-view.js）用同樣的零件代號建靜態零件，合批時與元素零件同桶。
+export const PARTS = { mesh, box, cyl, ico };
 
 function conifer(x, z, h = 0.42) {
   return [
@@ -183,6 +185,9 @@ function hall({ w, d, h, roofH = 0.22, wallColor = PALETTE.brick, roofColor = PA
   parts[1].position.y = h;
   // 正面一排窗，夜裡亮起。
   parts.push(glowMesh(box(w * 0.55, h * 0.28, 0.012), PALETTE.windowGlow, { y: h * 0.52, z: d / 2 + 0.006 }));
+  // 窗櫺把窗分成三格；牆腳一圈石砌台基。
+  for (const side of [-1, 1]) parts.push(mesh(box(0.012, h * 0.3, 0.016), PALETTE.timber, { x: side * w * 0.09, y: h * 0.52, z: d / 2 + 0.008 }));
+  parts.push(mesh(box(w + 0.04, 0.03, d + 0.04), PALETTE.tile, { y: 0.015 }));
   if (swallowtail) {
     parts.push(mesh(box(w + 0.1, 0.04, 0.05), roofColor, { y: h + roofH + 0.01 }));
     for (const side of [-1, 1]) {
@@ -209,6 +214,8 @@ function courtyardHouse({ pond = false } = {}) {
   } else {
     parts.push(...roundTree(-0.62, 0.38, 0.34), ...roundTree(0.62, 0.38, 0.34));
   }
+  // 前埕兩側的矮磚牆，中間留出入口。
+  for (const side of [-1, 1]) parts.push(mesh(box(0.4, 0.08, 0.04), PALETTE.brick, { x: side * 0.55, y: 0.07, z: 0.48 }));
   return group(parts);
 }
 
