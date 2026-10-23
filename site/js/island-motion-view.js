@@ -26,8 +26,8 @@ export const MOTION_PALETTE = {
   helmet: 0xc4a467,
   suitcase: 0x7a6a5e,
   stroller: 0x9a8b7c,
-  // 腮紅與候選人人物同色（island-models.js 的 figureCheek），亮度 0.58 不落在粉紅範圍。
-  cheek: 0xb08578,
+  // 腮紅與候選人人物同色。
+  cheek: PALETTE.figureCheek,
   train: 0x7a5c4c,
   trainRoof: 0x5e5852,
   bus: 0xb08a4e,
@@ -234,14 +234,19 @@ const NO_SHADOW = new Set(['eye', ...FACE_DETAILS]);
 // 角色配件（原尺寸、臉朝 +x）：大小守住 island-motion.js 的 ACCESSORY_TOP、ACCESSORY_CROWN、ACCESSORY_LOW、ACCESSORY_REACH。
 // arm 是手臂的固定姿勢（繞肩往前的角度，left 是 -z 側、right 是 +z 側；沒寫的手臂照走路擺動）；
 // ride 表示騎在車上（身體抬高，腿照走路的擺幅踩）；grounded 表示配件放在地上，不跟著身體起伏（帽子則跟著頭起伏）。
+// 帽子的殼：和髮殼一樣蓋住頭頂、往後腦傾斜，前緣在眼睛上方，不遮臉。
+const HAIR = CITIZEN_FIGURE.parts.find((p) => p.part === 'hair');
+const hatShell = (radius, cover, tilt) =>
+  new THREE.SphereGeometry(radius, 10, 5, 0, Math.PI * 2, 0, Math.PI * cover).rotateZ(tilt).translate(...HAIR.at);
 const wheel = (x, r, tube) => new THREE.TorusGeometry(r, tube, 4, 12).translate(x, r, 0);
 const ACCESSORIES = {
   // 學童的圓帽加帽簷，用中性的米色。
   cap: {
     color: MOTION_PALETTE.cap,
     geometry: () => mergeGeometries([
-      new THREE.SphereGeometry(HEAD.radius + 0.003, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, HEAD.at[1] + 0.004, 0),
-      boxGeometry(0.024, 0.004, 0.026, { pivot: [0.026, HEAD.at[1] + 0.006, 0] }),
+      hatShell(HAIR.radius + 0.002, HAIR.cover, HAIR.tilt),
+      // 帽簷從帽子前緣（頭頂往前約 20 度）伸出，在眼睛上方。
+      boxGeometry(0.026, 0.004, 0.03, { pivot: [0.025, HEAD.at[1] + 0.033, 0] }),
     ]),
   },
   // 長者的拐杖，拿在右手（+z 側）往前一點。
@@ -266,8 +271,9 @@ const ACCESSORIES = {
       boxGeometry(0.07, 0.004, 0.004, { pivot: [0, 0.032, 0] }),
       boxGeometry(0.004, 0.022, 0.004, { pivot: [-0.008, 0.04, 0] }),
       boxGeometry(0.014, 0.004, 0.01, { pivot: [-0.008, 0.052, 0] }),
-      boxGeometry(0.004, 0.026, 0.004, { pivot: [0.03, 0.044, 0] }),
-      boxGeometry(0.004, 0.004, 0.034, { pivot: [0.03, 0.058, 0] }),
+      // 把手立管與把手：把手在雙手往前伸的高度（肩下約 0.024）。
+      boxGeometry(0.004, 0.04, 0.004, { pivot: [0.03, 0.051, 0] }),
+      boxGeometry(0.004, 0.004, 0.034, { pivot: [0.03, 0.072, 0] }),
     ]),
   },
   // 農夫的斗笠：低平的圓錐，底緣在頭心上方 0.017，頂端不超過 ACCESSORY_TOP。
@@ -279,8 +285,9 @@ const ACCESSORIES = {
   helmet: {
     color: MOTION_PALETTE.helmet,
     geometry: () => mergeGeometries([
-      new THREE.SphereGeometry(HEAD.radius + 0.004, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, HEAD.at[1] + 0.002, 0),
-      new THREE.CylinderGeometry(0.04, 0.04, 0.004, 12).translate(0, HEAD.at[1] + 0.002, 0),
+      hatShell(HAIR.radius + 0.003, 0.45, 0.8),
+      // 帽緣一圈在眼睛上方。
+      new THREE.CylinderGeometry(0.04, 0.04, 0.004, 12).translate(0, HEAD.at[1] + 0.027, 0),
     ]),
   },
   // 旅客的行李箱：拉在身後（-x），手往後伸。
@@ -356,7 +363,7 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     }
   }
 
-  // 市民：每格同數，沿自己島的步道環走，途中過橋到鄰島再走回來。
+  // 市民：每格同數，沿自己島的步道環走，途中走上一座橋到拱頂折返。
   // 每種零件一個 InstancedMesh：同種零件每人有幾個（腿、手臂、眼睛各兩個），實例就是人數的幾倍，依市民順序排。
   const citizens = areas.flatMap((tile) => tile.citizens.map((citizen) => ({ tile, citizen, accessory: ACCESSORIES[roleOf(citizen).accessory] })));
   const citizenParts = Object.entries(CITIZEN_GEOMETRY).map(([name, geometry]) => {
