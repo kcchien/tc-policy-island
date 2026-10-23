@@ -6,9 +6,14 @@ import { el } from './dom.js';
 import { NO_MATCH_TEXT } from './filter.js';
 import { rawPolicyItemsText } from './policy-card.js';
 
-function candidateHeader(candidate, onOpenCandidate) {
-  const button = el('button', { type: 'button', class: 'area-open candidate-open' }, '看候選人資料');
+function candidateButton(candidate, label, onOpenCandidate) {
+  const button = el('button', { type: 'button', class: 'area-open candidate-open' }, label);
   button.addEventListener('click', () => onOpenCandidate(candidate.id));
+  return button;
+}
+
+function candidateHeader(candidate, onOpenCandidate) {
+  const button = candidateButton(candidate, '看候選人資料', onOpenCandidate);
   const meta = [
     candidate.party,
     candidate.ballotNumber === null ? null : `${candidate.ballotNumber} 號`,
@@ -74,11 +79,7 @@ function candidateStrip(candidates, onOpenCandidate) {
     'nav',
     { class: 'candidate-strip', 'aria-label': '看候選人資料' },
     el('span', { class: 'candidate-strip-label' }, '看候選人資料'),
-    el('span', { class: 'candidate-strip-buttons' }, candidates.map((candidate) => {
-      const button = el('button', { type: 'button', class: 'area-open candidate-open' }, candidate.name);
-      button.addEventListener('click', () => onOpenCandidate(candidate.id));
-      return button;
-    })),
+    el('span', { class: 'candidate-strip-buttons' }, candidates.map((candidate) => candidateButton(candidate, candidate.name, onOpenCandidate))),
   );
 }
 

@@ -5,17 +5,18 @@
 
 import { el } from './dom.js';
 import { markerLegend } from './island-layout.js';
+import { layer1StatusText } from './policy-card.js';
 import { bindSheetDialog } from './sheet.js';
 
 export const NO_PROFILE_TEXT = '尚未收錄候選人資料';
-const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
+// 索引分頁與對話框共用的說明文字。
+export const PROFILE_NOTE = '中選會公開資料，逐字呈現。';
 
 // candidate 是檢視模型的候選人（附 profileSource）。學歷與經歷一項一行，照資料集原樣，不斷句、不合併。
 export function profileCardContent(candidate) {
   const { profile, profileSource: source } = candidate;
   const base = { candidateId: candidate.id, name: candidate.name, party: candidate.party };
   if (!profile) return { ...base, fields: [], emptyText: NO_PROFILE_TEXT, source: null };
-  const { layer1 } = profile.verification;
   return {
     ...base,
     fields: [
@@ -32,7 +33,7 @@ export function profileCardContent(candidate) {
       archiveUrl: source.archiveUrl,
       snapshotUrl: source.snapshotUrl,
       snapshotNote: source.snapshotNote,
-      verification: `逐字比對：${STATUS_TEXT[layer1.status]}${layer1.checkedAt ? `（${layer1.checkedAt}）` : ''}`,
+      verification: `逐字比對：${layer1StatusText(profile.verification.layer1)}`,
     },
   };
 }
@@ -94,14 +95,14 @@ function profileCard(content, { idPrefix, focused, symbol }) {
 
 // 依檢視模型的候選人順序（排序規則）放三張卡片。
 export function renderProfileCards(container, vm, { idPrefix, focusId = null }) {
-  const legend = markerLegend(vm);
+  const symbols = new Map(markerLegend(vm).map((entry) => [entry.candidateId, entry.symbol]));
   container.replaceChildren(
-    ...vm.candidates.map((candidate, index) =>
-      profileCard(profileCardContent(candidate), { idPrefix, focused: candidate.id === focusId, symbol: legend[index].symbol })),
+    ...vm.candidates.map((candidate) =>
+      profileCard(profileCardContent(candidate), { idPrefix, focused: candidate.id === focusId, symbol: symbols.get(candidate.id) })),
   );
 }
 
-// 回傳對話框控制器：open(vm, candidateId) 開啟並捲到該候選人的卡片。桌面為置中對話框，800px 以下為底部抽屜。
+// 回傳對話框控制器：open(vm, candidateId) 開啟並捲到該候選人的卡片，不回傳值。桌面為置中對話框，800px 以下為底部抽屜。
 export function createCandidateDialog({ onClose = () => {} } = {}) {
   const note = el('p', { class: 'card-description' });
   // 捲動放在外層，內層格線的高度才不受限，三張卡片能撐成同一高度。
@@ -124,16 +125,15 @@ export function createCandidateDialog({ onClose = () => {} } = {}) {
 
   return {
     element: dialog,
+    // candidateId 須是 vm.candidates 中的候選人，由呼叫端先確認。
     open(vm, candidateId) {
-      if (!vm.candidates.some((c) => c.id === candidateId)) return false;
-      note.textContent = `中選會公開資料，逐字呈現。${vm.candidateOrderNote}。`;
+      note.textContent = `${PROFILE_NOTE}${vm.candidateOrderNote}。`;
       renderProfileCards(body, vm, { idPrefix: 'dialog-profile', focusId: candidateId });
       if (!dialog.open) {
         dialog.dataset.snap = 'half';
         dialog.showModal();
       }
       body.querySelector('.profile-card.is-focused').scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      return true;
     },
     close() {
       if (dialog.open) dialog.close();

@@ -5,7 +5,7 @@ import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
 import { renderTable } from './table-view.js';
 import { renderIslandList, renderLegend } from './island-list.js';
-import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
+import { createCandidateDialog, PROFILE_NOTE, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 
 const DATASET_URL = './data/dataset.json';
@@ -252,7 +252,7 @@ function startApp(vm, state, initialView) {
   };
 
   // 開啟某位候選人的候選人資料卡（三張並排，捲到並標示這一張）。表格欄頭、網址 candidate 參數使用，
-  // 也以 onSelectCandidate 交給島嶼檢視（點候選人人物時呼叫）。候選人不存在時回傳 false。
+  // 也以 onSelectCandidate 交給島嶼檢視（#22 接上：點候選人人物時呼叫）。候選人不存在時回傳 false。
   const openCandidateCard = (candidateId) => {
     if (!vm.candidates.some((c) => c.id === candidateId)) return false;
     card.close();
@@ -261,7 +261,8 @@ function startApp(vm, state, initialView) {
     state.policy = null;
     state.candidate = candidateId;
     updateUrl();
-    return candidateDialog.open(vm, candidateId);
+    candidateDialog.open(vm, candidateId);
+    return true;
   };
 
   const openCard = (areaId, policyId) => {
@@ -347,6 +348,7 @@ function startApp(vm, state, initialView) {
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
   renderLegend(document.getElementById('island-legend'), vm);
+  document.getElementById('panel-profile-note').textContent = PROFILE_NOTE;
   renderProfileCards(document.getElementById('candidate-profiles'), vm, { idPrefix: 'panel-profile' });
   setupTabs();
   applyTime();

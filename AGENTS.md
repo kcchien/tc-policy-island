@@ -92,7 +92,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 
 網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 
-開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。島嶼檢視由 `createIslandView(stage, { onSelectCandidate })` 取得這個函式，點候選人人物時呼叫 `onSelectCandidate(candidateId)`。
+開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 已把它以 `onSelectCandidate` 傳給 `createIslandView`；`island-view.js` 目前還沒收這個參數，由 #22 在參數解構加上 `onSelectCandidate`，點候選人人物時呼叫 `onSelectCandidate(candidateId)`。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 
 ### 資料與夾具
 

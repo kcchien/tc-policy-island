@@ -6,9 +6,12 @@ import { bindSheetDialog } from './sheet.js';
 
 const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
 
+// 第一層（逐字比對）的結果與日期，政見卡片與候選人資料卡共用。
+export const layer1StatusText = ({ status, checkedAt }) => `${STATUS_TEXT[status]}${checkedAt ? `（${checkedAt}）` : ''}`;
+
 export function verificationText({ layer1, layer2 }) {
   return [
-    `第一層 逐字比對：${STATUS_TEXT[layer1.status]}${layer1.checkedAt ? `（${layer1.checkedAt}）` : ''}`,
+    `第一層 逐字比對：${layer1StatusText(layer1)}`,
     `第二層 檢核表${layer2.checklistVersion ? `（版本 ${layer2.checklistVersion}）` : ''}：${STATUS_TEXT[layer2.status]}` +
       (layer2.checkedAt ? `（${layer2.model}，${layer2.checkedAt}）` : ''),
   ];
