@@ -7,6 +7,7 @@ import { renderTable } from './table-view.js';
 import { renderIslandList, renderLegend } from './island-list.js';
 import { createCandidateDialog, PROFILE_NOTE, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
+import { timeOfDayAt } from './island-daylight.js';
 
 const DATASET_URL = './data/dataset.json';
 const INTRO_SEEN_KEY = 'policy-island:intro-seen';
@@ -14,13 +15,16 @@ const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 // 與 main.css 的手機斷點相同：底部膠囊工具列、索引與卡片改為底部抽屜。
 const mobileQuery = window.matchMedia('(max-width: 800px)');
 
-// 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責，預設白天。
+// 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責。
+// 預設「自動」：依台灣時間選時段（timeOfDayAt），每分鐘檢查一次；點其他時段改為手動。
 const TIMES = [
   { id: 'dawn', name: '清晨' },
   { id: 'day', name: '白天' },
   { id: 'dusk', name: '黃昏' },
   { id: 'night', name: '夜晚' },
 ];
+const AUTO_TIME = { id: 'auto', name: '自動' };
+const AUTO_CHECK_MS = 60 * 1000;
 
 function supportsWebGL() {
   try {
@@ -125,7 +129,8 @@ function startApp(vm, state, initialView) {
   // 目前選中的議題區。關閉卡片後仍保留，切換檢視時沿用。
   let selectedArea = null;
   let island = null;
-  const hud = { time: 'day', paused: false, labels: true };
+  // timeMode 是 'auto' 或手動選的時段；time 是實際套用的時段。
+  const hud = { timeMode: AUTO_TIME.id, time: timeOfDayAt(Date.now()), paused: false, labels: true };
 
   const updateUrl = () => history.replaceState(null, '', formatSearch(state) || location.pathname);
 
@@ -174,14 +179,24 @@ function startApp(vm, state, initialView) {
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
   const withIsland = (fn) => island?.then((controller) => controller && fn(controller));
   const applyTime = () => {
+    const auto = hud.timeMode === AUTO_TIME.id;
+    hud.time = auto ? timeOfDayAt(Date.now()) : hud.timeMode;
     const current = TIMES.find((t) => t.id === hud.time);
     for (const button of document.querySelectorAll('[data-time]')) {
-      button.setAttribute('aria-pressed', String(button.dataset.time === hud.time));
+      button.setAttribute('aria-pressed', String(button.dataset.time === hud.timeMode));
     }
-    document.getElementById('tool-time-cycle-label').textContent = current.name;
-    document.getElementById('tool-time-cycle').setAttribute('aria-label', `切換時段，目前${current.name}`);
+    document.getElementById('tool-time-cycle-label').textContent = auto ? AUTO_TIME.name : current.name;
+    document.getElementById('tool-time-cycle').setAttribute('aria-label', `切換時段，目前${auto ? `${AUTO_TIME.name}（${current.name}）` : current.name}`);
     withIsland((controller) => controller.setTimeOfDay?.(hud.time));
   };
+  // 自動模式下跨過時段邊界時切換（島嶼檢視負責補間，減少動態時直接切換）。分頁回到前景時也馬上檢查。
+  const checkAutoTime = () => {
+    if (hud.timeMode === AUTO_TIME.id && timeOfDayAt(Date.now()) !== hud.time) applyTime();
+  };
+  setInterval(checkAutoTime, AUTO_CHECK_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) checkAutoTime();
+  });
   const applyPaused = () => {
     const button = document.getElementById('tool-pause');
     button.setAttribute('aria-pressed', String(hud.paused));
@@ -194,13 +209,15 @@ function startApp(vm, state, initialView) {
   };
   for (const button of document.querySelectorAll('[data-time]')) {
     button.addEventListener('click', () => {
-      hud.time = button.dataset.time;
+      hud.timeMode = button.dataset.time;
       applyTime();
     });
   }
+  // 手機的時段循環鈕：自動 → 清晨 → 白天 → 黃昏 → 夜晚 → 自動。
   document.getElementById('tool-time-cycle').addEventListener('click', () => {
-    const index = TIMES.findIndex((t) => t.id === hud.time);
-    hud.time = TIMES[(index + 1) % TIMES.length].id;
+    const modes = [AUTO_TIME, ...TIMES];
+    const index = modes.findIndex((t) => t.id === hud.timeMode);
+    hud.timeMode = modes[(index + 1) % modes.length].id;
     applyTime();
   });
   document.getElementById('tool-pause').addEventListener('click', () => {
@@ -227,6 +244,7 @@ function startApp(vm, state, initialView) {
           onSelectArea: (areaId) => openCard(areaId, null),
           onSelectCandidate: openCandidateCard,
           insets: stageInsets,
+          timeOfDay: hud.time,
         });
         controller.update(filtered);
         // 卡片開關、手機抽屜換段或拖曳時，畫面偏移跟著卡片遮住的範圍走。

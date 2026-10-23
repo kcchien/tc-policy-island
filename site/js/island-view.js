@@ -10,7 +10,7 @@ import {
 } from './island-camera.js';
 import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
-import { createDaylight } from './island-daylight.js';
+import { createDaylight, KEYFRAMES } from './island-daylight.js';
 import { createAnimator } from './island-clock.js';
 import { createEnvironment } from './island-environment.js';
 import { instancify } from './island-kit.js';
@@ -38,7 +38,8 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫；onSelectCandidate(candidateId) 在點選候選人人物時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 // insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
-export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
+// timeOfDay 是一開始的時段（不補間，直接是這個時段），省略時是白天。
+export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }), timeOfDay }) {
   const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -69,8 +70,8 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   const outline = islandPoints(layout, { surface: TILE_SURFACE, top: MODEL_TOP });
   const center = new THREE.Vector3(bounds.center.x, 0, bounds.center.z);
 
-  // 晝夜（預設白天）、天空、光照與發光材質。
-  const daylight = createDaylight();
+  // 晝夜、天空、光照與發光材質。
+  const daylight = createDaylight(KEYFRAMES[timeOfDay] ? { initial: timeOfDay } : {});
   const environment = createEnvironment(scene, { center, radius: bounds.radius, quality, waterRadius: outskirtsWaterRadius(bounds) });
   // 裝飾動畫的時間；後續的動畫用 animator.add 註冊（見 island-clock.js）。
   const animator = createAnimator({ reducedMotion });
