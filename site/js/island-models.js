@@ -52,6 +52,8 @@ export const PALETTE = {
   figureHead: 0xdccdb8,
   figureHair: 0x62564c,
   figureEye: 0x3a332e,
+  // 腮紅：低飽和的灰玫瑰色，亮度 0.58（粉紅範圍要 0.6 以上）。
+  figureCheek: 0xb08578,
 };
 
 const materials = new Map();
@@ -530,17 +532,25 @@ export function setMarkerLit(marker, lit) {
 export function figureModel(figure) {
   const body = new THREE.Group();
   const n = figure.segments;
+  const head = figure.parts.find((p) => p.part === 'head');
   for (const part of figure.parts) {
     const geometry = {
       sphere: () => new THREE.SphereGeometry(part.radius, n * 2, n),
       capsule: () => new THREE.CapsuleGeometry(part.radius, part.length, n / 2, n * 2),
-      // 半球殼往後腦傾斜，蓋住頭頂與後腦、露出額頭與眼睛，像短髮。
-      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * 0.5).rotateX(-0.95),
+      // 髮殼蓋住頭頂，往後腦（-z）傾斜，露出前額與臉。
+      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * part.cover).rotateX(-part.tilt),
       cylinder: () => new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, n),
+      // 腮紅與微笑線先做成朝 +z 的形狀，下面再轉到朝外。
+      disc: () => new THREE.CylinderGeometry(part.radius, part.radius, part.thickness, n * 2).rotateX(Math.PI / 2),
+      arc: () => new THREE.TorusGeometry(part.radius, part.tube, 4, n * 2, Math.PI).rotateZ(Math.PI),
     }[part.shape]();
     // Q 版人物用平滑著色，圓頭才不會一面一面。
     const m = new THREE.Mesh(geometry, material(PALETTE[part.color], { flatShading: false }));
     m.position.set(...part.at);
+    if (part.shape === 'disc' || part.shape === 'arc') {
+      const out = new THREE.Vector3(...part.at).sub(new THREE.Vector3(...head.at)).normalize();
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), out);
+    }
     m.castShadow = true;
     body.add(m);
   }

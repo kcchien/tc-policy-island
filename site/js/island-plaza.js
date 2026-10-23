@@ -4,9 +4,11 @@
 // 只以頭上的 ○△□ 名牌、腳下同形狀的底座與廣場名牌上的姓名區分，依排序規則由西到東並排，不在島上移動。
 
 // 人物由這些零件組成（相對腳底中心，y 朝上，人物面向 +z 也就是南方的鏡頭）。
-// shape 是 'cylinder'（radiusTop、radiusBottom、height）、'sphere'（radius）、'capsule'（radius、中段長 length）
-// 或 'dome'（蓋在頭上半的半球殼，radius），at 是零件中心。color 是 island-models.js 的 PALETTE 代號，只用人物專用的中性色。
-// Q 版大頭：頭的直徑約占身高四成，同一款短髮殼與兩個圓點眼睛，不畫其他五官，不模仿任何人的長相。
+// shape 是 'cylinder'（radiusTop、radiusBottom、height）、'sphere'（radius）、'capsule'（radius、中段長 length）、
+// 'dome'（髮殼：蓋住頭頂 cover × 180 度的半球殼，往後腦傾斜 tilt 弧度）、'disc'（腮紅：radius、thickness）
+// 或 'arc'（微笑線：半圓弧，radius、tube），at 是零件中心；腮紅與微笑線貼在頭上、朝外。
+// color 是 island-models.js 的 PALETTE 代號，只用人物專用的中性色。
+// Q 版大頭：頭的直徑約占身高四成，短髮殼只蓋頭頂與後腦，臉上只有圓點眼睛、腮紅與微笑線，不模仿任何人的長相。
 export const FIGURE_PARTS = [
   { part: 'leg', shape: 'cylinder', radiusTop: 0.03, radiusBottom: 0.026, height: 0.13, at: [-0.038, 0.065, 0], color: 'figure' },
   { part: 'leg', shape: 'cylinder', radiusTop: 0.03, radiusBottom: 0.026, height: 0.13, at: [0.038, 0.065, 0], color: 'figure' },
@@ -14,9 +16,12 @@ export const FIGURE_PARTS = [
   { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [-0.086, 0.25, 0], color: 'figure' },
   { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [0.086, 0.25, 0], color: 'figure' },
   { part: 'head', shape: 'sphere', radius: 0.114, at: [0, 0.448, 0], color: 'figureHead' },
-  { part: 'hair', shape: 'dome', radius: 0.119, at: [0, 0.448, -0.004], color: 'figureHair' },
+  { part: 'hair', shape: 'dome', radius: 0.119, cover: 0.5, tilt: 0.95, at: [0, 0.448, -0.004], color: 'figureHair' },
   { part: 'eye', shape: 'sphere', radius: 0.016, at: [-0.042, 0.466, 0.103], color: 'figureEye' },
   { part: 'eye', shape: 'sphere', radius: 0.016, at: [0.042, 0.466, 0.103], color: 'figureEye' },
+  { part: 'cheek', shape: 'disc', radius: 0.017, thickness: 0.004, at: [-0.064, 0.43, 0.093], color: 'figureCheek' },
+  { part: 'cheek', shape: 'disc', radius: 0.017, thickness: 0.004, at: [0.064, 0.43, 0.093], color: 'figureCheek' },
+  { part: 'mouth', shape: 'arc', radius: 0.02, tube: 0.004, at: [0, 0.418, 0.11], color: 'figureEye' },
 ];
 // 人物頭頂離腳底的高度（零件的單位，乘上 FIGURE_SCALE 才是場景尺寸），名牌放在頭頂上方 LABEL_GAP。
 const FIGURE_HEIGHT = 0.57;

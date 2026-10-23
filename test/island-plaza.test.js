@@ -5,6 +5,7 @@ import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
 import { figureLook, figurePose, plazaLayout } from '../site/js/island-plaza.js';
 import { makeRaw } from './fixtures/make-raw.js';
+import { assertFaceVisible } from './fixtures/face.js';
 
 const layoutOf = (raw) => islandLayout(buildViewModel(buildPublicDataset(raw)));
 
@@ -83,13 +84,14 @@ test('候選人人物是 Q 版中性造型：大頭（約占身高四成）、�
   const head = figure.parts.find((p) => p.part === 'head');
   const top = Math.max(...figure.parts.map((p) => p.at[1] + (p.radius ?? p.height / 2)));
 
-  assert.deepEqual([...new Set(figure.parts.map((p) => p.part))].sort(), ['arm', 'body', 'eye', 'hair', 'head', 'leg']);
+  assert.deepEqual([...new Set(figure.parts.map((p) => p.part))].sort(), ['arm', 'body', 'cheek', 'eye', 'hair', 'head', 'leg', 'mouth']);
+  assertFaceVisible(figure.parts, { forward: 2 });
   const ratio = (head.radius * 2) / top;
   assert.ok(ratio >= 0.36 && ratio <= 0.44, `頭占身高 ${ratio.toFixed(2)}`);
   // 名牌在頭頂上方。
   assert.ok(figure.labelHeight > top * figure.scale);
   // 每個零件的顏色是人物專用的中性色代號，不含任何影像來源。
-  assert.ok(figure.parts.every((p) => ['figure', 'figureHead', 'figureHair', 'figureEye'].includes(p.color)), JSON.stringify(figure.parts.map((p) => p.color)));
+  assert.ok(figure.parts.every((p) => ['figure', 'figureHead', 'figureHair', 'figureEye', 'figureCheek'].includes(p.color)), JSON.stringify(figure.parts.map((p) => p.color)));
   assert.ok(!JSON.stringify(figure).match(/texture|image|photo|url/i));
 });
 

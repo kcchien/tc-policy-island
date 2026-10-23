@@ -15,8 +15,8 @@ export const MOTION_THEMES = [
 
 // 所有循環動畫同一個週期（秒），強度一致。
 export const LOOP_SECONDS = 6;
-// 市民走路的速度（場景單位／秒）與步伐週期（秒）。
-export const CITIZEN_SPEED = 0.12;
+// 市民走路的速度（場景單位／秒）與步伐週期（秒）。速度約每秒走一個身高（參考做法的比例），騎車的人也同速，每格強度相同。
+export const CITIZEN_SPEED = 0.18;
 export const STEP_SECONDS = 0.7;
 // 環線車輛的速度（場景單位／秒）。
 export const TRAIN_SPEED = 0.9;
@@ -52,7 +52,8 @@ export const LOOP_REACH_FROM = 0.18 * LOOP_SCALE;
 
 // 市民是 Q 版大頭小人：原尺寸（乘 CITIZEN_SCALE 前）身高 height，頭的直徑約占身高四成。y 朝上、腳底在 0，臉朝 +x（行進方向），z 是左右。
 // 每種零件在 island-motion-view.js 是一個 InstancedMesh；腿與手臂的 at 是零件中心，擺動時繞上端（髖、肩）轉。
-// 身體是膠囊（radius、length 是中段圓柱長），髮殼是蓋在頭上半的半球殼。
+// 身體是膠囊（radius、length 是中段圓柱長）；髮殼蓋住頭頂 cover × 180 度，往後腦傾斜 tilt 弧度，露出前額與臉；
+// 臉上有圓點眼睛、腮紅（disc）與微笑線（arc，半圓弧），與候選人人物同一套臉（island-plaza.js）。
 export const CITIZEN_FIGURE = {
   height: 0.16,
   parts: [
@@ -62,26 +63,33 @@ export const CITIZEN_FIGURE = {
     { part: 'arm', shape: 'box', width: 0.008, height: 0.038, at: [0, 0.07, -0.022] },
     { part: 'arm', shape: 'box', width: 0.008, height: 0.038, at: [0, 0.07, 0.022] },
     { part: 'head', shape: 'sphere', radius: 0.032, at: [0, 0.125, 0] },
-    { part: 'hair', shape: 'dome', radius: 0.035, at: [-0.003, 0.125, 0] },
+    { part: 'hair', shape: 'dome', radius: 0.035, cover: 0.5, tilt: 0.95, at: [-0.003, 0.125, 0] },
     { part: 'eye', shape: 'sphere', radius: 0.0045, at: [0.029, 0.127, -0.011] },
     { part: 'eye', shape: 'sphere', radius: 0.0045, at: [0.029, 0.127, 0.011] },
+    { part: 'cheek', shape: 'disc', radius: 0.005, thickness: 0.0012, at: [0.026, 0.12, -0.017] },
+    { part: 'cheek', shape: 'disc', radius: 0.005, thickness: 0.0012, at: [0.026, 0.12, 0.017] },
+    { part: 'mouth', shape: 'arc', radius: 0.005, tube: 0.0012, at: [0.031, 0.117, 0] },
   ],
   // 腳下的圓形假影子（不用即時陰影，貼在地面上）。
   shadow: { radius: 0.03, opacity: 0.22 },
 };
 
-// 角色配件：依格子與市民的順序輪替（不讀議題區內容與政見），每格的人數固定。
+// 角色配件：依格子與市民的順序決定（不讀議題區內容與政見），每格的人數固定。
 // 配件的形狀在 island-motion-view.js 的 ACCESSORIES，大小守住這幾個範圍（原尺寸）：全部在 ACCESSORY_TOP 以下；
 // 帽子離身體中心 ACCESSORY_CROWN 以內；嬰兒車、腳踏車這類低處的配件在 ACCESSORY_LOW 以下、離身體中心 ACCESSORY_REACH 以內。
+// 角色（識別碼依序是學童、長者、通勤族、農夫、工人、旅客、推嬰兒車的家長）分三類配件：
+// wheeled 是地上有車輪或箱子的大件、hat 是帽子、hand 是手上的小件。每格第 i 位市民的類別相同（ROLE_GROUPS 的順序），
+// 各格的配件大小組成一樣，動態簽章會比對類別；同類別內的角色依格子順序輪替。
 export const CITIZEN_ROLES = [
-  { id: 'student', name: '學童', accessory: 'cap' },
-  { id: 'elder', name: '長者', accessory: 'cane' },
-  { id: 'commuter', name: '通勤族', accessory: 'bicycle' },
-  { id: 'farmer', name: '農夫', accessory: 'strawHat' },
-  { id: 'worker', name: '工人', accessory: 'helmet' },
-  { id: 'traveler', name: '旅客', accessory: 'suitcase' },
-  { id: 'parent', name: '推嬰兒車的家長', accessory: 'stroller' },
+  { id: 'student', group: 'hat', accessory: 'cap' },
+  { id: 'elder', group: 'hand', accessory: 'cane' },
+  { id: 'commuter', group: 'wheeled', accessory: 'bicycle' },
+  { id: 'farmer', group: 'hat', accessory: 'strawHat' },
+  { id: 'worker', group: 'hat', accessory: 'helmet' },
+  { id: 'traveler', group: 'wheeled', accessory: 'suitcase' },
+  { id: 'parent', group: 'wheeled', accessory: 'stroller' },
 ];
+export const ROLE_GROUPS = ['wheeled', 'hat', 'hand'];
 // 騎腳踏車時身體抬高的量（原尺寸）。
 export const RIDE_LIFT = 0.01;
 export const ACCESSORY_TOP = CITIZEN_FIGURE.height + RIDE_LIFT;
@@ -102,7 +110,7 @@ export const citizenZoom = (distance) => Math.min(CITIZEN_ZOOM.max, Math.max(1, 
 // 最高到 CITIZEN_HEIGHT（含離地 0.006、配件與起伏）；身體與手臂的半寬 CITIZEN_RADIUS；
 // 整個人含帽子是半徑 CITIZEN_CROWN 的柱子，低處配件另外伸出到半徑 CITIZEN_REACH、高 CITIZEN_REACH_HEIGHT。
 const CITIZEN_MAX_SCALE = CITIZEN_SCALE * CITIZEN_ZOOM.max;
-const CITIZEN_HALF_WIDTH = 0.026;
+const CITIZEN_HALF_WIDTH = Math.max(...CITIZEN_FIGURE.parts.filter((p) => p.part === 'arm').map((p) => Math.abs(p.at[2]) + p.width / 2));
 export const CITIZEN_HEIGHT = 0.006 + (ACCESSORY_TOP + CITIZEN_BOB) * CITIZEN_MAX_SCALE;
 export const CITIZEN_RADIUS = CITIZEN_HALF_WIDTH * CITIZEN_MAX_SCALE;
 export const CITIZEN_CROWN = ACCESSORY_CROWN * CITIZEN_MAX_SCALE;
@@ -128,23 +136,28 @@ function hexVertices(apothem) {
 const SPUR_LANE = 0.04;
 const SPUR_STEPS = 8;
 
-// 市民路線的形狀（相對格心、過橋方向朝 +x 時）：沿步道環內側繞一圈，經過東邊中點時過橋走到鄰島的步道環再走回來。
+// 市民繞的步道環內側一圈（相對格心），點是 [x, z, y]。
+const citizenRing = () => hexVertices(CITIZEN_APOTHEM).map(([x, z]) => [x, z, 0]);
+
+// 市民路線的形狀（相對格心、過橋方向朝 +x 時）：沿步道環內側繞一圈，經過東邊中點時走上橋，到橋中央拱頂折返。
+// 不走進鄰島，每座島上的市民只有自己那幾位，不會因為被較多鄰島選為過橋對象而比較熱鬧（ADR 0001）。
 // 點是 [x, z, y]，y 是過橋的拱起。centers 是兩島格心距離，每格相同，所以每格的形狀相同，只差旋轉。
 function citizenRoute(centers) {
-  const ring = hexVertices(CITIZEN_APOTHEM).map(([x, z]) => [x, z, 0]);
   const span = centers - 2 * WALKWAY_APOTHEM;
-  const crossing = Array.from({ length: SPUR_STEPS - 1 }, (_, k) => (k + 1) / SPUR_STEPS)
+  const crossing = Array.from({ length: SPUR_STEPS / 2 }, (_, k) => (k + 1) / SPUR_STEPS)
     .map((t) => [WALKWAY_APOTHEM + span * t, bridgeLift(t)]);
-  // 往鄰島走在北側（-z），回程走南側；頂點順序經過東邊（最後一個頂點到第一個）時接上。
-  const out = [[CITIZEN_APOTHEM, 0], [WALKWAY_APOTHEM, 0], ...crossing, [centers - WALKWAY_APOTHEM, 0], [centers - CITIZEN_APOTHEM, 0]]
-    .map(([x, y]) => [x, -SPUR_LANE, y]);
+  // 往橋上走在北側（-z），回程走南側；頂點順序經過東邊（最後一個頂點到第一個）時接上。
+  const out = [[CITIZEN_APOTHEM, 0], [WALKWAY_APOTHEM, 0], ...crossing].map(([x, y]) => [x, -SPUR_LANE, y]);
   const back = out.map(([x, , y]) => [x, SPUR_LANE, y]).reverse();
-  return [...ring, ...out, ...back];
+  return [...citizenRing(), ...out, ...back];
 }
 
-// 每格過哪座橋：優先選沒有環線車輛的橋（環線經過的橋，橋中點會在環線上），同樣條件時依方位（東起逆時針）取第一座。
+// 俯視平面上一點的比對鍵（環線上的點與橋中點比對用）。
+const pointKey = ([x, z]) => `${x.toFixed(6)},${z.toFixed(6)}`;
+
+// 每格上哪座橋：優先選沒有環線車輛的橋（環線經過的橋，橋中點會在環線上），同樣條件時依方位取第一座：
+// 從正東起依東、東南、西南、西、西北、東北的順序（俯視 +z 朝南，是順時針）。
 function spurOf(tile, body, ringKeys) {
-  const key = ([x, z]) => `${x.toFixed(6)},${z.toFixed(6)}`;
   const options = body.bridges
     .filter((b) => b.tiles.includes(tile.id))
     .map((b) => {
@@ -154,7 +167,7 @@ function spurOf(tile, body, ringKeys) {
         tileId: b.tiles.find((id) => id !== tile.id),
         angle,
         side: (Math.round(angle / (Math.PI / 3)) + 6) % 6,
-        busy: ringKeys.has(key([(from[0] + to[0]) / 2, (from[1] + to[1]) / 2])),
+        busy: ringKeys.has(pointKey([(from[0] + to[0]) / 2, (from[1] + to[1]) / 2])),
         centers: Math.hypot(to[0] - from[0], to[1] - from[1]) + 2 * WALKWAY_APOTHEM,
       };
     })
@@ -173,7 +186,7 @@ export function motionPlan(layout, { level = 'high' } = {}) {
   const counts = MOTION_LEVELS[level] ?? MOTION_LEVELS.high;
   const body = islandBody(layout);
   const ring = outerLoop(body);
-  const ringKeys = new Set(ring.map(([x, z]) => `${x.toFixed(6)},${z.toFixed(6)}`));
+  const ringKeys = new Set(ring.map(pointKey));
   let areaIndex = 0;
   const tiles = layout.tiles.map((tile) => {
     const { id, kind, position } = tile;
@@ -185,7 +198,7 @@ export function motionPlan(layout, { level = 'high' } = {}) {
     // 只有一格、沒有鄰島時只繞自己的步道環。
     const path = spur
       ? placeRoute(citizenRoute(spur.centers), spur.angle, center)
-      : placeRoute(hexVertices(CITIZEN_APOTHEM).map(([x, z]) => [x, z, 0]), 0, center);
+      : placeRoute(citizenRing(), 0, center);
     return {
       id,
       kind,
@@ -193,14 +206,19 @@ export function motionPlan(layout, { level = 'high' } = {}) {
       theme,
       spur: spur && { tileId: spur.tileId, angle: spur.angle },
       loops: LOOP_SPOTS.map((spot, i) => ({ ...spot, mirror: i === 1, periodSeconds: LOOP_SECONDS, scale: LOOP_SCALE })),
-      // 市民平均分散在路線上，同速同向。角色依議題區格子的順序與市民的順序輪替。
-      citizens: Array.from({ length: counts.citizensPerTile }, (_, i) => ({
-        phase: i / counts.citizensPerTile,
-        speed: CITIZEN_SPEED,
-        stepSeconds: STEP_SECONDS,
-        scale: CITIZEN_SCALE,
-        role: CITIZEN_ROLES[((areaIndex - 1) * counts.citizensPerTile + i) % CITIZEN_ROLES.length].id,
-      })),
+      // 市民平均分散在路線上，同速同向。第 i 位的配件類別每格相同（ROLE_GROUPS），類別內的角色依議題區格子的順序輪替。
+      citizens: Array.from({ length: counts.citizensPerTile }, (_, i) => {
+        const group = ROLE_GROUPS[i % ROLE_GROUPS.length];
+        const roles = CITIZEN_ROLES.filter((r) => r.group === group);
+        return {
+          phase: i / counts.citizensPerTile,
+          speed: CITIZEN_SPEED,
+          stepSeconds: STEP_SECONDS,
+          scale: CITIZEN_SCALE,
+          group,
+          role: roles[(areaIndex - 1) % roles.length].id,
+        };
+      }),
       path,
       pathLength: pathLength(path),
     };
@@ -287,15 +305,20 @@ export function loopPose(theme, t) {
 // 一格動態的數量與強度，不含格子識別碼、位置、題材與市民的角色。議題區格子之間必須完全相同。
 // 市民路線轉回過橋方向朝東再比對：每格過的橋方向不同，但路線的形狀與長度必須相同。
 export function motionSignature(tile) {
-  const angle = tile.spur?.angle ?? 0;
-  const [c, s] = [Math.cos(-angle), Math.sin(-angle)];
   const r = (v) => Math.round(v * 1e4) + 0;
-  return JSON.stringify({
-    loops: tile.loops.map(({ x, z, mirror, periodSeconds, scale }) => ({ x, z, mirror, periodSeconds, scale })),
-    citizens: tile.citizens.map(({ phase, speed, stepSeconds, scale }) => ({ phase, speed, stepSeconds, scale })),
-    path: tile.path.map(([x, z, y = 0]) => {
+  // 路線轉六個方向（每 60 度），取字串最小的那個當代表：同形狀、只差轉向的路線得到同一個代表。
+  // 不讀配置自己寫的過橋方向，什麼算相同由這裡決定。
+  const turned = (k) => {
+    const [c, s] = [Math.cos((k * Math.PI) / 3), Math.sin((k * Math.PI) / 3)];
+    return JSON.stringify(tile.path.map(([x, z, y = 0]) => {
       const [dx, dz] = [x - tile.center.x, z - tile.center.z];
       return [r(dx * c - dz * s), r(dx * s + dz * c), r(y)];
-    }),
+    }));
+  };
+  const path = Array.from({ length: 6 }, (_, k) => turned(k)).sort()[0];
+  return JSON.stringify({
+    loops: tile.loops.map(({ x, z, mirror, periodSeconds, scale }) => ({ x, z, mirror, periodSeconds, scale })),
+    citizens: tile.citizens.map(({ phase, speed, stepSeconds, scale, group }) => ({ phase, speed, stepSeconds, scale, group })),
+    path,
   });
 }

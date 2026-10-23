@@ -14,6 +14,7 @@ import { BRIDGE, islandBody, tileAt, TILE_SLOTS } from '../site/js/island-body.j
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
+import { assertFaceVisible } from './fixtures/face.js';
 
 // 一列三格加第二列兩格、一格裝飾格的小島。政見由 policies 指定。
 function rawWith(policies) {
@@ -62,7 +63,8 @@ test('市民是 Q 版大頭：頭約占身高四成，腿、手臂、身體、�
   const { parts, height, shadow } = CITIZEN_FIGURE;
   const head = parts.find((p) => p.part === 'head');
 
-  assert.deepEqual([...new Set(parts.map((p) => p.part))].sort(), ['arm', 'body', 'eye', 'hair', 'head', 'leg']);
+  assert.deepEqual([...new Set(parts.map((p) => p.part))].sort(), ['arm', 'body', 'cheek', 'eye', 'hair', 'head', 'leg', 'mouth']);
+  assertFaceVisible(parts, { forward: 0 });
   const ratio = (head.radius * 2) / height;
   assert.ok(ratio >= 0.36 && ratio <= 0.44, `頭占身高 ${ratio.toFixed(2)}`);
   // 頭頂（含髮殼）就是身高，腳底在 0。
@@ -74,16 +76,24 @@ test('市民是 Q 版大頭：頭約占身高四成，腿、手臂、身體、�
   assert.ok(shadow.opacity > 0.15 && shadow.opacity < 0.3);
 });
 
-test('市民的角色配件依格子與市民的順序輪替，與議題區內容和政見無關', () => {
+test('市民的角色配件：每格配件大小的組成相同，同類別內依格子順序輪替，與議題區內容和政見無關', () => {
   const plan = motionPlan(layoutOf(rawWith(FEW)));
   const roles = areaPlans(plan).map((tile) => tile.citizens.map((c) => c.role));
 
   assert.deepEqual(CITIZEN_ROLES.map((r) => r.id), ['student', 'elder', 'commuter', 'farmer', 'worker', 'traveler', 'parent']);
-  assert.deepEqual(roles.slice(0, 3), [
-    ['student', 'elder', 'commuter'],
-    ['farmer', 'worker', 'traveler'],
-    ['parent', 'student', 'elder'],
+  // 第 1 位是地上的大件（腳踏車、行李箱、嬰兒車），第 2 位戴帽子，第 3 位是拐杖。
+  assert.deepEqual(roles.slice(0, 4), [
+    ['commuter', 'student', 'elder'],
+    ['traveler', 'farmer', 'elder'],
+    ['parent', 'worker', 'elder'],
+    ['commuter', 'student', 'elder'],
   ]);
+  assert.deepEqual(areaPlans(motionPlan(layoutOf(rawWith(FEW)), { level: 'low' })).map((t) => t.citizens.map((c) => c.role)).slice(0, 2), [['commuter'], ['traveler']]);
+  // 簽章比對類別：換成另一類別的角色時不同，同類別內換角色時相同。
+  const [first] = areaPlans(plan);
+  const swap = (citizen, role) => ({ ...first, citizens: first.citizens.map((c) => (c === citizen ? { ...c, role, group: CITIZEN_ROLES.find((r) => r.id === role).group } : c)) });
+  assert.equal(motionSignature(swap(first.citizens[0], 'parent')), motionSignature(first));
+  assert.notEqual(motionSignature(swap(first.citizens[0], 'farmer')), motionSignature(first));
   // 換政見、換議題區名稱與說明，配件分配不變。
   const renamed = rawWith(MANY);
   renamed.issueAreas = renamed.issueAreas.map((a, i) => ({ ...a, name: `改名${i}`, description: '另一段說明', departments: ['另一局'] }));
@@ -93,7 +103,7 @@ test('市民的角色配件依格子與市民的順序輪替，與議題區內�
   assert.ok(CITIZEN_ROLES.every((r) => r.accessory));
 });
 
-test('市民沿路網走：繞自己島的步道環，途中過一座橋到鄰島再走回來，去回各走一側；優先走沒有環線車輛的橋', () => {
+test('市民沿路網走：繞自己島的步道環，途中走上一座橋到拱頂折返，去回各走一側，不進鄰島；優先走沒有環線車輛的橋', () => {
   for (const layout of [layoutOf(rawWith(FEW)), islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))]) {
     const plan = motionPlan(layout);
     const { bridges } = islandBody(layout);
@@ -104,9 +114,10 @@ test('市民沿路網走：繞自己島的步道環，途中過一座橋到鄰�
       const bridge = own.find((b) => b.tiles.includes(tile.spur.tileId));
       assert.ok(bridge, `${tile.id} 的過橋對象 ${tile.spur.tileId} 不是鄰島`);
       if (own.some((b) => !onRing(b))) assert.ok(!onRing(bridge), `${tile.id} 有沒有車的橋卻走環線的橋`);
-      // 路線上的點：在自己島、鄰島或橋上（橋上拱起）。
+      // 路線上的點：只在自己島或橋上（橋上拱起），不走進鄰島，每座島上只有自己的市民。
       const visited = new Set(tile.path.map(([x, z]) => tileAt(layout, { x, z })));
-      assert.deepEqual([...visited].sort(), [null, tile.id, tile.spur.tileId].sort(), tile.id);
+      assert.deepEqual([...visited].sort(), [null, tile.id].sort(), tile.id);
+      assert.ok(Math.max(...tile.path.map(([, , y]) => y)) >= BRIDGE.rise - 1e-9, `${tile.id} 沒走到拱頂`);
       assert.ok(tile.path.every(([x, z, y]) => tileAt(layout, { x, z }) !== null || y > 0), `${tile.id} 在水道上方卻沒拱起`);
       // 橋上去回兩條線分開，都在橋面內。
       const [fx, fz] = bridge.from;
