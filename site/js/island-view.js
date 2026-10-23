@@ -167,7 +167,8 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     const narrow = width <= NARROW_WIDTH;
     const polar = narrow ? POLAR_NARROW : POLAR_WIDE;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
-    const frame = frameIsland(outline, { fov: FOV, aspect, polar, fill: 0.8 });
+    const visibleFov = (360 / Math.PI) * Math.atan(Math.tan((FOV * Math.PI) / 360) * offset.fovScale);
+    const frame = frameIsland(outline, { fov: visibleFov, aspect, polar, fill: 0.8 });
     Object.assign(controls, cameraLimits(bounds, frame.distance));
     home = { polar, distance: frame.distance, target: new THREE.Vector3(frame.target.x, 0, frame.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。

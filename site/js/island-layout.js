@@ -192,16 +192,20 @@ export function orbitCenter(focus, center, distance, { near, far }) {
 
 // 全螢幕畫布的邊緣被浮動元件（索引面板、工具列）遮住時，投影中心改到沒被遮住的區域正中。
 // insets 是四邊被遮住的像素寬度。回傳值給 camera.setViewOffset：在較大的虛擬畫布上取畫布大小的一塊，
-// 鏡頭的 aspect 要設成 fullWidth / fullHeight；構圖（frameIsland）用 visibleAspect。
+// 鏡頭的 aspect 要設成 fullWidth / fullHeight。垂直視角涵蓋整個虛擬畫布高度，
+// 構圖（frameIsland）改用未遮住區域的長寬比 visibleAspect，與視角半角正切乘上 fovScale 後的視角。
 export function viewOffset({ width, height, insets }) {
   const dx = (insets.left - insets.right) / 2;
   const dy = (insets.top - insets.bottom) / 2;
+  const fullHeight = height + 2 * Math.abs(dy);
+  const visibleHeight = height - insets.top - insets.bottom;
   return {
     fullWidth: width + 2 * Math.abs(dx),
-    fullHeight: height + 2 * Math.abs(dy),
+    fullHeight,
     x: dx < 0 ? -2 * dx : 0,
     y: dy < 0 ? -2 * dy : 0,
-    visibleAspect: (width - insets.left - insets.right) / (height - insets.top - insets.bottom),
+    visibleAspect: (width - insets.left - insets.right) / visibleHeight,
+    fovScale: visibleHeight / fullHeight,
   };
 }
 
