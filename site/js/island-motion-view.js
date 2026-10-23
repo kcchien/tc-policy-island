@@ -71,9 +71,9 @@ const ripple = new THREE.Matrix4();
 const jet = new THREE.Vector3();
 
 // 循環道具：每個題材的靜態底座與會動的零件，以原尺寸組好，放上格子時乘配置的倍率（island-motion.js 的 LOOP_SCALE）。
-// 原尺寸的範圍：底座與低處零件在半徑 0.065 以內，高 0.45 以內；會動零件離地 0.18 以上才可伸出到半徑 0.15
-// （對應 island-motion.js 的 LOOP_CORE、LOOP_REACH、LOOP_REACH_FROM，測試據此確認不擋住標記）。
-// 道具周圍的鋪面與灌木不跟著放大，固定 PAD_SCALE 倍，不進元素區。
+// 原尺寸的範圍：底座與低處零件在半徑 0.05 以內，高 0.45 以內；會動零件離地 0.18 以上才可伸出到半徑 0.15
+// （對應 island-motion.js 的 LOOP_CORE、LOOP_HEIGHT、LOOP_REACH、LOOP_REACH_FROM，測試據此確認不擋住標記、不進元素區）。
+// 道具周圍的鋪面與灌木不跟著放大，固定 PAD_SCALE 倍；灌木放在朝格心的一側，避開格緣的市民路線。
 const PAD_SCALE = 1.25;
 // moving 的 transform(pose, m) 把零件在道具座標裡的矩陣寫進 m。
 const LOOP_PROPS = {
@@ -94,12 +94,12 @@ const LOOP_PROPS = {
   },
   fountain: {
     base: () => [
-      part(unitCyl(10), MOTION_PALETTE.stone, { scale: [0.062, 0.04, 0.062], y: 0.02 }),
-      part(unitCyl(10), PALETTE.shallow, { scale: [0.052, 0.01, 0.052], y: 0.042 }),
+      part(unitCyl(10), MOTION_PALETTE.stone, { scale: [0.05, 0.04, 0.05], y: 0.02 }),
+      part(unitCyl(10), PALETTE.shallow, { scale: [0.042, 0.01, 0.042], y: 0.042 }),
       part(unitCyl(6), MOTION_PALETTE.stone, { scale: [0.012, 0.08, 0.012], y: 0.08 }),
     ],
     moving: [{
-      geometry: () => new THREE.ConeGeometry(0.036, 0.14, 6, 1, true).translate(0, -0.07, 0).rotateX(Math.PI),
+      geometry: () => new THREE.ConeGeometry(0.032, 0.14, 6, 1, true).translate(0, -0.07, 0).rotateX(Math.PI),
       color: PALETTE.shallow,
       transform: (pose, m) => m.makeRotationY(pose.spin).scale(jet.set(1, pose.jet, 1)).setPosition(0, 0.12, 0),
     }],
@@ -142,13 +142,13 @@ const LOOP_PROPS = {
   },
   boat: {
     base: () => [
-      part(unitCyl(12), MOTION_PALETTE.stone, { scale: [0.064, 0.03, 0.064], y: 0.015 }),
-      part(unitCyl(12), PALETTE.water, { scale: [0.056, 0.01, 0.056], y: 0.032 }),
+      part(unitCyl(12), MOTION_PALETTE.stone, { scale: [0.05, 0.03, 0.05], y: 0.015 }),
+      part(unitCyl(12), PALETTE.water, { scale: [0.044, 0.01, 0.044], y: 0.032 }),
     ],
     moving: [{
       geometry: () => mergeGeometries([
-        boxGeometry(0.056, 0.014, 0.026, { pivot: [0, 0.008, 0] }),
-        new THREE.ConeGeometry(0.022, 0.06, 3).translate(0, 0.045, 0),
+        boxGeometry(0.046, 0.014, 0.022, { pivot: [0, 0.008, 0] }),
+        new THREE.ConeGeometry(0.02, 0.06, 3).translate(0, 0.045, 0),
       ]),
       color: MOTION_PALETTE.hull,
       transform: (pose, m) => m.makeRotationZ(pose.roll).setPosition(pose.drift, 0.04 + pose.bob, 0),
@@ -232,8 +232,9 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
       // 道具周圍的小鋪面與兩叢矮灌木，每格都一樣。
       at(PAD_SCALE).add(
         part(unitCyl(10), MOTION_PALETTE.road, { scale: [0.1, 0.008, 0.1], y: 0.004 }),
-        part(unitIco(), PALETTE.foliage, { scale: [0.03, 0.025, 0.03], x: 0.1, y: 0.02, z: 0.055 }),
-        part(unitIco(), PALETTE.foliageDark, { scale: [0.025, 0.022, 0.025], x: -0.1, y: 0.018, z: 0.06 }),
+        // 兩叢南北對稱：東側道具轉 180 度放，對稱才不會讓灌木換到標記那一側。
+        part(unitIco(), PALETTE.foliage, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: -0.035 }),
+        part(unitIco(), PALETTE.foliageDark, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: 0.035 }),
       );
       at(loop.scale).add(...LOOP_PROPS[tile.theme].base());
     }
