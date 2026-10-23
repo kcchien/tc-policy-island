@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
+import { filterViewModel } from '../site/js/filter.js';
 import { makeRaw, policy, pendingVerification, localElement } from './fixtures/make-raw.js';
 
 const viewModelOf = (raw) => buildViewModel(buildPublicDataset(raw));
@@ -136,4 +137,17 @@ test('議題區附上配對的在地感元素，裝飾格一併帶出並附元�
       ['tile-empty', [3, 0], null],
     ],
   );
+});
+
+test('議題區依資料順序給固定編號 01、02⋯，篩選後編號不變', () => {
+  const raw = makeRaw();
+  const second = policy('p-a2', 'cand-a', undefined, 'area-b');
+  second.summary = '只在第二區的關鍵字';
+  raw.policies.push(second);
+
+  const vm = viewModelOf(raw);
+  const filtered = filterViewModel(vm, { query: '只在第二區' });
+
+  assert.deepEqual(vm.rows.map((row) => [row.issueArea.id, row.number]), [['area-a', '01'], ['area-b', '02']]);
+  assert.deepEqual(filtered.rows.map((row) => [row.issueArea.id, row.number]), [['area-b', '02']]);
 });

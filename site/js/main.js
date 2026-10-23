@@ -4,12 +4,22 @@ import { filterViewModel } from './filter.js';
 import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
 import { renderTable } from './table-view.js';
-import { renderIslandList, renderLegend } from './island-list.js';
+import { renderCandidateIndex, renderIslandList, renderLegend } from './island-list.js';
 import { el } from './dom.js';
 
 const DATASET_URL = './data/dataset.json';
 const INTRO_SEEN_KEY = 'policy-island:intro-seen';
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+// 與 main.css 的手機斷點相同：底部膠囊工具列、索引與卡片改為底部抽屜。
+const mobileQuery = window.matchMedia('(max-width: 800px)');
+
+// 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責，預設白天。
+const TIMES = [
+  { id: 'dawn', name: '清晨' },
+  { id: 'day', name: '白天' },
+  { id: 'dusk', name: '黃昏' },
+  { id: 'night', name: '夜晚' },
+];
 
 function supportsWebGL() {
   try {
@@ -56,6 +66,7 @@ function showViewNote(text) {
 // 島嶼檢視無法使用時停用切換按鈕，只留表格檢視。
 function disableIsland(reason) {
   document.querySelector('.view-button[data-view="island"]').disabled = true;
+  document.body.dataset.island = 'unavailable';
   showViewNote(reason);
 }
 
@@ -71,6 +82,29 @@ function resultStatusText(filtered) {
   return `符合篩選條件的政見共 ${matchCount} 筆，分布在 ${filtered.rows.length} 個議題區。`;
 }
 
+// 索引面板的分頁：議題區、候選人。
+function setupTabs() {
+  const tabs = [...document.querySelectorAll('.index-tab')];
+  const select = (tab) => {
+    for (const t of tabs) {
+      const selected = t === tab;
+      t.setAttribute('aria-selected', String(selected));
+      t.tabIndex = selected ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+    }
+  };
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', (event) => {
+      const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+      if (!step) return;
+      const next = tabs[(index + step + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
+    });
+  });
+}
+
 function startApp(vm, state, initialView) {
   const tableRoot = document.getElementById('table-root');
   const form = document.getElementById('filters');
@@ -78,8 +112,11 @@ function startApp(vm, state, initialView) {
   const district = document.getElementById('district');
   const status = document.getElementById('result-status');
   const stage = document.getElementById('island-stage');
-  const panel = document.getElementById('island-panel');
-  const panelToggle = document.getElementById('island-panel-toggle');
+  const panel = document.getElementById('index-panel');
+  const indexToggle = document.getElementById('tool-index');
+  const toolbar = document.getElementById('hud-toolbar');
+  const titleCard = document.querySelector('.title-card');
+  const controls = document.getElementById('controls');
   const islandList = document.getElementById('island-list');
 
   let view = initialView;
@@ -87,6 +124,7 @@ function startApp(vm, state, initialView) {
   // 目前選中的議題區。關閉卡片後仍保留，切換檢視時沿用。
   let selectedArea = null;
   let island = null;
+  const hud = { time: 'day', paused: false, labels: true };
 
   const updateUrl = () => history.replaceState(null, '', formatSearch(state) || location.pathname);
 
@@ -99,14 +137,72 @@ function startApp(vm, state, initialView) {
   });
   document.body.append(card.element);
 
-  const setPanelOpen = (open) => {
+  // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
+  // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
+  const indexClose = document.getElementById('index-close');
+  const setPanelOpen = (open, { returnFocus = false } = {}) => {
     panel.classList.toggle('is-open', open);
-    panelToggle.setAttribute('aria-expanded', String(open));
+    indexToggle.setAttribute('aria-expanded', String(open));
+    if (open) indexClose.focus();
+    else if (returnFocus) indexToggle.focus();
   };
-  panelToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
-  document.getElementById('island-reset').addEventListener('click', () => {
-    island?.then((controller) => controller?.showAll());
+  indexToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
+  indexClose.addEventListener('click', () => setPanelOpen(false, { returnFocus: true }));
+  panel.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel.classList.contains('is-open')) setPanelOpen(false, { returnFocus: true });
   });
+
+  // 畫布四邊被浮動元件遮住的寬度：桌面是上方工具列與右側索引面板，手機是標題卡與底部膠囊列。
+  const stageInsets = () => {
+    const { innerWidth: width, innerHeight: height } = window;
+    const bar = toolbar.getBoundingClientRect();
+    if (mobileQuery.matches) {
+      return { top: titleCard.getBoundingClientRect().bottom, right: 0, bottom: Math.max(0, height - bar.top), left: 0 };
+    }
+    return { top: bar.bottom, right: Math.max(0, width - panel.getBoundingClientRect().left), bottom: 0, left: 0 };
+  };
+
+  // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
+  const withIsland = (fn) => island?.then((controller) => controller && fn(controller));
+  const applyTime = () => {
+    const current = TIMES.find((t) => t.id === hud.time);
+    for (const button of document.querySelectorAll('[data-time]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.time === hud.time));
+    }
+    document.getElementById('tool-time-cycle-label').textContent = current.name;
+    document.getElementById('tool-time-cycle').setAttribute('aria-label', `切換時段，目前${current.name}`);
+    withIsland((controller) => controller.setTimeOfDay?.(hud.time));
+  };
+  const applyPaused = () => {
+    const button = document.getElementById('tool-pause');
+    button.setAttribute('aria-pressed', String(hud.paused));
+    document.getElementById('tool-pause-label').textContent = hud.paused ? '播放' : '暫停';
+    withIsland((controller) => controller.setPaused?.(hud.paused));
+  };
+  const applyLabels = () => {
+    document.getElementById('tool-labels').setAttribute('aria-pressed', String(hud.labels));
+    stage.classList.toggle('labels-off', !hud.labels);
+  };
+  for (const button of document.querySelectorAll('[data-time]')) {
+    button.addEventListener('click', () => {
+      hud.time = button.dataset.time;
+      applyTime();
+    });
+  }
+  document.getElementById('tool-time-cycle').addEventListener('click', () => {
+    const index = TIMES.findIndex((t) => t.id === hud.time);
+    hud.time = TIMES[(index + 1) % TIMES.length].id;
+    applyTime();
+  });
+  document.getElementById('tool-pause').addEventListener('click', () => {
+    hud.paused = !hud.paused;
+    applyPaused();
+  });
+  document.getElementById('tool-labels').addEventListener('click', () => {
+    hud.labels = !hud.labels;
+    applyLabels();
+  });
+  document.getElementById('tool-overview').addEventListener('click', () => withIsland((controller) => controller.showAll()));
 
   const renderIslandPanel = () => {
     renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null) });
@@ -120,8 +216,11 @@ function startApp(vm, state, initialView) {
           vm,
           reducedMotion: () => reducedMotionQuery.matches,
           onSelectArea: (areaId) => openCard(areaId, null),
+          insets: stageInsets,
         });
         controller.update(filtered);
+        controller.setTimeOfDay?.(hud.time);
+        controller.setPaused?.(hud.paused);
         document.getElementById('island-status').remove();
         return controller;
       })
@@ -170,7 +269,10 @@ function startApp(vm, state, initialView) {
     for (const button of document.querySelectorAll('.view-button')) {
       button.setAttribute('aria-pressed', String(button.dataset.view === next));
     }
+    // 搜尋與篩選：島嶼檢視放在索引面板，表格檢視放在表格上方。
+    document.getElementById(next === 'island' ? 'panel-controls-slot' : 'table-controls-slot').append(controls);
     if (next === 'island') {
+      setPanelOpen(false);
       renderIslandPanel();
       ensureIsland().then((controller) => {
         if (!controller) return;
@@ -197,7 +299,7 @@ function startApp(vm, state, initialView) {
     renderTable(tableRoot, filtered, { onOpenCard: openCard });
     highlightTableRow();
     renderIslandPanel();
-    island?.then((controller) => controller?.update(filtered));
+    withIsland((controller) => controller.update(filtered));
     status.textContent = resultStatusText(filtered);
   };
 
@@ -218,7 +320,13 @@ function startApp(vm, state, initialView) {
   });
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
+  document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
   renderLegend(document.getElementById('island-legend'), vm);
+  renderCandidateIndex(document.getElementById('candidate-index'), vm);
+  setupTabs();
+  applyTime();
+  applyPaused();
+  applyLabels();
   updateUrl();
   render();
   setView(view);
@@ -247,7 +355,7 @@ async function start() {
     const response = await fetch(DATASET_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const vm = buildViewModel(await response.json());
-    document.getElementById('data-cutoff-date').textContent = vm.meta.dataCutoffDate;
+    for (const node of document.querySelectorAll('[data-cutoff-date]')) node.textContent = vm.meta.dataCutoffDate;
     startApp(vm, state, view);
   } catch (error) {
     const message = `政見資料載入失敗（${error.message}），請稍後重新整理。`;
