@@ -54,15 +54,17 @@ test('畫面文案模組的每個字串與文字函式的輸出都不含內部�
   for (const text of [...literals, ...outputs]) assert.deepEqual(internalDetails(text), [], text);
 });
 
-// 畫面文字集中在 ui-text.js，關卡才掃得到。dataset.js 的中文是資料列舉（行政區、來源類型、元素類別）、
-// 排序規則的唯一定義與給維護者的驗證訊息，其中上畫面的來源類型與排序說明由關卡直接載入檢查。
-// island-daylight.js 與 island-motion.js 的名稱只供程式辨識，畫面上的時段名稱取自 ui-text.js 的 TIME_NAMES。
-const EXEMPT = new Set(['ui-text.js', 'dataset.js', 'island-daylight.js', 'island-motion.js']);
+// 畫面文字集中在 ui-text.js，關卡才掃得到。畫面模組是建立 DOM（引用 dom.js）或取用畫面文案（引用 ui-text.js）的模組；
+// 其餘模組的中文是資料列舉、給維護者的錯誤訊息或程式內部名稱，不上畫面。dataset.js 上畫面的來源類型與排序說明
+// 由關卡直接載入檢查。
+const SCREEN_MODULE = /from '\.\/(dom|ui-text)\.js'/;
 const CJK = /[㐀-鿿！-～]/;
 
 test('畫面模組不寫中文字串，畫面文字一律從 ui-text.js 取用', () => {
-  for (const file of readdirSync(JS_DIR).filter((f) => f.endsWith('.js') && !EXEMPT.has(f))) {
-    const code = readFileSync(`${JS_DIR}${file}`, 'utf8').split('\n').filter((line) => !/^\s*\/\//.test(line)).join('\n');
+  const files = readdirSync(JS_DIR).filter((f) => f.endsWith('.js') && f !== 'ui-text.js');
+  for (const file of files) {
+    const code = readFileSync(`${JS_DIR}${file}`, 'utf8');
+    if (!SCREEN_MODULE.test(code)) continue;
     const chinese = stringLiterals(code).filter((s) => CJK.test(s));
     assert.deepEqual(chinese, [], `${file} 有中文字串`);
   }
