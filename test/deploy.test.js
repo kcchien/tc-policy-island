@@ -45,7 +45,7 @@ test('專案不存在時先建立專案，正式環境分支為 main，再部署
   assert.equal(result.ok, true);
   assert.deepEqual(calls.slice(3), [
     'wrangler pages project list --json',
-    'wrangler pages project create tc-policy-island --production-branch main',
+    'wrangler pages project create tc-policy-island --production-branch main --force',
     'wrangler pages deploy site --project-name tc-policy-island --branch main',
   ]);
 });

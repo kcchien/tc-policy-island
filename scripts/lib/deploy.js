@@ -12,7 +12,8 @@ const CHECK_STEPS = [
   { name: '上線關卡', args: ['scripts/gates.js'] },
 ];
 
-const CREATE_ARGS = ['pages', 'project', 'create', PROJECT_NAME, '--production-branch', PRODUCTION_BRANCH];
+// wrangler 4.149 起會把 Pages 專案建立轉交 Workers 而失敗；--force 讓專案直接建在 Pages，之後的部署不需要
+const CREATE_ARGS = ['pages', 'project', 'create', PROJECT_NAME, '--production-branch', PRODUCTION_BRANCH, '--force'];
 const DEPLOY_ARGS = ['pages', 'deploy', SITE_DIR, '--project-name', PROJECT_NAME, '--branch', PRODUCTION_BRANCH];
 
 export function deploy({ run, log, dryRun = false }) {
