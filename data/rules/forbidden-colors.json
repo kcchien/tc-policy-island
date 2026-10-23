@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "note": "色碼換成 HSL 後，色相（hue，度）、飽和度（saturation，0~1）、亮度（lightness，0~1）三者都落在某一範圍內就禁用。色相範圍 from 大於 to 時表示跨過 0 度。依據見 docs/rules/forbidden-colors.md。",
+  "ranges": [
+    { "id": "party-blue", "name": "藍", "group": "政黨色", "hue": [195, 255], "saturation": [0.2, 1], "lightness": [0.08, 0.96] },
+    { "id": "party-green", "name": "綠", "group": "政黨色", "hue": [75, 170], "saturation": [0.2, 1], "lightness": [0.08, 0.96] },
+    { "id": "party-white", "name": "白", "group": "政黨色", "hue": [0, 360], "saturation": [0, 1], "lightness": [0.96, 1] },
+    { "id": "party-orange", "name": "橘", "group": "政黨色", "hue": [18, 45], "saturation": [0.55, 1], "lightness": [0.3, 0.85] },
+    { "id": "candidate-ocean-blue", "name": "海洋藍", "group": "候選人識別色", "hue": [180, 215], "saturation": [0.2, 1], "lightness": [0.08, 0.96] },
+    { "id": "candidate-pink", "name": "粉紅", "group": "候選人識別色", "hue": [320, 15], "saturation": [0.3, 1], "lightness": [0.6, 0.96] },
+    { "id": "candidate-magenta", "name": "桃紅", "group": "候選人識別色", "hue": [300, 350], "saturation": [0.3, 1], "lightness": [0.25, 0.6] },
+    { "id": "candidate-purple", "name": "紫", "group": "候選人識別色", "hue": [255, 300], "saturation": [0.15, 1], "lightness": [0.08, 0.96] }
+  ]
+}

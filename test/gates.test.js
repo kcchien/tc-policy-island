@@ -181,3 +181,33 @@ test('議題區名稱、元素名稱與檔名含品牌用語時不通過', () =>
   assert.match(output, /localElements\[el-a\]\.name：含品牌用語「親子味」/);
   assert.match(output, /檔名 taichung-way\.html：含品牌用語「Taichung Way」/);
 });
+
+test('CSS 與 3D 材質使用政黨色或候選人識別色時，禁用色檢查不通過並指出檔案與色碼', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'css/main.css': ':root { --accent: #1f4fbf; --soft: hotpink; }\n.x { color: rgb(120 60 200); border-color: hsl(30 90% 55%); }',
+    'js/island.js': "new MeshStandardMaterial({ color: 0x2e8b3d });\nconst foam = '#FFF';",
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /css\/main\.css：色碼 #1f4fbf 落在政黨色「藍」/);
+  assert.match(output, /css\/main\.css：色碼 hotpink 落在候選人識別色「粉紅」/);
+  assert.match(output, /css\/main\.css：色碼 rgb\(120 60 200\) 落在候選人識別色「紫」/);
+  assert.match(output, /css\/main\.css：色碼 hsl\(30 90% 55%\) 落在政黨色「橘」/);
+  assert.match(output, /js\/island\.js：色碼 0x2e8b3d 落在政黨色「綠」/);
+  assert.match(output, /js\/island\.js：色碼 #FFF 落在政黨色「白」/);
+});
+
+test('低飽和的灰青色、透明色與第三方程式碼中的色碼不擋', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'css/main.css': '.x { color: #7d9a98; background: transparent; box-shadow: 0 1px 2px rgb(0 0 255 / 0); }\n/* 註解裡的 #0000ff 不算 */',
+    'vendor/three/build/three.module.js': 'const Color = 0x0000ff;',
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.equal(code, 0, output);
+});

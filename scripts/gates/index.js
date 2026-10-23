@@ -3,9 +3,10 @@ import datasetStructure from './dataset-structure.js';
 import verifiedPolicies from './verified-policies.js';
 import candidateColumns from './candidate-columns.js';
 import brandTerms from './brand-terms.js';
+import forbiddenColors from './forbidden-colors.js';
 
 // 上線關卡清單。新增關卡：在本目錄寫一個 { id, name, check(site) → 失敗訊息陣列 } 模組，加進這裡。
-export const GATES = [datasetStructure, verifiedPolicies, candidateColumns, brandTerms];
+export const GATES = [datasetStructure, verifiedPolicies, candidateColumns, brandTerms, forbiddenColors];
 
 export function runGates(siteDir) {
   const site = openSite(siteDir);
