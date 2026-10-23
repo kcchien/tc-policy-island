@@ -13,6 +13,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { SOURCE_TYPES } from '../site/js/dataset.js';
+import { GLYPH_RESTORED_MARK } from '../site/js/ui-text.js';
 import { readJson } from './lib/raw-data.js';
 import { pdfPageText } from './lib/pdf-text.js';
 import { htmlToSnapshotText, pageTitle, requestArchive } from './lib/source-capture.js';
@@ -67,7 +68,8 @@ function capturePdf() {
   });
   const notes = [`PDF 第 ${values.page} 頁以 pdftotext 轉成文字`];
   for (const { baseFont, count } of restored) {
-    notes.push(`字型 ${baseFont} 的 ${count} 個字形文字由 PDF 字型對照還原（對照檔 ${relative(REPO_ROOT, glyphMapPath)}）`);
+    // 畫面依 GLYPH_RESTORED_MARK 判斷要不要顯示白話的還原說明，措辭改了要一起改。
+    notes.push(`字型 ${baseFont} 的 ${count} 個字形文字由 PDF 字型${GLYPH_RESTORED_MARK}（對照檔 ${relative(REPO_ROOT, glyphMapPath)}）`);
   }
   if (unmapped > 0) console.log(`注意：快照仍有 ${unmapped} 個字元無法轉成文字（U+FFFD）`);
   return { text, snapshotNote: notes.join('；') };

@@ -4,6 +4,7 @@ import { el } from './dom.js';
 import { parseMarkdown } from './markdown.js';
 import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from './method-content.js';
 import { REPO_FILES_MANIFEST, repoDocumentByPath, repoFileSitePath, repoFileUrl } from './repo-documents.js';
+import { LOAD_TEXT, METHOD_TEXT, REPO_DOCUMENT_TEXT } from './ui-text.js';
 
 const DATASET_URL = './data/dataset.json';
 const MANIFEST_URL = `./data/${REPO_FILES_MANIFEST}`;
@@ -54,7 +55,7 @@ function blockNodes(blocks, docPath) {
 
 function checklistNodes({ version, items }) {
   return [
-    el('p', {}, `版本 ${version}`),
+    el('p', {}, METHOD_TEXT.listVersion(version)),
     el('ol', {}, items.map((item) => el('li', {},
       el('strong', {}, item.title), el('code', { class: 'repo-id' }, item.id), el('br'), item.rule))),
   ];
@@ -63,9 +64,9 @@ function checklistNodes({ version, items }) {
 // 欄名照原檔的欄位名，候選人欄是原檔的候選人識別碼。
 function brandTermNodes({ version, tiers }) {
   return [
-    el('p', {}, `版本 ${version}`),
+    el('p', {}, METHOD_TEXT.listVersion(version)),
     ...tiers.flatMap(({ label, rows }) => [
-      el('h4', {}, `${label}（${rows.length} 個）`),
+      el('h4', {}, METHOD_TEXT.tierHeading(label, rows.length)),
       el('div', { class: 'method-table-wrap' }, el('table', { class: 'method-table' },
         el('thead', {}, el('tr', {}, ['term', 'candidate', 'note'].map((key) => el('th', { scope: 'col' }, el('code', {}, key))))),
         el('tbody', {}, rows.map((row) => el('tr', {}, row.map((value) => el('td', {}, value))))))),
@@ -91,24 +92,28 @@ async function renderRepoDocument(container, available) {
   const sitePath = `./${repoFileSitePath(doc.path)}`;
   const body = el('div', { class: 'repo-document-body' });
   const present = available.has(doc.path);
+  const text = REPO_DOCUMENT_TEXT[doc.id];
+  // 標題與說明用白話，不顯示檔案路徑；需要原檔的人從連結到 GitHub 或下載原始檔案。
   const details = el('details', { class: 'repo-document', id: `doc-${doc.id}`, open: container.hasAttribute('data-open') },
     el('summary', {},
-      el('span', { class: 'repo-document-label' }, '引用 repo 文件'),
-      el('h3', { class: 'repo-document-title' }, doc.title),
-      el('code', { class: 'repo-document-path' }, doc.path)),
+      el('span', { class: 'repo-document-label' }, METHOD_TEXT.documentLabel),
+      el('h3', { class: 'repo-document-title' }, text.title),
+      el('span', { class: 'repo-document-description' }, text.description)),
     present
-      ? el('p', { class: 'repo-document-links' }, el('a', { href: sitePath }, '原檔'), el('a', { href: repoFileUrl(doc.path) }, '在 GitHub 查看'))
+      ? el('p', { class: 'repo-document-links' },
+        el('a', { href: repoFileUrl(doc.path) }, METHOD_TEXT.viewOnGithub), el('a', { href: sitePath }, METHOD_TEXT.originalFile))
       : null,
     body);
   container.replaceChildren(details);
   if (!present) {
-    body.append(el('p', { class: 'repo-document-missing' }, '尚未產生'));
+    body.append(el('p', { class: 'repo-document-missing' }, METHOD_TEXT.missing));
     return;
   }
   try {
     body.replaceChildren(...documentNodes(doc, await fetchOk(sitePath, 'text')));
   } catch (error) {
-    body.replaceChildren(el('p', { class: 'status status-error' }, `文件載入失敗（${error.message}），可改看原檔。`));
+    console.error(error);
+    body.replaceChildren(el('p', { class: 'status status-error' }, LOAD_TEXT.documentFailed));
   }
 }
 
@@ -117,10 +122,10 @@ function fillDataset(dataset) {
   const statusItems = dataStatusItems(dataset.candidates);
   document.getElementById('data-status-list').replaceChildren(...(statusItems.length > 0
     ? statusItems.map((text) => el('li', {}, text))
-    : [el('li', {}, '每位候選人都已有一手來源。')]));
+    : [el('li', {}, METHOD_TEXT.allHaveSources)]));
   const { candidateOrder } = orderCandidates(dataset.candidates);
   document.getElementById('order-rule-list').replaceChildren(...candidateOrderItems(candidateOrder).map(({ text, current }) =>
-    el('li', { class: current ? 'is-current' : null }, text, current ? el('strong', { class: 'current-rule' }, '（目前採用）') : null)));
+    el('li', { class: current ? 'is-current' : null }, text, current ? el('strong', { class: 'current-rule' }, METHOD_TEXT.currentRule) : null)));
   fillRows('issue-area-table', dataset.issueAreas.map((area) => [area.name, area.departments.join('、'), area.description]));
   fillRows('local-element-table', dataset.localElements.map((e) => [e.name, e.category, e.place, e.reason]));
 }
@@ -138,12 +143,15 @@ async function start() {
   const [datasetResult, manifestResult] = await Promise.allSettled([fetchOk(DATASET_URL, 'json'), fetchOk(MANIFEST_URL, 'json')]);
   const dataset = datasetResult.status === 'fulfilled' ? datasetResult.value : null;
   if (dataset) fillDataset(dataset);
-  else document.getElementById('data-cutoff-date').textContent = `資料載入失敗（${datasetResult.reason.message}）`;
+  else {
+    console.error(datasetResult.reason);
+    document.getElementById('data-cutoff-date').textContent = LOAD_TEXT.methodDatasetFailed;
+  }
   const containers = [...document.querySelectorAll('[data-repo-file]')];
   // 文件清單載入失敗時說明載入失敗，不誤報成「尚未產生」。
   if (manifestResult.status === 'rejected') {
-    const message = `文件清單載入失敗（${manifestResult.reason.message}），請稍後重新整理。`;
-    for (const container of containers) container.replaceChildren(el('p', { class: 'status status-error' }, message));
+    console.error(manifestResult.reason);
+    for (const container of containers) container.replaceChildren(el('p', { class: 'status status-error' }, LOAD_TEXT.documentsFailed));
     return;
   }
   const available = new Set(manifestResult.value.documents);

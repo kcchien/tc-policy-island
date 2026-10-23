@@ -5,9 +5,10 @@ import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
 import { renderTable } from './table-view.js';
 import { renderIslandList, renderLegend } from './island-list.js';
-import { createCandidateDialog, PROFILE_NOTE, renderProfileCards } from './candidate-card.js';
+import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
+import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
 
 const DATASET_URL = './data/dataset.json';
 const INTRO_SEEN_KEY = 'policy-island:intro-seen';
@@ -17,13 +18,8 @@ const mobileQuery = window.matchMedia('(max-width: 800px)');
 
 // 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責。
 // 預設「自動」：依台灣時間選時段（timeOfDayAt），每分鐘檢查一次；點其他時段改為手動。
-const TIMES = [
-  { id: 'dawn', name: '清晨' },
-  { id: 'day', name: '白天' },
-  { id: 'dusk', name: '黃昏' },
-  { id: 'night', name: '夜晚' },
-];
-const AUTO_TIME = { id: 'auto', name: '自動' };
+const TIMES = ['dawn', 'day', 'dusk', 'night'].map((id) => ({ id, name: TIME_NAMES[id] }));
+const AUTO_TIME = { id: 'auto', name: TIME_NAMES.auto };
 const AUTO_CHECK_MS = 60 * 1000;
 
 function supportsWebGL() {
@@ -78,13 +74,6 @@ function disableIsland(reason) {
 function setupDistricts(select, selected) {
   select.append(...TAICHUNG_DISTRICTS.map((name) => el('option', { value: name }, name)));
   select.value = TAICHUNG_DISTRICTS.includes(selected) ? selected : '';
-}
-
-function resultStatusText(filtered) {
-  if (!filtered.filter.active) return '';
-  const { matchCount } = filtered.filter;
-  if (matchCount === 0) return '沒有符合篩選條件的政見。';
-  return `符合篩選條件的政見共 ${matchCount} 筆，分布在 ${filtered.rows.length} 個議題區。`;
 }
 
 // 索引面板的分頁：議題區、候選人。
@@ -186,7 +175,7 @@ function startApp(vm, state, initialView) {
       button.setAttribute('aria-pressed', String(button.dataset.time === hud.timeMode));
     }
     document.getElementById('tool-time-cycle-label').textContent = auto ? AUTO_TIME.name : current.name;
-    document.getElementById('tool-time-cycle').setAttribute('aria-label', `切換時段，目前${auto ? `${AUTO_TIME.name}（${current.name}）` : current.name}`);
+    document.getElementById('tool-time-cycle').setAttribute('aria-label', auto ? ISLAND_TEXT.timeCycleAuto(current.name) : ISLAND_TEXT.timeCycle(current.name));
     withIsland((controller) => controller.setTimeOfDay?.(hud.time));
   };
   // 自動模式下跨過時段邊界時切換（島嶼檢視負責補間，減少動態時直接切換）。分頁回到前景時也馬上檢查。
@@ -200,7 +189,7 @@ function startApp(vm, state, initialView) {
   const applyPaused = () => {
     const button = document.getElementById('tool-pause');
     button.setAttribute('aria-pressed', String(hud.paused));
-    document.getElementById('tool-pause-label').textContent = hud.paused ? '播放' : '暫停';
+    document.getElementById('tool-pause-label').textContent = hud.paused ? ISLAND_TEXT.play : ISLAND_TEXT.pause;
     withIsland((controller) => controller.setPaused?.(hud.paused));
   };
   const applyLabels = () => {
@@ -258,7 +247,7 @@ function startApp(vm, state, initialView) {
       })
       .catch((error) => {
         console.error(error);
-        disableIsland('島嶼檢視載入失敗，已改用表格檢視。');
+        disableIsland(ISLAND_TEXT.loadFailed);
         setView('table');
         return null;
       });
@@ -370,7 +359,7 @@ function startApp(vm, state, initialView) {
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
   renderLegend(document.getElementById('island-legend'), vm);
-  document.getElementById('panel-profile-note').textContent = PROFILE_NOTE;
+  document.getElementById('panel-profile-note').textContent = PROFILE_TEXT.note;
   renderProfileCards(document.getElementById('candidate-profiles'), vm, { idPrefix: 'panel-profile' });
   setupTabs();
   applyTime();
@@ -402,7 +391,7 @@ async function start() {
   if (state.view !== view) state.view = null;
   document.body.dataset.view = view;
   document.body.dataset.webgl = webgl ? 'yes' : 'no';
-  if (!webgl) disableIsland('此裝置無法顯示島嶼檢視，已改用表格檢視。');
+  if (!webgl) disableIsland(ISLAND_TEXT.noWebgl);
   setupIntro();
   try {
     const response = await fetch(DATASET_URL);
@@ -411,7 +400,9 @@ async function start() {
     for (const node of document.querySelectorAll('[data-cutoff-date]')) node.textContent = vm.meta.dataCutoffDate;
     startApp(vm, state, view);
   } catch (error) {
-    const message = `政見資料載入失敗（${error.message}），請稍後重新整理。`;
+    // 錯誤細節只寫進主控台，畫面用白話。
+    console.error(error);
+    const message = LOAD_TEXT.datasetFailed;
     document.getElementById('table-root').replaceChildren(el('p', { class: 'status status-error' }, message));
     document.getElementById('island-status').textContent = message;
   }
