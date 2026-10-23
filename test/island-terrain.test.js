@@ -49,6 +49,13 @@ test('背景樹數千棵，分針葉與闊葉兩種，數量依畫質遞減；�
   assert.ok(meanY('conifer') > meanY('broadleaf'), `針葉平均高度 ${meanY('conifer').toFixed(2)}、闊葉 ${meanY('broadleaf').toFixed(2)}`);
 });
 
+test('聚落有一部分小屋亮窗燈（點綴，不是每戶），窗戶在牆面上', () => {
+  const plan = planOutskirts(layoutOf());
+  const lit = plan.houses.filter((house) => house.window);
+  assert.ok(lit.length > 0 && lit.length < plan.houses.length, `亮燈 ${lit.length} / ${plan.houses.length}`);
+  for (const house of lit) assert.ok(house.window.y > 0 && house.window.y < house.height, '窗戶在牆的高度內');
+});
+
 test('雲、海上的小島與帆船依畫質遞減，至少一座燈塔', () => {
   const layout = layoutOf();
   const [high, medium, low] = ['high', 'medium', 'low'].map((quality) => planOutskirts(layout, { quality }));

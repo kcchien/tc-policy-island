@@ -33,7 +33,7 @@ export const TERRAIN_PALETTE = {
   trunk: 0x5e5148,
   // 闊葉樹（平原與低丘）與針葉樹（山坡）的樹冠，每棵取一色。
   canopy: [0x86884f, 0x7a7f4a, 0x6f6d4f, 0x938a58, 0xa59155, 0x9d9d58],
-  conifer: [0x5a5d3c, 0x6b7345, 0x5d6345, 0x797a52],
+  conifer: [0x5a5d3c, 0x707345, 0x5d6345, 0x797a52],
   wall: 0xd8ccb8,
   roof: [0x7c5c4c, 0x6a625c],
   cloud: 0xe6e1d8,
@@ -333,6 +333,8 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
       const house = { x, y, z, width: 0.2 + rand() * 0.12, depth: 0.15 + rand() * 0.08, height: 0.12 + rand() * 0.06, roof: 0.08, rotation: FIELD_ANGLE + (rand() < 0.5 ? 0 : Math.PI / 2), roofColor: TERRAIN_PALETTE.roof[Math.floor(rand() * TERRAIN_PALETTE.roof.length)] };
       if (y < SEA_LEVEL + 0.15 || !onLand(x, z) || y + house.height + house.roof > clearanceAt(x, z)) continue;
       if (placed.some((o) => Math.hypot(o.x - x, o.z - z) < 0.36)) continue;
+      // 約四成的小屋正面有一扇亮燈的窗（夜裡點綴，依種子決定，不讀政見）。y 是窗心離地高度。
+      house.window = rand() < 0.4 ? { y: house.height * 0.55 } : null;
       placed.push(house);
     }
     if (placed.length < 3) continue;

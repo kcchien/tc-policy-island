@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { ambientAt, planOutskirts, SEA_LEVEL, silhouetteColor, TERRAIN_PALETTE } from './island-terrain.js';
 import { PALETTE } from './island-models.js';
+import { landShade } from './island-daylight.js';
 
 // 夜間係數超過這個值，鳥回巢不畫。
 const BIRDS_UNTIL_NIGHT = 0.75;
@@ -148,7 +149,7 @@ function wingGeometry(side) {
   return g;
 }
 
-// environment 是 createEnvironment 的結果（水面材質要加雲影）。回傳 { plan, update(t, dt, env) }；env 有 night、fog（霧色）與 skyHorizon（地平線色）。
+// environment 是 createEnvironment 的結果（水面材質要加雲影）。回傳 { plan, update(t, dt, env) }；env 有 night、fog（霧色）、skyHorizon（地平線色）與 lighting（目前的光線，用來算陸地色調）。
 export function createOutskirts(scene, { layout, quality, environment }) {
   const plan = planOutskirts(layout, { quality: quality.level });
   const group = new THREE.Group();
@@ -210,6 +211,19 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     mesh.computeBoundingSphere();
     group.add(mesh);
   }
+  // 窗燈：亮燈小屋正面一扇小窗，與島上窗戶共用發光材質與窗光色，夜裡才明顯。
+  const litHouses = plan.houses.filter((house) => house.window);
+  const windows = new THREE.InstancedMesh(new THREE.BoxGeometry(0.06, 0.05, 0.012), environment.glowMaterial, Math.max(1, litHouses.length));
+  windows.count = litHouses.length;
+  const front = new THREE.Vector3();
+  litHouses.forEach((house, i) => {
+    q.setFromAxisAngle(up, house.rotation);
+    front.set(0, 0, house.depth / 2 + 0.006).applyQuaternion(q);
+    windows.setMatrixAt(i, m.compose(p.set(house.x + front.x, house.y + house.window.y, house.z + front.z), q, s.set(1, 1, 1)));
+    windows.setColorAt(i, color.setHex(PALETTE.windowGlow));
+  });
+  windows.computeBoundingSphere();
+  group.add(windows);
 
   // 霧團：貼地的扁平圓，顏色跟著時段的霧色。
   // 每團各自一份材質（透明度不同），共用透明度貼圖與幾何。
@@ -322,6 +336,17 @@ export function createOutskirts(scene, { layout, quality, environment }) {
 
   scene.add(group);
 
+  // 依時段壓暗外圍：所有受光的材質（地形、樹、聚落、小島、燈塔、船、雲、鳥）記下原色，每幀乘上陸地色調。
+  // 發光件、霧團、遠山是不受光的材質，另有自己的處理，不在這裡。
+  const tinted = [];
+  group.traverse((object) => {
+    const material = object.material;
+    if (!object.isMesh || !material?.isMeshStandardMaterial || tinted.some((t) => t.material === material)) return;
+    tinted.push({ material, base: material.color.clone() });
+  });
+  const shadeColor = new THREE.Color();
+  let lastShade = '';
+
   const ridgeLighting = { night: 0, skyHorizon: 0 };
   const fogColor = new THREE.Color();
   const euler = new THREE.Euler();
@@ -333,6 +358,16 @@ export function createOutskirts(scene, { layout, quality, environment }) {
       const night = env.night ?? 0;
       const { clouds, fogBanks, birds, boats, waterTime } = ambientAt(plan, t);
       environment.setWaterTime(waterTime);
+
+      if (env.lighting) {
+        const shade = landShade(env.lighting);
+        const key = shade.join();
+        if (key !== lastShade) {
+          lastShade = key;
+          shadeColor.setRGB(shade[0], shade[1], shade[2], THREE.SRGBColorSpace);
+          for (const { material, base } of tinted) material.color.copy(base).multiply(shadeColor);
+        }
+      }
 
       // 遠山剪影往地平線色混。
       if (env.skyHorizon !== undefined) {

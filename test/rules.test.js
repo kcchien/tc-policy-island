@@ -15,9 +15,9 @@ import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
 import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
 import {
-  blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES, SKY_HALO, STAR_COLOR, WATER_SPARKLE, WATER_STARS,
+  blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES, landShade, SKY_HALO, STAR_COLOR, WATER_SPARKLE, WATER_STARS,
 } from '../site/js/island-daylight.js';
-import { RIDGE_RINGS, silhouetteColor, terrainColor } from '../site/js/island-terrain.js';
+import { RIDGE_RINGS, silhouetteColor, TERRAIN_PALETTE, terrainColor } from '../site/js/island-terrain.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -191,6 +191,33 @@ test('天空的太陽光暈與星星、水面的深淺漂移與閃光、遠山�
       }
     }
   }
+  assert.deepEqual(hits.slice(0, 20), []);
+});
+
+test('外圍地面、樹、聚落、小島、船與雲的色碼乘上任兩時段補間途中的陸地色調後，都不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  // 色調在 sRGB 給定，three.js 轉成線性後與材質色相乘，畫面輸出再轉回 sRGB。
+  const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const toSrgb = (c) => (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055);
+  const colors = Object.entries(TERRAIN_PALETTE)
+    .filter(([key]) => !key.startsWith('farRidge'))
+    .flatMap(([key, value]) => [value].flat().map((hex) => [key, hex]));
+  const ids = Object.keys(KEYFRAMES);
+  const hits = [];
+  for (const a of ids) {
+    for (const b of ids) {
+      for (let k = 0; k <= 1; k += 0.1) {
+        const shade = landShade(blendLighting(KEYFRAMES[a], KEYFRAMES[b], k));
+        for (const [key, hex] of colors) {
+          const [r, g, bl] = [16, 8, 0].map((shift, i) => Math.round(toSrgb(toLinear(((hex >> shift) & 0xff) / 255) * toLinear(shade[i])) * 255));
+          for (const range of forbiddenRangesOf({ ...rgbToHsl({ r, g, b: bl }), alpha: 1 }, ranges)) {
+            hits.push(`${a}→${b} ${k.toFixed(1)} ${key} ${hex.toString(16)} → rgb(${r},${g},${bl}) ${range.name}`);
+          }
+        }
+      }
+    }
+  }
+  assert.ok(colors.length >= 30);
   assert.deepEqual(hits.slice(0, 20), []);
 });
 

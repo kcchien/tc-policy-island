@@ -23,35 +23,43 @@ export const KEYFRAMES = {
     sunColor: 0xebd3c2, sunIntensity: 1.8, sunDirection: [14, 7, 6], sunGlow: 0xeddbc9,
     hemiSky: 0xe7d3c6, hemiGround: 0x6b5a5a, hemiIntensity: 1.2,
     fillColor: 0xc4d4d2, fillIntensity: 0.3,
-    waterShallow: 0xa1bab8, waterDeep: 0x6c9391, night: 0.3, exposure: 1,
+    waterShallow: 0xa1bab8, waterDeep: 0x6c9391, landTint: 0xd2beac, landTintStrength: 0.25, night: 0.3, exposure: 1,
   },
   day: {
     skyTop: 0xb8cccb, skyHorizon: 0xf4eee3, fog: 0xf4eee3, fogNear: 55, fogFar: 150,
     sunColor: 0xf6efe4, sunIntensity: 2.9, sunDirection: [-10, 22, 12], sunGlow: 0xf5eee0,
     hemiSky: 0xf0f4f3, hemiGround: 0x8f8270, hemiIntensity: 1.35,
     fillColor: 0xc4d4d2, fillIntensity: 0.35,
-    waterShallow: 0xabc4c2, waterDeep: 0x769e9c, night: 0, exposure: 1,
+    waterShallow: 0xabc4c2, waterDeep: 0x769e9c, landTint: 0xd2beac, landTintStrength: 0, night: 0, exposure: 1,
   },
   dusk: {
     skyTop: 0x768293, skyHorizon: 0xe0bca3, fog: 0xe0bca3, fogNear: 50, fogFar: 145,
     sunColor: 0xdbae94, sunIntensity: 1.8, sunDirection: [-16, 9, 5], sunGlow: 0xe6cab3,
     hemiSky: 0xe3ccbf, hemiGround: 0x7d6660, hemiIntensity: 1.2,
     fillColor: 0x8f9ca3, fillIntensity: 0.3,
-    waterShallow: 0x92aaa7, waterDeep: 0x65817f, night: 0.4, exposure: 1,
+    waterShallow: 0x92aaa7, waterDeep: 0x65817f, landTint: 0xcfa281, landTintStrength: 0.5, night: 0.4, exposure: 1,
   },
   night: {
     skyTop: 0x1d2026, skyHorizon: 0x3d434d, fog: 0x3d434d, fogNear: 40, fogFar: 130,
     sunColor: 0xc6cad2, sunIntensity: 1.15, sunDirection: [-6, 18, -8], sunGlow: 0x818898,
     hemiSky: 0x9aa0ae, hemiGround: 0x605a63, hemiIntensity: 1.85,
     fillColor: 0x8f9ca3, fillIntensity: 0.25,
-    waterShallow: 0x455454, waterDeep: 0x2d3939, night: 1, exposure: 1,
+    waterShallow: 0x455454, waterDeep: 0x2d3939, landTint: 0x5c6370, landTintStrength: 0.85, night: 1, exposure: 1,
   },
 };
 
 // 關鍵影格裡是色碼的欄位，補間時逐色版內插。
 export const COLOR_KEYS = new Set([
-  'skyTop', 'skyHorizon', 'fog', 'sunColor', 'sunGlow', 'hemiSky', 'hemiGround', 'fillColor', 'waterShallow', 'waterDeep',
+  'skyTop', 'skyHorizon', 'fog', 'sunColor', 'sunGlow', 'hemiSky', 'hemiGround', 'fillColor', 'waterShallow', 'waterDeep', 'landTint',
 ]);
+
+// 外圍陸地（地形、背景樹、聚落、海上小島與船、雲）的色調倍率 [r, g, b]（sRGB，0~1）。
+// 外圍材質用固定的頂點色與材質色，夜晚半球光又強，不另外壓暗會跟白天一樣亮；
+// 所以依時段把材質色乘上 landTint，強度 landTintStrength（白天 0 不改色，黃昏偏暖，夜晚最暗偏冷）。
+export function landShade(lighting) {
+  const k = lighting.landTintStrength;
+  return [16, 8, 0].map((shift) => 1 + ((((lighting.landTint >> shift) & 0xff) / 255) - 1) * k);
+}
 
 // 著色器的混色比例（island-environment.js 照用，禁用色測試也照這些比例檢查）：
 // 天空往太陽光暈色最多混到 SKY_HALO；星星往 STAR_COLOR 混，夜間係數 1 時混滿；水面閃光往太陽光暈色最多混到 WATER_SPARKLE。

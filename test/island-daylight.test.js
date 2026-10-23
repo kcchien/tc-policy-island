@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  blendLighting, createDaylight, DEFAULT_TIME_OF_DAY, glowLevel, KEYFRAMES, timeOfDayAt, TIMES_OF_DAY, TRANSITION_MS,
+  blendLighting, createDaylight, DEFAULT_TIME_OF_DAY, glowLevel, KEYFRAMES, landShade, timeOfDayAt, TIMES_OF_DAY, TRANSITION_MS,
 } from '../site/js/island-daylight.js';
 
 // 台灣時間（UTC+8）的某日某時某分，換成毫秒時間戳。
@@ -34,6 +34,19 @@ test('每個關鍵影格都有天空、太陽光暈、半球光、補光、淺�
     assert.equal(k.fog, k.skyHorizon, `${id} 的霧色等於地平線色，遠景融進天空`);
     assert.ok(k.fillIntensity > 0 && k.fillIntensity < k.sunIntensity, `${id} 補光比太陽弱`);
   }
+});
+
+test('外圍陸地的色調：白天不改色，黃昏變暗偏暖，夜晚最暗偏冷；補間途中平順變化', () => {
+  const [day, dawn, dusk, night] = ['day', 'dawn', 'dusk', 'night'].map((id) => landShade(KEYFRAMES[id]));
+  assert.deepEqual(day, [1, 1, 1]);
+  const mean = (rgb) => (rgb[0] + rgb[1] + rgb[2]) / 3;
+  assert.ok(mean(dawn) < 1 && mean(dusk) < 1);
+  assert.ok(mean(night) < 0.6, `夜晚平均 ${mean(night).toFixed(2)}`);
+  assert.ok(mean(night) < mean(dusk) && mean(dusk) <= mean(dawn) + 0.05);
+  assert.ok(dusk[0] > dusk[2], '黃昏偏暖：紅大於藍');
+  assert.ok(night[2] > night[0], '夜晚偏冷：藍大於紅');
+  const half = landShade(blendLighting(KEYFRAMES.day, KEYFRAMES.night, 0.5));
+  assert.ok(mean(half) < 1 && mean(half) > mean(night));
 });
 
 test('光照強度照參考的結構：白天太陽最強，夜晚太陽最弱但半球光最強（冷色但看得清楚）', () => {
