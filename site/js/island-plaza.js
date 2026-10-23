@@ -16,12 +16,12 @@ export const FIGURE_PARTS = [
   { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [-0.086, 0.25, 0], color: 'figure' },
   { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [0.086, 0.25, 0], color: 'figure' },
   { part: 'head', shape: 'sphere', radius: 0.114, at: [0, 0.448, 0], color: 'figureHead' },
-  { part: 'hair', shape: 'dome', radius: 0.119, cover: 0.5, tilt: 0.95, at: [0, 0.448, -0.004], color: 'figureHair' },
-  { part: 'eye', shape: 'sphere', radius: 0.016, at: [-0.042, 0.466, 0.103], color: 'figureEye' },
-  { part: 'eye', shape: 'sphere', radius: 0.016, at: [0.042, 0.466, 0.103], color: 'figureEye' },
-  { part: 'cheek', shape: 'disc', radius: 0.017, thickness: 0.004, at: [-0.064, 0.43, 0.093], color: 'figureCheek' },
-  { part: 'cheek', shape: 'disc', radius: 0.017, thickness: 0.004, at: [0.064, 0.43, 0.093], color: 'figureCheek' },
-  { part: 'mouth', shape: 'arc', radius: 0.02, tube: 0.004, at: [0, 0.418, 0.11], color: 'figureEye' },
+  { part: 'hair', shape: 'dome', radius: 0.119, cover: 0.42, tilt: 1, at: [0, 0.448, -0.004], color: 'figureHair' },
+  { part: 'eye', shape: 'sphere', radius: 0.016, at: [-0.042, 0.478, 0.102], color: 'figureEye' },
+  { part: 'eye', shape: 'sphere', radius: 0.016, at: [0.042, 0.478, 0.102], color: 'figureEye' },
+  { part: 'cheek', shape: 'disc', radius: 0.018, thickness: 0.004, at: [-0.064, 0.445, 0.094], color: 'figureCheek' },
+  { part: 'cheek', shape: 'disc', radius: 0.018, thickness: 0.004, at: [0.064, 0.445, 0.094], color: 'figureCheek' },
+  { part: 'mouth', shape: 'arc', radius: 0.024, tube: 0.005, at: [0, 0.437, 0.113], color: 'figureEye' },
 ];
 // 人物頭頂離腳底的高度（零件的單位，乘上 FIGURE_SCALE 才是場景尺寸），名牌放在頭頂上方 LABEL_GAP。
 const FIGURE_HEIGHT = 0.57;
