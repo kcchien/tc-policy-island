@@ -38,9 +38,15 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
-  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、候選人標記、構圖、鏡頭限制、畫質、飛行
+  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖、鏡頭限制、飛行
   js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）
-  js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入
+  js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats
+  js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
+  js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
+  js/island-clock.js   動畫迴圈時間：統一推進、暫停、減少動態停在固定畫格；後續動畫一律用它註冊（Node 可測）
+  js/island-parts.js   零件分桶規則（Node 可測）
+  js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
+  js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例、候選人分頁
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）

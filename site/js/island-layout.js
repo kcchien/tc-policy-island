@@ -112,6 +112,21 @@ export function islandLayout(vm, { filtered = null } = {}) {
   return { hexSize: HEX_SIZE, tiles, bounds: boundsOf(tiles), legend };
 }
 
+// 全島格子的頂點 [x, z]，相鄰格共用的頂點只列一次（路燈放在這些位置）。
+export function tileCorners(layout) {
+  const corners = new Map();
+  for (const { position } of layout.tiles) {
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI / 6 + (i * Math.PI) / 3;
+      const x = position.x + Math.cos(a) * layout.hexSize;
+      const z = position.z + Math.sin(a) * layout.hexSize;
+      // 以萬分之一取整當鍵；toFixed 會把 -1e-17 寫成 -0.0000，跟 0.0000 對不上。
+      corners.set(`${Math.round(x * 1e4) + 0},${Math.round(z * 1e4) + 0}`, [x, z]);
+    }
+  }
+  return [...corners.values()];
+}
+
 // 構圖用的島外形點：每格六個頂點（水面高度 0 與格子頂面 surface），加上格心上方元素模型的頂點 top。
 // 用實際格子而不用矩形包圍盒，包圍盒的角落在水上，會讓島被縮得太小。
 export function islandPoints(layout, { surface, top }) {
@@ -206,18 +221,6 @@ export function viewOffset({ width, height, insets }) {
     y: dy < 0 ? -2 * dy : 0,
     visibleAspect: (width - insets.left - insets.right) / visibleHeight,
     fovScale: visibleHeight / fullHeight,
-  };
-}
-
-// 800px 以下或觸控裝置降為中畫質：像素比上限 1.4、關閉陰影。
-export function qualityFor({ width, coarsePointer, devicePixelRatio }) {
-  const medium = width <= 800 || coarsePointer;
-  const cap = medium ? 1.4 : 1.75;
-  return {
-    level: medium ? 'medium' : 'high',
-    pixelRatio: Math.min(devicePixelRatio, cap),
-    shadows: !medium,
-    antialias: !medium || devicePixelRatio < 2,
   };
 }
 
