@@ -26,6 +26,7 @@
 ```
 site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   index.html           importmap 與頁面骨架
+  method.html          整理方法頁（頁首與頁尾都連得到）
   css/main.css         配色變數（依 ADR 0001）
   js/dataset.js        政見資料集：欄位表、驗證、排除未核對、候選人排序
   js/view-model.js     檢視模型：議題區 × 候選人矩陣
@@ -35,9 +36,14 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
+  js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
+  js/markdown.js       repo 文件的 Markdown 解析（只支援 repo 用到的寫法）
+  js/method-content.js 整理方法頁由資料產生的內容
+  js/method.js         整理方法頁的進站流程
   _headers             Cloudflare Pages 回應標頭（出處快照指定 UTF-8）
   data/dataset.json    建置產物，不進版控
   data/snapshots/      建置時複製的公開出處快照，不進版控
+  data/repo-files/     建置時逐字複製的引用 repo 文件，與清單 data/repo-files.json 都不進版控
   vendor/three/        three.js r160（島嶼檢視的票加入）
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
@@ -45,7 +51,7 @@ data/raw/              原始資料（建置輸入）
   sources/<candidateId>.json   每位候選人一檔，陣列
   policies/<candidateId>.json  每位候選人一檔，陣列
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
-data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版
+data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版；核對報告寫在 report.md（整理方法頁照原文公開，還沒有時顯示「尚未產生」）
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
@@ -75,6 +81,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - `data/raw/` 只放從一手來源抽取的真實資料。示範或測試用的政見一律放 `test/fixtures/`，候選人用虛構的「範例甲乙丙」「候選人甲乙丙」，不掛真實候選人的名字。
 - 新增上線關卡：在 `scripts/gates/` 寫一個 `{ id, name, check(site) }` 模組（`check` 回傳失敗訊息陣列，`site.dataset()` 讀公開資料集），加進 `scripts/gates/index.js` 的 `GATES`，並在 `test/gates.test.js` 用夾具網站目錄驗證擋下違規、放行合規。
 - 品牌用語掃描與禁用色檢查讀 `data/rules/` 的正式清單；`site.files()` 列出網站目錄全部檔案，`site.readText(path)` 讀檔。改清單或新增網站文案後跑 `node --test test/rules.test.js`，它會用正式資料檢查本站文案、檔名與專案名。
+- 整理方法頁要照原文公開的 repo 檔案加進 `site/js/repo-documents.js` 的 `REPO_DOCUMENTS`，並在 `site/method.html` 放一個 `data-repo-file="<repo 路徑>"` 容器。逐字副本不受品牌用語掃描，由關卡 `repo-documents` 驗證逐字相同，見 `docs/rules/brand-terms.md`「例外：引用 repo 文件」。頁面文案不要寫進這些檔案。
 - `test/` 底下的 `.js` 都會被 `node --test` 當成測試檔執行，夾具模組不要有副作用。
 - 無頭 Chrome 的 `--window-size` 有最小寬度，390px 截圖會被裁切，手機版改用可模擬裝置寬度的瀏覽器驗證。
 
