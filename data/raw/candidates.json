@@ -14,7 +14,7 @@
     "party": "民主進步黨",
     "ballotNumber": null,
     "nameStrokes": 7,
-    "rawPolicyItems": { "total": null, "sourceIds": [] },
+    "rawPolicyItems": { "total": 153, "sourceIds": ["ho-main"] },
     "dataStatus": null
   },
   {
