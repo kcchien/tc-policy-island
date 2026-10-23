@@ -1,17 +1,40 @@
 // 檢視模型：公開資料集 → 議題區 × 候選人矩陣。島嶼檢視與表格檢視都只讀這個矩陣。
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
-import { CANDIDATE_ORDER_RULES } from './dataset.js';
+import { CANDIDATE_ORDER_RULES, SOURCE_TYPES } from './dataset.js';
 
 export const NO_POLICY_LABEL = '未提出相關政見';
 
+// 出處快照放在公開資料集（site/data/dataset.json）旁的 snapshots/，檔名沿用原快照檔名。
+// 建置指令依此複製檔案，卡片依此產生連結。
+export const SNAPSHOT_DIR = 'snapshots';
+export const snapshotFileName = (source) => source.snapshotPath.split('/').pop();
+
+function sourceView(source) {
+  return {
+    id: source.id,
+    title: source.title,
+    url: source.url,
+    archiveUrl: source.archiveUrl,
+    snapshotUrl: `./data/${SNAPSHOT_DIR}/${snapshotFileName(source)}`,
+    sourceType: source.sourceType,
+    sourceTypeName: SOURCE_TYPES[source.sourceType],
+    retrievedAt: source.retrievedAt,
+  };
+}
+
 export function buildViewModel(dataset) {
+  const sources = new Map(dataset.sources.map((s) => [s.id, sourceView(s)]));
+  const policyView = (policy) => ({
+    ...policy,
+    quotes: policy.quotes.map((quote) => ({ ...quote, source: sources.get(quote.sourceId) })),
+  });
   const rows = dataset.issueAreas.map((issueArea) => ({
     issueArea,
     cells: dataset.candidates.map((candidate) => {
-      const policies = dataset.policies.filter(
-        (p) => p.issueAreaId === issueArea.id && p.candidateId === candidate.id,
-      );
+      const policies = dataset.policies
+        .filter((p) => p.issueAreaId === issueArea.id && p.candidateId === candidate.id)
+        .map(policyView);
       return {
         candidateId: candidate.id,
         status: policies.length > 0 ? 'has-policies' : 'no-policies',

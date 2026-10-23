@@ -89,3 +89,24 @@ test('沒有任何公開政見時，每一格都是「未提出相關政見」',
   const statuses = vm.rows.flatMap((row) => row.cells.map((cell) => cell.status));
   assert.deepEqual(statuses, Array(6).fill('no-policies'));
 });
+
+test('每則原文引述附上出處（來源類型中文名、網址、出處快照位置），供政見卡片使用', () => {
+  const raw = makeRaw();
+  const source = raw.sources.find((s) => s.id === 'src-cand-a');
+  source.archiveUrl = 'https://web.archive.org/web/2026/https://example.org/cand-a';
+  source.archiveError = null;
+
+  const vm = viewModelOf(raw);
+
+  const [quote] = vm.rows[0].cells[0].policies[0].quotes;
+  assert.deepEqual(quote.source, {
+    id: 'src-cand-a',
+    title: '測試出處',
+    url: 'https://example.org/cand-a',
+    archiveUrl: 'https://web.archive.org/web/2026/https://example.org/cand-a',
+    snapshotUrl: './data/snapshots/src-cand-a.txt',
+    sourceType: 'official-website',
+    sourceTypeName: '官網',
+    retrievedAt: '2026-10-23',
+  });
+});
