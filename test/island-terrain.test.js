@@ -41,6 +41,32 @@ test('西側是海、東側是山稜：島西方的地面在水面下，島東�
   assert.ok(east[2] > 8, '遠處的山稜至少 8 單位高');
 });
 
+test('島的東半部直接接著平原，南北兩側與東側緊鄰島邊的地面都在水面上，不形成包夾的水道', () => {
+  const layout = layoutOf();
+  const plan = planOutskirts(layout);
+  const { maxX, minZ, maxZ, center } = layout.bounds;
+
+  const near = [[maxX + 0.8, center.z], [maxX - 1, minZ - 0.8], [maxX - 1, maxZ + 0.8]];
+  for (const [x, z] of near) assert.ok(plan.heightAt(x, z) > SEA_LEVEL, `(${x.toFixed(1)}, ${z.toFixed(1)}) 應是陸地`);
+});
+
+test('東側的山離島越遠越高：近島處是低矮丘陵，遠處有明顯隆起的主峰', () => {
+  const layout = layoutOf();
+  const plan = planOutskirts(layout);
+  const { maxX, minZ, maxZ } = layout.bounds;
+  // 島東緣往東 from~to 單位、南北 spread 範圍內的最高點。
+  const highest = (from, to, spread) => {
+    let top = -Infinity;
+    for (let x = maxX + from; x <= maxX + to; x += 0.5) {
+      for (let z = minZ - spread; z <= maxZ + spread; z += 0.5) top = Math.max(top, plan.heightAt(x, z));
+    }
+    return top;
+  };
+
+  assert.ok(highest(1, 5, 0) < 2, `近島五單位內最高 ${highest(1, 5, 0).toFixed(1)}`);
+  assert.ok(highest(30, 50, 30) > 12, `遠處最高 ${highest(30, 50, 30).toFixed(1)}`);
+});
+
 test('外圍的地形、樹、霧團、雲、飛鳥都在高度上限下方，從允許的視角看不會擋住格子', () => {
   const layout = layoutOf();
   for (const quality of ['high', 'low']) {
@@ -50,6 +76,8 @@ test('外圍的地形、樹、霧團、雲、飛鳥都在高度上限下方，�
       for (let z = -plan.extent; z <= plan.extent; z += 1.7) below(x, plan.heightAt(x, z), z, '地形');
     }
     for (const tree of plan.trees) below(tree.x, tree.y + tree.height, tree.z, '樹頂');
+    for (const house of plan.houses) below(house.x, house.y + house.height + house.roof, house.z, '屋頂');
+    assert.ok(plan.houses.length > 0, '平原上有聚落');
     for (let t = 0; t < 600; t += 7) {
       const { clouds, fogBanks, birds } = ambientAt(plan, t);
       for (const c of clouds) below(c.x, c.y, c.z, '雲');

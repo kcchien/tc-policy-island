@@ -47,8 +47,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-parts.js   零件分桶規則（Node 可測）
   js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
-  js/island-terrain.js 外圍地形與環境的配置（Node 可測）：noise 地形（西側海岸、東側山稜）、依高度上色、各畫質的樹與霧數量、樹群、霧團、雲、飛鳥與依動畫時間的位置；外圍物件高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
-  js/island-outskirts.js 外圍的 3D 場景：地形網格、樹群 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
+  js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈）、地面色、各畫質的樹、霧、聚落數量、樹群、聚落、霧團、雲、飛鳥與依動畫時間的位置；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
+  js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例、候選人分頁
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）

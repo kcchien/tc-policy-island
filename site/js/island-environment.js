@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { glowLevel, KEYFRAMES } from './island-daylight.js';
+import { SEA_LEVEL } from './island-terrain.js';
 
 const SKY_RADIUS = 300;
 
@@ -36,7 +37,7 @@ function skyDome() {
 }
 
 // center 是島中心，radius 是島的範圍半徑（決定陰影相機與太陽距離）。waterRadius 是水面的半徑，要蓋過外圍地形。
-export function createEnvironment(scene, { center, radius, quality, waterRadius = radius * 6 }) {
+export function createEnvironment(scene, { center, radius, quality, waterRadius }) {
   const sky = skyDome();
   sky.position.copy(center);
   scene.add(sky);
@@ -55,7 +56,7 @@ export function createEnvironment(scene, { center, radius, quality, waterRadius 
   const waterMaterial = new THREE.MeshStandardMaterial({ roughness: 0.75 });
   const water = new THREE.Mesh(new THREE.CircleGeometry(waterRadius, 64), waterMaterial);
   water.rotation.x = -Math.PI / 2;
-  water.position.copy(center).setY(0.12);
+  water.position.copy(center).setY(SEA_LEVEL);
   water.receiveShadow = true;
   scene.add(water);
 

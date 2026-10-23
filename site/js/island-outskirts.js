@@ -3,26 +3,29 @@
 // 只讀格子位置，不讀政見資料（ADR 0001）；色碼都在 island-terrain.js 的 TERRAIN_PALETTE。
 
 import * as THREE from 'three';
-import { ambientAt, planOutskirts, TERRAIN_PALETTE, terrainColor } from './island-terrain.js';
+import { ambientAt, OUTSKIRTS_DETAIL, planOutskirts, TERRAIN_PALETTE } from './island-terrain.js';
 
 // 夜間係數超過這個值，鳥回巢不畫。
 const BIRDS_UNTIL_NIGHT = 0.75;
-// 雲影最多幾朵（著色器的陣列長度），與雲的數量上限相同。
-const MAX_CLOUD_SHADOWS = 9;
+// 雲影最多幾朵（著色器的陣列長度），等於各畫質雲的數量上限。
+const MAX_CLOUD_SHADOWS = Math.max(...Object.values(OUTSKIRTS_DETAIL).map((d) => d.clouds));
 
-// 地形網格：平面依高度抬起，每個頂點依高度上色，flatShading 呈現低多邊形的面。
+// 地形網格：平面依高度抬起，每個三角面取面心的地面色（田塊、浪花線的邊界才清楚），flatShading 呈現低多邊形的面。
 function terrainMesh(plan, material) {
   const size = plan.extent * 2;
-  const geometry = new THREE.PlaneGeometry(size, size, plan.segments, plan.segments);
+  const segments = plan.detail.segments;
+  const geometry = new THREE.PlaneGeometry(size, size, segments, segments).toNonIndexed();
   geometry.rotateX(-Math.PI / 2);
   geometry.translate(plan.center.x, 0, plan.center.z);
   const position = geometry.attributes.position;
+  for (let i = 0; i < position.count; i++) position.setY(i, plan.heightAt(position.getX(i), position.getZ(i)));
   const colors = new Float32Array(position.count * 3);
   const color = new THREE.Color();
-  for (let i = 0; i < position.count; i++) {
-    const h = plan.heightAt(position.getX(i), position.getZ(i));
-    position.setY(i, h);
-    color.setHex(terrainColor(h)).toArray(colors, i * 3);
+  for (let i = 0; i < position.count; i += 3) {
+    const x = (position.getX(i) + position.getX(i + 1) + position.getX(i + 2)) / 3;
+    const z = (position.getZ(i) + position.getZ(i + 1) + position.getZ(i + 2)) / 3;
+    color.setHex(plan.colorAt(x, z));
+    for (let k = 0; k < 3; k++) color.toArray(colors, (i + k) * 3);
   }
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
@@ -32,12 +35,7 @@ function terrainMesh(plan, material) {
 }
 
 // 雲影：在地形與水面的材質加一段著色器，雲正下方的地面依距離變暗。uniform 每幀由 update 更新。
-function cloudShadowUniforms() {
-  return {
-    cloudShadows: { value: Array.from({ length: MAX_CLOUD_SHADOWS }, () => new THREE.Vector4()) },
-  };
-}
-export function addCloudShadows(material, uniforms) {
+function addCloudShadows(material, uniforms) {
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
@@ -86,7 +84,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   const group = new THREE.Group();
   group.name = 'outskirts';
 
-  const shadows = cloudShadowUniforms();
+  const shadows = { cloudShadows: { value: Array.from({ length: MAX_CLOUD_SHADOWS }, () => new THREE.Vector4()) } };
   const groundMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.95, metalness: 0 });
   addCloudShadows(groundMaterial, shadows);
   addCloudShadows(environment.waterMaterial, shadows);
@@ -110,7 +108,19 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     canopy.setMatrixAt(i, m.compose(p.set(tree.x, tree.y + trunkHeight, tree.z), q, s.set(tree.radius, tree.height - trunkHeight, tree.radius)));
     canopy.setColorAt(i, color.setHex(tree.color));
   });
-  for (const mesh of [canopy, trunk]) {
+  // 聚落：牆與屋頂各一個 InstancedMesh。屋頂是四角錐，屋頂色每戶各自取。
+  const wallGeometry = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
+  const roofGeometry = new THREE.ConeGeometry(Math.SQRT1_2, 1, 4).rotateY(Math.PI / 4).translate(0, 0.5, 0);
+  const walls = new THREE.InstancedMesh(wallGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.wall, flatShading: true, roughness: 0.9 }), Math.max(1, plan.houses.length));
+  const roofs = new THREE.InstancedMesh(roofGeometry, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9 }), Math.max(1, plan.houses.length));
+  walls.count = roofs.count = plan.houses.length;
+  plan.houses.forEach((house, i) => {
+    q.setFromAxisAngle(up, house.rotation);
+    walls.setMatrixAt(i, m.compose(p.set(house.x, house.y - 0.03, house.z), q, s.set(house.width, house.height + 0.03, house.depth)));
+    roofs.setMatrixAt(i, m.compose(p.set(house.x, house.y + house.height, house.z), q, s.set(house.width * 1.1, house.roof, house.depth * 1.1)));
+    roofs.setColorAt(i, color.setHex(house.roofColor));
+  });
+  for (const mesh of [canopy, trunk, walls, roofs]) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.computeBoundingSphere();

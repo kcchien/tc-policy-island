@@ -30,9 +30,9 @@ export const KEYFRAMES = {
   },
   dusk: {
     skyTop: 0xa9a0a8, skyHorizon: 0xdcb9a0, fog: 0xcdb4a2, fogNear: 55, fogFar: 140,
-    sunColor: 0xe6cdb8, sunIntensity: 1.3, sunDirection: [-16, 6, 4],
-    hemiSky: 0xcdb9b0, hemiGround: 0x6e4434, hemiIntensity: 1.2,
-    water: 0x9a9894, night: 0.55, exposure: 1.05,
+    sunColor: 0xe6cdb8, sunIntensity: 1.7, sunDirection: [-16, 9, 5],
+    hemiSky: 0xd6c9c0, hemiGround: 0x86705e, hemiIntensity: 1.6,
+    water: 0x8fa8a2, night: 0.55, exposure: 1.2,
   },
   night: {
     skyTop: 0x1d1f27, skyHorizon: 0x3b3c46, fog: 0x34353e, fogNear: 45, fogFar: 125,
