@@ -616,7 +616,8 @@ export function batchMarkerFaces(scene, signs) {
   }
   const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
   const batches = [...byGeometry].map(([geometry, faces]) => {
-    const [lit, off] = [signLitMaterial(), signOffMaterial()].map((m) => {
+    // 灰色牌面半透明，同一個 InstancedMesh 的實例之間不排序：不寫深度，前後互疊時不會互相剪掉。
+    const [lit, off] = [signLitMaterial(), Object.assign(signOffMaterial().clone(), { depthWrite: false })].map((m) => {
       const mesh = new THREE.InstancedMesh(geometry, m, faces.length);
       // 實例跟著格子抬高，建立時的包圍球不準。
       mesh.frustumCulled = false;

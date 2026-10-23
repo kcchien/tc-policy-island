@@ -141,7 +141,7 @@ test('直式畫面的預設視角用較低俯角並轉一點方位角，島比�
   assert.ok(Math.abs(Math.max(box.maxX - box.minX, box.maxY - box.minY) / 2 - 0.8) < 0.01);
 });
 
-test('橫式畫面的預設視角不給比例時，東西長的島占可視區寬度八成以上並置中；直式維持 FILL.portrait', () => {
+test('橫式畫面的預設視角不給比例時，東西長的島占可視區寬度八成以上（設定 FILL.landscape）並置中；直式維持 FILL.portrait', () => {
   const points = taichungLike();
   for (const aspect of [1085 / 900, 16 / 9, 1.0]) {
     const view = homeView(points, { fov: 32, aspect });

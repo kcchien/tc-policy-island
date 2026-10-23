@@ -138,16 +138,17 @@ function withLift(material, lift) {
 
 // 合併桶：每個零件的共用幾何套上自己的變換，連同顏色與議題區序號接成一個網格，整桶一次繪製呼叫。
 // 零件已依議題區排序（island-parts.js），每區的三角形連在一起，記成區段與外框；點選時只檢查射線打中外框的區段。
-// normals 為 false 時不存法向量（flatShading 的材質由著色器算面法向量）。
-function mergedMesh(bucket, material, { slotOf, lift, normals }) {
+// 法向量一律保留：flatShading 的材質雖然由著色器算面法向量，接收陰影的 normalBias 仍讀頂點法向量，缺了會算出 NaN。
+function mergedMesh(bucket, material, { slotOf, lift }) {
   let vertexCount = 0;
   let indexCount = 0;
   for (const { geometry } of bucket.items) {
+    if (!geometry.attributes.normal) geometry.computeVertexNormals();
     vertexCount += geometry.attributes.position.count;
     indexCount += geometry.index ? geometry.index.count : geometry.attributes.position.count;
   }
   const position = new Float32Array(vertexCount * 3);
-  const normal = normals ? new Float32Array(vertexCount * 3) : null;
+  const normal = new Float32Array(vertexCount * 3);
   // 顏色存線性值，16 位元避免深色出現色階。
   const colors = new Uint16Array(vertexCount * 3);
   const owners = new Uint8Array(vertexCount);
@@ -163,20 +164,19 @@ function mergedMesh(bucket, material, { slotOf, lift, normals }) {
     const pos = geometry.attributes.position;
     normalMatrix.getNormalMatrix(transform);
     color.setHex(part.color);
-    const slot = slotOf(part.owner ?? null);
+    // instancify 收集零件時 owner 已是議題區識別碼或 null。
+    const slot = slotOf(part.owner);
     let range = ranges.at(-1);
-    if (!range || range.owner !== (part.owner ?? null)) {
-      range = { owner: part.owner ?? null, slot, start: io, count: 0, box: new THREE.Box3() };
+    if (!range || range.owner !== part.owner) {
+      range = { owner: part.owner, slot, start: io, count: 0, box: new THREE.Box3() };
       ranges.push(range);
     }
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i).applyMatrix4(transform);
       position.set([v.x, v.y, v.z], (vo + i) * 3);
       range.box.expandByPoint(v);
-      if (normal) {
-        v.fromBufferAttribute(geometry.attributes.normal, i).applyMatrix3(normalMatrix).normalize();
-        normal.set([v.x, v.y, v.z], (vo + i) * 3);
-      }
+      v.fromBufferAttribute(geometry.attributes.normal, i).applyMatrix3(normalMatrix).normalize();
+      normal.set([v.x, v.y, v.z], (vo + i) * 3);
       colors.set([color.r, color.g, color.b].map((c) => Math.round(c * 65535)), (vo + i) * 3);
       owners[vo + i] = slot;
     }
@@ -188,7 +188,7 @@ function mergedMesh(bucket, material, { slotOf, lift, normals }) {
   }
   const merged = new THREE.BufferGeometry();
   merged.setAttribute('position', new THREE.BufferAttribute(position, 3));
-  if (normal) merged.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  merged.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
   merged.setAttribute('color', new THREE.BufferAttribute(colors, 3, true));
   merged.setAttribute('kitOwner', new THREE.BufferAttribute(owners, 1));
   merged.setIndex(new THREE.BufferAttribute(index, 1));
@@ -284,7 +284,7 @@ export function instancify(root, { glowMaterial }) {
     }
     let mesh;
     if (bucket.merged) {
-      mesh = mergedMesh(bucket, materials[bucket.material], { slotOf, lift, normals: bucket.material === 'clay' });
+      mesh = mergedMesh(bucket, materials[bucket.material], { slotOf, lift });
       if (bucket.castShadow) mesh.customDepthMaterial = depthMaterial;
     } else {
       mesh = new THREE.InstancedMesh(bucket.items[0].geometry, materials[bucket.material], bucket.items.length);

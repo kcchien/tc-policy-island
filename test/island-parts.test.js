@@ -1,6 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { castsShadow, partBuckets, SCALE_JITTER, scaleJitter } from '../site/js/island-parts.js';
+import { buildPublicDataset } from '../site/js/dataset.js';
+import { buildViewModel } from '../site/js/view-model.js';
+import { islandLayout } from '../site/js/island-layout.js';
+import { heroPlan, heroSceneFor } from '../site/js/island-heroes.js';
+import { decorPlan } from '../site/js/island-decor.js';
+import { decorModel } from '../site/js/island-decor-models.js';
+import { loadRawData } from '../scripts/lib/raw-data.js';
 
 const SHAPES = ['box', 'cone6', 'cyl8:0.5'];
 const MATERIALS = ['standard', 'glow'];
@@ -57,6 +65,23 @@ test('合併的桶依議題區排序：同一區的零件相鄰（點選與選�
 test('繪製呼叫數不隨零件數線性增加：零件從 60 個加到 6000 個，桶數不變', () => {
   const counts = [60, 600, 6000].map((n) => partBuckets(parts(n)).length);
   assert.deepEqual(counts, [4, 4, 4]);
+});
+
+test('正式資料的主題場景與靜態裝飾合批後不超過 8 桶，投影的只有 1 桶（繪製呼叫預算：桌面 ≤ 200、手機 ≤ 150）', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(fileURLToPath(new URL('../data/raw', import.meta.url))))));
+  // 零件庫的材質種類：發光形體是 glow，其他零件庫形體都是 clay（island-kit.js 的 materialKind）。
+  const kitPart = (part, source, extra = {}) => ({
+    shape: part.shape, material: part.shape.startsWith('glow') ? 'glow' : 'clay', castShadow: castsShadow(source), ...extra,
+  });
+  const parts = [
+    ...heroPlan(layout).flatMap((hero) => heroSceneFor(hero.areaId).parts.map((p) => kitPart(p, 'hero', { owner: hero.areaId }))),
+    ...decorPlan(layout).tiles.flatMap((tile) => tile.items.flatMap((item) => decorModel(item.kind, tile.species)
+      .map((p) => kitPart(p, item.kind, { owner: tile.id, lod: item.small ? 'small' : null })))),
+  ];
+  const buckets = partBuckets(parts);
+  assert.ok(parts.length > 1000, `零件只有 ${parts.length} 個`);
+  assert.ok(buckets.length <= 8, `合批後 ${buckets.length} 桶：${buckets.map((b) => b.key).join('、')}`);
+  assert.equal(buckets.filter((b) => b.castShadow).length, 1);
 });
 
 test('投影的只有主題場景與大樹，小物件、路燈與其他裝飾不投影', () => {
