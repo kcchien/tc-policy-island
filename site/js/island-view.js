@@ -17,7 +17,10 @@ import { instancify } from './island-kit.js';
 import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
 import { createMotion } from './island-motion-view.js';
-import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE } from './island-models.js';
+import {
+  figureModel, hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE,
+} from './island-models.js';
+import { figurePose, plazaLayout } from './island-plaza.js';
 import { el } from './dom.js';
 
 const FOV = 32;
@@ -32,10 +35,10 @@ const LABEL_NARROW = new THREE.Vector3(0, TILE_SURFACE + 0.9, -0.2);
 // 構圖時算進的高度：格子頂面加上元素模型的最高高度（island-models.js 的元素區）。
 const MODEL_TOP = TILE_SURFACE + 1.1;
 
-// onSelectArea(areaId) 在使用者點選議題區格子時呼叫。
+// onSelectArea(areaId) 在使用者點選議題區格子時呼叫；onSelectCandidate(candidateId) 在點選候選人人物時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 // insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
-export function createIslandView(stage, { vm, reducedMotion, onSelectArea, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
+export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
   const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -61,6 +64,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   const scene = new THREE.Scene();
 
   const layout = islandLayout(vm);
+  const plaza = plazaLayout(layout);
   const { bounds } = layout;
   const outline = islandPoints(layout, { surface: TILE_SURFACE, top: MODEL_TOP });
   const center = new THREE.Vector3(bounds.center.x, 0, bounds.center.z);
@@ -83,9 +87,11 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     const g = new THREE.Group();
     g.position.set(tileInfo.position.x, 0, tileInfo.position.z);
     const { tile, top } = hexTile(layout.hexSize);
-    if (tileInfo.kind === 'decorative') top.material.color.setHex(PALETTE.decorativeTop);
+    // 候選人廣場是鋪面的裝飾格，在地感元素照議題區格子的位置放在北半，南半站候選人人物。
+    const isPlaza = tileInfo.id === plaza.tile?.id;
+    if (tileInfo.kind === 'decorative') top.material.color.setHex(isPlaza ? PALETTE.plazaTop : PALETTE.decorativeTop);
     g.add(tile);
-    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, tileInfo.kind);
+    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, isPlaza ? 'area' : tileInfo.kind);
     if (model) {
       model.position.y = TILE_SURFACE;
       g.add(model);
@@ -115,6 +121,41 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     }
     scene.add(g);
   }
+  // 候選人人物：三人同一款，依排序規則並排在廣場。人物不移動，只有待機動畫。
+  // 頭上名牌只有形狀；姓名寫在廣場南端的廣場名牌，三人並列（姓名放頭上會互疊）。
+  const plate = (info) => [el('b', { class: 'island-label-number' }, info.symbol), el('span', { class: 'island-label-name' }, info.name)];
+  const figures = plaza.figures.map((info) => {
+    const { model, body, hit } = figureModel(info);
+    model.position.set(info.position.x, TILE_SURFACE, info.position.z);
+    hit.userData.candidateId = info.candidateId;
+    const label = new CSS2DObject(el('span', { class: 'island-label-anchor' },
+      el('span', { class: 'island-label island-figure-label' }, el('b', { class: 'island-label-number' }, info.symbol))));
+    label.position.y = info.labelHeight;
+    model.add(label);
+    scene.add(model);
+    return { info, body, hit };
+  });
+  if (plaza.tile) {
+    // 名牌層不接收指標事件，廣場名牌上的姓名另外開放點選，手機上比點人物容易。
+    // 名牌層對輔助科技隱藏，候選人資料由索引的「候選人」分頁提供，所以姓名按鈕不進 Tab 順序。
+    const entries = plaza.figures.map((info) => {
+      const button = el('button', { type: 'button', class: 'island-plaza-entry', tabindex: '-1' }, ...plate(info));
+      button.addEventListener('click', () => onSelectCandidate?.(info.candidateId));
+      return button;
+    });
+    const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' },
+      el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, '候選人廣場'), ...entries)));
+    sign.position.set(plaza.sign.x, TILE_SURFACE, plaza.sign.z);
+    scene.add(sign);
+  }
+  const figureHits = figures.map((f) => f.hit);
+  animator.add((t) => {
+    for (const { info, body } of figures) {
+      const { stretch, tilt } = figurePose(info.idle, t);
+      body.scale.y = info.scale * stretch;
+      body.rotation.z = tilt;
+    }
+  });
   scene.add(streetLamps(tileCorners(layout)));
   // 每格的循環道具、市民、環線車輛與路網（island-motion-view.js），配置不讀政見。
   const motion = createMotion(scene, layout, { level: quality.level, groupOf: (id) => tiles.get(id)?.group, glowMaterial: environment.glowMaterial });
@@ -307,47 +348,57 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     requestRender();
   }
 
-  // 射線打到的第一個議題區格子：合批的零件從實例查回議題區，其餘往上找格子群組。
-  // 裝飾格與路燈的零件沒有議題區，射線穿過去。
+  // 射線打到的第一個議題區格子或候選人人物，回傳 { areaId } 或 { candidateId }。
+  // 合批的零件從實例查回議題區，其餘往上找格子群組。裝飾格與路燈的零件沒有議題區，射線穿過去。
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const areaOf = (hit) => {
-    if (hit.object.isInstancedMesh) return kit.ownerOf(hit);
+  const targetOf = (hit) => {
+    if (hit.object.userData.candidateId) return { candidateId: hit.object.userData.candidateId };
+    if (hit.object.isInstancedMesh) {
+      const areaId = kit.ownerOf(hit);
+      return areaId ? { areaId } : null;
+    }
     let node = hit.object;
     while (node && !node.userData.areaId) node = node.parent;
-    return node?.userData.areaId ?? null;
+    return node ? { areaId: node.userData.areaId } : null;
   };
-  function areaAt(clientX, clientY) {
+  function targetAt(clientX, clientY) {
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    return raycaster.intersectObjects(pickable, true).map(areaOf).find(Boolean) ?? null;
+    return raycaster.intersectObjects([...pickable, ...figureHits], true).map(targetOf).find(Boolean) ?? null;
   }
 
-  // 滑過格子（桌面滑鼠）：淡色外框，游標旁顯示議題區編號與名稱。每幀最多查一次射線。
+  // 滑過格子或人物（桌面滑鼠）：格子顯示淡色外框；游標旁顯示議題區編號與名稱，或人物的形狀與姓名。
+  // 每幀最多查一次射線。
   const hoverTip = el('p', { class: 'island-hover', 'aria-hidden': 'true' });
   hoverTip.hidden = true;
   stage.append(hoverTip);
+  // hoveredId 是滑過的議題區（外框用）；hoveredKey 另含人物，判斷滑過目標有沒有變。
   let hoveredId = null;
+  let hoveredKey = null;
   let hoverAt = null;
   let hoverPending = false;
-  const setHover = (areaId) => {
-    if (areaId === hoveredId) return;
-    hoveredId = areaId;
-    selection.hover(areaId && tileCenter(areaId));
-    renderer.domElement.classList.toggle('is-hovering', Boolean(areaId));
-    hoverTip.hidden = !areaId;
-    if (areaId) {
-      const label = tiles.get(areaId).label;
-      hoverTip.replaceChildren(...[...label.childNodes].map((node) => node.cloneNode(true)));
+  const setHover = (target) => {
+    const key = target ? target.areaId ?? `candidate:${target.candidateId}` : null;
+    if (key === hoveredKey) return;
+    hoveredKey = key;
+    hoveredId = target?.areaId ?? null;
+    selection.hover(hoveredId && tileCenter(hoveredId));
+    renderer.domElement.classList.toggle('is-hovering', Boolean(target));
+    hoverTip.hidden = !target;
+    if (target) {
+      hoverTip.replaceChildren(...(target.areaId
+        ? [...tiles.get(target.areaId).label.childNodes].map((node) => node.cloneNode(true))
+        : plate(plaza.figures.find((f) => f.candidateId === target.candidateId))));
     }
     requestRender();
   };
   const updateHover = () => {
     hoverPending = false;
     if (!hoverAt) return setHover(null);
-    setHover(areaAt(hoverAt.x, hoverAt.y));
-    if (!hoveredId) return;
+    setHover(targetAt(hoverAt.x, hoverAt.y));
+    if (!hoveredKey) return;
     const rect = stage.getBoundingClientRect();
     hoverTip.style.left = `${hoverAt.x - rect.left}px`;
     hoverTip.style.top = `${hoverAt.y - rect.top}px`;
@@ -389,8 +440,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     const isClick = down && !multiTouch && !isDrag(down, { x: event.clientX, y: event.clientY });
     release(event);
     if (!isClick) return;
-    const areaId = areaAt(event.clientX, event.clientY);
-    if (areaId) onSelectArea(areaId);
+    const target = targetAt(event.clientX, event.clientY);
+    if (target?.areaId) onSelectArea(target.areaId);
+    else if (target?.candidateId) onSelectCandidate?.(target.candidateId);
   });
 
   const observer = new ResizeObserver(resize);

@@ -561,6 +561,45 @@ body[data-view="island"] .policy-card::backdrop {
   opacity: 0.45;
 }
 
+/* 候選人廣場：人物頭上只有形狀；姓名在廣場南端的廣場名牌，三人同字級並列，掛在格子下方。 */
+.island-figure-label {
+  padding: 1px 6px;
+}
+
+.island-plaza-sign {
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: none;
+  /* 錨點在格子南端；名牌往下移半個自身高度，頂端貼著錨點，不蓋住人物 */
+  margin-top: 12px;
+  translate: 0 50%;
+  white-space: nowrap;
+}
+
+.island-plaza-title {
+  flex-basis: 100%;
+  color: var(--charcoal-soft);
+  font-size: 0.6875rem;
+  text-align: center;
+}
+
+.island-plaza-entry {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.island-plaza-entry:hover {
+  text-decoration: underline;
+}
+
 /* 索引面板 */
 
 .index-panel {
@@ -1604,6 +1643,21 @@ body[data-view="island"] .policy-card::backdrop {
 
   .island-label-number {
     font-size: 0.6875rem;
+  }
+
+  /* 廣場名牌在島的邊緣，姓名照樣顯示；改成直列，寬度才不會超出畫面 */
+  .island-plaza-sign {
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 12px;
+  }
+
+  .island-plaza-title {
+    flex-basis: auto;
+  }
+
+  .island-plaza-sign .island-label-name {
+    display: inline;
   }
 
   .policy-table,
