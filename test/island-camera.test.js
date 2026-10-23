@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout, islandPoints, projectedBox } from '../site/js/island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, FLIGHT_MS, flightDuration, homeView, isDrag,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, FILL, FLIGHT_MS, flightDuration, homeView, isDrag,
 } from '../site/js/island-camera.js';
 import { makeRaw } from './fixtures/make-raw.js';
 
@@ -139,4 +139,18 @@ test('直式畫面的預設視角用較低俯角並轉一點方位角，島比�
   const box = projectedBox(points, { fov: 32, aspect: portraitAspect, ...portrait });
   assert.ok(Math.abs((box.minX + box.maxX) / 2) < 0.01 && Math.abs((box.minY + box.maxY) / 2) < 0.01, JSON.stringify(box));
   assert.ok(Math.abs(Math.max(box.maxX - box.minX, box.maxY - box.minY) / 2 - 0.8) < 0.01);
+});
+
+test('橫式畫面的預設視角不給比例時，東西長的島占可視區寬度八成以上並置中；直式維持 FILL.portrait', () => {
+  const points = taichungLike();
+  for (const aspect of [1085 / 900, 16 / 9, 1.0]) {
+    const view = homeView(points, { fov: 32, aspect });
+    const box = projectedBox(points, { fov: 32, aspect, ...view });
+    assert.ok((box.maxX - box.minX) / 2 >= 0.8, `長寬比 ${aspect} 的島寬只占 ${((box.maxX - box.minX) / 2).toFixed(2)}`);
+    assert.ok(box.minX >= -1 && box.maxX <= 1 && box.minY >= -1 && box.maxY <= 1, '島超出畫面');
+    assert.ok(Math.abs(Math.max(box.maxX - box.minX, box.maxY - box.minY) / 2 - FILL.landscape) < 0.01);
+  }
+  const portrait = homeView(points, { fov: 32, aspect: 390 / 600 });
+  const box = projectedBox(points, { fov: 32, aspect: 390 / 600, ...portrait });
+  assert.ok(Math.abs(Math.max(box.maxX - box.minX, box.maxY - box.minY) / 2 - FILL.portrait) < 0.01);
 });

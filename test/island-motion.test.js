@@ -417,8 +417,8 @@ test('放大後的道具、市民、主題場景、在地感元素與靜態裝�
   }
 
   // 橫式桌面與直式手機（扣掉浮動元件後的可見範圍長寬比）。
-  for (const aspect of [1.6, 1.2, 0.6, 0.5, 0.46]) {
-    const view = homeView(outline, { fov: 32, aspect, fill: 0.8 });
+  for (const aspect of [2.6, 2.2, 2.0, 1.9, 1.8, 1.6, 1.4, 1.2, 1.0, 0.9, 0.6, 0.5, 0.46]) {
+    const view = homeView(outline, { fov: 32, aspect });
     const camera = [
       view.target.x + view.distance * Math.sin(view.polar) * Math.sin(view.azimuth),
       view.distance * Math.cos(view.polar),

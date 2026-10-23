@@ -367,7 +367,7 @@ export function createIslandView(stage, {
     remeasureLabels();
     // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
-    const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
+    const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect });
     Object.assign(controls, cameraLimits(bounds, view.distance));
     home = { ...view, target: new THREE.Vector3(view.target.x, 0, view.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。
