@@ -126,10 +126,12 @@ export const MARKER_TEXT = {
 };
 
 // 島嶼檢視與工具列。
-export const TIME_NAMES = { dawn: '清晨', day: '白天', dusk: '黃昏', night: '夜晚' };
+// auto 是「自動」：依台灣時間選時段。
+export const TIME_NAMES = { auto: '自動', dawn: '清晨', day: '白天', dusk: '黃昏', night: '夜晚' };
 export const ISLAND_TEXT = {
   plaza: '候選人廣場',
   timeCycle: (name) => `切換時段，目前${name}`,
+  timeCycleAuto: (name) => `切換時段，目前自動（${name}）`,
   pause: '暫停',
   play: '播放',
   loadFailed: '島嶼檢視載入失敗，已改用表格檢視。',
