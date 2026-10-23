@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
-import { makeRaw, policy, pendingVerification } from './fixtures/make-raw.js';
+import { makeRaw, policy, pendingVerification, localElement } from './fixtures/make-raw.js';
 
 const viewModelOf = (raw) => buildViewModel(buildPublicDataset(raw));
 
@@ -109,4 +109,31 @@ test('每則原文引述附上出處（來源類型中文名、網址、出處�
     sourceTypeName: '官網',
     retrievedAt: '2026-10-23',
   });
+});
+
+test('議題區附上配對的在地感元素，裝飾格一併帶出並附元素，供島嶼檢視使用', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-mountain'), localElement('el-snack', '小吃')];
+  raw.issueAreas[0].localElementId = 'el-snack';
+  raw.decorativeTiles = [
+    { id: 'tile-east', axial: [2, 0], localElementId: 'el-mountain' },
+    { id: 'tile-empty', axial: [3, 0], localElementId: null },
+  ];
+
+  const vm = viewModelOf(raw);
+
+  assert.deepEqual(
+    vm.rows.map((row) => [row.issueArea.id, row.issueArea.axial, row.localElement?.id ?? null, row.localElement?.category ?? null]),
+    [
+      ['area-a', [0, 0], 'el-snack', '小吃'],
+      ['area-b', [1, 0], null, null],
+    ],
+  );
+  assert.deepEqual(
+    vm.decorativeTiles.map((tile) => [tile.id, tile.axial, tile.localElement?.name ?? null]),
+    [
+      ['tile-east', [2, 0], '元素el-mountain'],
+      ['tile-empty', [3, 0], null],
+    ],
+  );
 });

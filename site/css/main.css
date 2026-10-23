@@ -242,6 +242,215 @@ select {
   margin-top: 8px;
 }
 
+/* 檢視切換：兩種檢視共用頁首、搜尋列與政見卡片 */
+
+body[data-view="island"] .table-root,
+body[data-view="table"] .island-view {
+  display: none;
+}
+
+/* 島嶼檢視：左側 3D 島，右側議題區清單 */
+
+.island-view {
+  /* 島是東西長的橫長形，畫布太高只會多出上下的空水面。 */
+  --island-height: clamp(420px, calc(100dvh - 240px), 560px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.island-stage {
+  position: relative;
+  height: var(--island-height);
+  overflow: hidden;
+  border-radius: var(--radius-large);
+  background: var(--rice-deep);
+  touch-action: none;
+}
+
+.island-canvas {
+  display: block;
+  cursor: grab;
+}
+
+.island-canvas:active {
+  cursor: grabbing;
+}
+
+.island-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.island-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--gap);
+  color: var(--charcoal-soft);
+  text-align: center;
+}
+
+.island-reset {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--laterite);
+  border-radius: 999px;
+  background: var(--rice);
+  color: var(--laterite);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.island-reset:hover {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+/* 長名牌每行最多四字，同一列相鄰的名牌才不會互疊。 */
+.island-label {
+  display: block;
+  max-width: calc(4em + 14px);
+  padding: 2px 7px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--rice) 88%, transparent);
+  box-shadow: var(--shadow);
+  color: var(--charcoal);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.island-label.is-selected {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+.island-label.is-dimmed {
+  opacity: 0.45;
+}
+
+.island-panel {
+  display: flex;
+  flex-direction: column;
+  height: var(--island-height);
+  min-height: 0;
+  background: var(--rice-deep);
+  border-radius: var(--radius-large);
+}
+
+.island-panel-toggle {
+  display: none;
+}
+
+.island-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.island-panel-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-note {
+  flex-basis: 100%;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.island-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.island-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  background: var(--rice);
+  text-align: left;
+  cursor: pointer;
+}
+
+.island-item:hover {
+  border-color: var(--laterite-soft);
+}
+
+.island-item[aria-current="true"] {
+  border-color: var(--laterite);
+  box-shadow: inset 4px 0 0 var(--laterite);
+}
+
+.island-item-markers {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+}
+
+/* 標記徽章：三人同色同尺寸，亮起是實心，沒有政見是淡灰。 */
+.marker-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 1px solid var(--candidate);
+  border-radius: 4px;
+  color: var(--candidate);
+  font-family: var(--font-mono);
+  line-height: 1;
+  opacity: 0.4;
+}
+
+.marker-badge.is-lit {
+  background: var(--candidate);
+  color: var(--rice);
+  opacity: 1;
+}
+
+.area-row.is-selected .area-cell {
+  outline: 2px solid var(--laterite);
+}
+
 /* 表格檢視：候選人欄等寬（table-layout: fixed），字級相同 */
 
 .policy-table {
@@ -583,6 +792,137 @@ select {
   .field-search,
   .field-district {
     flex: 1 1 100%;
+  }
+
+  /* 島嶼檢視：島占滿螢幕寬度，議題區清單改為底部抽屜。頁首與搜尋列縮小，讓島在第一個畫面就完整出現。 */
+  .island-view {
+    --island-height: clamp(280px, 78vw, 56dvh);
+    grid-template-columns: minmax(0, 1fr);
+    margin-inline: calc(-1 * var(--gap));
+  }
+
+  .island-stage {
+    border-radius: 0;
+  }
+
+  /* 直書名牌往上長，按鈕放右下角才不會壓到東北角的名牌。 */
+  .island-reset {
+    top: auto;
+    bottom: 10px;
+  }
+
+  body[data-view="island"] {
+    padding-bottom: 64px;
+  }
+
+  body[data-view="island"] .site-header {
+    padding-top: 10px;
+  }
+
+  body[data-view="island"] .view-button {
+    min-height: 36px;
+    padding: 4px 12px;
+  }
+
+  body[data-view="island"] .toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 6.5rem auto;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  body[data-view="island"] .toolbar .field label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  body[data-view="island"] .toolbar input,
+  body[data-view="island"] .toolbar select {
+    padding: 8px;
+  }
+
+  body[data-view="island"] .filter-reset {
+    min-height: 44px;
+    padding: 4px 8px;
+  }
+
+  body[data-view="island"] .order-note {
+    margin-top: 8px;
+    font-size: 0.8125rem;
+  }
+
+  /* 每格只有約 35px 寬，橫書名牌必然互相重疊，改為直書。
+     錨點高度為 0，名牌往上長，底端對齊格子，不蓋住格子南側的標記。 */
+  .island-label-anchor {
+    display: block;
+    height: 0;
+  }
+
+  .island-label {
+    display: block;
+    max-width: none;
+    padding: 3px 1px;
+    /* 錨點高度為 0，直書的行長會被算成 0，不禁止換行就會一字一行。 */
+    white-space: nowrap;
+    border-radius: 5px;
+    font-size: 0.6875rem;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    transform: translateY(-100%);
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .island-panel {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    height: auto;
+    max-height: 70dvh;
+    border-radius: var(--radius-large) var(--radius-large) 0 0;
+    box-shadow: var(--shadow);
+  }
+
+  .island-panel-toggle {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    border: 0;
+    background: transparent;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .island-panel-toggle::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 6px;
+    border-radius: 2px;
+    background: var(--laterite-soft);
+  }
+
+  .island-panel-body {
+    display: none;
+    padding-top: 0;
+  }
+
+  .island-panel.is-open .island-panel-body {
+    display: flex;
+  }
+
+  .island-panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
 
   .policy-table,
