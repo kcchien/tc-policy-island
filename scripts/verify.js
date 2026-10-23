@@ -1,6 +1,7 @@
-// 核對政見：node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--jobs 1]
+// 核對政見：node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--profiles-only] [--jobs 1]
 //   [--model claude-opus-5-5] [--claude claude] [--brand-terms data/rules/brand-terms.json] [--date YYYY-MM-DD]
-// 對每筆政見先跑第一層（逐字比對出處快照），通過才送第二層（claude -p 全新 session 依檢核表判定），
+// 先對候選人資料跑逐字比對（只有第一層），結果寫回 <raw>/candidates.json；--profiles-only 到此為止。
+// 再對每筆政見先跑第一層（逐字比對出處快照），通過才送第二層（claude -p 全新 session 依檢核表判定），
 // 結果寫回 <raw>/policies/<candidateId>.json 的 verification。見 ADR 0002。
 // --jobs 是第二層同時執行的 session 數，每筆仍各開一個全新 session。
 import { spawn } from 'node:child_process';
@@ -15,6 +16,7 @@ import { loadRawData, readJson } from './lib/raw-data.js';
 import {
   buildLayer2Request,
   checkLayer1,
+  checkProfileLayer1,
   LAYER2_OUTPUT_SCHEMA,
   loadVerificationRules,
   parseLayer2Output,
@@ -29,6 +31,7 @@ const { values } = parseArgs({
     raw: { type: 'string', default: 'data/raw' },
     candidate: { type: 'string', multiple: true },
     'skip-passed': { type: 'boolean', default: false },
+    'profiles-only': { type: 'boolean', default: false },
     jobs: { type: 'string', default: '1' },
     model: { type: 'string', default: 'claude-opus-5-5' },
     claude: { type: 'string', default: 'claude' },
@@ -132,6 +135,20 @@ function writePolicy(path, policy) {
   writeFileSync(path, `${JSON.stringify(records, null, 2)}\n`);
 }
 
+// 候選人資料只跑第一層（學歷與經歷逐字比對，沒有摘要），不花費用，每次都重跑。結果寫回 candidates.json。
+function verifyProfiles(rawDir, snapshots) {
+  const path = join(rawDir, 'candidates.json');
+  const candidates = readJson(path);
+  const targets = candidates.filter((c) => c.profile !== null && (!values.candidate || values.candidate.includes(c.id)));
+  for (const candidate of targets) {
+    const result = checkProfileLayer1(candidate.profile, snapshots);
+    candidate.profile.verification = { layer1: { status: result.status, checkedAt: values.date } };
+    const detail = result.problems.length > 0 ? `；${result.problems.join('；')}` : '';
+    console.log(`${candidate.id} 候選人資料：逐字比對${STATUS_TEXT.layer1[result.status]}${detail}`);
+  }
+  if (targets.length > 0) writeFileSync(path, `${JSON.stringify(candidates, null, 2)}\n`);
+}
+
 // 兩層都以現行檢核表版本通過才算已通過；檢核表升版後舊的通過要重跑。
 const passedWithCurrentChecklist = (policy, checklistVersion) =>
   isVerified(policy) && policy.verification.layer2.checklistVersion === checklistVersion;
@@ -158,6 +175,8 @@ async function main() {
   });
   const { snapshots, notes } = readSnapshots(raw.sources);
   for (const note of notes) console.log(note);
+  verifyProfiles(rawDir, snapshots);
+  if (values['profiles-only']) return;
 
   const targets = raw.policies
     .filter((p) => !values.candidate || values.candidate.includes(p.candidateId))

@@ -5,8 +5,43 @@
     "party": "中國國民黨",
     "ballotNumber": null,
     "nameStrokes": 6,
-    "rawPolicyItems": { "total": 117, "sourceIds": ["chiang-main"] },
-    "dataStatus": null
+    "rawPolicyItems": {
+      "total": 117,
+      "sourceIds": [
+        "chiang-main"
+      ]
+    },
+    "dataStatus": null,
+    "profile": {
+      "birthYear": 1972,
+      "education": [
+        "美國南卡羅萊納大學國際關係博士",
+        "美國匹茲堡大學國際事務碩士",
+        "國立政治大學外交學系學士",
+        "台中一中",
+        "豐南國中",
+        "瑞穗國小"
+      ],
+      "experience": [
+        "中華民國第八、九、十屆立法委員",
+        "中國國民黨主席",
+        "行政院新聞局長",
+        "東吳大學政治系副教授",
+        "台灣經濟研究院國際處代處長",
+        "公民團體評鑑立法院優秀委員",
+        "國民黨立法院黨團總召",
+        "2021年美國《時代》雜誌全球百大未來領導人"
+      ],
+      "sourceId": "chiang-bulletin-2024",
+      "electionYear": 2024,
+      "electionName": "第11屆立法委員選舉（臺中市第8選舉區）",
+      "verification": {
+        "layer1": {
+          "status": "pass",
+          "checkedAt": "2026-10-23"
+        }
+      }
+    }
   },
   {
     "id": "ho-hsin-chun",
@@ -14,8 +49,39 @@
     "party": "民主進步黨",
     "ballotNumber": null,
     "nameStrokes": 7,
-    "rawPolicyItems": { "total": 153, "sourceIds": ["ho-main"] },
-    "dataStatus": null
+    "rawPolicyItems": {
+      "total": 153,
+      "sourceIds": [
+        "ho-main"
+      ]
+    },
+    "dataStatus": null,
+    "profile": {
+      "birthYear": 1973,
+      "education": [
+        "英國約克大學婦女研究碩士",
+        "國立成功大學",
+        "臺中女中",
+        "成功國中",
+        "塗城國小"
+      ],
+      "experience": [
+        "第八、九、十屆立法委員",
+        "立法院民主進步黨黨團幹事長、書記長",
+        "立法院教育及文化委員會、交通委員會召集委員",
+        "第一屆大臺中市議員",
+        "第十五、十六屆臺中縣議員"
+      ],
+      "sourceId": "ho-bulletin-2024",
+      "electionYear": 2024,
+      "electionName": "第11屆立法委員選舉（臺中市第7選舉區）",
+      "verification": {
+        "layer1": {
+          "status": "pass",
+          "checkedAt": "2026-10-23"
+        }
+      }
+    }
   },
   {
     "id": "hung-li-hua",
@@ -23,7 +89,28 @@
     "party": "司法正義黨",
     "ballotNumber": null,
     "nameStrokes": 9,
-    "rawPolicyItems": { "total": null, "sourceIds": [] },
-    "dataStatus": "尚無一手來源"
+    "rawPolicyItems": {
+      "total": null,
+      "sourceIds": []
+    },
+    "dataStatus": "尚無一手來源",
+    "profile": {
+      "birthYear": 1961,
+      "education": [
+        "沙鹿國中、嘉陽高級中學"
+      ],
+      "experience": [
+        "國立彰化師範大學企業高階管理碩士肄業，87年欣雅莉服裝至今，中港女國際同濟會副秘書長辦921賑災義賣會，烜烜莉工程行至今16年，洪麗華營造有限公司，曾擔任鹿寮里里長拜訪5000戶里民，創辦社團法人台中鑫關懷協會，擔任理事長，曾擔任鹿寮里守望相助隊第一屆大隊長。"
+      ],
+      "sourceId": "hung-bulletin-2024",
+      "electionYear": 2024,
+      "electionName": "第11屆立法委員選舉（臺中市第2選舉區）",
+      "verification": {
+        "layer1": {
+          "status": "pass",
+          "checkedAt": "2026-10-23"
+        }
+      }
+    }
   }
 ]

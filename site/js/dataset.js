@@ -77,6 +77,18 @@ const SCHEMAS = {
     'rawPolicyItems.total': 'count?',
     'rawPolicyItems.sourceIds': 'strings',
     dataStatus: 'string?',
+    // 候選人資料（中選會登記資料），null 表示尚未收錄。學歷與經歷逐字照出處，逐字比對通過才公開。
+    profile: 'object?',
+    'profile.birthYear': 'int',
+    'profile.education': 'strings',
+    'profile.experience': 'strings',
+    'profile.sourceId': 'string',
+    'profile.electionYear': 'int',
+    'profile.electionName': 'string',
+    'profile.verification': 'object',
+    'profile.verification.layer1': 'object',
+    'profile.verification.layer1.status': 'status',
+    'profile.verification.layer1.checkedAt': 'date?',
   },
   issueArea: {
     id: 'string',
@@ -107,6 +119,8 @@ const SCHEMAS = {
     archiveError: 'string?',
     snapshotPath: 'string',
     snapshotSha256: 'sha256',
+    // 出處快照的產生方式說明，例如 PDF 轉文字的工具與還原方法；直接取自網頁可見文字時為 null。
+    snapshotNote: 'string?',
     sourceType: 'sourceType',
     title: 'string',
     retrievedAt: 'date',
@@ -147,11 +161,12 @@ function lookup(record, path) {
   return { missing: false, value };
 }
 
-// 依欄位表檢查一筆資料；父欄位缺漏或型別錯誤時不再檢查其子欄位。
+// 依欄位表檢查一筆資料；父欄位缺漏、型別錯誤或為 null 時不再檢查其子欄位。
 function checkFields(record, schema, where, errors) {
   const broken = [];
+  const empty = [];
   for (const [path, spec] of Object.entries(schema)) {
-    if (broken.some((parent) => path.startsWith(`${parent}.`))) continue;
+    if ([...broken, ...empty].some((parent) => path.startsWith(`${parent}.`))) continue;
     const { missing, value } = lookup(record, path);
     if (missing) {
       errors.push(`${where}：缺少欄位 ${path}`);
@@ -160,7 +175,10 @@ function checkFields(record, schema, where, errors) {
     }
     const nullable = spec.endsWith('?');
     const type = TYPES[spec.replace('?', '')];
-    if (nullable && value === null) continue;
+    if (nullable && value === null) {
+      empty.push(path);
+      continue;
+    }
     if (!type.ok(value)) {
       errors.push(`${where}：欄位 ${path} 應為${type.desc}${nullable ? '或 null' : ''}，實際為 ${JSON.stringify(value)}`);
       broken.push(path);
@@ -205,10 +223,15 @@ function checkCandidates(candidates, sourcesById, errors) {
       errors.push(`候選人 ${c.id}：${rule.keyName}與 ${seen.get(c[rule.key])} 相同，無法決定排序`);
     }
     seen.set(c[rule.key], c.id);
-    for (const sourceId of c.rawPolicyItems.sourceIds) {
+    const refs = c.rawPolicyItems.sourceIds.map((sourceId) => ({ field: 'rawPolicyItems.sourceIds', sourceId }));
+    if (c.profile !== null) refs.push({ field: 'profile.sourceId', sourceId: c.profile.sourceId });
+    for (const { field, sourceId } of refs) {
       const source = sourcesById.get(sourceId);
-      if (!source) errors.push(`候選人 ${c.id}：rawPolicyItems.sourceIds 指向不存在的出處 ${sourceId}`);
-      else if (source.candidateId !== c.id) errors.push(`候選人 ${c.id}：rawPolicyItems.sourceIds 的出處 ${sourceId} 屬於候選人 ${source.candidateId}`);
+      if (!source) errors.push(`候選人 ${c.id}：${field} 指向不存在的出處 ${sourceId}`);
+      else if (source.candidateId !== c.id) errors.push(`候選人 ${c.id}：${field} 的出處 ${sourceId} 屬於候選人 ${source.candidateId}`);
+    }
+    if (c.profile !== null && c.profile.verification.layer1.status !== 'pending' && c.profile.verification.layer1.checkedAt === null) {
+      errors.push(`候選人 ${c.id}：候選人資料逐字比對已有結果，profile.verification.layer1.checkedAt 不得為 null`);
     }
   }
 }
@@ -310,10 +333,16 @@ export function orderCandidates(candidates) {
   };
 }
 
-// 公開的出處：被公開政見引用，或作為候選人原始政見條目總數的依據。
+// 候選人資料只有逐字比對通過才公開（沒有摘要，不做第二層）。見 ADR 0001。
+export function isProfileVerified(profile) {
+  return profile !== null && profile.verification.layer1.status === 'pass';
+}
+
+// 公開的出處：被公開政見引用、作為候選人原始政見條目總數的依據，或是公開候選人資料的出處。
 function publicSourceIds(candidates, policies) {
   return new Set([
     ...candidates.flatMap((c) => c.rawPolicyItems.sourceIds),
+    ...candidates.filter((c) => c.profile !== null).map((c) => c.profile.sourceId),
     ...policies.flatMap((p) => p.quotes.map((q) => q.sourceId)),
   ]);
 }
@@ -323,7 +352,10 @@ export function buildPublicDataset(raw, { builtAt = null } = {}) {
   const errors = validateRawData(raw);
   if (errors.length > 0) throw new DatasetValidationError(errors);
   const copy = structuredClone(raw);
-  const { candidateOrder, candidates } = orderCandidates(copy.candidates);
+  const { candidateOrder, candidates } = orderCandidates(copy.candidates.map((c) => ({
+    ...c,
+    profile: isProfileVerified(c.profile) ? c.profile : null,
+  })));
   const policies = copy.policies.filter(isVerified);
   const sourceIds = publicSourceIds(candidates, policies);
   return {

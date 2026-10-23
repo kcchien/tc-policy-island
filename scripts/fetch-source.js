@@ -1,8 +1,11 @@
 // 擷取一個出處：node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型>
-//   [--title <頁面標題>] [--html <本機 HTML 檔>] [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]
+//   [--title <頁面標題>] [--html <本機 HTML 檔>] [--pdf <本機 PDF 檔> [--page 1] [--glyph-map <字型對照檔>] [--pdftotext pdftotext]]
+//   [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]
 // 抓取頁面存成出處快照 <snapshots>/<sourceId>.txt，送 Wayback Machine 存檔，
 // 再把出處紀錄寫進 <raw>/sources/<candidateId>.json（同識別碼取代，否則加在最後）。
 // 頁面要登入或由瀏覽器渲染時，先在瀏覽器另存 HTML，用 --html 指定，--url 仍填原網址。
+// PDF 出處（例如選舉公報）先下載，用 --pdf 指定，以 pdftotext 轉出 --page 那一頁的文字；
+// 有字形抽不出文字時，用 --glyph-map 指定字型對照檔還原（見 scripts/lib/pdf-text.js），出處紀錄的 snapshotNote 會註明。
 // 存檔失敗只記錄原因，不中止；--no-archive 不送存檔（已有存檔網址時保留原紀錄的存檔欄位）。
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -11,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { SOURCE_TYPES } from '../site/js/dataset.js';
 import { readJson } from './lib/raw-data.js';
+import { pdfPageText } from './lib/pdf-text.js';
 import { htmlToSnapshotText, pageTitle, requestArchive } from './lib/source-capture.js';
 
 // snapshotPath 相對於 repo 根目錄，與 build.js、verify.js 相同。
@@ -26,6 +30,10 @@ const { values } = parseArgs({
     type: { type: 'string' },
     title: { type: 'string' },
     html: { type: 'string' },
+    pdf: { type: 'string' },
+    page: { type: 'string', default: '1' },
+    'glyph-map': { type: 'string' },
+    pdftotext: { type: 'string', default: 'pdftotext' },
     'no-archive': { type: 'boolean', default: false },
     raw: { type: 'string', default: 'data/raw' },
     snapshots: { type: 'string', default: 'data/snapshots' },
@@ -43,6 +51,26 @@ function checkArgs() {
   if (!/^https?:\/\/\S+$/.test(values.url)) throw new Error(`--url 應為 http(s) 網址，實際為 ${values.url}`);
   if (!/^[a-z0-9][a-z0-9-]*$/.test(values.id)) throw new Error(`--id 只能用小寫英數與連字號，實際為 ${values.id}`);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(values.date)) throw new Error(`--date 應為 YYYY-MM-DD，實際為 ${values.date}`);
+  if (values.pdf && values.html) throw new Error('--pdf 與 --html 只能擇一');
+  if (values.pdf && !values.title) throw new Error('PDF 出處要用 --title 指定標題');
+  if (!/^[1-9]\d*$/.test(values.page)) throw new Error(`--page 應為正整數，實際為 ${values.page}`);
+  if (values['glyph-map'] && !values.pdf) throw new Error('--glyph-map 只用於 --pdf');
+}
+
+// PDF 的一頁轉成出處快照文字，snapshotNote 寫明轉換方法與字型對照還原。
+function capturePdf() {
+  const glyphMapPath = values['glyph-map'] ? resolve(values['glyph-map']) : null;
+  const { text, restored, unmapped } = pdfPageText(readFileSync(resolve(values.pdf)), {
+    page: Number(values.page),
+    glyphMap: glyphMapPath ? readJson(glyphMapPath) : null,
+    pdftotext: values.pdftotext,
+  });
+  const notes = [`PDF 第 ${values.page} 頁以 pdftotext 轉成文字`];
+  for (const { baseFont, count } of restored) {
+    notes.push(`字型 ${baseFont} 的 ${count} 個字形文字由 PDF 字型對照還原（對照檔 ${relative(REPO_ROOT, glyphMapPath)}）`);
+  }
+  if (unmapped > 0) console.log(`注意：快照仍有 ${unmapped} 個字元無法轉成文字（U+FFFD）`);
+  return { text, snapshotNote: notes.join('；') };
 }
 
 // 依回應標頭的 charset 解碼，沒寫時當 UTF-8。
@@ -55,9 +83,16 @@ async function fetchHtml(url) {
 
 async function main() {
   checkArgs();
-  const html = values.html ? readFileSync(resolve(values.html), 'utf8') : await fetchHtml(values.url);
-  const text = htmlToSnapshotText(html);
-  const title = values.title ?? pageTitle(html);
+  let text;
+  let title = values.title;
+  let snapshotNote = null;
+  if (values.pdf) {
+    ({ text, snapshotNote } = capturePdf());
+  } else {
+    const html = values.html ? readFileSync(resolve(values.html), 'utf8') : await fetchHtml(values.url);
+    text = htmlToSnapshotText(html);
+    title ??= pageTitle(html);
+  }
   if (!title) throw new Error('頁面沒有 <title>，用 --title 指定標題');
 
   const sourcesPath = join(resolve(values.raw), 'sources', `${values.candidate}.json`);
@@ -77,6 +112,7 @@ async function main() {
     ...archive,
     snapshotPath: relative(REPO_ROOT, snapshotFile),
     snapshotSha256: createHash('sha256').update(text).digest('hex'),
+    snapshotNote,
     sourceType: values.type,
     title,
     retrievedAt: values.date,
