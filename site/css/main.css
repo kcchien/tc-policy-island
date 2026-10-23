@@ -229,6 +229,21 @@ select {
   color: var(--laterite);
 }
 
+/* 背景音樂：關閉時音符畫一道斜線，音量滑桿放在開關旁 */
+.music-group {
+  align-items: center;
+}
+
+#tool-music[aria-pressed="true"] .icon-muted {
+  display: none;
+}
+
+.music-volume {
+  width: 72px;
+  margin: 0 10px 0 4px;
+  accent-color: var(--laterite);
+}
+
 .view-note {
   margin: 0;
   color: var(--charcoal-soft);
@@ -1583,8 +1598,10 @@ body[data-view="island"] .policy-card::backdrop {
     padding: 4px 2px;
   }
 
+  /* 膠囊列放不下音量滑桿，手機用裝置的音量鍵調整 */
   body[data-view="island"] .time-group,
-  body[data-view="island"] .view-button[aria-pressed="true"] {
+  body[data-view="island"] .view-button[aria-pressed="true"],
+  body[data-view="island"] .music-volume {
     display: none;
   }
 
