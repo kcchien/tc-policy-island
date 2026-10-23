@@ -7,6 +7,7 @@ import { decorPlan } from './island-decor.js';
 import { DECOR_COLORS, decorModel } from './island-decor-models.js';
 import { buildHeroScene } from './island-hero-view.js';
 import { kitPartMesh } from './island-kit.js';
+import { castsShadow } from './island-parts.js';
 
 // 光池：路燈下貼地的圓形暖光，加法混合，亮度隨夜間係數。
 const POOL_RADIUS = 0.15;
@@ -27,7 +28,7 @@ export function createDecor(scene, layout, { groupOf, surface }) {
     }
     for (const item of tile.items) {
       const model = new THREE.Group();
-      for (const part of decorModel(item.kind, tile.species)) model.add(kitPartMesh(part, DECOR_COLORS));
+      for (const part of decorModel(item.kind, tile.species)) model.add(kitPartMesh(part, DECOR_COLORS, { castShadow: castsShadow(item.kind) }));
       model.position.set(item.x, surface, item.z);
       model.rotation.y = item.yaw;
       if (item.small) model.userData.lod = 'small';

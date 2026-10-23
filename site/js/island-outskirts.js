@@ -206,7 +206,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     roofs.setColorAt(i, color.setHex(house.roofColor));
   });
   for (const mesh of [walls, roofs]) {
-    mesh.castShadow = true;
+    mesh.castShadow = false;
     mesh.receiveShadow = true;
     mesh.computeBoundingSphere();
     group.add(mesh);
@@ -291,7 +291,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     isletCanopy.setColorAt(i, color.setHex(islet.tree.color));
   });
   for (const mesh of [islets, isletCanopy]) {
-    mesh.castShadow = true;
+    mesh.castShadow = false;
     mesh.receiveShadow = true;
     mesh.computeBoundingSphere();
     group.add(mesh);
@@ -305,7 +305,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     const solid = (geometry, hex, at) => {
       const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: hex, flatShading: true, roughness: 0.8 }));
       mesh.position.y = at;
-      mesh.castShadow = true;
+      mesh.castShadow = false;
       tower.add(mesh);
     };
     solid(new THREE.CylinderGeometry(0.16, 0.26, height * 0.78, 10), TERRAIN_PALETTE.lighthouse, height * 0.39);
@@ -329,7 +329,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   const sails = new THREE.InstancedMesh(sailGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.sail, side: THREE.DoubleSide, flatShading: true, roughness: 0.9 }), Math.max(1, plan.boats.length));
   for (const mesh of [hulls, sails]) {
     mesh.count = plan.boats.length;
-    mesh.castShadow = true;
+    mesh.castShadow = false;
     mesh.frustumCulled = false;
     group.add(mesh);
   }

@@ -82,7 +82,8 @@ function clay(color) {
 
 // 零件資料（island-heroes.js 的格式 { shape, color, size, at, rot?, yaw? }）→ Mesh，color 依 colors 色表換成色碼。
 // 變換是「平移 at · 繞 y 轉 yaw · rot · 縮放 size」（與 island-heroes.js 的 partBounds 相同）。主題場景與靜態裝飾共用。
-export function kitPartMesh(part, colors) {
+// castShadow 由呼叫端依 island-parts.js 的 castsShadow 決定，發光件一律不投影。
+export function kitPartMesh(part, colors, { castShadow = false } = {}) {
   const { geometry, glow } = kitShape(part.shape);
   const color = colors[part.color];
   const mesh = new THREE.Mesh(geometry, glow ? glowSourceMaterial(color) : clay(color));
@@ -91,7 +92,7 @@ export function kitPartMesh(part, colors) {
     .multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rx, ry, rz)));
   mesh.matrix.makeTranslation(...part.at).multiply(rotation).scale(new THREE.Vector3(...part.size));
   mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
-  mesh.castShadow = !glow;
+  mesh.castShadow = castShadow && !glow;
   mesh.receiveShadow = !glow;
   return mesh;
 }
@@ -120,9 +121,108 @@ function lodOf(object) {
   return null;
 }
 
-// 把 root 底下用共用幾何、材質可合批的靜態零件換成 InstancedMesh，加到 root。
+// 合併網格的抬高格數上限（議題區數加 1）。
+const LIFT_SLOTS = 64;
+
+// 材質加上選取抬高：頂點帶議題區序號 kitOwner，頂點著色器加上 kitLift[序號]（所有合併網格共用同一份 lift）。
+function withLift(material, lift) {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.kitLift = lift;
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\nattribute float kitOwner;\nuniform float kitLift[${LIFT_SLOTS}];`)
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.y += kitLift[int(kitOwner)];');
+  };
+  material.customProgramCacheKey = () => 'kit-lift';
+  return material;
+}
+
+// 合併桶：每個零件的共用幾何套上自己的變換，連同顏色與議題區序號接成一個網格，整桶一次繪製呼叫。
+// 零件已依議題區排序（island-parts.js），每區的三角形連在一起，記成區段與外框；點選時只檢查射線打中外框的區段。
+// normals 為 false 時不存法向量（flatShading 的材質由著色器算面法向量）。
+function mergedMesh(bucket, material, { slotOf, lift, normals }) {
+  let vertexCount = 0;
+  let indexCount = 0;
+  for (const { geometry } of bucket.items) {
+    vertexCount += geometry.attributes.position.count;
+    indexCount += geometry.index ? geometry.index.count : geometry.attributes.position.count;
+  }
+  const position = new Float32Array(vertexCount * 3);
+  const normal = normals ? new Float32Array(vertexCount * 3) : null;
+  // 顏色存線性值，16 位元避免深色出現色階。
+  const colors = new Uint16Array(vertexCount * 3);
+  const owners = new Uint8Array(vertexCount);
+  const index = vertexCount > 65535 ? new Uint32Array(indexCount) : new Uint16Array(indexCount);
+  const v = new THREE.Vector3();
+  const normalMatrix = new THREE.Matrix3();
+  const color = new THREE.Color();
+  const ranges = [];
+  let vo = 0;
+  let io = 0;
+  for (const part of bucket.items) {
+    const { geometry, transform } = part;
+    const pos = geometry.attributes.position;
+    normalMatrix.getNormalMatrix(transform);
+    color.setHex(part.color);
+    const slot = slotOf(part.owner ?? null);
+    let range = ranges.at(-1);
+    if (!range || range.owner !== (part.owner ?? null)) {
+      range = { owner: part.owner ?? null, slot, start: io, count: 0, box: new THREE.Box3() };
+      ranges.push(range);
+    }
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(transform);
+      position.set([v.x, v.y, v.z], (vo + i) * 3);
+      range.box.expandByPoint(v);
+      if (normal) {
+        v.fromBufferAttribute(geometry.attributes.normal, i).applyMatrix3(normalMatrix).normalize();
+        normal.set([v.x, v.y, v.z], (vo + i) * 3);
+      }
+      colors.set([color.r, color.g, color.b].map((c) => Math.round(c * 65535)), (vo + i) * 3);
+      owners[vo + i] = slot;
+    }
+    const start = io;
+    if (geometry.index) for (let i = 0; i < geometry.index.count; i++) index[io++] = geometry.index.getX(i) + vo;
+    else for (let i = 0; i < pos.count; i++) index[io++] = vo + i;
+    range.count += io - start;
+    vo += pos.count;
+  }
+  const merged = new THREE.BufferGeometry();
+  merged.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  if (normal) merged.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  merged.setAttribute('color', new THREE.BufferAttribute(colors, 3, true));
+  merged.setAttribute('kitOwner', new THREE.BufferAttribute(owners, 1));
+  merged.setIndex(new THREE.BufferAttribute(index, 1));
+  merged.computeBoundingSphere();
+  merged.computeBoundingBox();
+  // 選取抬高讓包圍球不準；整桶散在全島，本來就幾乎都在畫面裡。
+  const mesh = new THREE.Mesh(merged, material);
+  mesh.frustumCulled = false;
+  const box = new THREE.Box3();
+  const up = new THREE.Vector3();
+  const saved = new THREE.Matrix4();
+  const shift = new THREE.Matrix4();
+  // 點選：只對射線打中外框（含抬高）的區段逐三角形檢查，打到的結果記上議題區。
+  mesh.raycast = function raycast(raycaster, intersects) {
+    saved.copy(this.matrixWorld);
+    for (const range of ranges) {
+      up.set(0, lift.value[range.slot], 0);
+      if (!raycaster.ray.intersectsBox(box.copy(range.box).translate(up).applyMatrix4(saved))) continue;
+      merged.setDrawRange(range.start, range.count);
+      this.matrixWorld.copy(saved).premultiply(shift.makeTranslation(up.x, up.y, up.z));
+      const before = intersects.length;
+      THREE.Mesh.prototype.raycast.call(this, raycaster, intersects);
+      for (let i = before; i < intersects.length; i++) intersects[i].owner = range.owner;
+    }
+    this.matrixWorld.copy(saved);
+    merged.setDrawRange(0, Infinity);
+  };
+  return mesh;
+}
+
+// 把 root 底下用共用幾何、材質可合批的靜態零件合批，加到 root：非發光零件依材質合併成幾個網格，
+// 發光件依形體收進 InstancedMesh（island-parts.js 的 partBuckets）。
 // glowMaterial 是所有發光件共用的材質（顏色每幀乘夜間係數）。祖先設了 userData.lod 的零件另外分桶，
-// 那幾個 InstancedMesh 的 userData.lod 標明分組，呼叫端依鏡頭距離整個隱藏。
+// 那幾個網格的 userData.lod 標明分組，呼叫端依鏡頭距離整個隱藏。
 // 回傳 { meshes, ownerOf(hit), setOwnerOffset(owner, y) }。
 export function instancify(root, { glowMaterial }) {
   root.updateMatrixWorld(true);
@@ -161,22 +261,45 @@ export function instancify(root, { glowMaterial }) {
   const color = new THREE.Color();
   const jitter = new THREE.Matrix4();
   let serial = 0;
+  // 合併網格的選取抬高：每個議題區一格（0 號是不屬於任何議題區的零件，永遠是 0），著色器把頂點抬高這個量。
+  const slots = new Map([[null, 0]]);
+  const slotOf = (owner) => {
+    if (!slots.has(owner)) slots.set(owner, slots.size);
+    if (slots.size > LIFT_SLOTS) throw new Error(`議題區超過 ${LIFT_SLOTS - 1} 個，合併網格的抬高放不下`);
+    return slots.get(owner);
+  };
+  const lift = { value: new Float32Array(LIFT_SLOTS) };
+  const materials = Object.fromEntries(Object.entries(base).map(([kind, material]) => [
+    kind, kind === 'glow' ? material : withLift(Object.assign(material, { vertexColors: true }), lift),
+  ]));
+  const depthMaterial = withLift(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }), lift);
+
   const meshes = partBuckets(parts).map((bucket) => {
-    const mesh = new THREE.InstancedMesh(bucket.items[0].geometry, base[bucket.material], bucket.items.length);
-    bucket.items.forEach((part, i) => {
+    for (const part of bucket.items) {
       // 主題場景零件的縮放微抖動（island-parts.js 的 scaleJitter），共面的零件錯開一點，不會 z-fighting。
       if (isClayShape(part.shape)) {
         const j = scaleJitter(serial++);
         part.transform.multiply(jitter.makeScale(j, j, j));
       }
-      mesh.setMatrixAt(i, part.transform);
-      mesh.setColorAt(i, color.setHex(part.color));
-    });
-    mesh.castShadow = bucket.material !== 'glow' && bucket.items.some((p) => p.castShadow);
+    }
+    let mesh;
+    if (bucket.merged) {
+      mesh = mergedMesh(bucket, materials[bucket.material], { slotOf, lift, normals: bucket.material === 'clay' });
+      if (bucket.castShadow) mesh.customDepthMaterial = depthMaterial;
+    } else {
+      mesh = new THREE.InstancedMesh(bucket.items[0].geometry, materials[bucket.material], bucket.items.length);
+      bucket.items.forEach((part, i) => {
+        mesh.setMatrixAt(i, part.transform);
+        mesh.setColorAt(i, color.setHex(part.color));
+      });
+      mesh.userData.items = bucket.items.map((p) => ({ owner: p.owner, transform: p.transform }));
+      mesh.computeBoundingSphere();
+    }
+    mesh.castShadow = bucket.castShadow;
     mesh.receiveShadow = bucket.material !== 'glow';
-    mesh.userData.items = bucket.items.map((p) => ({ owner: p.owner, transform: p.transform }));
+    mesh.userData.kit = true;
+    mesh.userData.parts = bucket.items.length;
     if (bucket.lod) mesh.userData.lod = bucket.lod;
-    mesh.computeBoundingSphere();
     root.add(mesh);
     return mesh;
   });
@@ -186,8 +309,9 @@ export function instancify(root, { glowMaterial }) {
   const moved = new THREE.Matrix4();
   return {
     meshes,
-    // 射線打到的實例屬於哪個議題區。
+    // 射線打到的零件屬於哪個議題區：合併網格由 raycast 記在 hit.owner，InstancedMesh 從實例查。
     ownerOf(hit) {
+      if (hit.owner !== undefined) return hit.owner;
       return hit.object.userData.items?.[hit.instanceId]?.owner ?? null;
     },
     // 把某議題區的零件整體抬高 y（選取時格子抬高，零件要跟著）。
@@ -195,8 +319,10 @@ export function instancify(root, { glowMaterial }) {
       // 篩選時每格都會重畫一次，高度沒變就不必重寫實例矩陣。
       if ((offsets.get(owner) ?? 0) === y) return;
       offsets.set(owner, y);
+      if (slots.has(owner)) lift.value[slots.get(owner)] = y;
       offset.makeTranslation(0, y, 0);
       for (const mesh of meshes) {
+        if (!mesh.isInstancedMesh) continue;
         let changed = false;
         mesh.userData.items.forEach((item, i) => {
           if (item.owner !== owner) return;

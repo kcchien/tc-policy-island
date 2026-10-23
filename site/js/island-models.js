@@ -72,7 +72,7 @@ function mesh(form, color, { x = 0, y = 0, z = 0, rotX = 0, rotY = 0, rotZ = 0, 
   if (!form.isBufferGeometry) m.scale.set(...form.scale);
   m.position.set(x, y, z);
   m.rotation.set(rotX, rotY, rotZ);
-  m.castShadow = true;
+  m.castShadow = false;
   m.receiveShadow = true;
   return m;
 }
@@ -505,7 +505,7 @@ export function markerModel(marker) {
     markerGeometries.set(key, geometry);
   }
   const m = new THREE.Mesh(markerGeometries.get(key), offMaterial());
-  m.castShadow = true;
+  m.castShadow = false;
   return m;
 }
 
@@ -590,7 +590,7 @@ export function markerSign(marker) {
   face.position.y = baseHeight + postHeight + plateHeight / 2 - 0.02;
   // 牌面頂端往北（離鏡頭）後仰，從斜上方看也讀得到圖示。
   face.rotation.x = -MARKER_SIGN.tilt;
-  face.castShadow = true;
+  face.castShadow = false;
   sign.add(face);
   sign.userData.face = face;
   return sign;
@@ -598,8 +598,45 @@ export function markerSign(marker) {
 
 // 標記亮起或灰掉。marker 是 markerSign 的立牌（或 markerModel 的平躺形狀）。
 export function setMarkerLit(marker, lit) {
-  if (marker.userData.face) marker.userData.face.material = lit ? signLitMaterial() : signOffMaterial();
-  else marker.material = lit ? litMaterial() : offMaterial();
+  if (marker.userData.face) {
+    marker.userData.face.material = lit ? signLitMaterial() : signOffMaterial();
+    marker.userData.face.userData.lit = lit;
+  } else marker.material = lit ? litMaterial() : offMaterial();
+}
+
+// 標記牌面合批：牌面留在格子群組裡（點選、選取抬高照舊）但不直接畫，改由每種形狀亮、灰各一個 InstancedMesh 畫，
+// 全島的牌面只花 6 次繪製呼叫。sync() 依牌面目前的世界矩陣與亮暗寫入實例，重畫前呼叫。signs 是 markerSign 的立牌。
+export function batchMarkerFaces(scene, signs) {
+  const byGeometry = new Map();
+  for (const sign of signs) {
+    const { face } = sign.userData;
+    face.visible = false;
+    if (!byGeometry.has(face.geometry)) byGeometry.set(face.geometry, []);
+    byGeometry.get(face.geometry).push(face);
+  }
+  const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
+  const batches = [...byGeometry].map(([geometry, faces]) => {
+    const [lit, off] = [signLitMaterial(), signOffMaterial()].map((m) => {
+      const mesh = new THREE.InstancedMesh(geometry, m, faces.length);
+      // 實例跟著格子抬高，建立時的包圍球不準。
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+      return mesh;
+    });
+    return { faces, lit, off };
+  });
+  return {
+    sync() {
+      for (const { faces, lit, off } of batches) {
+        faces.forEach((face, i) => {
+          lit.setMatrixAt(i, face.userData.lit ? face.matrixWorld : hidden);
+          off.setMatrixAt(i, face.userData.lit ? hidden : face.matrixWorld);
+        });
+        lit.instanceMatrix.needsUpdate = true;
+        off.instanceMatrix.needsUpdate = true;
+      }
+    },
+  };
 }
 
 // 候選人人物：figure 是 plazaLayout 的人物配置，模型完全由配置產生（零件、細分、尺寸、顏色、底座、點選範圍），
@@ -629,7 +666,7 @@ export function figureModel(figure) {
       const out = new THREE.Vector3(...part.at).sub(new THREE.Vector3(...head.at)).normalize();
       m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), out);
     }
-    m.castShadow = true;
+    m.castShadow = false;
     body.add(m);
   }
   body.scale.setScalar(figure.scale);

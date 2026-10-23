@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { kitPartMesh } from './island-kit.js';
 import { HERO_COLORS, heroSceneFor } from './island-heroes.js';
+import { castsShadow } from './island-parts.js';
 
 // 放置介面：議題區 areaId 的主題場景，依 transform { x, y, z, scale, yaw } 放好，回傳 THREE.Group。
 // 單位空間底面 ±0.5、高 0～1.5、正面朝 +z；transform 是場景底面中心在父物件座標裡的位置。
@@ -12,7 +13,7 @@ export function buildHeroScene(areaId, { x = 0, y = 0, z = 0, scale = 1, yaw = 0
   const scene = heroSceneFor(areaId);
   const group = new THREE.Group();
   group.name = `hero:${scene.id}`;
-  for (const part of scene.parts) group.add(kitPartMesh(part, HERO_COLORS));
+  for (const part of scene.parts) group.add(kitPartMesh(part, HERO_COLORS, { castShadow: castsShadow('hero') }));
   group.position.set(x, y, z);
   group.rotation.y = yaw;
   group.scale.setScalar(scale);

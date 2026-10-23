@@ -75,7 +75,8 @@ function movingMesh(geometry, color, count, { glowMaterial = null, smooth = fals
     for (let i = 0; i < count; i++) mesh.setColorAt(i, c.setHex(typeof color === 'function' ? color(i) : color));
   }
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  mesh.castShadow = !glowMaterial;
+  // 會動的零件不投影（只有主題場景與大樹投影，見 island-parts.js 的 castsShadow），市民另有腳下的假影子。
+  mesh.castShadow = false;
   mesh.receiveShadow = !glowMaterial;
   // 實例每幀移動，建立時的包圍球不準，不做視錐剔除。
   mesh.frustumCulled = false;
@@ -228,8 +229,6 @@ const CITIZEN_COLORS = {
   cheek: () => MOTION_PALETTE.cheek,
   mouth: () => MOTION_PALETTE.eye,
 };
-// 臉上的小零件太小，不投影。
-const NO_SHADOW = new Set(['eye', ...FACE_DETAILS]);
 
 // 角色配件（原尺寸、臉朝 +x）：大小守住 island-motion.js 的 ACCESSORY_TOP、ACCESSORY_CROWN、ACCESSORY_LOW、ACCESSORY_REACH。
 // arm 是手臂的固定姿勢（繞肩往前的角度，left 是 -z 側、right 是 +z 側；沒寫的手臂照走路擺動）；
@@ -369,7 +368,6 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   const citizenParts = Object.entries(CITIZEN_GEOMETRY).map(([name, geometry]) => {
     const parts = CITIZEN_FIGURE.parts.filter((p) => p.part === name);
     const mesh = movingMesh(geometry(parts[0]), (i) => CITIZEN_COLORS[name](Math.floor(i / parts.length)), citizens.length * parts.length, { smooth: true });
-    mesh.castShadow = !NO_SHADOW.has(name);
     scene.add(mesh);
     return { name, parts, placements: parts.map(partPlacement), mesh };
   });

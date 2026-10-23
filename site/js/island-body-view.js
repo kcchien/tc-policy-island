@@ -137,7 +137,8 @@ function part(parent, key, make, color, { x = 0, y = 0, z = 0, rotX = 0, rotY = 
   m.position.set(x, y, z);
   m.rotation.set(rotX, rotY, rotZ, 'YXZ');
   m.scale.set(...scale);
-  m.castShadow = true;
+  // 只有主題場景與大樹投影（island-parts.js 的 castsShadow），島體零件只接收陰影。
+  m.castShadow = false;
   m.receiveShadow = true;
   parent.add(m);
   return m;
