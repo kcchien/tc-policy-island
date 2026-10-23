@@ -11,6 +11,7 @@
     "build": "node scripts/build.js",
     "gates": "node scripts/gates.js",
     "check": "node --test && node scripts/build.js && node scripts/gates.js",
-    "preview": "node scripts/build.js && node scripts/preview.js"
+    "preview": "node scripts/build.js && node scripts/preview.js",
+    "deploy": "node scripts/deploy.js"
   }
 }

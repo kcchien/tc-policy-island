@@ -7,4 +7,7 @@ site/data/repo-files.json
 # 本專案零 npm 相依，不應出現
 node_modules/
 
+# wrangler 的本機快取
+.wrangler/
+
 .DS_Store
