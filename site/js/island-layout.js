@@ -10,8 +10,10 @@ export const MARKER_SHAPES = [
   { shape: 'square', symbol: '□', sides: 4, start: Math.PI / 4 },
 ];
 
-// 格心到頂點的距離（場景單位）。
-export const HEX_SIZE = 1;
+import { GRID_SPACING, ISLAND_RADIUS, TILE_SLOTS } from './island-body.js';
+
+// 每座島格心到頂點的距離（場景單位）。島與島之間隔著水道，格心的間距見 axialToPosition。
+export const HEX_SIZE = ISLAND_RADIUS;
 // 標記尺寸固定，不隨政見數量改變。尺寸以面積計：三種形狀的面積都等於半徑 MARKER_SIZE 的圓，
 // 外接圓相同的話三角形只有圓的四成大，看起來就不是同尺寸。
 const MARKER_SIZE = 0.17;
@@ -33,8 +35,8 @@ export function markerOutline({ sides, start, radius }) {
 const MARKER_SPACING = 0.42;
 const MARKER_ROW_Z = 0.52;
 
-// 尖頂六角格的軸向座標換成平面座標：q 往東（+x），r 往南（+z）。
-export function axialToPosition([q, r], size = HEX_SIZE) {
+// 尖頂六角格的軸向座標換成平面座標：q 往東（+x），r 往南（+z）。格距比島大，相鄰島之間留出水道。
+export function axialToPosition([q, r], size = GRID_SPACING) {
   return { x: size * Math.sqrt(3) * (q + r / 2), z: size * 1.5 * r };
 }
 
@@ -94,6 +96,8 @@ export function islandLayout(vm, { filtered = null } = {}) {
       axial: row.issueArea.axial,
       position: axialToPosition(row.issueArea.axial),
       localElement: row.localElement,
+      heroSlot: { ...TILE_SLOTS.hero },
+      elementSlot: { ...TILE_SLOTS.element.area },
       dimmed: !shown.has(row.issueArea.id),
       markers: markersOf(shown.get(row.issueArea.id), legend),
     })),
@@ -105,26 +109,14 @@ export function islandLayout(vm, { filtered = null } = {}) {
       axial: tile.axial,
       position: axialToPosition(tile.axial),
       localElement: tile.localElement,
+      heroSlot: null,
+      elementSlot: { ...TILE_SLOTS.element.decorative },
       dimmed: false,
       markers: [],
     })),
   ];
-  return { hexSize: HEX_SIZE, tiles, bounds: boundsOf(tiles), legend };
-}
-
-// 全島格子的頂點 [x, z]，相鄰格共用的頂點只列一次（路燈放在這些位置）。
-export function tileCorners(layout) {
-  const corners = new Map();
-  for (const { position } of layout.tiles) {
-    for (let i = 0; i < 6; i++) {
-      const a = Math.PI / 6 + (i * Math.PI) / 3;
-      const x = position.x + Math.cos(a) * layout.hexSize;
-      const z = position.z + Math.sin(a) * layout.hexSize;
-      // 以萬分之一取整當鍵；toFixed 會把 -1e-17 寫成 -0.0000，跟 0.0000 對不上。
-      corners.set(`${Math.round(x * 1e4) + 0},${Math.round(z * 1e4) + 0}`, [x, z]);
-    }
-  }
-  return [...corners.values()];
+  // hexSize 是每座島的外接半徑，spacing 是軸向座標換算的格距（相鄰格心相距 √3 倍）。
+  return { hexSize: HEX_SIZE, spacing: GRID_SPACING, tiles, bounds: boundsOf(tiles), legend };
 }
 
 // 構圖用的島外形點：每格六個頂點（水面高度 0 與格子頂面 surface），加上格心上方元素模型的頂點 top。

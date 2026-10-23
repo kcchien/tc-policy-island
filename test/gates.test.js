@@ -44,6 +44,7 @@ const COMPLIANT_FILES = {
   'css/main.css': ':root { --laterite: #8e4b32; --rice: #f4efe6; --water: #7d9a98; }\nbody { color: rgb(47, 44, 41); background: var(--rice); }',
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
   'js/island-motion.js': repoFile('site/js/island-motion.js'),
+  'js/island-body.js': repoFile('site/js/island-body.js'),
   'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
   ...REPO_FILES,
   ...PROFILE_SNAPSHOTS,

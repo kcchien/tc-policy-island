@@ -8,6 +8,7 @@ import {
   CITIZEN_HEIGHT, CITIZEN_RADIUS, CITIZEN_SCALE, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
   LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
 } from '../site/js/island-motion.js';
+import { islandBody } from '../site/js/island-body.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
@@ -63,24 +64,40 @@ test('循環動畫的題材依格子順序輪替，裝飾格沒有動態', () =>
   assert.deepEqual([decorative.loops.length, decorative.citizens.length], [0, 0]);
 });
 
-test('路網鋪在每條格子邊上，相鄰兩格共用的邊只鋪一次', () => {
-  const plan = motionPlan(layoutOf(rawWith(FEW)));
-
-  // 6 格共 36 條邊，相鄰格共用 8 條：一列內 3 條加第二列內 1 條，兩列之間 4 條。
-  assert.equal(plan.roads.length, 28);
-  assert.equal(plan.roads.filter((road) => road.shared).length, 8);
-});
-
-test('環線繞島外緣一圈、在格子外面，車輛數量依畫質而定、與格子無關', () => {
-  const layout = layoutOf(rawWith(FEW));
-  const plan = motionPlan(layout);
-
-  assert.equal(plan.ring.length, 20);
-  for (const [x, z] of plan.ring) {
-    const nearest = Math.min(...layout.tiles.map((t) => Math.hypot(x - t.position.x, z - t.position.z)));
-    assert.ok(nearest > 1.05, `環線上的點 ${x},${z} 離格心只有 ${nearest}`);
+test('環線沿步道環與橋繞整群島外緣一圈，車輛數量依畫質而定、與格子無關', () => {
+  for (const layout of [layoutOf(rawWith(FEW)), islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))]) {
+    const plan = motionPlan(layout);
+    const { network, bridges } = islandBody(layout);
+    const byId = new Map(network.nodes.map((n) => [n.id, n]));
+    const segments = network.edges.map(({ a, b }) => [byId.get(a), byId.get(b)]);
+    // 環線上每一點都在路網的某一段路或橋上（橋上的點另有拱起的高度）。
+    const onNetwork = ([x, z]) => segments.some(([p, q]) => {
+      const [dx, dz] = [q.x - p.x, q.z - p.z];
+      const k = Math.max(0, Math.min(1, ((x - p.x) * dx + (z - p.z) * dz) / (dx * dx + dz * dz)));
+      return Math.hypot(p.x + dx * k - x, p.z + dz * k - z) < 1e-9;
+    });
+    for (const point of plan.ring) assert.ok(onNetwork(point), `環線上的點 ${point} 不在路網上`);
+    // 每座島都被環線圍住（環繞數不為 0）。
+    for (const tile of layout.tiles) assert.notEqual(windingNumber(plan.ring, tile.position), 0, tile.id);
+    // 車道往右偏就是往島外：在步道環上的每段中點，右偏後離最近格心更遠。
+    let s = 0;
+    plan.ring.forEach((p, i) => {
+      const q = plan.ring[(i + 1) % plan.ring.length];
+      const length = Math.hypot(q[0] - p[0], q[1] - p[1]);
+      if (p[2] === 0 && q[2] === 0) {
+        const nearest = ({ x, z }) => Math.min(...layout.tiles.map((t) => Math.hypot(x - t.position.x, z - t.position.z)));
+        const center = pointAlong(plan.ring, s + length / 2);
+        const outer = pointAlong(plan.ring, s + length / 2, { lane: 0.05 });
+        assert.ok(nearest(outer) > nearest(center), `第 ${i} 段的右側不是島外`);
+      }
+      s += length;
+    });
+    // 有過橋：至少一點拱在水道上方。
+    assert.ok(bridges.length > 0 && plan.ring.some((p) => p[2] > 0));
   }
+  const plan = motionPlan(layoutOf(rawWith(FEW)));
   assert.deepEqual(plan.vehicles.map((v) => v.kind), ['train', 'bus', 'bus']);
+  const layout = layoutOf(rawWith(FEW));
   assert.deepEqual(motionPlan(layout, { level: 'low' }).vehicles.map((v) => v.kind), ['train', 'bus']);
 });
 
@@ -193,6 +210,19 @@ test('放大後的道具與市民不擋住正式資料任何標記：桌面與�
     assert.deepEqual(hidden, [], `長寬比 ${aspect}`);
   }
 });
+
+// 封閉折線繞 point 的圈數（俯視平面上）。
+function windingNumber(ring, { x, z }) {
+  let total = 0;
+  ring.forEach(([ax, az], i) => {
+    const [bx, bz] = ring[(i + 1) % ring.length];
+    let d = Math.atan2(bz - z, bx - x) - Math.atan2(az - z, ax - x);
+    if (d > Math.PI) d -= 2 * Math.PI;
+    if (d < -Math.PI) d += 2 * Math.PI;
+    total += d;
+  });
+  return Math.round(total / (2 * Math.PI));
+}
 
 const round1 = (v) => Math.round(v * 1e6) / 1e6 + 0;
 const round = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, round1(v)]));
