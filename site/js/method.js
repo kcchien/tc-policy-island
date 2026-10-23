@@ -124,10 +124,17 @@ function fillDataset(dataset) {
   const { candidateOrder } = orderCandidates(dataset.candidates);
   document.getElementById('order-rule-list').replaceChildren(...candidateOrderItems(candidateOrder).map(({ text, current }) =>
     el('li', { class: current ? 'is-current' : null }, text, current ? el('strong', { class: 'current-rule' }, '（目前採用）') : null)));
-  document.querySelector('#issue-area-table tbody').replaceChildren(...dataset.issueAreas.map((area) =>
-    el('tr', {}, el('th', { scope: 'row' }, area.name), el('td', {}, area.departments.join('、')), el('td', {}, area.description))));
-  document.querySelector('#local-element-table tbody').replaceChildren(...dataset.localElements.map((element) =>
-    el('tr', {}, el('th', { scope: 'row' }, element.name), el('td', {}, element.category), el('td', {}, element.place), el('td', {}, element.reason))));
+  fillRows('issue-area-table', dataset.issueAreas.map((area) => [area.name, area.departments.join('、'), area.description]));
+  fillRows('local-element-table', dataset.localElements.map((e) => [e.name, e.category, e.place, e.reason]));
+}
+
+// 每列第一格是列標題；data-label 讓窄螢幕逐列堆疊時仍看得到欄名。
+function fillRows(tableId, rows) {
+  const table = document.getElementById(tableId);
+  const labels = [...table.querySelectorAll('thead th')].map((th) => th.textContent);
+  table.tBodies[0].replaceChildren(...rows.map(([head, ...cells]) => el('tr', {},
+    el('th', { scope: 'row' }, head),
+    cells.map((text, i) => el('td', { 'data-label': labels[i + 1] }, text)))));
 }
 
 async function start() {

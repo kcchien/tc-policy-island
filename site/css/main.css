@@ -626,10 +626,16 @@ select {
   margin: 8px 0;
 }
 
+/* 表格內不任意斷字，窄欄給最小寬度，太寬時由外框橫向捲動 */
 .method-table {
   width: 100%;
   border-collapse: collapse;
+  overflow-wrap: normal;
   font-size: 0.875rem;
+}
+
+.method-table :is(th, td):not(:last-child) {
+  min-width: 5.5em;
 }
 
 .method-table th,
@@ -644,8 +650,38 @@ select {
   background: var(--rice-deep);
 }
 
-.method-table tbody th {
-  white-space: nowrap;
+/* 由資料產生的表格在窄螢幕逐列堆疊，每格前面標欄名 */
+@media (max-width: 600px) {
+  .method-table-stack thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .method-table-stack tr,
+  .method-table-stack th,
+  .method-table-stack td {
+    display: block;
+    min-width: 0;
+  }
+
+  .method-table-stack tr {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--laterite-soft);
+  }
+
+  .method-table-stack th,
+  .method-table-stack td {
+    padding: 2px 4px;
+    border-bottom: 0;
+  }
+
+  .method-table-stack td::before {
+    content: attr(data-label) "：";
+    color: var(--charcoal-soft);
+  }
 }
 
 /* 引用 repo 文件：原文逐字呈現，與整理者的說明文字分開標示 */
