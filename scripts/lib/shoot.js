@@ -60,8 +60,42 @@ export function parseClick(text) {
   return { selector: text };
 }
 
+export const USAGE = `截圖與版面量測：以本機無頭 Chrome 開網站，截圖或量測版面。
+
+用法：
+  node scripts/shoot.js shot [參數]      截圖存成 PNG（子指令省略時為 shot，但至少要給一個參數）
+  node scripts/shoot.js measure [參數]   印出名牌重疊與水平捲動的量測結果（JSON）
+  node scripts/shoot.js --help           顯示這段說明（-h 或不給任何參數也一樣）
+
+畫面：
+  --device desktop|laptop|phone   裝置：desktop 1440x900、laptop 1024x768、phone 390x844 三倍像素加觸控（預設 desktop）
+  --motion reduce|full            減少動態（鏡頭與時段直接到位）或完整動態（每步後等動畫跑完）（預設 reduce）
+  --time auto|dawn|day|dusk|night 時段；auto 依台灣時間（預設 day）
+
+網址：
+  --path /                        頁面路徑，例如 /method.html
+  --view island|table             檢視
+  --area <id>  --policy <id>  --candidate <id>  --q <關鍵字>  --district <行政區>
+
+操作：
+  --click <x,y 或 CSS 選擇器>     點擊畫面座標或元素中心，可重複，依序執行
+  --wait <毫秒>                   最後再多等的時間（預設 0）
+
+輸出：
+  --out <路徑>                    shot 的 PNG（預設 shot.png）；measure 另存 JSON（預設不存）
+  --strict                        measure 有重疊或水平捲動時結束碼 1
+
+環境：
+  --url <網址>                    指定網站網址；不給時自動開本機預覽（要先建置）
+  --dir site  --port 0            本機預覽的網站目錄與埠（0 為自動挑選）
+  --chrome <執行檔>               Chrome 路徑，也可用環境變數 CHROME_PATH
+  --timeout 60000                 等頁面就緒的上限（毫秒）
+`;
+
 // 命令列參數 → 設定。第一個位置參數是子指令（shot 或 measure，省略為 shot）。
+// 沒有任何參數、或有 --help／-h 時回傳 { command: 'help' }。
 export function parseShootArgs(argv) {
+  if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) return { command: 'help' };
   const { values, positionals } = parseArgs({ args: argv, options: OPTIONS, allowPositionals: true });
   if (positionals.length > 1) throw new Error(`多出的參數：${positionals.slice(1).join(' ')}`);
   const command = oneOf('子指令', positionals[0] ?? 'shot', COMMANDS);

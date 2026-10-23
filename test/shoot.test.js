@@ -1,12 +1,37 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { FLIGHT_MS } from '../site/js/island-camera.js';
 import { TRANSITION_MS } from '../site/js/island-daylight.js';
-import { DEVICES, SETTLE_MS, buildScenario, overlapArea, parseClick, parseShootArgs, summarizeLayout } from '../scripts/lib/shoot.js';
+import { DEVICES, SETTLE_MS, USAGE, buildScenario, overlapArea, parseClick, parseShootArgs, summarizeLayout } from '../scripts/lib/shoot.js';
 import { CHROME_CANDIDATES, chromeArgs, findChrome } from '../scripts/lib/cdp.js';
 
+const SHOOT_SCRIPT = fileURLToPath(new URL('../scripts/shoot.js', import.meta.url));
+
+test('說明：--help、-h 或不給任何參數時回傳說明，不解析其他參數', () => {
+  assert.deepEqual(parseShootArgs([]), { command: 'help' });
+  assert.deepEqual(parseShootArgs(['--help']), { command: 'help' });
+  assert.deepEqual(parseShootArgs(['measure', '-h']), { command: 'help' });
+  assert.deepEqual(parseShootArgs(['--device', 'tablet', '--help']), { command: 'help' });
+});
+
+test('說明：指令印出子指令與每個參數並以結束碼 0 結束', () => {
+  for (const args of [['--help'], ['-h'], []]) {
+    const result = spawnSync(process.execPath, [SHOOT_SCRIPT, ...args], { encoding: 'utf8' });
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, USAGE);
+  }
+  for (const name of ['shot', 'measure', '--device', '--motion', '--time', '--path', '--view', '--area', '--policy', '--candidate',
+    '--q', '--district', '--click', '--wait', '--out', '--strict', '--url', '--dir', '--port', '--chrome', '--timeout']) {
+    assert.ok(USAGE.includes(name), `說明缺少 ${name}`);
+  }
+});
+
 test('截圖參數：預設桌面、減少動態、白天，子指令省略為 shot 並輸出 shot.png', () => {
-  const options = parseShootArgs([]);
+  const options = parseShootArgs(['shot']);
+  assert.deepEqual(parseShootArgs(['--wait', '0']).command, 'shot');
 
   assert.equal(options.command, 'shot');
   assert.equal(options.device, 'desktop');
