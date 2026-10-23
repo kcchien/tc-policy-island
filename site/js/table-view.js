@@ -3,8 +3,7 @@
 // 每格的候選人名稱只在單欄時顯示，對螢幕閱讀器隱藏（欄標題已提供）。
 
 import { el } from './dom.js';
-import { NO_MATCH_TEXT } from './filter.js';
-import { rawPolicyItemsText } from './policy-card.js';
+import { NO_MATCH_TEXT, rawPolicyItemsText, TABLE_TEXT as T } from './ui-text.js';
 
 function candidateButton(candidate, label, onOpenCandidate) {
   const button = el('button', { type: 'button', class: 'area-open candidate-open' }, label);
@@ -13,11 +12,11 @@ function candidateButton(candidate, label, onOpenCandidate) {
 }
 
 function candidateHeader(candidate, onOpenCandidate) {
-  const button = candidateButton(candidate, '看候選人資料', onOpenCandidate);
+  const button = candidateButton(candidate, T.openProfile, onOpenCandidate);
   const meta = [
     candidate.party,
-    candidate.ballotNumber === null ? null : `${candidate.ballotNumber} 號`,
-    `公開政見 ${candidate.policyCount} 筆`,
+    candidate.ballotNumber === null ? null : T.ballotNumber(candidate.ballotNumber),
+    T.policyCount(candidate.policyCount),
     rawPolicyItemsText(candidate.rawPolicyItems),
   ].filter(Boolean);
   return el(
@@ -52,7 +51,7 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
       cell.policies.map((policy) => {
         const button = el('button', { type: 'button', class: 'policy-chip' }, el('span', { class: 'chip-summary' }, policy.summary));
         if (policy.districts.length > 0) {
-          button.append(el('span', { class: 'chip-districts' }, `適用行政區：${policy.districts.join('、')}`));
+          button.append(el('span', { class: 'chip-districts' }, T.districts(policy.districts)));
         }
         button.addEventListener('click', () => openPolicy(policy.id));
         return el('li', {}, button);
@@ -62,7 +61,7 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
 }
 
 function areaHeader(row, onOpenCard) {
-  const button = el('button', { type: 'button', class: 'area-open' }, '看政見卡片');
+  const button = el('button', { type: 'button', class: 'area-open' }, T.openCard);
   button.addEventListener('click', () => onOpenCard(row.issueArea.id, null));
   return el(
     'th',
@@ -77,8 +76,8 @@ function areaHeader(row, onOpenCard) {
 function candidateStrip(candidates, onOpenCandidate) {
   return el(
     'nav',
-    { class: 'candidate-strip', 'aria-label': '看候選人資料' },
-    el('span', { class: 'candidate-strip-label' }, '看候選人資料'),
+    { class: 'candidate-strip', 'aria-label': T.openProfile },
+    el('span', { class: 'candidate-strip-label' }, T.openProfile),
     el('span', { class: 'candidate-strip-buttons' }, candidates.map((candidate) => candidateButton(candidate, candidate.name, onOpenCandidate))),
   );
 }
@@ -93,12 +92,12 @@ export function renderTable(container, vm, { onOpenCard, onOpenCandidate }) {
   const table = el(
     'table',
     { class: 'policy-table', role: 'table', 'aria-describedby': 'candidate-order-note' },
-    el('caption', { class: 'visually-hidden' }, '各議題區候選人政見對照表'),
+    el('caption', { class: 'visually-hidden' }, T.caption),
     el('colgroup', {}, el('col', { class: 'area-col' }), vm.candidates.map(() => el('col', { class: 'candidate-col' }))),
     el(
       'thead',
       { role: 'rowgroup' },
-      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, '議題區'), vm.candidates.map((candidate) => candidateHeader(candidate, onOpenCandidate))),
+      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, T.areaHead), vm.candidates.map((candidate) => candidateHeader(candidate, onOpenCandidate))),
     ),
     el(
       'tbody',

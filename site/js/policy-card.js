@@ -1,31 +1,20 @@
 // 政見卡片：一個議題區內三位候選人的政見並排。表格檢視與島嶼檢視共用，只讀檢視模型的一列（row）。
-// 桌面為置中對話框，800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js）。
+// 桌面為置中對話框，800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js）。畫面文字取自 ui-text.js。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
-
-const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
-
-// 第一層（逐字比對）的結果與日期，政見卡片與候選人資料卡共用。
-export const layer1StatusText = ({ status, checkedAt }) => `${STATUS_TEXT[status]}${checkedAt ? `（${checkedAt}）` : ''}`;
-
-export function verificationText({ layer1, layer2 }) {
-  return [
-    `第一層 逐字比對：${layer1StatusText(layer1)}`,
-    `第二層 檢核表${layer2.checklistVersion ? `（版本 ${layer2.checklistVersion}）` : ''}：${STATUS_TEXT[layer2.status]}` +
-      (layer2.checkedAt ? `（${layer2.model}，${layer2.checkedAt}）` : ''),
-  ];
-}
-
-export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
-
-export function candidateCountText(areaPolicyCount, rawPolicyItems) {
-  return `此議題區 ${areaPolicyCount} 筆政見，${rawPolicyItemsText(rawPolicyItems)}`;
-}
+import { candidateCountText, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText } from './ui-text.js';
 
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
 export const policyHref = (policyId) => `?policy=${encodeURIComponent(policyId)}`;
 export const areaHref = (areaId) => `?area=${encodeURIComponent(areaId)}`;
+
+// 出處、原文存檔、網頁備份三個連結，政見卡片與候選人資料卡共用。
+export const sourceLinks = (source) => [
+  el('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.link),
+  el('a', { href: source.snapshotUrl, target: '_blank' }, SOURCE_TEXT.snapshot),
+  source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.archive),
+];
 
 function quoteBlock(quote) {
   const { source } = quote;
@@ -37,35 +26,29 @@ function quoteBlock(quote) {
       'figcaption',
       { class: 'quote-source' },
       el('span', { class: 'source-type' }, source.sourceTypeName),
-      el('span', {}, `${source.title}（${source.retrievedAt} 擷取）`),
-      el(
-        'span',
-        { class: 'source-links' },
-        el('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, '出處'),
-        el('a', { href: source.snapshotUrl, target: '_blank' }, '出處快照'),
-        source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, '存檔網址'),
-      ),
+      el('span', {}, SOURCE_TEXT.titleWithDate(source.title, source.retrievedAt)),
+      el('span', { class: 'source-links' }, sourceLinks(source)),
     ),
   );
 }
 
 function policyArticle(policy, focused) {
-  const districts = policy.districts.length > 0 ? policy.districts.join('、') : '未指定';
+  const districts = policy.districts.length > 0 ? policy.districts.join('、') : T.noDistricts;
   return el(
     'article',
     { class: `policy${focused ? ' is-focused' : ''}`, id: `card-policy-${policy.id}`, 'aria-current': focused ? 'true' : null },
     el('h4', { class: 'policy-summary' }, policy.summary),
-    policy.conflictNote && el('p', { class: 'conflict-note' }, el('strong', {}, '出處說法不一：'), policy.conflictNote),
+    policy.conflictNote && el('p', { class: 'conflict-note' }, el('strong', {}, T.conflict), policy.conflictNote),
     ...policy.quotes.map(quoteBlock),
     el(
       'dl',
       { class: 'policy-facts' },
-      el('dt', {}, '適用行政區'),
+      el('dt', {}, T.districts),
       el('dd', {}, districts),
-      el('dt', {}, '核對紀錄'),
-      el('dd', {}, ...verificationText(policy.verification).map((line) => el('span', { class: 'verification-line' }, line))),
+      el('dt', {}, T.verification),
+      el('dd', {}, el('span', { class: 'verification-line' }, verificationText(policy.verification))),
     ),
-    el('a', { class: 'policy-link', href: policyHref(policy.id) }, '這筆政見的連結'),
+    el('a', { class: 'policy-link', href: policyHref(policy.id) }, T.policyLink),
   );
 }
 
@@ -93,10 +76,10 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const title = el('h2', { class: 'card-title', id: 'policy-card-title' });
   const description = el('p', { class: 'card-description' });
   const body = el('div', { class: 'card-columns' });
-  const closeButton = el('button', { type: 'button', class: 'card-close' }, '關閉');
-  const shareLink = el('a', { class: 'card-share' }, '這個議題區的連結');
+  const closeButton = el('button', { type: 'button', class: 'card-close' }, T.close);
+  const shareLink = el('a', { class: 'card-share' }, T.areaLink);
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
-  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': '切換卡片高度' });
+  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': T.handle });
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },
@@ -115,7 +98,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     open(row, vm, { focusPolicyId = null } = {}) {
       const { issueArea } = row;
       title.textContent = issueArea.name;
-      description.textContent = `${issueArea.description}（對應局處：${issueArea.departments.join('、')}）`;
+      description.textContent = T.areaDescription(issueArea.description, issueArea.departments);
       shareLink.setAttribute('href', areaHref(issueArea.id));
       body.replaceChildren(
         ...vm.candidates.map((candidate) =>

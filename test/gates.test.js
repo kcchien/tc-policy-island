@@ -45,6 +45,7 @@ const COMPLIANT_FILES = {
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
   'js/island-motion.js': repoFile('site/js/island-motion.js'),
   'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
+  'js/ui-text.js': repoFile('site/js/ui-text.js'),
   ...REPO_FILES,
   ...PROFILE_SNAPSHOTS,
 };
@@ -404,6 +405,87 @@ test('頁面上引用 repo 文件的容器標註清單以外的檔案時不通�
   assert.notEqual(code, 0);
   assert.match(output, /method\.html：引用 repo 文件的容器標註 docs\/research\/candidates-2026\.md，不在引用 repo 文件清單中/);
   assert.match(output, /method\.html：含品牌用語「六星」/);
+});
+
+// 受眾文案：整理者撰寫、給市民看的文字不得外漏內部實作細節。
+
+test('頁面文案含檔案路徑、副檔名或工具名時，受眾文案關卡不通過並指出檔案與類別', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'method.html': '<p>核對報告放在 <code>data/verification/report.md</code>。</p><p>公報以 pdftotext 轉成文字。</p>',
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /method\.html：含檔案路徑「data\/verification\/report\.md」/);
+  assert.match(output, /method\.html：含工具名「pdftotext」/);
+});
+
+test('畫面文案模組含模型代號、字型名或程式欄位名時，受眾文案關卡不通過', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/ui-text.js': "export const A = '第二層（claude-opus-5-5）';\nexport const B = `字型 NotoSerifCJKtc-Light 還原，見 archiveUrl ${x}`;",
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /js\/ui-text\.js：含模型代號「claude-opus-5-5」/);
+  assert.match(output, /js\/ui-text\.js：含字型名「NotoSerifCJKtc-Light」/);
+  assert.match(output, /js\/ui-text\.js：含程式欄位名「archiveUrl」/);
+});
+
+test('網站目錄缺少畫面文案模組時，受眾文案關卡不通過', () => {
+  const files = { ...COMPLIANT_FILES };
+  delete files['js/ui-text.js'];
+
+  const { code, output } = runGates(makeSite(() => {}, files));
+
+  assert.notEqual(code, 0);
+  assert.match(output, /找不到畫面文案模組 js\/ui-text\.js/);
+});
+
+test('aria-label、title、placeholder 與 meta description 也算畫面文字；註解、程式與連結網址不算', () => {
+  const html = '<!doctype html><meta name="description" content="資料在 data/dataset.json">'
+    + '<button aria-label="切換 snapshotNote">鈕</button>'
+    + '<!-- 註解提到 pdftotext 不擋 --><script>const s = "wrangler";</script>'
+    + '<a href="./data/repo-files/docs/x.md">在 GitHub 查看</a>';
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'index.html': html });
+
+  const { output } = runGates(site);
+
+  assert.match(output, /index\.html：含檔案路徑「data\/dataset\.json」/);
+  assert.match(output, /index\.html：含程式欄位名「snapshotNote」/);
+  assert.doesNotMatch(output, /pdftotext|wrangler|docs\/x\.md/);
+});
+
+test('整理者撰寫的資料欄位含程式欄位名時不通過；iBike 這類服務名稱不擋', () => {
+  const site = makeSite((dataset) => {
+    dataset.issueAreas[0].description = '依 issueAreaId 分類';
+    dataset.policies[0].summary = '增設 iBike 租賃站';
+  }, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /issueAreas\[area-a\]\.description：含程式欄位名「issueAreaId」/);
+  assert.doesNotMatch(output, /iBike/);
+});
+
+test('原文引述、候選人資料原文、出處標題與逐字公開的 repo 文件含內部細節時，受眾文案關卡不擋', () => {
+  const site = makeSite((dataset) => {
+    dataset.policies[0].quotes[0].text = '詳見 www.example.tw/policy/index.html';
+    dataset.candidates[0].profile.experience = ['node 協會理事長'];
+    dataset.sources[0].title = 'policy_2026.pdf';
+    dataset.sources[0].snapshotNote = 'PDF 第 1 頁以 pdftotext 轉成文字';
+  }, COMPLIANT_FILES);
+
+  const { output } = runGates(site);
+
+  // 合規網站目錄已含逐字公開的 repo 文件（內有路徑、指令與欄位名），一併驗證不擋。
+  // 改過的經歷不在出處快照中，候選人資料關卡會擋，這裡只看受眾文案關卡。
+  assert.match(output, /✓ 受眾文案不外漏內部細節/, output);
 });
 
 // 人物配置的替身：包住正式的 plazaLayout，再由 change 竄改結果，模擬違規的配置。

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { profileCardContent } from '../site/js/candidate-card.js';
+import { GLYPH_RESTORED_TEXT } from '../site/js/ui-text.js';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, profileVerification } from './fixtures/make-raw.js';
 
@@ -32,8 +33,9 @@ test('候選人資料卡逐字列出姓名、政黨、出生年、學歷、經�
       url: 'https://bulletin.cec.gov.tw/test-fixture/cand-a.pdf',
       archiveUrl: null,
       snapshotUrl: './data/snapshots/profile-src-cand-a.txt',
-      snapshotNote: 'PDF 第 1 頁以 pdftotext 轉成文字',
-      verification: '逐字比對：通過（2026-10-24）',
+      // 一般的 PDF 轉文字不需要說明；轉換紀錄只留在公開資料集。
+      snapshotNote: null,
+      verification: '已通過核對：學歷與經歷逐字比對原文（2026-10-24）',
     },
   });
 });
@@ -68,7 +70,8 @@ test('正式資料的三張卡片與公開資料集逐字一致：每一項學�
     assert.equal(card.source.url, source.url);
     assert.equal(card.source.archiveUrl, source.archiveUrl);
     assert.equal(card.source.retrievedAt, source.retrievedAt);
-    assert.equal(card.source.snapshotNote, source.snapshotNote);
+    // 有字形還原的公報，卡片用白話說明，不出現轉換工具、字型與對照檔。
+    assert.equal(card.source.snapshotNote, source.snapshotNote.includes('字型對照還原') ? GLYPH_RESTORED_TEXT : null);
     assert.ok(card.source.origin.includes(`${candidate.profile.electionYear} 年${candidate.profile.electionName}`));
   }
 });

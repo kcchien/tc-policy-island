@@ -79,7 +79,7 @@ const stripMarkup = (line) => line
   .replace(/\s+/g, '');
 
 for (const doc of REPO_DOCUMENTS.filter((d) => d.format === 'markdown' && !d.optional)) {
-  test(`${doc.title}（${doc.path}）解析後不漏字`, () => {
+  test(`${doc.path} 解析後不漏字`, () => {
     const text = readFileSync(new URL(`../${doc.path}`, import.meta.url), 'utf8');
     const rendered = plainText(parseMarkdown(text)).replace(/\s+/g, '');
 
