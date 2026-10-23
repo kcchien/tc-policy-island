@@ -22,6 +22,9 @@ export function openSite(dir) {
     readText(path) {
       return readFileSync(join(dir, path), 'utf8');
     },
+    readBytes(path) {
+      return readFileSync(join(dir, path));
+    },
     dataset() {
       if (dataset === undefined) {
         const path = join(dir, DATASET_PATH);

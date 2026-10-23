@@ -1,6 +1,8 @@
 # 建置產物：由 node scripts/build.js 產生，不進版控
 site/data/dataset.json
 site/data/snapshots/
+site/data/repo-files/
+site/data/repo-files.json
 
 # 本專案零 npm 相依，不應出現
 node_modules/
