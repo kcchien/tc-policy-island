@@ -37,14 +37,14 @@ export const KEYFRAMES = {
     sunColor: 0xdbae94, sunIntensity: 1.8, sunDirection: [-16, 9, 5], sunGlow: 0xe6cab3,
     hemiSky: 0xe3ccbf, hemiGround: 0x7d6660, hemiIntensity: 1.2,
     fillColor: 0x8f9ca3, fillIntensity: 0.3,
-    waterShallow: 0x92aaa7, waterDeep: 0x65817f, landTint: 0xcfa281, landTintStrength: 0.5, night: 0.4, exposure: 1,
+    waterShallow: 0x92aaa7, waterDeep: 0x65817f, landTint: 0xcfa281, landTintStrength: 0.35, night: 0.4, exposure: 1,
   },
   night: {
     skyTop: 0x1d2026, skyHorizon: 0x3d434d, fog: 0x3d434d, fogNear: 40, fogFar: 130,
     sunColor: 0xc6cad2, sunIntensity: 1.15, sunDirection: [-6, 18, -8], sunGlow: 0x818898,
     hemiSky: 0x9aa0ae, hemiGround: 0x605a63, hemiIntensity: 1.85,
     fillColor: 0x8f9ca3, fillIntensity: 0.25,
-    waterShallow: 0x455454, waterDeep: 0x2d3939, landTint: 0x5c6370, landTintStrength: 0.85, night: 1, exposure: 1,
+    waterShallow: 0x566868, waterDeep: 0x3a4848, landTint: 0x6f778c, landTintStrength: 0.45, night: 1, exposure: 1,
   },
 };
 
