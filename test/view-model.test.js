@@ -109,7 +109,32 @@ test('每則原文引述附上出處（來源類型中文名、網址、出處�
     sourceType: 'official-website',
     sourceTypeName: '官網',
     retrievedAt: '2026-10-23',
+    snapshotNote: null,
   });
+});
+
+test('候選人附上候選人資料的出處（含出處快照說明），未公開候選人資料時為 null', () => {
+  const raw = makeRaw();
+  raw.candidates.find((c) => c.id === 'cand-c').profile.verification.layer1 = { status: 'fail', checkedAt: '2026-10-24' };
+  raw.sources.find((s) => s.id === 'profile-src-cand-a').archiveUrl = 'https://web.archive.org/web/2026/https://bulletin.cec.gov.tw/a.pdf';
+
+  const vm = viewModelOf(raw);
+
+  const candA = vm.candidates.find((c) => c.id === 'cand-a');
+  assert.deepEqual(candA.profileSource, {
+    id: 'profile-src-cand-a',
+    title: '測試選舉公報',
+    url: 'https://bulletin.cec.gov.tw/test-fixture/cand-a.pdf',
+    archiveUrl: 'https://web.archive.org/web/2026/https://bulletin.cec.gov.tw/a.pdf',
+    snapshotUrl: './data/snapshots/profile-src-cand-a.txt',
+    sourceType: 'election-bulletin',
+    sourceTypeName: '選舉公報',
+    retrievedAt: '2026-10-23',
+    snapshotNote: 'PDF 第 1 頁以 pdftotext 轉成文字',
+  });
+  const candC = vm.candidates.find((c) => c.id === 'cand-c');
+  assert.equal(candC.profile, null);
+  assert.equal(candC.profileSource, null);
 });
 
 test('議題區附上配對的在地感元素，裝飾格一併帶出並附元素，供島嶼檢視使用', () => {

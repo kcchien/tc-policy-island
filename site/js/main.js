@@ -4,7 +4,8 @@ import { filterViewModel } from './filter.js';
 import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
 import { renderTable } from './table-view.js';
-import { renderCandidateIndex, renderIslandList, renderLegend } from './island-list.js';
+import { renderIslandList, renderLegend } from './island-list.js';
+import { createCandidateDialog, PROFILE_NOTE, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 
 const DATASET_URL = './data/dataset.json';
@@ -137,6 +138,14 @@ function startApp(vm, state, initialView) {
   });
   document.body.append(card.element);
 
+  const candidateDialog = createCandidateDialog({
+    onClose() {
+      state.candidate = null;
+      updateUrl();
+    },
+  });
+  document.body.append(candidateDialog.element);
+
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
   const indexClose = document.getElementById('index-close');
@@ -216,6 +225,7 @@ function startApp(vm, state, initialView) {
           vm,
           reducedMotion: () => reducedMotionQuery.matches,
           onSelectArea: (areaId) => openCard(areaId, null),
+          onSelectCandidate: openCandidateCard,
           insets: stageInsets,
         });
         controller.update(filtered);
@@ -241,9 +251,25 @@ function startApp(vm, state, initialView) {
     }
   };
 
+  // 開啟某位候選人的候選人資料卡（三張並排，捲到並標示這一張）。表格欄頭、網址 candidate 參數使用，
+  // 也以 onSelectCandidate 交給島嶼檢視（#22 接上：點候選人人物時呼叫）。候選人不存在時回傳 false。
+  const openCandidateCard = (candidateId) => {
+    if (!vm.candidates.some((c) => c.id === candidateId)) return false;
+    card.close();
+    setPanelOpen(false);
+    state.area = null;
+    state.policy = null;
+    state.candidate = candidateId;
+    updateUrl();
+    candidateDialog.open(vm, candidateId);
+    return true;
+  };
+
   const openCard = (areaId, policyId) => {
     const row = vm.rows.find((r) => r.issueArea.id === areaId);
     if (!row) return false;
+    candidateDialog.close();
+    state.candidate = null;
     selectedArea = areaId;
     state.area = policyId ? null : areaId;
     state.policy = policyId;
@@ -296,7 +322,7 @@ function startApp(vm, state, initialView) {
 
   const render = () => {
     filtered = filterViewModel(vm, { query: state.query, district: state.district });
-    renderTable(tableRoot, filtered, { onOpenCard: openCard });
+    renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard });
     highlightTableRow();
     renderIslandPanel();
     withIsland((controller) => controller.update(filtered));
@@ -322,7 +348,8 @@ function startApp(vm, state, initialView) {
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
   renderLegend(document.getElementById('island-legend'), vm);
-  renderCandidateIndex(document.getElementById('candidate-index'), vm);
+  document.getElementById('panel-profile-note').textContent = PROFILE_NOTE;
+  renderProfileCards(document.getElementById('candidate-profiles'), vm, { idPrefix: 'panel-profile' });
   setupTabs();
   applyTime();
   applyPaused();
@@ -331,13 +358,17 @@ function startApp(vm, state, initialView) {
   render();
   setView(view);
 
-  // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時開該區卡片（表格檢視先捲到該列）。
+  // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時開該區卡片（表格檢視先捲到該列）；
+  // 都沒有時，指向候選人就開該候選人的候選人資料卡。識別碼不存在就從網址移除。
   const policyRow = state.policy && vm.rows.find((r) => r.cells.some((c) => c.policies.some((p) => p.id === state.policy)));
   if (policyRow) {
     openCard(policyRow.issueArea.id, state.policy);
   } else if (state.area && vm.rows.some((r) => r.issueArea.id === state.area)) {
     if (view === 'table') scrollToTableRow(state.area);
     openCard(state.area, null);
+  } else if (state.candidate && !openCandidateCard(state.candidate)) {
+    state.candidate = null;
+    updateUrl();
   }
 }
 

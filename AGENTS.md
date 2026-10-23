@@ -35,7 +35,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/table-view.js     表格檢視
   js/filter.js         搜尋與行政區篩選（filterViewModel）
   js/policy-card.js    政見卡片（兩種檢視共用）
-  js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）
+  js/candidate-card.js 候選人資料卡：內容純函式 profileCardContent（Node 可測）、三張同尺寸卡片、對話框（索引候選人分頁、表格欄頭、網址共用）
+  js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖、鏡頭限制、飛行
@@ -47,7 +48,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-parts.js   零件分桶規則（Node 可測）
   js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
-  js/island-list.js    索引面板：議題區清單（含編號）、標記圖例、候選人分頁
+  js/island-list.js    索引面板：議題區清單（含編號）、標記圖例（候選人分頁的卡片在 candidate-card.js）
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
   js/markdown.js       repo 文件的 Markdown 解析（只支援 repo 用到的寫法）
@@ -87,9 +88,11 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - **候選人資料** `profile`：`birthYear`、`education[]`、`experience[]`（學歷與經歷逐字照出處）、`sourceId`（出處須屬同一位候選人）、`electionYear`、`electionName`（資料取自哪一場選舉，例如「第11屆立法委員選舉（臺中市第8選舉區）」）、`verification { layer1 { status, checkedAt? } }`。只有第一層（逐字比對），`pass` 才公開，否則公開資料集的 `profile` 為 `null`。姓名與政黨沿用候選人的欄位。抽取方法見 `data/extraction/candidate-profiles.md`。
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。
 
-檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount` 與 `rawPolicyItems`，另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
+檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount`、`rawPolicyItems` 與 `profileSource`（候選人資料的出處，含 `snapshotNote`；`profile` 為 `null` 時也是 `null`），另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
 
-網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
+網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
+
+開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 已把它以 `onSelectCandidate` 傳給 `createIslandView`；`island-view.js` 目前還沒收這個參數，由 #22 在參數解構加上 `onSelectCandidate`，點候選人人物時呼叫 `onSelectCandidate(candidateId)`。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 
 ### 資料與夾具
 

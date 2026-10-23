@@ -47,3 +47,21 @@ export function bindSheetDrag(handle, sheet, { onSnap }) {
   handle.addEventListener('pointerup', end);
   handle.addEventListener('pointercancel', end);
 }
+
+// 政見卡片與候選人資料卡共用的對話框行為：把手拖曳與鍵盤切換、關閉鈕、點遮罩關閉；onClose 在對話框關閉後呼叫。
+export function bindSheetDialog(dialog, { handle, closeButton, onClose }) {
+  const snapTo = (snap) => {
+    if (snap === 'closed') dialog.close();
+    else dialog.dataset.snap = snap;
+  };
+  bindSheetDrag(handle, dialog, { onSnap: snapTo });
+  // 觸控與滑鼠由 bindSheetDrag 處理；鍵盤操作的 click（detail 為 0）在這裡切換。
+  handle.addEventListener('click', (event) => {
+    if (event.detail === 0) snapTo(snapSheet({ from: dialog.dataset.snap, fraction: 0, moved: false }));
+  });
+  closeButton.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => onClose());
+}
