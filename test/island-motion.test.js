@@ -11,6 +11,9 @@ import {
   LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
 } from '../site/js/island-motion.js';
 import { BRIDGE, islandBody, tileAt, TILE_SLOTS } from '../site/js/island-body.js';
+import { heroPlan, heroSceneFor, partBounds } from '../site/js/island-heroes.js';
+import { decorPlan } from '../site/js/island-decor.js';
+import { plazaLayout } from '../site/js/island-plaza.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
@@ -261,6 +264,29 @@ test('道具與市民放大到全景看得到，每格的倍率相同，倍率�
   assert.notEqual(motionSignature(taller), motionSignature(tiles[0]), '只有一格市民比較大時，簽章要不同');
 });
 
+test('市民路線與候選人人物不和靜態裝飾重疊：正式資料的每一格', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  // 踏石平貼地面，走過去不算重疊。
+  const items = decorPlan(layout).tiles.flatMap((tile) => tile.items
+    .filter((item) => item.kind !== 'stone')
+    .map((item) => ({ ...item, x: tile.center.x + item.x, z: tile.center.z + item.z, tileId: tile.id })));
+  const near = (x, z, radius) => items.filter((item) => Math.hypot(item.x - x, item.z - z) < item.radius + radius);
+
+  for (const tile of areaPlans(motionPlan(layout))) {
+    const steps = Math.ceil(tile.pathLength / 0.01);
+    for (let i = 0; i < steps; i++) {
+      const { x, z } = pointAlong(tile.path, i * 0.01, { total: tile.pathLength });
+      const hit = near(x, z, CITIZEN_RADIUS);
+      assert.deepEqual(hit.map((item) => `${item.tileId}/${item.kind}`), [], `${tile.id} 的市民在 (${x.toFixed(2)}, ${z.toFixed(2)}) 碰到裝飾`);
+    }
+  }
+  const plaza = plazaLayout(layout);
+  for (const figure of plaza.figures) {
+    const hit = near(figure.position.x, figure.position.z, figure.padRadius);
+    assert.deepEqual(hit.map((item) => item.kind), [], `${figure.candidateId} 的人物底座碰到裝飾`);
+  }
+});
+
 test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺到最遠也不伸進元素區', () => {
   const tile = areaPlans(motionPlan(layoutOf(rawWith(FEW))))[0];
   // 市民路線上最靠近道具軸心的距離（每 0.01 取一點）。
@@ -284,18 +310,24 @@ const SURFACE = 0.44;
 // 北側的主題場景與在地感元素最南到哪裡。
 const ELEMENT_MAX_Z = Math.max(TILE_SLOTS.hero.z + TILE_SLOTS.hero.size / 2, TILE_SLOTS.element.area.maxZ);
 const RAW_DIR = fileURLToPath(new URL('../data/raw', import.meta.url));
+// 取立牌立柱的低處（牌面中心約在島面上 0.25），比牌面難看到，檢查較嚴。
 const MARKER_TOP = SURFACE + 0.08;
-function blocked(from, camera, { x, z, radius, bottom = 0, height }) {
+// 障礙物是直立圓柱 { x, z, radius, bottom?, height }，或軸對齊的盒子 { min: [x, y, z], max }（y 從格子頂面量起）。
+function blocked(from, camera, obstacle) {
+  const { x, z, radius, bottom = 0, height = obstacle.max?.[1] } = obstacle;
   for (let k = 1; k <= 400; k++) {
     const t = k / 400;
     const [px, py, pz] = from.map((v, i) => v + (camera[i] - v) * t);
     if (py > SURFACE + height) return false;
-    if (py >= SURFACE + bottom && Math.hypot(px - x, pz - z) < radius) return true;
+    if (obstacle.min) {
+      const p = [px, py - SURFACE, pz];
+      if (p.every((c, i) => c >= obstacle.min[i] && c <= obstacle.max[i])) return true;
+    } else if (py >= SURFACE + bottom && Math.hypot(px - x, pz - z) < radius) return true;
   }
   return false;
 }
 
-test('放大後的道具、市民、放滿的主題場景位置與在地感元素都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
+test('放大後的道具、市民、主題場景、在地感元素與靜態裝飾都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
   const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
   const plan = motionPlan(layout);
   const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
@@ -309,10 +341,20 @@ test('放大後的道具、市民、放滿的主題場景位置與在地感元�
       .filter(() => tile.citizens.length > 0)
       .flatMap(({ x, z }) => [{ x, z, radius: CITIZEN_CROWN, height: CITIZEN_HEIGHT }, { x, z, radius: CITIZEN_REACH, height: CITIZEN_REACH_HEIGHT }]),
   ]);
-  // 主題場景位置：放滿到高度上限，以外接底面的圓柱近似，主題場景接上後也不得擋到鄰島的標記。
-  const { hero } = TILE_SLOTS;
+  // 主題場景：每個零件的外框照擺放（每座同倍率，朝向不轉）放大平移。在地感元素以外接元素區的圓柱近似。
+  for (const hero of heroPlan(layout)) {
+    const { x, z, scale } = hero.transform;
+    for (const part of heroSceneFor(hero.areaId).parts) {
+      const b = partBounds(part);
+      const offset = [x, 0, z];
+      obstacles.push({ min: b.min.map((v, i) => offset[i] + v * scale), max: b.max.map((v, i) => offset[i] + v * scale) });
+    }
+  }
+  // 靜態裝飾：每件以最寬處為半徑、最高處為高的圓柱近似。
+  for (const tile of decorPlan(layout).tiles) {
+    for (const item of tile.items) obstacles.push({ x: tile.center.x + item.x, z: tile.center.z + item.z, radius: item.reach, height: item.height });
+  }
   for (const tile of layout.tiles.filter((t) => t.heroSlot)) {
-    obstacles.push({ x: tile.position.x + hero.x, z: tile.position.z + hero.z, radius: (hero.size / 2) * Math.SQRT2, height: hero.maxHeight * hero.size });
     const e = tile.elementSlot;
     obstacles.push({
       x: tile.position.x + (e.minX + e.maxX) / 2, z: tile.position.z + (e.minZ + e.maxZ) / 2,

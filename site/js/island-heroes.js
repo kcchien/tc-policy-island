@@ -937,15 +937,14 @@ export function heroSceneFor(areaId) {
 }
 
 // 主題場景位置（island-layout.js 每個議題區格子的 heroSlot，數值在 island-body.js 的 TILE_SLOTS.hero）：
-// 放大 slot.size 倍，底面中心放在格心加 (slot.x, slot.z)。場景比 slot.maxHeight 高時整座等比縮小，
-// 放大後不擋到鄰島的標記（預設視角的視線測試在 test/island-motion.test.js）。縮放只看場景本身，與政見無關。
+// 每座都放大 slot.size 倍（每島同倍率），底面中心放在格心加 (slot.x, slot.z)。
+// 放大後不擋到鄰島的標記（預設視角的視線測試在 test/island-motion.test.js）。與政見無關。
 export function heroSlotTransform(tile) {
   const slot = tile.heroSlot;
-  const height = sceneBounds(heroSceneFor(tile.id)).max[1];
   return {
     x: tile.position.x + slot.x,
     z: tile.position.z + slot.z,
-    scale: slot.size * Math.min(1, slot.maxHeight / height),
+    scale: slot.size,
     yaw: slot.facing,
   };
 }

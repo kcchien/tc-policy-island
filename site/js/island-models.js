@@ -45,8 +45,7 @@ export const PALETTE = {
   windowGlow: 0xf2e2a0,
   // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
   lampGlow: 0xe8d488,
-  lampPost: 0x4f4a45,
-  // 候選人廣場：人物腳下的形狀底座、人物（身體、頭、髮殼、眼睛）。三位候選人人物同一組中性色。
+  // 候選人廣場：人物腳下的形狀底座、人物（身體、頭、髮殼、眼睛、腮紅）。三位候選人人物同一組中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
   figureHead: 0xdccdb8,
@@ -94,16 +93,6 @@ const group = (...children) => {
 
 // 島頂面的高度（島體見 island-body-view.js）。
 export const TILE_SURFACE = 0.44;
-
-// 路燈：燈柱加燈泡，夜裡燈泡亮起。每盞都一樣，與議題區內容無關。
-// positions 是 [x, z]，相對傳回群組的原點（island-body.js 的路燈位置每島六盞）。
-export function streetLamps(positions) {
-  const lamps = positions.flatMap(([x, z]) => [
-    mesh(cyl(0.012, 0.018, 0.3, 5), PALETTE.lampPost, { x, y: TILE_SURFACE + 0.15, z }),
-    glowMesh(sphere(0.035, 6, 4), PALETTE.lampGlow, { x, y: TILE_SURFACE + 0.32, z }),
-  ]);
-  return group(lamps);
-}
 
 // 常用形體：零件庫的共用單位幾何加縮放，同種形體全島只建一份幾何。
 // 每個元素先在約 1.5 × 1.05 的範圍內組好，再由 fitInto 縮放到格子的元素區。
@@ -520,8 +509,97 @@ export function markerModel(marker) {
   return m;
 }
 
+// 格子上的候選人標記：小立牌。圓角底座、立柱與一塊圓角牌面，牌面正反兩面凸出 ○△□ 圖示（面積相同的形狀等比縮小）。
+// 三個立牌的底座、立柱、牌面尺寸與位置規則完全相同，只有圖示形狀不同（ADR 0001）。
+// 尺寸（場景單位）：底座半徑與高、立柱高、牌面寬高厚、圖示相對 islandLayout 標記大小的比例、牌面後仰角（弧度）。
+export const MARKER_SIGN = {
+  baseRadius: 0.07,
+  baseHeight: 0.03,
+  postHeight: 0.15,
+  plateWidth: 0.2,
+  plateHeight: 0.17,
+  plateDepth: 0.024,
+  plateCorner: 0.035,
+  iconScale: 0.32,
+  tilt: 0.35,
+};
+// 圖示的頂點色（乘上牌面材質的顏色），比牌面暗，亮起與灰掉時都看得出形狀。
+const ICON_SHADE = 0.3;
+
+// 圓角矩形（x-y 平面，中心在原點）。
+function roundedRect(w, h, r) {
+  const [x, y] = [w / 2, h / 2];
+  const s = new THREE.Shape();
+  s.moveTo(-x + r, -y);
+  s.lineTo(x - r, -y);
+  s.quadraticCurveTo(x, -y, x, -y + r);
+  s.lineTo(x, y - r);
+  s.quadraticCurveTo(x, y, x - r, y);
+  s.lineTo(-x + r, y);
+  s.quadraticCurveTo(-x, y, -x, y - r);
+  s.lineTo(-x, -y + r);
+  s.quadraticCurveTo(-x, -y, -x + r, -y);
+  return s;
+}
+
+// 牌面加圖示合成一份幾何（以頂點色分出圖示），一個立牌只花一次繪製呼叫。同形狀的立牌共用。
+// 平面形狀的 y 對應牌面的上方：markerShape 把俯視的 -z 畫到 +y，三角形尖端朝上。
+const signGeometries = new Map();
+function signFaceGeometry(marker) {
+  const key = `${marker.sides}:${marker.start}:${marker.radius}`;
+  if (signGeometries.has(key)) return signGeometries.get(key);
+  const { plateWidth, plateHeight, plateDepth, plateCorner, iconScale } = MARKER_SIGN;
+  const plate = new THREE.ExtrudeGeometry(roundedRect(plateWidth, plateHeight, plateCorner), { depth: plateDepth, bevelEnabled: false, curveSegments: 4 });
+  plate.translate(0, 0, -plateDepth / 2);
+  const iconDepth = plateDepth + 0.012;
+  const icon = new THREE.ExtrudeGeometry(markerShape({ ...marker, radius: marker.radius * iconScale }), { depth: iconDepth, bevelEnabled: false, curveSegments: 16 });
+  icon.translate(0, 0, -iconDepth / 2);
+  const parts = [[plate, 1], [icon, ICON_SHADE]];
+  const count = parts.reduce((sum, [g]) => sum + g.attributes.position.count, 0);
+  const position = new Float32Array(count * 3);
+  const normal = new Float32Array(count * 3);
+  const color = new Float32Array(count * 3);
+  let offset = 0;
+  for (const [g, shade] of parts) {
+    position.set(g.attributes.position.array, offset * 3);
+    normal.set(g.attributes.normal.array, offset * 3);
+    color.fill(shade, offset * 3, (offset + g.attributes.position.count) * 3);
+    offset += g.attributes.position.count;
+    g.dispose();
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  geometry.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(color, 3));
+  signGeometries.set(key, geometry);
+  return geometry;
+}
+
+const signLitMaterial = () => material(PALETTE.markerLit, { vertexColors: true, flatShading: false, emissive: PALETTE.markerGlow, emissiveIntensity: 0.6 });
+const signOffMaterial = () => material(PALETTE.markerOff, { vertexColors: true, flatShading: false, transparent: true, opacity: 0.55 });
+
+// 立牌：底座與立柱用零件庫的共用幾何（之後合批），牌面另成一個 Mesh，亮暗隨篩選切換材質。
+// 原點在底座底面中心；marker 是 islandLayout 的標記資料。
+export function markerSign(marker) {
+  const { baseRadius, baseHeight, postHeight, plateHeight } = MARKER_SIGN;
+  const sign = group(
+    mesh(cyl(baseRadius, baseRadius * 1.1, baseHeight, 16), PALETTE.tile, { y: baseHeight / 2 }),
+    mesh(cyl(0.012, 0.012, postHeight, 8), PALETTE.timber, { y: baseHeight + postHeight / 2 }),
+  );
+  const face = new THREE.Mesh(signFaceGeometry(marker), signOffMaterial());
+  face.position.y = baseHeight + postHeight + plateHeight / 2 - 0.02;
+  // 牌面頂端往北（離鏡頭）後仰，從斜上方看也讀得到圖示。
+  face.rotation.x = -MARKER_SIGN.tilt;
+  face.castShadow = true;
+  sign.add(face);
+  sign.userData.face = face;
+  return sign;
+}
+
+// 標記亮起或灰掉。marker 是 markerSign 的立牌（或 markerModel 的平躺形狀）。
 export function setMarkerLit(marker, lit) {
-  marker.material = lit ? litMaterial() : offMaterial();
+  if (marker.userData.face) marker.userData.face.material = lit ? signLitMaterial() : signOffMaterial();
+  else marker.material = lit ? litMaterial() : offMaterial();
 }
 
 // 候選人人物：figure 是 plazaLayout 的人物配置，模型完全由配置產生（零件、細分、尺寸、顏色、底座、點選範圍），
