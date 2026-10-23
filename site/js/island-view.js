@@ -4,7 +4,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter, qualityFor } from './island-layout.js';
+import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter } from './island-layout.js';
+import { initialQuality } from './island-quality.js';
 import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, TILE_SURFACE } from './island-models.js';
 import { el } from './dom.js';
 
@@ -27,10 +28,11 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
-  const quality = qualityFor({
+  const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
     devicePixelRatio: window.devicePixelRatio || 1,
+    userAgent: navigator.userAgent,
   });
 
   const renderer = new THREE.WebGLRenderer({ antialias: quality.antialias, powerPreference: 'low-power' });

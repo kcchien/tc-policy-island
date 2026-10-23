@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, qualityFor,
+  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -157,18 +157,6 @@ test('窄而高的畫面要退得比較遠才能看到整座島，距離上限�
 
   assert.ok(portrait > wide);
   assert.ok(cameraLimits(layout.bounds, portrait).maxDistance >= portrait);
-});
-
-test('寬度 800px 以下或觸控裝置降低畫質與像素比上限', () => {
-  const desktop = qualityFor({ width: 1280, coarsePointer: false, devicePixelRatio: 2 });
-  const narrow = qualityFor({ width: 800, coarsePointer: false, devicePixelRatio: 3 });
-  const touch = qualityFor({ width: 1024, coarsePointer: true, devicePixelRatio: 2 });
-  const lowDpr = qualityFor({ width: 390, coarsePointer: true, devicePixelRatio: 1 });
-
-  assert.deepEqual([desktop.level, desktop.pixelRatio, desktop.shadows], ['high', 1.75, true]);
-  assert.deepEqual([narrow.level, narrow.pixelRatio, narrow.shadows], ['medium', 1.4, false]);
-  assert.deepEqual([touch.level, touch.pixelRatio], ['medium', 1.4]);
-  assert.equal(lowDpr.pixelRatio, 1);
 });
 
 test('投影：鏡頭看的點落在畫面正中，垂直視角邊緣上的點落在畫面上緣', () => {

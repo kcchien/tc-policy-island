@@ -188,18 +188,6 @@ export function orbitCenter(focus, center, distance, { near, far }) {
   return { x: focus.x + (center.x - focus.x) * t, z: focus.z + (center.z - focus.z) * t };
 }
 
-// 800px 以下或觸控裝置降為中畫質：像素比上限 1.4、關閉陰影。
-export function qualityFor({ width, coarsePointer, devicePixelRatio }) {
-  const medium = width <= 800 || coarsePointer;
-  const cap = medium ? 1.4 : 1.75;
-  return {
-    level: medium ? 'medium' : 'high',
-    pixelRatio: Math.min(devicePixelRatio, cap),
-    shadows: !medium,
-    antialias: !medium || devicePixelRatio < 2,
-  };
-}
-
 // 鏡頭飛到議題區的時間。減少動態時為 0，直接切到目的地。
 export function flightPlan({ reducedMotion }) {
   return { durationMs: reducedMotion ? 0 : 900 };

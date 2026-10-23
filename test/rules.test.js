@@ -13,7 +13,8 @@ import { openSite } from '../scripts/gates/site.js';
 import { PROJECT_NAME } from '../scripts/lib/deploy.js';
 import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
-import { extractColors, forbiddenRangesOf, loadForbiddenColors } from '../scripts/lib/colors.js';
+import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
+import { blendLighting, COLOR_KEYS, KEYFRAMES } from '../site/js/island-daylight.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -97,9 +98,9 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
   assert.deepEqual(names.filter((name) => scan(name).length > 0), []);
 });
 
-test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
+test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
   const { ranges } = loadForbiddenColors();
-  const files = ['site/js/island-models.js', 'site/js/island-view.js'];
+  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js'];
   let scanned = 0;
   for (const file of files) {
     const text = readFileSync(repoPath(file), 'utf8');
@@ -110,6 +111,25 @@ test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不�
     scanned += colors.length;
   }
   assert.ok(scanned >= 40, `只掃到 ${scanned} 個色碼`);
+});
+
+test('晝夜切換途中的天空、霧、光照與水色，任兩個時段之間的補間色也不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  const ids = Object.keys(KEYFRAMES);
+  const hits = [];
+  for (const a of ids) {
+    for (const b of ids) {
+      for (let k = 0; k <= 1; k += 0.05) {
+        const lighting = blendLighting(KEYFRAMES[a], KEYFRAMES[b], k);
+        for (const key of COLOR_KEYS) {
+          const hex = lighting[key];
+          const color = { ...rgbToHsl({ r: (hex >> 16) & 0xff, g: (hex >> 8) & 0xff, b: hex & 0xff }), alpha: 1 };
+          for (const range of forbiddenRangesOf(color, ranges)) hits.push(`${a}→${b} ${k.toFixed(2)} ${key} ${hex.toString(16)} ${range.name}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(hits, []);
 });
 
 test('本 repo 的網站文案與配色，以正式原始資料建置後通過品牌用語掃描與禁用色檢查', () => {
