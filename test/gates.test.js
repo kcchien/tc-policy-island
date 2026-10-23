@@ -15,7 +15,10 @@ const GATES_SCRIPT = fileURLToPath(new URL('../scripts/gates.js', import.meta.ur
 // files 是 { 相對路徑: 內容 }，另外寫入網站目錄的檔案。
 function makeSite(tamper = () => {}, files = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'gates-site-'));
-  const dataset = buildPublicDataset(makeRaw(), { builtAt: '2026-10-24T00:00:00.000Z' });
+  const raw = makeRaw();
+  // 候選人廣場所在的裝飾格。
+  raw.decorativeTiles = [{ id: 'tile-plaza', axial: [0, 1], localElementId: null }];
+  const dataset = buildPublicDataset(raw, { builtAt: '2026-10-24T00:00:00.000Z' });
   tamper(dataset);
   mkdirSync(join(dir, 'data'));
   writeFileSync(join(dir, 'data', 'dataset.json'), JSON.stringify(dataset));
@@ -40,6 +43,7 @@ const COMPLIANT_FILES = {
   'index.html': '<!doctype html><title>台中政見島</title><p>由 AI 依公開資料整理，與任何候選人或政黨無關。</p>',
   'css/main.css': ':root { --laterite: #8e4b32; --rice: #f4efe6; --water: #7d9a98; }\nbody { color: rgb(47, 44, 41); background: var(--rice); }',
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
+  'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
   ...REPO_FILES,
   ...PROFILE_SNAPSHOTS,
 };
@@ -399,4 +403,68 @@ test('頁面上引用 repo 文件的容器標註清單以外的檔案時不通�
   assert.notEqual(code, 0);
   assert.match(output, /method\.html：引用 repo 文件的容器標註 docs\/research\/candidates-2026\.md，不在引用 repo 文件清單中/);
   assert.match(output, /method\.html：含品牌用語「六星」/);
+});
+
+// 人物配置的替身：包住正式的 plazaLayout，再由 change 竄改結果，模擬違規的配置。
+const plazaModule = (change) => `${repoFile('site/js/island-plaza.js').replace('export function plazaLayout(', 'function realPlazaLayout(')}
+export function plazaLayout(layout) {
+  const plaza = realPlazaLayout(layout);
+  (${change})(plaza);
+  return plaza;
+}
+`;
+
+const FIGURE_CHANGES = [
+  ['尺寸', (plaza) => { plaza.figures[1].scale = 1.1; }],
+  ['幾何', (plaza) => { plaza.figures[1].parts[5].radius += 0.01; }],
+  ['材質', (plaza) => { plaza.figures[1].color = 'markerLit'; }],
+  ['動畫參數', (plaza) => { plaza.figures[1].idle.sway *= 2; }],
+  ['動畫相位', (plaza) => { plaza.figures[1].idle.phase = 0.5; }],
+];
+for (const [what, change] of FIGURE_CHANGES) {
+  test(`某位候選人人物的${what}與其他人不同時，人物一致關卡不通過並指出候選人`, () => {
+    const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'js/island-plaza.js': plazaModule(change) });
+
+    const { code, output } = runGates(site);
+
+    assert.notEqual(code, 0);
+    assert.match(output, /✗ 人物一致：/);
+    assert.match(output, /cand-b/);
+  });
+}
+
+test('人物順序不依排序規則或沒有等距並排時，人物一致關卡不通過', () => {
+  const swapped = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-plaza.js': plazaModule((plaza) => {
+      const [a, b] = plaza.figures;
+      [a.position, b.position] = [b.position, a.position];
+      plaza.figures.splice(0, 2, b, a);
+    }),
+  });
+  const uneven = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-plaza.js': plazaModule((plaza) => { plaza.figures[2].position.x += 0.2; }),
+  });
+
+  const first = runGates(swapped);
+  const second = runGates(uneven);
+
+  assert.notEqual(first.code, 0);
+  assert.match(first.output, /人物順序應為 cand-a、cand-b、cand-c/);
+  assert.notEqual(second.code, 0);
+  assert.match(second.output, /等距/);
+});
+
+test('沒有候選人廣場或網站目錄缺少人物配置模組時，人物一致關卡不通過', () => {
+  const { 'js/island-plaza.js': _, ...files } = COMPLIANT_FILES;
+  const noPlaza = makeSite((dataset) => { dataset.decorativeTiles = []; }, COMPLIANT_FILES);
+
+  const missing = runGates(makeSite(() => {}, files));
+  const empty = runGates(noPlaza);
+
+  assert.notEqual(missing.code, 0);
+  assert.match(missing.output, /js\/island-plaza\.js/);
+  assert.notEqual(empty.code, 0);
+  assert.match(empty.output, /候選人廣場/);
 });

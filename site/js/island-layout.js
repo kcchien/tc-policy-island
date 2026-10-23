@@ -38,12 +38,12 @@ export function axialToPosition([q, r], size = HEX_SIZE) {
   return { x: size * Math.sqrt(3) * (q + r / 2), z: size * 1.5 * r };
 }
 
+// 候選人依排序配的形狀與標記尺寸。格上的標記與候選人廣場的人物底座都用這份。
 export function markerLegend(vm) {
-  return vm.candidates.map((candidate, index) => ({
-    candidateId: candidate.id,
-    name: candidate.name,
-    ...MARKER_SHAPES[index % MARKER_SHAPES.length],
-  }));
+  return vm.candidates.map((candidate, index) => {
+    const shape = MARKER_SHAPES[index % MARKER_SHAPES.length];
+    return { candidateId: candidate.id, name: candidate.name, ...shape, size: MARKER_SIZE, radius: circumradius(shape.sides, MARKER_SIZE) };
+  });
 }
 
 function markersOf(row, legend) {
@@ -57,8 +57,8 @@ function markersOf(row, legend) {
       symbol: entry.symbol,
       sides: entry.sides,
       start: entry.start,
-      size: MARKER_SIZE,
-      radius: circumradius(entry.sides, MARKER_SIZE),
+      size: entry.size,
+      radius: entry.radius,
       lit: Boolean(cell && cell.policies.length > 0),
       offset: { x: (index - offset) * MARKER_SPACING, z: MARKER_ROW_Z },
     };
