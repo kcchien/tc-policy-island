@@ -134,6 +134,9 @@ function startApp(vm, state, initialView) {
     },
   });
   document.body.append(candidateDialog.element);
+  // 名牌要避開的浮動元件（見 stageObstacles）開關時，請島嶼檢視重排名牌。鏡頭沒動時不會自己重排。
+  const refreshLabels = () => withIsland((controller) => controller.refreshLabels());
+  candidateDialog.element.addEventListener('close', refreshLabels);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
@@ -143,6 +146,7 @@ function startApp(vm, state, initialView) {
     indexToggle.setAttribute('aria-expanded', String(open));
     if (open) indexClose.focus();
     else if (returnFocus) indexToggle.focus();
+    refreshLabels();
   };
   indexToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
   indexClose.addEventListener('click', () => setPanelOpen(false, { returnFocus: true }));
@@ -193,7 +197,7 @@ function startApp(vm, state, initialView) {
   const applyLabels = () => {
     document.getElementById('tool-labels').setAttribute('aria-pressed', String(hud.labels));
     stage.classList.toggle('labels-off', !hud.labels);
-    withIsland((controller) => controller.refreshLabels());
+    refreshLabels();
   };
   for (const button of document.querySelectorAll('[data-time]')) {
     button.addEventListener('click', () => {
@@ -270,6 +274,7 @@ function startApp(vm, state, initialView) {
     state.candidate = candidateId;
     updateUrl();
     candidateDialog.open(vm, candidateId);
+    refreshLabels();
     return true;
   };
 

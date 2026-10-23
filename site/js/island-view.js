@@ -93,7 +93,8 @@ export function createIslandView(stage, {
   const tiles = new Map();
   const pickable = [];
   const labelAnchors = [];
-  // 參與避讓的名牌：{ id, node, group?, compact }。compact 表示可以縮成只留編號。
+  // 參與避讓的名牌：{ id, node, group?, compact, pinned? }。compact 表示可以縮成只留編號；
+  // pinned 的名牌（人物名牌與廣場名牌）先放，議題區名牌讓它們。
   const labelEntries = [];
   for (const tileInfo of layout.tiles) {
     const g = new THREE.Group();
@@ -152,7 +153,7 @@ export function createIslandView(stage, {
     const label = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     label.position.y = info.labelHeight;
     // 三人的頭上名牌同一組：一起顯示或一起隱藏。
-    labelEntries.push({ id: `figure:${info.candidateId}`, node, group: 'figures', compact: false });
+    labelEntries.push({ id: `figure:${info.candidateId}`, node, group: 'figures', compact: false, pinned: true });
     model.add(label);
     scene.add(model);
     return { info, body, hit };
@@ -168,8 +169,7 @@ export function createIslandView(stage, {
     const node = el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, ISLAND_TEXT.plaza), ...entries);
     const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     sign.position.set(plaza.sign.x, TILE_SURFACE, plaza.sign.z);
-    // 廣場名牌排在人物名牌前面，議題區名牌讓它。
-    labelEntries.unshift({ id: 'plaza-sign', node, compact: false });
+    labelEntries.push({ id: 'plaza-sign', node, compact: false, pinned: true });
     scene.add(sign);
   }
   const figureHits = figures.map((f) => f.hit);
@@ -266,6 +266,11 @@ export function createIslandView(stage, {
   let labelModes = new Map();
   let labelKey = '';
   let labelsDirty = true;
+  // 名牌的字級或內容可能變了（斷點、網頁字型載入）：尺寸重量並重排。
+  const remeasureLabels = () => {
+    for (const entry of labelEntries) entry.sizes = null;
+    labelsDirty = true;
+  };
   const setMode = (node, mode) => {
     node.classList.toggle('is-compact', mode === 'number');
     node.classList.toggle('is-hidden', mode === 'hidden');
@@ -305,11 +310,11 @@ export function createIslandView(stage, {
         full: entry.sizes.full,
         number: entry.sizes.number,
         group: entry.group,
-        rank: entry.group || entry.id === 'plaza-sign' ? 0 : 1,
+        pinned: Boolean(entry.pinned),
       });
     }
-    // 廣場名牌與人物名牌先放；議題區名牌由畫面下方（離鏡頭近）往上放。
-    items.sort((a, b) => a.rank - b.rank || (a.rank === 1 ? b.y - a.y : 0));
+    // 人物名牌與廣場名牌先放；議題區名牌由畫面下方（離鏡頭近）往上放。
+    items.sort((a, b) => b.pinned - a.pinned || (a.pinned ? 0 : b.y - a.y));
     labelModes = placeLabels(items, { obstacles: obstacles(), selectedId, previous: labelModes });
     for (const entry of labelEntries) {
       if (labelModes.has(entry.id)) setMode(entry.node, labelModes.get(entry.id));
@@ -352,9 +357,8 @@ export function createIslandView(stage, {
     applyOffset();
     const narrow = width <= NARROW_WIDTH;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
-    // 斷點換了名牌的字級與內容，尺寸重量。
-    for (const entry of labelEntries) entry.sizes = null;
-    labelsDirty = true;
+    // 斷點換了名牌的字級與內容。
+    remeasureLabels();
     // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
     const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
@@ -534,10 +538,8 @@ export function createIslandView(stage, {
   const observer = new ResizeObserver(resize);
   observer.observe(stage);
   resize();
-  // 網頁字型載入後名牌尺寸會變，重量一次。
   document.fonts?.ready.then(() => {
-    for (const entry of labelEntries) entry.sizes = null;
-    labelsDirty = true;
+    remeasureLabels();
     requestRender();
   });
   // 使用者中途切換系統的減少動態設定，重畫一次讓動畫停住或開始走。
@@ -621,7 +623,7 @@ export function createIslandView(stage, {
       requestRender();
     },
     resize,
-    // 浮動元件變了（例如名牌開關、說明收起）時重排名牌。
+    // 浮動元件變了（例如名牌開關、索引抽屜或候選人資料卡開關）時重排名牌。
     refreshLabels() {
       labelsDirty = true;
       requestRender();

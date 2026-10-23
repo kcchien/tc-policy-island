@@ -96,7 +96,8 @@ function policyArticle(policy, { focused, open }) {
 }
 
 // 一欄：欄頭（姓名、政黨、筆數）固定在欄頂，下面是資料狀態與政見。policies 是篩選後的政見。
-function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, active, index }) {
+// openIds 是重畫前已展開的政見，篩選時保留；tabbed 表示手機分頁模式（欄位才是分頁面板）。
+function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, openIds, active, index, tabbed }) {
   let empty = null;
   if (cell.policies.length === 0) empty = vm.noPolicyText;
   else if (policies.length === 0) empty = NO_MATCH_TEXT;
@@ -105,8 +106,9 @@ function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId
     {
       class: `card-column${active ? ' is-active' : ''}`,
       id: `card-column-${index}`,
-      role: 'tabpanel',
-      'aria-labelledby': `card-tab-${index}`,
+      role: tabbed ? 'tabpanel' : null,
+      'aria-labelledby': tabbed ? `card-tab-${index}` : null,
+      'aria-label': tabbed ? null : candidate.name,
     },
     el(
       'header',
@@ -120,7 +122,8 @@ function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId
     candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
     empty
       ? el('p', { class: 'no-policy' }, empty)
-      : el('div', { class: 'policy-stack' }, policies.map((policy) => policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded }))),
+      : el('div', { class: 'policy-stack' }, policies.map((policy) =>
+        policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id) }))),
   );
 }
 
@@ -133,8 +136,9 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const body = el('div', { class: 'card-columns' });
   // 開卡片時焦點放在關閉鈕，Tab 往後是篩選與各欄政見。
   const closeButton = el('button', { type: 'button', class: 'card-close', autofocus: true }, DIALOG_TEXT.close);
-  const heightButton = el('button', { type: 'button', class: 'card-height', 'aria-pressed': 'false' }, T.enlarge);
-  const expandButton = el('button', { type: 'button', class: 'card-expand', 'aria-pressed': 'false' }, T.expandAll);
+  // 這兩顆按鈕的文字說明按下後的動作（放大／縮小、展開／收合），不另標按下狀態。
+  const heightButton = el('button', { type: 'button', class: 'card-height' }, T.enlarge);
+  const expandButton = el('button', { type: 'button', class: 'card-expand' }, T.expandAll);
   const shareLink = el('a', { class: 'card-share' }, T.areaLink);
   const search = el('input', { id: 'card-search', type: 'search', autocomplete: 'off', placeholder: T.searchPlaceholder });
   const district = el(
@@ -185,6 +189,11 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   let current = null;
   let expanded = false;
   let active = 0;
+  // 與 main.css 的手機斷點相同：800px 以下三欄改為分頁。在函式內讀，Node 載入本模組時不碰 window。
+  const tabbedQuery = window.matchMedia('(max-width: 800px)');
+  tabbedQuery.addEventListener('change', () => {
+    if (current && dialog.open) render();
+  });
 
   const selectTab = (index, { focus = false } = {}) => {
     active = index;
@@ -199,6 +208,9 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const render = ({ focusPolicyId = null } = {}) => {
     const { row, vm } = current;
     const matcher = policyMatcher({ query: search.value, district: district.value });
+    // 重畫前讀者自己點開的政見，重畫後照樣展開。
+    const openIds = new Set([...body.querySelectorAll('.policy-details[open]')].map((d) => d.closest('.policy').id.slice('card-policy-'.length)));
+    const tabbed = tabbedQuery.matches;
     const columns = vm.candidates.map((candidate) => {
       const cell = row.cells.find((c) => c.candidateId === candidate.id);
       return { candidate, cell, policies: cell.policies.filter(matcher.matches) };
@@ -221,7 +233,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     );
     body.replaceChildren(
       ...columns.map(({ candidate, cell, policies }, index) =>
-        candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, active: index === active, index })),
+        candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed })),
     );
     selectTab(active);
     filterStatus.textContent = T.filterStatus({
@@ -232,7 +244,6 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
 
   const setExpanded = (next) => {
     expanded = next;
-    expandButton.setAttribute('aria-pressed', String(next));
     expandButton.textContent = next ? T.collapseAll : T.expandAll;
     for (const details of body.querySelectorAll('.policy-details')) details.open = next;
   };
@@ -241,7 +252,6 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   // 桌面島嶼檢視的卡片高度：接近全高（預設），或縮小停靠在下方、上方露出島。
   const setTall = (tall) => {
     dialog.dataset.height = tall ? 'tall' : 'docked';
-    heightButton.setAttribute('aria-pressed', String(!tall));
     heightButton.textContent = tall ? T.shrink : T.enlarge;
   };
   heightButton.addEventListener('click', () => {
@@ -267,10 +277,16 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       description.textContent = T.areaDescription(issueArea.description, issueArea.departments);
       shareLink.setAttribute('href', areaHref(issueArea.id));
       if (!sameArea) {
-        search.value = focusPolicyId ? '' : filter.query ?? '';
-        district.value = !focusPolicyId && TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
+        search.value = filter.query ?? '';
+        district.value = TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
+        // 換議題區時清掉上一區的展開狀態。
+        body.replaceChildren();
         setExpanded(false);
         active = 0;
+      }
+      if (focusPolicyId) {
+        search.value = '';
+        district.value = '';
       }
       // 指定政見時分頁切到那位候選人。
       const focusIndex = focusPolicyId

@@ -345,11 +345,6 @@ select {
   transform: translateY(1px);
 }
 
-.card-height[aria-pressed="true"],
-.card-expand[aria-pressed="true"] {
-  background: var(--rice-deep);
-}
-
 /* 搜尋與篩選 */
 
 .filters {
@@ -1194,11 +1189,6 @@ body[data-view="island"] .card-height {
   flex: 1 1 14rem;
 }
 
-.card-field label {
-  color: var(--charcoal-soft);
-  font-size: 0.75rem;
-}
-
 .card-filters input,
 .card-filters select {
   min-height: var(--button-height);
@@ -1293,6 +1283,7 @@ body[data-view="island"] .card-height {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 4px 8px;
+  min-height: var(--button-height);
   padding: 10px 12px;
   border-radius: var(--radius-small);
   cursor: pointer;
