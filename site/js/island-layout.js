@@ -112,8 +112,6 @@ export function islandLayout(vm, { filtered = null } = {}) {
   return { hexSize: HEX_SIZE, tiles, bounds: boundsOf(tiles), legend };
 }
 
-// 構圖用的島外形點：每格六個頂點（水面高度 0 與格子頂面 surface），加上格心上方元素模型的頂點 top。
-// 用實際格子而不用矩形包圍盒，包圍盒的角落在水上，會讓島被縮得太小。
 // 全島格子的頂點 [x, z]，相鄰格共用的頂點只列一次（路燈放在這些位置）。
 export function tileCorners(layout) {
   const corners = new Map();
@@ -129,6 +127,8 @@ export function tileCorners(layout) {
   return [...corners.values()];
 }
 
+// 構圖用的島外形點：每格六個頂點（水面高度 0 與格子頂面 surface），加上格心上方元素模型的頂點 top。
+// 用實際格子而不用矩形包圍盒，包圍盒的角落在水上，會讓島被縮得太小。
 export function islandPoints(layout, { surface, top }) {
   const points = [];
   for (const { position } of layout.tiles) {

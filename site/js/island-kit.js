@@ -60,7 +60,11 @@ export function instancify(root, { glowMaterial }) {
       object,
     });
   });
-  for (const part of parts) part.object.removeFromParent();
+  for (const part of parts) {
+    part.object.removeFromParent();
+    // 發光件的來源材質每件一個，只用來標記，換掉後就釋放。
+    if (part.material === 'glow') part.object.material.dispose();
+  }
 
   const base = {
     standard: new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 }),
@@ -82,6 +86,7 @@ export function instancify(root, { glowMaterial }) {
     return mesh;
   });
 
+  const offsets = new Map();
   const offset = new THREE.Matrix4();
   const moved = new THREE.Matrix4();
   return {
@@ -92,6 +97,9 @@ export function instancify(root, { glowMaterial }) {
     },
     // 把某議題區的零件整體抬高 y（選取時格子抬高，零件要跟著）。
     setOwnerOffset(owner, y) {
+      // 篩選時每格都會重畫一次，高度沒變就不必重寫實例矩陣。
+      if ((offsets.get(owner) ?? 0) === y) return;
+      offsets.set(owner, y);
       offset.makeTranslation(0, y, 0);
       for (const mesh of meshes) {
         let changed = false;

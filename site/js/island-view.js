@@ -155,13 +155,15 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     renderer.shadowMap.needsUpdate = !animating || frame % shadowEvery === 0;
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
-    if (animating) {
+    // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
+    const continuous = moving || flight || !settled || animating;
+    if (continuous) {
       const next = governor.frame(now);
       if (next) applyQuality(next);
+      requestRender();
     } else {
       governor.pause();
     }
-    if (moving || flight || !settled || animating) requestRender();
   };
   // 執行中降級：降像素比、關毛玻璃（.lowfx）、降低陰影更新頻率。
   const applyQuality = (next) => {

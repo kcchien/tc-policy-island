@@ -46,7 +46,8 @@ export const PALETTE = {
   markerGlow: 0x8a6f4a,
   markerOff: 0x6b6560,
   windowGlow: 0xf2e2a0,
-  lampGlow: 0xf4e8b8,
+  // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
+  lampGlow: 0xe8d488,
   lampPost: 0x4f4a45,
 };
 

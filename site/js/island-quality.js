@@ -10,7 +10,8 @@ export const QUALITY_LEVELS = {
 // 社群 App 內建瀏覽器：Facebook、Instagram、LINE、Threads（UA 代號 Barcelona）。
 const IN_APP_BROWSER = /\bFBAN\/|\bFBAV\/|\bFB_IAB\b|\bInstagram\b|\bLine\/|\bBarcelona\b/i;
 
-// 社群 App 內建瀏覽器預設低；800px 以下或觸控裝置預設中；其餘高。lowFx 為 true 時關掉毛玻璃。
+// 社群 App 內建瀏覽器預設低；800px 以下或觸控裝置預設中；其餘高。
+// lowFx（關掉毛玻璃）一開始都是 false，執行中卡頓才由 createFpsGovernor 打開。
 export function initialQuality({ width, coarsePointer, devicePixelRatio, userAgent = '' }) {
   const level = IN_APP_BROWSER.test(userAgent) ? 'low' : width <= 800 || coarsePointer ? 'medium' : 'high';
   const preset = QUALITY_LEVELS[level];
