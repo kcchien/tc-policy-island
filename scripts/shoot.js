@@ -164,14 +164,15 @@ async function runStep(page, step, { options, scenario }) {
     case 'ready':
       return waitUntilReady(page, options.timeoutMs);
     case 'time': {
-      // 手機版的時段按鈕藏起來了，用程式點一樣有效。
+      // 手機版的時段按鈕藏起來了，用程式點一樣有效。整理方法頁這類沒有島嶼的頁面直接略過。
       const found = await evaluate(page, `(() => {
+        if (!document.getElementById('island-stage')) return 'no-island';
         const button = document.querySelector('[data-time="${step.time}"]');
         if (!button) return false;
         button.click();
         return true;
       })()`);
-      if (!found) console.warn(`注意：頁面沒有時段按鈕，--time ${step.time} 沒有作用`);
+      if (found === false) console.warn(`注意：頁面沒有時段按鈕，--time ${step.time} 沒有作用`);
       return;
     }
     case 'click':

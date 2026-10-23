@@ -25,6 +25,36 @@ node scripts/preview.js    # 本機預覽 http://localhost:8000/
 
 `npm run check` 依序跑測試、建置與關卡；`npm run preview` 會先建置再開預覽。
 
+### 截圖與版面量測
+
+`scripts/shoot.js` 用本機的 Chrome（無頭模式，透過 Chrome DevTools Protocol）截圖，不需要安裝套件。沒給 `--url` 時會自己開本機預覽，所以先跑一次建置。
+
+```sh
+node scripts/shoot.js --out shots/desktop.png                                  # 桌面 1440x900、白天
+node scripts/shoot.js --device phone --time night --out shots/phone-night.png  # 手機 390x844（三倍像素、觸控）
+node scripts/shoot.js --device laptop --area transportation --out shots/area.png
+node scripts/shoot.js --device phone --click '#tool-index' --out shots/index.png
+node scripts/shoot.js measure --device phone --strict                          # 名牌重疊與水平捲動，有問題時結束碼 1
+```
+
+預設行為：
+
+- 裝置寬度用模擬設定，不靠視窗大小（無頭 Chrome 的視窗有最小寬度，390px 會被撐寬）。
+- 預設減少動態：鏡頭與時段直接到位、動畫停在固定畫格，同樣的參數截出同樣的畫面。`--motion full` 時每一步之後會等鏡頭飛行與時段補間跑完。
+- 預設白天，不依執行當下的時間；`--time auto` 才依台灣時間。
+- 等頁面就緒（資料載入、島嶼場景建好）後再多等幾個畫格；WebGL 退回軟體繪圖時會提示，等待以畫格計，不會截到還沒畫好的畫面。
+
+找不到 Chrome 時用 `--chrome` 或環境變數 `CHROME_PATH` 指定執行檔。
+
+### 補送網頁備份
+
+`scripts/fetch-source.js` 送 Wayback Machine 存檔失敗時，會依 60、120、240、480 秒退避重試；同一台機器上同時只有一個存檔流程，兩次送出至少隔 20 秒。重試後仍沒有存檔網址的出處，之後用下面的指令補送：
+
+```sh
+node scripts/fetch-source.js --retry-archive                    # 全部候選人
+node scripts/fetch-source.js --retry-archive --candidate <id>   # 只補一位
+```
+
 ## 部署
 
 由維護者在本機執行，CI 只做檢查、不部署。本專案不裝 npm 套件，wrangler 要另外全域安裝（`npm install -g wrangler`），並先以 `wrangler login` 登入 Cloudflare。
