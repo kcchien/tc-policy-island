@@ -1,0 +1,156 @@
+[
+  {
+    "id": "dadu-plateau",
+    "name": "大肚山",
+    "category": "自然景觀",
+    "place": "大肚、龍井、沙鹿、西屯一帶",
+    "reason": "更新世隆起形成的紅土台地，是自然地形，不是任何市府的建設；本站主色的紅土赭色也取自這裡。"
+  },
+  {
+    "id": "tiezhen-mountain",
+    "name": "鐵砧山",
+    "category": "自然景觀",
+    "place": "大甲區",
+    "reason": "大甲的自然山丘，地名與山形早於現代市政，不涉及任何市長任期的建設。"
+  },
+  {
+    "id": "gaomei-wetland",
+    "name": "高美濕地",
+    "category": "自然景觀",
+    "place": "清水區",
+    "reason": "大甲溪口泥沙淤積形成的自然濕地，島上只呈現濕地與水鳥，不呈現步道、風機等後來的人工設施。"
+  },
+  {
+    "id": "dadu-river-mouth",
+    "name": "大肚溪口濕地",
+    "category": "自然景觀",
+    "place": "龍井區與彰化縣交界",
+    "reason": "烏溪（大肚溪）出海口的自然河口濕地，是自然地形，不是市府建設。"
+  },
+  {
+    "id": "xinshe-terraces",
+    "name": "新社河階台地",
+    "category": "自然景觀",
+    "place": "新社區",
+    "reason": "大甲溪下切形成的河階地形，是自然地形；不收新社花海等由市府舉辦的活動。"
+  },
+  {
+    "id": "toukeshan",
+    "name": "頭嵙山",
+    "category": "自然景觀",
+    "place": "北屯區",
+    "reason": "大坑山區的最高峰，是自然山岳；不收大坑一帶由市府興建的步道與設施。"
+  },
+  {
+    "id": "baxian-mountain",
+    "name": "八仙山",
+    "category": "自然景觀",
+    "place": "和平區",
+    "reason": "中央山脈支脈的自然山岳，森林遊樂區由中央林業主管機關管理，與市長任期無關。"
+  },
+  {
+    "id": "daxueshan",
+    "name": "大雪山",
+    "category": "自然景觀",
+    "place": "和平區",
+    "reason": "雪山山脈的自然山岳與森林，森林遊樂區由中央林業主管機關管理，與市長任期無關。"
+  },
+  {
+    "id": "xue-mountain",
+    "name": "雪山",
+    "category": "自然景觀",
+    "place": "和平區（台灣第二高峰）",
+    "reason": "台灣第二高峰，位於中央管轄的國家公園內，是自然山岳，與市長任期無關。"
+  },
+  {
+    "id": "nanhu-mountain",
+    "name": "南湖大山",
+    "category": "自然景觀",
+    "place": "和平區東端，與宜蘭縣、花蓮縣交界",
+    "reason": "台中市最東端的自然高山，與市長任期無關。"
+  },
+  {
+    "id": "formosan-landlocked-salmon",
+    "name": "櫻花鉤吻鮭",
+    "category": "自然景觀",
+    "place": "和平區七家灣溪",
+    "reason": "冰河時期留存的原生魚種，棲地保育由中央機關主管，與市長任期無關。"
+  },
+  {
+    "id": "suncake",
+    "name": "太陽餅",
+    "category": "小吃",
+    "place": "全市",
+    "reason": "民間糕餅業者發展出的傳統點心，不是市府政策的產物；島上只呈現點心本身，不呈現任何店家品牌。"
+  },
+  {
+    "id": "bubble-tea",
+    "name": "珍珠奶茶",
+    "category": "小吃",
+    "place": "全市",
+    "reason": "民間茶飲業者發展出的飲品，不是市府政策的產物；島上不呈現任何店家品牌。"
+  },
+  {
+    "id": "da-mian-geng",
+    "name": "大麵羹",
+    "category": "小吃",
+    "place": "全市",
+    "reason": "台中的傳統麵食，由民間小吃店傳承，與市府政策無關。"
+  },
+  {
+    "id": "mayi-soup",
+    "name": "麻薏湯",
+    "category": "小吃",
+    "place": "全市",
+    "reason": "用黃麻嫩葉煮的傳統夏季湯品，是民間飲食習慣，與市府政策無關。"
+  },
+  {
+    "id": "mitou-ice",
+    "name": "蜜豆冰",
+    "category": "小吃",
+    "place": "全市",
+    "reason": "民間冰店發展出的傳統冰品，與市府政策無關。"
+  },
+  {
+    "id": "tube-rice-pudding",
+    "name": "筒仔米糕",
+    "category": "小吃",
+    "place": "清水區",
+    "reason": "清水的傳統小吃，由民間小吃店傳承，與市府政策無關；島上不呈現任何店家品牌。"
+  },
+  {
+    "id": "dajia-taro",
+    "name": "大甲芋頭",
+    "category": "小吃",
+    "place": "大甲區",
+    "reason": "大甲的傳統農產與芋頭點心，由農民與民間業者發展，與市府政策無關。"
+  },
+  {
+    "id": "lake-pavilion",
+    "name": "台中公園湖心亭",
+    "category": "老建築",
+    "place": "北區台中公園",
+    "reason": "1908 年為縱貫鐵路全線通車典禮興建，早於所有民選市長；島上只呈現亭子本身，不呈現公園後來的整修工程。"
+  },
+  {
+    "id": "luce-chapel",
+    "name": "東海大學路思義教堂",
+    "category": "老建築",
+    "place": "西屯區東海大學",
+    "reason": "1963 年落成，屬私立大學所有，不是市府建設。"
+  },
+  {
+    "id": "xiaoyun-manor",
+    "name": "筱雲山莊",
+    "category": "老建築",
+    "place": "神岡區",
+    "reason": "清代呂家宅第，屬私人家族所有，與市長任期無關。"
+  },
+  {
+    "id": "shekou-lin-residence",
+    "name": "社口林宅",
+    "category": "老建築",
+    "place": "神岡區",
+    "reason": "清代林家宅第（大夫第），屬私人家族所有，與市長任期無關。"
+  }
+]

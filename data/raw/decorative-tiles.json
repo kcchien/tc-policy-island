@@ -1,0 +1,4 @@
+[
+  { "id": "tile-east-tip", "axial": [4, -2], "localElementId": "nanhu-mountain" },
+  { "id": "tile-southwest", "axial": [-4, 2], "localElementId": "dadu-river-mouth" }
+]
