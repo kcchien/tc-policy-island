@@ -11,7 +11,7 @@ function markerBadge(marker, offText) {
     'span',
     { class: `marker-badge${marker.lit ? ' is-lit' : ''}`, 'data-candidate': marker.candidateId, 'data-lit': String(marker.lit), title: MARKER_TEXT.state(marker.name, state) },
     el('span', { 'aria-hidden': 'true' }, marker.symbol),
-    el('span', { class: 'visually-hidden' }, `${marker.name}${state}`),
+    el('span', { class: 'visually-hidden' }, MARKER_TEXT.spoken(marker.name, state)),
   );
 }
 

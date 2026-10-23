@@ -7,7 +7,7 @@ import { el } from './dom.js';
 import { markerLegend } from './island-layout.js';
 import { sourceLinks } from './policy-card.js';
 import { bindSheetDialog } from './sheet.js';
-import { POLICY_CARD_TEXT, PROFILE_TEXT as T, profileVerificationText, snapshotNoteText, SOURCE_TEXT } from './ui-text.js';
+import { DIALOG_TEXT, PROFILE_TEXT as T, profileVerificationText, snapshotNoteText, SOURCE_TEXT } from './ui-text.js';
 
 // candidate 是檢視模型的候選人（附 profileSource）。學歷與經歷一項一行，照資料集原樣，不斷句、不合併。
 // snapshotNote 是給讀者的白話說明，無需說明時為 null；抓取指令寫的轉換紀錄只留在公開資料集。
@@ -100,8 +100,8 @@ export function createCandidateDialog({ onClose = () => {} } = {}) {
   // 捲動放在外層，內層格線的高度才不受限，三張卡片能撐成同一高度。
   const body = el('div', { class: 'profile-cards' });
   const scroller = el('div', { class: 'card-body' }, body);
-  const closeButton = el('button', { type: 'button', class: 'card-close' }, POLICY_CARD_TEXT.close);
-  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': POLICY_CARD_TEXT.handle });
+  const closeButton = el('button', { type: 'button', class: 'card-close' }, DIALOG_TEXT.close);
+  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog candidate-dialog', 'aria-labelledby': 'candidate-dialog-title', 'data-snap': 'half' },

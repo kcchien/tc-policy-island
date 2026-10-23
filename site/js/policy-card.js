@@ -3,7 +3,7 @@
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
-import { candidateCountText, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText } from './ui-text.js';
+import { candidateCountText, DIALOG_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText } from './ui-text.js';
 
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
 export const policyHref = (policyId) => `?policy=${encodeURIComponent(policyId)}`;
@@ -76,10 +76,10 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const title = el('h2', { class: 'card-title', id: 'policy-card-title' });
   const description = el('p', { class: 'card-description' });
   const body = el('div', { class: 'card-columns' });
-  const closeButton = el('button', { type: 'button', class: 'card-close' }, T.close);
+  const closeButton = el('button', { type: 'button', class: 'card-close' }, DIALOG_TEXT.close);
   const shareLink = el('a', { class: 'card-share' }, T.areaLink);
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
-  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': T.handle });
+  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },

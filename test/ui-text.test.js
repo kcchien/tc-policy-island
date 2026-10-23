@@ -55,7 +55,8 @@ test('畫面文案模組的每個字串與文字函式的輸出都不含內部�
 });
 
 // 畫面文字集中在 ui-text.js，關卡才掃得到。dataset.js 的中文是資料列舉（行政區、來源類型、元素類別）、
-// 排序規則的唯一定義與給維護者的驗證訊息；島嶼的時段與動態題材名稱不上畫面。
+// 排序規則的唯一定義與給維護者的驗證訊息，其中上畫面的來源類型與排序說明由關卡直接載入檢查。
+// island-daylight.js 與 island-motion.js 的名稱只供程式辨識，畫面上的時段名稱取自 ui-text.js 的 TIME_NAMES。
 const EXEMPT = new Set(['ui-text.js', 'dataset.js', 'island-daylight.js', 'island-motion.js']);
 const CJK = /[㐀-鿿！-～]/;
 

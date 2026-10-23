@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module';
+import { join } from 'node:path';
 import { htmlScreenText, internalDetails, stringLiterals } from '../lib/audience-text.js';
 import { DATASET_PATH, THIRD_PARTY } from './site.js';
 import { REPO_FILES_DIR } from '../../site/js/repo-documents.js';
@@ -19,10 +21,16 @@ const SCREEN_FIELDS = {
   policies: (p) => [['summary', p.summary], ['conflictNote', p.conflictNote], ...p.districts.map((d, i) => [`districts[${i}]`, d])],
 };
 
+// 資料集模組裡會上畫面的文字：來源類型的中文名與排序規則說明（其餘中文是給維護者的驗證訊息與資料列舉）。
+export const DATASET_MODULE = 'js/dataset.js';
+
 const describe = (where, text) => internalDetails(text).map(({ kind, text: hit }) => `${where}：含${kind}「${hit}」`);
 
-// 整行註解不是文案。
-const withoutComments = (code) => code.split('\n').filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line)).join('\n');
+// 直接載入網站目錄裡的資料集模組，檢查的就是要上線的文字。Node 24 可以同步 require ES 模組。
+function datasetModuleTexts(site) {
+  const { SOURCE_TYPES, CANDIDATE_ORDER_RULES } = createRequire(import.meta.url)(join(site.dir, DATASET_MODULE));
+  return [...Object.values(SOURCE_TYPES), ...Object.values(CANDIDATE_ORDER_RULES).flatMap((rule) => [rule.note, rule.keyName])];
+}
 
 export default {
   id: 'audience-text',
@@ -36,7 +44,10 @@ export default {
     if (!files.includes(UI_TEXT_MODULE)) {
       failures.push(`找不到畫面文案模組 ${UI_TEXT_MODULE}`);
     } else {
-      for (const text of stringLiterals(withoutComments(site.readText(UI_TEXT_MODULE)))) failures.push(...describe(UI_TEXT_MODULE, text));
+      for (const text of stringLiterals(site.readText(UI_TEXT_MODULE))) failures.push(...describe(UI_TEXT_MODULE, text));
+    }
+    if (files.includes(DATASET_MODULE)) {
+      for (const text of datasetModuleTexts(site)) failures.push(...describe(DATASET_MODULE, text));
     }
     const dataset = site.dataset();
     for (const [key, fieldsOf] of Object.entries(SCREEN_FIELDS)) {

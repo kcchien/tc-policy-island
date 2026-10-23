@@ -2,7 +2,7 @@
 // 上線關卡「受眾文案」掃這個檔案的每個字串：不得外漏檔案路徑、副檔名、工具名、字型名、模型代號、程式欄位名、
 // 內部版本識別碼與內部流程術語。GLOSSARY 的術語是內部用語，畫面用白話，例如出處快照寫成「原文存檔」、
 // 存檔網址寫成「網頁備份」。頁面骨架的固定文字寫在 HTML，同一關卡掃描。
-// 本檔的註解不要用單引號或反引號，關卡依引號切出字串。
+// 關卡把樣板字串的運算式當空白，運算式裡不要再寫樣板字串。
 
 // 核對結果。
 const STATUS = { pending: '未核對', pass: '通過', fail: '不通過' };
@@ -27,9 +27,10 @@ export function profileVerificationText({ layer1 }) {
 }
 
 // 原文存檔的說明。抓取指令寫的轉換紀錄是給維護者的，畫面只在有字形還原時用白話說明，細節留在抽取紀錄。
-// 抓取指令有字形還原時，轉換紀錄寫「由 PDF 字型對照還原」，這裡只比對其中不屬內部術語的一段。
+// 抓取指令有字形還原時，轉換紀錄含 GLYPH_RESTORED_MARK（抓取指令引用同一個常數）。
+export const GLYPH_RESTORED_MARK = '對照還原';
 export const GLYPH_RESTORED_TEXT = '部分文字因原始檔案的字型無法直接轉成文字，已比對公報影像逐字還原。';
-export const snapshotNoteText = (note) => (note && note.includes('對照還原') ? GLYPH_RESTORED_TEXT : null);
+export const snapshotNoteText = (note) => (note && note.includes(GLYPH_RESTORED_MARK) ? GLYPH_RESTORED_TEXT : null);
 
 export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
 export const candidateCountText = (areaPolicyCount, rawPolicyItems) =>
@@ -54,10 +55,14 @@ export const SOURCE_TEXT = {
   titleWithDate: (title, date) => `${title}（${date} 擷取）`,
 };
 
-// 政見卡片。
-export const POLICY_CARD_TEXT = {
+// 對話框共用（政見卡片與候選人資料卡；手機為底部抽屜）。
+export const DIALOG_TEXT = {
   close: '關閉',
   handle: '切換卡片高度',
+};
+
+// 政見卡片。
+export const POLICY_CARD_TEXT = {
   areaLink: '這個議題區的連結',
   policyLink: '這筆政見的連結',
   areaDescription: (description, departments) => `${description}（對應局處：${departments.join('、')}）`,
@@ -96,6 +101,8 @@ export const MARKER_TEXT = {
   lit: '有政見',
   legendNote: '亮起表示有政見，灰色表示沒有；標記不表示政見多寡。',
   state: (name, state) => `${name}：${state}`,
+  // 螢幕閱讀器念的版本，接在標記符號之後。
+  spoken: (name, state) => `${name}${state}`,
 };
 
 // 島嶼檢視與工具列。
@@ -112,6 +119,7 @@ export const ISLAND_TEXT = {
 // 載入失敗。錯誤細節只寫進瀏覽器主控台，畫面不顯示。
 export const LOAD_TEXT = {
   datasetFailed: '政見資料載入失敗，請稍後重新整理。',
+  // 填在整理方法頁「資料截止日：…。」句中，句號由頁面提供。
   methodDatasetFailed: '資料載入失敗，請稍後重新整理',
   documentsFailed: '文件載入失敗，請稍後重新整理。',
   documentFailed: '這份文件載入失敗，可改到 GitHub 查看。',

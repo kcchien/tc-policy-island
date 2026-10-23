@@ -436,6 +436,47 @@ test('畫面文案模組含模型代號、字型名或程式欄位名時，受�
   assert.match(output, /js\/ui-text\.js：含程式欄位名「archiveUrl」/);
 });
 
+test('畫面文案模組的行尾註解含引號時，下一行的字串照樣被掃到；註解本身不掃', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/ui-text.js': "export const A = '關閉'; // it's ok, see data/x.json\nexport const B = '見 data/verification/report.md';\n/* 'pdftotext' */",
+  });
+
+  const { output } = runGates(site);
+
+  assert.match(output, /js\/ui-text\.js：含檔案路徑「data\/verification\/report\.md」/);
+  assert.doesNotMatch(output, /data\/x\.json|pdftotext/);
+});
+
+test('按鈕的 value 與社群分享用的 meta 說明也算畫面文字', () => {
+  const html = '<meta property="og:description" content="見 snapshotPath"><input type="submit" value="送出 archiveUrl">';
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'index.html': html });
+
+  const { output } = runGates(site);
+
+  assert.match(output, /index\.html：含程式欄位名「snapshotPath」/);
+  assert.match(output, /index\.html：含程式欄位名「archiveUrl」/);
+});
+
+test('一般用語不誤擋：TCP/IP、12 位數字、Node 與版本號以外的英文', () => {
+  const site = makeSite((dataset) => {
+    dataset.policies[0].summary = '推動 TCP/IP 教育，設置 Node 創客中心，補助 202610230001 號計畫';
+  }, COMPLIANT_FILES);
+
+  const { output } = runGates(site);
+
+  assert.match(output, /✓ 受眾文案不外漏內部細節/, output);
+});
+
+test('網站上的排序規則說明與來源類型名稱含內部細節時，受眾文案關卡不通過', () => {
+  const dataset = repoFile('site/js/dataset.js').replace("'official-website': '官網'", "'official-website': '官網（sourceType）'");
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'js/dataset.js': dataset });
+
+  const { output } = runGates(site);
+
+  assert.match(output, /js\/dataset\.js：含程式欄位名「sourceType」/);
+});
+
 test('網站目錄缺少畫面文案模組時，受眾文案關卡不通過', () => {
   const files = { ...COMPLIANT_FILES };
   delete files['js/ui-text.js'];

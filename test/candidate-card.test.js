@@ -71,7 +71,7 @@ test('正式資料的三張卡片與公開資料集逐字一致：每一項學�
     assert.equal(card.source.archiveUrl, source.archiveUrl);
     assert.equal(card.source.retrievedAt, source.retrievedAt);
     // 有字形還原的公報，卡片用白話說明，不出現轉換工具、字型與對照檔。
-    assert.equal(card.source.snapshotNote, source.snapshotNote.includes('字型對照還原') ? GLYPH_RESTORED_TEXT : null);
+    assert.equal(card.source.snapshotNote, /字型 \S+ 的 \d+ 個字形/.test(source.snapshotNote) ? GLYPH_RESTORED_TEXT : null);
     assert.ok(card.source.origin.includes(`${candidate.profile.electionYear} 年${candidate.profile.electionName}`));
   }
 });
