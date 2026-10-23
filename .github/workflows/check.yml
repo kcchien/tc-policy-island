@@ -1,0 +1,24 @@
+# 每次 push 公開執行測試與上線關卡。只做檢查，不部署（部署由維護者在本機執行）。
+name: 測試與上線關卡
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: 測試
+        run: node --test
+      - name: 建置公開資料集
+        run: node scripts/build.js
+      - name: 上線關卡
+        run: node scripts/gates.js

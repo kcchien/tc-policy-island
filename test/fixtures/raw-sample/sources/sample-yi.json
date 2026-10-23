@@ -1,0 +1,14 @@
+[
+  {
+    "id": "sample-src-yi",
+    "candidateId": "sample-yi",
+    "url": "https://example.org/sample-yi/policy",
+    "archiveUrl": null,
+    "archiveError": "測試夾具不送存檔",
+    "snapshotPath": "test/fixtures/snapshots/sample-src-yi.txt",
+    "snapshotSha256": "a7c7228e9431485ed5b9b99aa3ee878ba46ab7e5de9f30e2e83597efe95a7906",
+    "sourceType": "official-website",
+    "title": "範例乙政見頁",
+    "retrievedAt": "2026-10-23"
+  }
+]

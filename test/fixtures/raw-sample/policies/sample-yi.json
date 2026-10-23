@@ -1,0 +1,23 @@
+[
+  {
+    "id": "sample-yi-001",
+    "candidateId": "sample-yi",
+    "issueAreaId": "sample-childcare",
+    "summary": "每區至少設一所托育中心，收托名額增加一倍。",
+    "quotes": [
+      { "text": "範例托育中心每區至少一所，收托名額增加一倍。", "sourceId": "sample-src-yi" }
+    ],
+    "districts": [],
+    "conflictNote": null,
+    "verification": {
+      "layer1": { "status": "pass", "checkedAt": "2026-10-23" },
+      "layer2": {
+        "status": "pass",
+        "reason": "摘要忠於原文，無評價字眼（範例）",
+        "checklistVersion": "sample-1",
+        "model": "sample-model",
+        "checkedAt": "2026-10-23"
+      }
+    }
+  }
+]

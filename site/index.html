@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>台中政見島</title>
+    <meta name="description" content="由 AI 依公開資料整理的 2026 台中市長候選人政見對照，與任何候選人或政黨無關。" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <!-- three.js r160 由島嶼檢視的票放進 site/vendor/three/，在那之前不會被載入 -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module" src="./js/main.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">台中政見島</h1>
+      <p class="site-subtitle" lang="en">Taichung Policy Island</p>
+    </header>
+
+    <main id="app" class="site-main" aria-live="polite">
+      <p class="status">載入政見資料中⋯</p>
+    </main>
+
+    <footer class="site-footer">
+      <p>本站由 AI 依公開資料自動整理，與任何候選人或政黨無關，未經人工逐筆審查。</p>
+      <p>資料截止日：<span id="data-cutoff-date">載入中</span></p>
+    </footer>
+  </body>
+</html>

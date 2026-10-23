@@ -1,0 +1,29 @@
+[
+  {
+    "id": "chiang-chi-chen",
+    "name": "江啟臣",
+    "party": "中國國民黨",
+    "ballotNumber": null,
+    "nameStrokes": 6,
+    "rawPolicyItems": { "total": null, "sourceIds": [] },
+    "dataStatus": null
+  },
+  {
+    "id": "ho-hsin-chun",
+    "name": "何欣純",
+    "party": "民主進步黨",
+    "ballotNumber": null,
+    "nameStrokes": 7,
+    "rawPolicyItems": { "total": null, "sourceIds": [] },
+    "dataStatus": null
+  },
+  {
+    "id": "hung-li-hua",
+    "name": "洪麗華",
+    "party": "司法正義黨",
+    "ballotNumber": null,
+    "nameStrokes": 9,
+    "rawPolicyItems": { "total": null, "sourceIds": [] },
+    "dataStatus": "尚無一手來源"
+  }
+]

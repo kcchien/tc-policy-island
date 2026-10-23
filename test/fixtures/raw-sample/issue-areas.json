@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sample-transport",
+    "name": "交通（範例）",
+    "departments": ["交通局"],
+    "description": "測試夾具用議題區",
+    "axial": [0, 0],
+    "localElementId": null
+  },
+  {
+    "id": "sample-childcare",
+    "name": "托育（範例）",
+    "departments": ["社會局"],
+    "description": "測試夾具用議題區",
+    "axial": [1, 0],
+    "localElementId": null
+  }
+]

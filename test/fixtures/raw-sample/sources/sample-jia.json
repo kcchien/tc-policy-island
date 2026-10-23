@@ -1,0 +1,14 @@
+[
+  {
+    "id": "sample-src-jia",
+    "candidateId": "sample-jia",
+    "url": "https://example.org/sample-jia/policy",
+    "archiveUrl": null,
+    "archiveError": "測試夾具不送存檔",
+    "snapshotPath": "test/fixtures/snapshots/sample-src-jia.txt",
+    "snapshotSha256": "b0e7b2bc9ea86639d280abbd550d3b0ad07e1093ecc2f5b8cbdf8c3d4133c64d",
+    "sourceType": "official-website",
+    "title": "範例甲政見頁",
+    "retrievedAt": "2026-10-23"
+  }
+]

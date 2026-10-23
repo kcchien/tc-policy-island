@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sample-jia-001",
+    "candidateId": "sample-jia",
+    "issueAreaId": "sample-transport",
+    "summary": "在範例區增設三條公車路線，每 15 分鐘一班。",
+    "quotes": [
+      { "text": "在範例區增設三條範例公車路線，每十五分鐘一班。", "sourceId": "sample-src-jia" }
+    ],
+    "districts": ["大里區"],
+    "conflictNote": null,
+    "verification": {
+      "layer1": { "status": "pass", "checkedAt": "2026-10-23" },
+      "layer2": {
+        "status": "pass",
+        "reason": "摘要忠於原文，無評價字眼（範例）",
+        "checklistVersion": "sample-1",
+        "model": "sample-model",
+        "checkedAt": "2026-10-23"
+      }
+    }
+  },
+  {
+    "id": "sample-jia-002",
+    "candidateId": "sample-jia",
+    "issueAreaId": "sample-transport",
+    "summary": "範例區增設兩座公園（尚未核對，不應公開）。",
+    "quotes": [
+      { "text": "範例區增設兩座範例公園。", "sourceId": "sample-src-jia" }
+    ],
+    "districts": [],
+    "conflictNote": null,
+    "verification": {
+      "layer1": { "status": "pending", "checkedAt": null },
+      "layer2": { "status": "pending", "reason": null, "checklistVersion": null, "model": null, "checkedAt": null }
+    }
+  }
+]
