@@ -45,9 +45,14 @@ export const PALETTE = {
   windowGlow: 0xf2e2a0,
   // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
   lampGlow: 0xe8d488,
-  // 候選人廣場：人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
+  // 候選人廣場：人物腳下的形狀底座、人物（身體、頭、髮殼、眼睛、腮紅）。三位候選人人物同一組中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
+  figureHead: 0xdccdb8,
+  figureHair: 0x62564c,
+  figureEye: 0x3a332e,
+  // 腮紅：低飽和的灰玫瑰色，亮度 0.58（粉紅範圍要 0.6 以上）。
+  figureCheek: 0xb08578,
 };
 
 const materials = new Map();
@@ -603,14 +608,27 @@ export function setMarkerLit(marker, lit) {
 // 回傳 { model, body, hit }：body 是待機動畫伸縮擺動的部分，hit 是點選用的隱形圓柱（比人物略大，手機好點）。
 // 人物會動，不用零件庫的共用幾何，instancify 不會合批。
 export function figureModel(figure) {
-  const color = PALETTE[figure.color];
   const body = new THREE.Group();
+  const n = figure.segments;
+  const head = figure.parts.find((p) => p.part === 'head');
   for (const part of figure.parts) {
-    const geometry = part.shape === 'sphere'
-      ? new THREE.IcosahedronGeometry(part.radius, figure.sphereDetail)
-      : new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, figure.segments);
-    const m = new THREE.Mesh(geometry, material(color));
+    const geometry = {
+      sphere: () => new THREE.SphereGeometry(part.radius, n * 2, n),
+      capsule: () => new THREE.CapsuleGeometry(part.radius, part.length, n / 2, n * 2),
+      // 髮殼蓋住頭頂，往後腦（-z）傾斜，露出前額與臉。
+      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * part.cover).rotateX(-part.tilt),
+      cylinder: () => new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, n),
+      // 腮紅與微笑線先做成朝 +z 的形狀，下面再轉到朝外。
+      disc: () => new THREE.CylinderGeometry(part.radius, part.radius, part.thickness, n * 2).rotateX(Math.PI / 2),
+      arc: () => new THREE.TorusGeometry(part.radius, part.tube, 4, n * 2, Math.PI).rotateZ(Math.PI),
+    }[part.shape]();
+    // Q 版人物用平滑著色，圓頭才不會一面一面。
+    const m = new THREE.Mesh(geometry, material(PALETTE[part.color], { flatShading: false }));
     m.position.set(...part.at);
+    if (part.shape === 'disc' || part.shape === 'arc') {
+      const out = new THREE.Vector3(...part.at).sub(new THREE.Vector3(...head.at)).normalize();
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), out);
+    }
     m.castShadow = true;
     body.add(m);
   }

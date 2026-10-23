@@ -5,6 +5,7 @@ import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
 import { figureLook, figurePose, plazaLayout } from '../site/js/island-plaza.js';
 import { makeRaw } from './fixtures/make-raw.js';
+import { assertFaceVisible } from './fixtures/face.js';
 
 const layoutOf = (raw) => islandLayout(buildViewModel(buildPublicDataset(raw)));
 
@@ -72,11 +73,26 @@ test('三個人物的幾何、尺寸、材質與待機動畫參數完全相同�
   assert.deepEqual(Object.keys(looks[0]).filter((key) => ['candidateId', 'name', 'symbol', 'position'].includes(key)), []);
   assert.equal(looks[0].pad.size, plaza.figures[2].pad.size);
   assert.deepEqual(looks[2], looks[0]);
-  assert.equal(looks[0].color, 'figure');
   assert.ok(looks[0].parts.length > 0);
   assert.ok(looks[0].idle.periodSeconds > 0);
   // 每個人物是各自的物件，關卡才能抓到單一人物被改動。
   assert.notEqual(plaza.figures[0].parts, plaza.figures[1].parts);
+});
+
+test('候選人人物是 Q 版中性造型：大頭（約占身高四成）、髮殼、圓點眼睛，只用中性色，不用照片或貼圖', () => {
+  const [figure] = plazaLayout(layoutOf(withDecorativeTiles())).figures;
+  const head = figure.parts.find((p) => p.part === 'head');
+  const top = Math.max(...figure.parts.map((p) => p.at[1] + (p.radius ?? p.height / 2)));
+
+  assert.deepEqual([...new Set(figure.parts.map((p) => p.part))].sort(), ['arm', 'body', 'cheek', 'eye', 'hair', 'head', 'leg', 'mouth']);
+  assertFaceVisible(figure.parts, { forward: 2 });
+  const ratio = (head.radius * 2) / top;
+  assert.ok(ratio >= 0.36 && ratio <= 0.44, `頭占身高 ${ratio.toFixed(2)}`);
+  // 名牌在頭頂上方。
+  assert.ok(figure.labelHeight > top * figure.scale);
+  // 每個零件的顏色是人物專用的中性色代號，不含任何影像來源。
+  assert.ok(figure.parts.every((p) => ['figure', 'figureHead', 'figureHair', 'figureEye', 'figureCheek'].includes(p.color)), JSON.stringify(figure.parts.map((p) => p.color)));
+  assert.ok(!JSON.stringify(figure).match(/texture|image|photo|url/i));
 });
 
 test('人物配置不受政見資料影響', () => {

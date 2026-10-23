@@ -4,15 +4,24 @@
 // 只以頭上的 ○△□ 名牌、腳下同形狀的底座與廣場名牌上的姓名區分，依排序規則由西到東並排，不在島上移動。
 
 // 人物由這些零件組成（相對腳底中心，y 朝上，人物面向 +z 也就是南方的鏡頭）。
-// shape 是 'cylinder'（radiusTop、radiusBottom、height）或 'sphere'（radius），at 是零件中心。
-// 頭是素面球體，沒有五官與髮型。
+// shape 是 'cylinder'（radiusTop、radiusBottom、height）、'sphere'（radius）、'capsule'（radius、中段長 length）、
+// 'dome'（髮殼：蓋住頭頂 cover × 180 度的半球殼，往後腦傾斜 tilt 弧度）、'disc'（腮紅：radius、thickness）
+// 或 'arc'（微笑線：半圓弧，radius、tube），at 是零件中心；腮紅與微笑線貼在頭上、朝外。
+// color 是 island-models.js 的 PALETTE 代號，只用人物專用的中性色。
+// Q 版大頭：頭的直徑約占身高四成，短髮殼只蓋頭頂與後腦，臉上只有圓點眼睛、腮紅與微笑線，不模仿任何人的長相。
 export const FIGURE_PARTS = [
-  { part: 'leg', shape: 'cylinder', radiusTop: 0.032, radiusBottom: 0.028, height: 0.2, at: [-0.042, 0.1, 0] },
-  { part: 'leg', shape: 'cylinder', radiusTop: 0.032, radiusBottom: 0.028, height: 0.2, at: [0.042, 0.1, 0] },
-  { part: 'body', shape: 'cylinder', radiusTop: 0.068, radiusBottom: 0.084, height: 0.22, at: [0, 0.31, 0] },
-  { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.19, at: [-0.1, 0.32, 0] },
-  { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.19, at: [0.1, 0.32, 0] },
-  { part: 'head', shape: 'sphere', radius: 0.07, at: [0, 0.5, 0] },
+  { part: 'leg', shape: 'cylinder', radiusTop: 0.03, radiusBottom: 0.026, height: 0.13, at: [-0.038, 0.065, 0], color: 'figure' },
+  { part: 'leg', shape: 'cylinder', radiusTop: 0.03, radiusBottom: 0.026, height: 0.13, at: [0.038, 0.065, 0], color: 'figure' },
+  { part: 'body', shape: 'capsule', radius: 0.075, length: 0.09, at: [0, 0.24, 0], color: 'figure' },
+  { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [-0.086, 0.25, 0], color: 'figure' },
+  { part: 'arm', shape: 'cylinder', radiusTop: 0.024, radiusBottom: 0.02, height: 0.14, at: [0.086, 0.25, 0], color: 'figure' },
+  { part: 'head', shape: 'sphere', radius: 0.114, at: [0, 0.448, 0], color: 'figureHead' },
+  { part: 'hair', shape: 'dome', radius: 0.119, cover: 0.42, tilt: 1, at: [0, 0.448, -0.004], color: 'figureHair' },
+  { part: 'eye', shape: 'sphere', radius: 0.016, at: [-0.042, 0.478, 0.102], color: 'figureEye' },
+  { part: 'eye', shape: 'sphere', radius: 0.016, at: [0.042, 0.478, 0.102], color: 'figureEye' },
+  { part: 'cheek', shape: 'disc', radius: 0.018, thickness: 0.004, at: [-0.064, 0.445, 0.094], color: 'figureCheek' },
+  { part: 'cheek', shape: 'disc', radius: 0.018, thickness: 0.004, at: [0.064, 0.445, 0.094], color: 'figureCheek' },
+  { part: 'mouth', shape: 'arc', radius: 0.024, tube: 0.005, at: [0, 0.437, 0.113], color: 'figureEye' },
 ];
 // 人物頭頂離腳底的高度（零件的單位，乘上 FIGURE_SCALE 才是場景尺寸），名牌放在頭頂上方 LABEL_GAP。
 const FIGURE_HEIGHT = 0.57;
@@ -53,11 +62,9 @@ export function plazaLayout(layout) {
     position: { x: tile.position.x + (index - offset) * FIGURE_SPACING, z: tile.position.z + FIGURE_ROW_Z },
     facing: 0,
     scale: FIGURE_SCALE,
-    color: 'figure',
     labelHeight: FIGURE_HEIGHT * FIGURE_SCALE + LABEL_GAP,
-    // 零件的多邊形細分（圓柱邊數、球體細分層數）與點選範圍的半徑。
+    // 零件的多邊形細分（圓柱邊數；球體、膠囊與髮殼繞一圈 2 倍、上下 segments 段）與點選範圍的半徑。
     segments: 8,
-    sphereDetail: 1,
     hitRadius: 0.19,
     // 每個人物各自一份，關卡才抓得到單一人物被改動。
     parts: structuredClone(FIGURE_PARTS),

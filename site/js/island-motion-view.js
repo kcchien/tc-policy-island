@@ -4,7 +4,9 @@
 // 會動的零件每種一個 InstancedMesh，每幀由動畫迴圈更新矩陣，繪製呼叫數不隨格子數增加。
 
 import * as THREE from 'three';
-import { citizenPose, loopPose, motionPlan, VEHICLE_HALF_WIDTH, vehiclePose } from './island-motion.js';
+import {
+  CITIZEN_FIGURE, CITIZEN_ROLES, citizenPose, citizenZoom, loopPose, motionPlan, RIDE_LIFT, VEHICLE_HALF_WIDTH, vehiclePose,
+} from './island-motion.js';
 import { tileAt } from './island-body.js';
 import { material, PALETTE, PARTS, TILE_SURFACE } from './island-models.js';
 
@@ -14,6 +16,18 @@ export const MOTION_PALETTE = {
   skin: 0xc49a7c,
   trousers: 0x4f4a45,
   clothes: [0x8a5a44, 0x9a7b55, 0x6f6a58, 0xa86f5a, 0x7c6f66, 0xb59a74],
+  hair: [0x3a302a, 0x5a4636, 0x6e655d, 0x2e2a27],
+  eye: 0x2b2522,
+  shadow: 0x3a332e,
+  // 角色配件：學童帽用米色（不用常見的亮黃），其他都是低飽和的大地色。
+  cap: 0xcdbb94,
+  cane: 0x5e4a3c,
+  bike: 0x5e5852,
+  helmet: 0xc4a467,
+  suitcase: 0x7a6a5e,
+  stroller: 0x9a8b7c,
+  // 腮紅與候選人人物同色。
+  cheek: PALETTE.figureCheek,
   train: 0x7a5c4c,
   trainRoof: 0x5e5852,
   bus: 0xb08a4e,
@@ -27,6 +41,12 @@ export const MOTION_PALETTE = {
 
 // 車輛底部離步道面的高度（步道略高出島頂面）。
 const VEHICLE_LIFT = 0.008;
+// 橋的甲板頂面高出步道面的量（island-body-view.js 的甲板厚 0.022，中心在步道面）。
+const BRIDGE_DECK = 0.011;
+// 上橋時墊高到甲板頂面的拱起高度：拱起到這個高度時腳底已在甲板上。
+const DECK_RAMP = 0.02;
+// 市民角色 → 角色資料（配件代號）。
+const roleOf = (citizen) => CITIZEN_ROLES.find((r) => r.id === citizen.role);
 
 // 零件庫的共用單位幾何（零件代號與 island-models.js 相同，同種形體合進同一桶）。
 const unitBox = () => PARTS.box(1, 1, 1).geometry;
@@ -36,15 +56,19 @@ const unitIco = () => PARTS.ico(1).geometry;
 // 靜態零件：共用單位幾何撐成 scale，instancify 會合批。
 const part = (geometry, color, { scale = [1, 1, 1], ...at } = {}) => PARTS.mesh({ geometry, scale }, color, at);
 
-// 逐實例上色的零件共用一份材質（底色維持預設，乘上實例顏色）。
-let tintedMaterial = null;
+// 逐實例上色的零件共用一份材質（底色維持預設，乘上實例顏色）。市民的圓頭圓身用平滑著色的那一份。
+const tintedMaterials = new Map();
+const tinted = (smooth) => {
+  if (!tintedMaterials.has(smooth)) tintedMaterials.set(smooth, new THREE.MeshStandardMaterial({ flatShading: !smooth, roughness: 0.9, metalness: 0 }));
+  return tintedMaterials.get(smooth);
+};
 
 // 會動的零件：每種一個 InstancedMesh，原點在零件的轉軸。
 // color 是單一顏色，或每個實例一個顏色的函式 (i) → 色碼。發光件用共用的發光材質，顏色同樣寫在實例上。
-function movingMesh(geometry, color, count, { glowMaterial = null } = {}) {
+// smooth 用平滑著色（市民），其他零件維持低多邊形的平面著色。
+function movingMesh(geometry, color, count, { glowMaterial = null, smooth = false } = {}) {
   const perInstance = typeof color === 'function' || glowMaterial;
-  tintedMaterial ??= new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 });
-  const base = glowMaterial ?? (perInstance ? tintedMaterial : material(color));
+  const base = glowMaterial ?? (perInstance ? tinted(smooth) : material(color, smooth ? { flatShading: false } : {}));
   const mesh = new THREE.InstancedMesh(geometry, base, count);
   if (perInstance) {
     const c = new THREE.Color();
@@ -168,14 +192,127 @@ function mergeGeometries(list) {
   return merged;
 }
 
-// 市民：身體、頭、兩條腿，原尺寸頭頂高 0.16、身寬半徑 0.025，放上格子時乘配置的倍率（island-motion.js 的 CITIZEN_SCALE）。
-// 腿的原點在髖部，擺動時繞髖部轉。
-const CITIZEN = {
-  body: () => new THREE.CylinderGeometry(0.02, 0.025, 0.066, 6).translate(0, 0.09, 0),
-  head: () => new THREE.SphereGeometry(0.018, 6, 4).translate(0, 0.142, 0),
-  leg: () => boxGeometry(0.013, 0.057, 0.013, { pivot: [0, -0.0285, 0] }),
-  hip: 0.057,
-  legGap: 0.01,
+// 市民：Q 版大頭小人，零件的尺寸與位置來自 island-motion.js 的 CITIZEN_FIGURE（原尺寸，臉朝 +x），
+// 放上格子時乘配置的倍率與鏡頭距離的放大（citizenZoom）。每種零件一個 InstancedMesh，腿與手臂的原點在上端，擺動時繞髖、肩轉。
+const HEAD = CITIZEN_FIGURE.parts.find((p) => p.part === 'head');
+// 幾何以零件中心為原點（腿與手臂以上端為原點）；每個零件實例的位置與朝向在 partPlacement。
+const swingPart = (p) => boxGeometry(p.width, p.height, p.width, { pivot: [0, -p.height / 2, 0] });
+const CITIZEN_GEOMETRY = {
+  leg: swingPart,
+  arm: swingPart,
+  body: (p) => new THREE.CapsuleGeometry(p.radius, p.length, 3, 8),
+  head: (p) => new THREE.SphereGeometry(p.radius, 10, 8),
+  // 髮殼蓋住頭頂，往後腦（-x）傾斜，露出前額與臉（鏡頭多半從斜上方看）。
+  hair: (p) => new THREE.SphereGeometry(p.radius, 10, 5, 0, Math.PI * 2, 0, Math.PI * p.cover).rotateZ(p.tilt),
+  eye: (p) => new THREE.SphereGeometry(p.radius, 5, 4),
+  // 腮紅與微笑線做成朝 +z 的形狀，partPlacement 再轉到朝頭的外側。
+  cheek: (p) => new THREE.CylinderGeometry(p.radius, p.radius, p.thickness, 8).rotateX(Math.PI / 2),
+  mouth: (p) => new THREE.TorusGeometry(p.radius, p.tube, 3, 8, Math.PI).rotateZ(Math.PI),
+};
+const FACE_DETAILS = new Set(['cheek', 'mouth']);
+// 零件實例在市民座標裡的固定位置與朝向（腿與手臂另外每幀加上擺動）。
+function partPlacement(p) {
+  const at = new THREE.Vector3(...p.at);
+  const turn = new THREE.Quaternion();
+  if (FACE_DETAILS.has(p.part)) turn.setFromUnitVectors(new THREE.Vector3(0, 0, 1), at.clone().sub(new THREE.Vector3(...HEAD.at)).normalize());
+  return new THREE.Matrix4().compose(at, turn, new THREE.Vector3(1, 1, 1));
+}
+// 零件的顏色：衣服、頭髮依市民的順序輪替，與格子內容無關。
+const CITIZEN_COLORS = {
+  leg: () => MOTION_PALETTE.trousers,
+  arm: (i) => MOTION_PALETTE.clothes[i % MOTION_PALETTE.clothes.length],
+  body: (i) => MOTION_PALETTE.clothes[i % MOTION_PALETTE.clothes.length],
+  head: () => MOTION_PALETTE.skin,
+  hair: (i) => MOTION_PALETTE.hair[i % MOTION_PALETTE.hair.length],
+  eye: () => MOTION_PALETTE.eye,
+  cheek: () => MOTION_PALETTE.cheek,
+  mouth: () => MOTION_PALETTE.eye,
+};
+// 臉上的小零件太小，不投影。
+const NO_SHADOW = new Set(['eye', ...FACE_DETAILS]);
+
+// 角色配件（原尺寸、臉朝 +x）：大小守住 island-motion.js 的 ACCESSORY_TOP、ACCESSORY_CROWN、ACCESSORY_LOW、ACCESSORY_REACH。
+// arm 是手臂的固定姿勢（繞肩往前的角度，left 是 -z 側、right 是 +z 側；沒寫的手臂照走路擺動）；
+// ride 表示騎在車上（身體抬高，腿照走路的擺幅踩）；grounded 表示配件放在地上，不跟著身體起伏（帽子則跟著頭起伏）。
+// 帽子的殼：和髮殼一樣蓋住頭頂、往後腦傾斜，前緣在眼睛上方，不遮臉。
+const HAIR = CITIZEN_FIGURE.parts.find((p) => p.part === 'hair');
+const hatShell = (radius, cover, tilt) =>
+  new THREE.SphereGeometry(radius, 10, 5, 0, Math.PI * 2, 0, Math.PI * cover).rotateZ(tilt).translate(...HAIR.at);
+const wheel = (x, r, tube) => new THREE.TorusGeometry(r, tube, 4, 12).translate(x, r, 0);
+const ACCESSORIES = {
+  // 學童的圓帽加帽簷，用中性的米色。
+  cap: {
+    color: MOTION_PALETTE.cap,
+    geometry: () => mergeGeometries([
+      hatShell(HAIR.radius + 0.002, HAIR.cover, HAIR.tilt),
+      // 帽簷從帽子前緣（頭頂往前約 20 度）伸出，在眼睛上方。
+      boxGeometry(0.026, 0.004, 0.03, { pivot: [0.025, HEAD.at[1] + 0.033, 0] }),
+    ]),
+  },
+  // 長者的拐杖，拿在右手（+z 側）往前一點。
+  cane: {
+    color: MOTION_PALETTE.cane,
+    grounded: true,
+    arm: { right: 0.6 },
+    geometry: () => mergeGeometries([
+      new THREE.CylinderGeometry(0.003, 0.003, 0.058, 5).translate(0.024, 0.029, 0.024),
+      boxGeometry(0.014, 0.004, 0.004, { pivot: [0.02, 0.058, 0.024] }),
+    ]),
+  },
+  // 通勤族的腳踏車：兩個輪子、車架、坐墊、把手。
+  bicycle: {
+    color: MOTION_PALETTE.bike,
+    ride: true,
+    grounded: true,
+    arm: { left: 0.9, right: 0.9 },
+    geometry: () => mergeGeometries([
+      wheel(-0.034, 0.019, 0.003),
+      wheel(0.034, 0.019, 0.003),
+      boxGeometry(0.07, 0.004, 0.004, { pivot: [0, 0.032, 0] }),
+      boxGeometry(0.004, 0.022, 0.004, { pivot: [-0.008, 0.04, 0] }),
+      boxGeometry(0.014, 0.004, 0.01, { pivot: [-0.008, 0.052, 0] }),
+      // 把手立管與把手：把手在雙手往前伸的高度（肩下約 0.024）。
+      boxGeometry(0.004, 0.04, 0.004, { pivot: [0.03, 0.051, 0] }),
+      boxGeometry(0.004, 0.004, 0.034, { pivot: [0.03, 0.072, 0] }),
+    ]),
+  },
+  // 農夫的斗笠：低平的圓錐，底緣在頭心上方 0.017，頂端不超過 ACCESSORY_TOP。
+  strawHat: {
+    color: PALETTE.straw,
+    geometry: () => new THREE.ConeGeometry(0.042, 0.026, 12).translate(0, HEAD.at[1] + 0.017 + 0.013, 0),
+  },
+  // 工人的安全帽：半球加一圈帽緣。
+  helmet: {
+    color: MOTION_PALETTE.helmet,
+    geometry: () => mergeGeometries([
+      hatShell(HAIR.radius + 0.003, 0.45, 0.8),
+      // 帽緣一圈在眼睛上方。
+      new THREE.CylinderGeometry(0.04, 0.04, 0.004, 12).translate(0, HEAD.at[1] + 0.027, 0),
+    ]),
+  },
+  // 旅客的行李箱：拉在身後（-x），手往後伸。
+  suitcase: {
+    color: MOTION_PALETTE.suitcase,
+    grounded: true,
+    arm: { right: -0.45 },
+    geometry: () => mergeGeometries([
+      boxGeometry(0.024, 0.034, 0.02, { pivot: [-0.045, 0.019, 0.02] }),
+      boxGeometry(0.003, 0.03, 0.003, { pivot: [-0.04, 0.05, 0.02] }),
+      wheel(-0.045, 0.003, 0.0015),
+    ]),
+  },
+  // 推嬰兒車：車籃、車篷、四個小輪子、把手，兩手往前推。
+  stroller: {
+    color: MOTION_PALETTE.stroller,
+    grounded: true,
+    arm: { left: 0.75, right: 0.75 },
+    geometry: () => mergeGeometries([
+      boxGeometry(0.036, 0.022, 0.03, { pivot: [0.046, 0.036, 0] }),
+      new THREE.SphereGeometry(0.018, 8, 4, 0, Math.PI, 0, Math.PI / 2).rotateY(Math.PI / 2).translate(0.046, 0.047, 0),
+      boxGeometry(0.004, 0.04, 0.026, { pivot: [0.026, 0.046, 0] }),
+      ...[0.034, 0.054].flatMap((x) => [-0.013, 0.013].map((z) => new THREE.CylinderGeometry(0.007, 0.007, 0.004, 8).rotateX(Math.PI / 2).translate(x, 0.007, z))),
+    ]),
+  },
 };
 
 // 車輛：車身、車頂、兩側窗帶（夜裡發光）、車燈（夜裡發光）。長度方向沿 +x。
@@ -226,13 +363,36 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     }
   }
 
-  // 市民：每格同數，沿格子的邊走。
-  const citizens = areas.flatMap((tile) => tile.citizens.map((citizen) => ({ tile, citizen })));
-  // 衣服顏色依市民的順序輪替，與格子內容無關。
-  const body = movingMesh(CITIZEN.body(), (i) => MOTION_PALETTE.clothes[i % MOTION_PALETTE.clothes.length], citizens.length);
-  const head = movingMesh(CITIZEN.head(), MOTION_PALETTE.skin, citizens.length);
-  const legs = movingMesh(CITIZEN.leg(), MOTION_PALETTE.trousers, citizens.length * 2);
-  scene.add(body, head, legs);
+  // 市民：每格同數，沿自己島的步道環走，途中走上一座橋到拱頂折返。
+  // 每種零件一個 InstancedMesh：同種零件每人有幾個（腿、手臂、眼睛各兩個），實例就是人數的幾倍，依市民順序排。
+  const citizens = areas.flatMap((tile) => tile.citizens.map((citizen) => ({ tile, citizen, accessory: ACCESSORIES[roleOf(citizen).accessory] })));
+  const citizenParts = Object.entries(CITIZEN_GEOMETRY).map(([name, geometry]) => {
+    const parts = CITIZEN_FIGURE.parts.filter((p) => p.part === name);
+    const mesh = movingMesh(geometry(parts[0]), (i) => CITIZEN_COLORS[name](Math.floor(i / parts.length)), citizens.length * parts.length, { smooth: true });
+    mesh.castShadow = !NO_SHADOW.has(name);
+    scene.add(mesh);
+    return { name, parts, placements: parts.map(partPlacement), mesh };
+  });
+  // 腳下的假影子：半透明的深色圓片，不寫深度，不受光。
+  const shadowMesh = new THREE.InstancedMesh(
+    new THREE.CircleGeometry(CITIZEN_FIGURE.shadow.radius, 12).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: MOTION_PALETTE.shadow, transparent: true, opacity: CITIZEN_FIGURE.shadow.opacity, depthWrite: false }),
+    citizens.length,
+  );
+  shadowMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  shadowMesh.frustumCulled = false;
+  shadowMesh.userData.dynamic = true;
+  scene.add(shadowMesh);
+  // 配件：每種一個 InstancedMesh，實例是有這種配件的市民。
+  const accessoryMeshes = new Map(Object.entries(ACCESSORIES).flatMap(([name, spec]) => {
+    const owners = citizens.filter((c) => c.accessory === spec);
+    if (owners.length === 0) return [];
+    const mesh = movingMesh(spec.geometry(), spec.color, owners.length);
+    scene.add(mesh);
+    return [[spec, { mesh, owners }]];
+  }));
+  // 每個市民在自己配件那個 InstancedMesh 裡的實例序號。
+  const accessoryIndex = citizens.map((c) => (c.accessory ? accessoryMeshes.get(c.accessory).owners.indexOf(c) : -1));
 
   // 車輛：每節車廂一組車身、車頂、窗帶、車燈。
   const cars = plan.vehicles.flatMap((vehicle) => Array.from({ length: vehicle.cars }, (_, index) => ({ vehicle, index, spec: VEHICLES[vehicle.kind] })));
@@ -255,12 +415,12 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   // heading 是 atan2(dz, dx)；零件的長度方向是 +x，繞 y 轉 -heading 才會對齊行進方向。
   const placeAt = (x, y, z, heading, scale = 1) => place.compose(v.set(x, y, z), q.setFromAxisAngle(up, -heading), s.setScalar(scale));
 
-  const citizenMeshes = [body, head, legs];
   const carMeshes = [carBody, carRoof, carWindows, headlights];
   const poses = {};
   const vehiclePoses = new Map();
 
-  function update(t) {
+  // env.cameraDistance 是鏡頭到旋轉中心的距離，市民依此放大（citizenZoom）。
+  function update(t, dt, env = {}) {
     for (const theme in LOOP_PROPS) poses[theme] = loopPose(theme, t);
     for (const { theme, piece, mesh, spots } of movers) {
       spots.forEach(({ tile, loop }, i) => {
@@ -271,18 +431,42 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
       mesh.instanceMatrix.needsUpdate = true;
     }
 
-    citizens.forEach(({ tile, citizen }, i) => {
+    const zoom = citizenZoom(env.cameraDistance ?? 0);
+    citizens.forEach(({ tile, citizen, accessory }, i) => {
       const pose = citizenPose(tile, citizen, t);
-      placeAt(pose.x, TILE_SURFACE + 0.006 + pose.bob * citizen.scale + liftOf(tile.id), pose.z, pose.heading, citizen.scale);
-      body.setMatrixAt(i, place);
-      head.setMatrixAt(i, place);
-      // 兩條腿反向擺動（place 已含倍率，這裡用原尺寸）。
-      local.makeRotationZ(pose.legSwing).setPosition(0, CITIZEN.hip, -CITIZEN.legGap);
-      legs.setMatrixAt(i * 2, m.multiplyMatrices(place, local));
-      local.makeRotationZ(-pose.legSwing).setPosition(0, CITIZEN.hip, CITIZEN.legGap);
-      legs.setMatrixAt(i * 2 + 1, m.multiplyMatrices(place, local));
+      const scale = citizen.scale * zoom;
+      // 在島上跟著選取抬高（在橋面中段不屬於任何島），過橋時跟著拱起；影子貼地，不跟著起伏。
+      // 步道面高出島頂面 0.006；橋面的甲板再厚一些，上橋時漸漸墊高。
+      const deck = BRIDGE_DECK * Math.min(1, pose.y / DECK_RAMP);
+      const ground = TILE_SURFACE + 0.006 + pose.y + deck + liftOf(tileAt(layout, pose));
+      placeAt(pose.x, ground + 0.001, pose.z, pose.heading, scale);
+      shadowMesh.setMatrixAt(i, place);
+      // 身體的抬高（原尺寸）：走路的起伏，騎車時另坐高一點。
+      const lift = pose.bob + (accessory?.ride ? RIDE_LIFT : 0);
+      placeAt(pose.x, ground, pose.z, pose.heading, scale);
+      for (const { name, parts, placements, mesh } of citizenParts) {
+        parts.forEach((p, k) => {
+          if (name === 'leg' || name === 'arm') {
+            // 左右兩側（-z、+z）反向擺動；配件指定的手臂姿勢固定不擺。
+            const side = p.at[2] < 0 ? 'left' : 'right';
+            const fixed = name === 'arm' ? accessory?.arm?.[side] : undefined;
+            const swing = fixed ?? (name === 'leg' ? pose.legSwing : pose.armSwing) * (side === 'left' ? 1 : -1);
+            local.makeRotationZ(swing).setPosition(p.at[0], p.at[1] + p.height / 2 + lift, p.at[2]);
+          } else {
+            local.makeTranslation(0, lift, 0).multiply(placements[k]);
+          }
+          mesh.setMatrixAt(i * parts.length + k, m.multiplyMatrices(place, local));
+        });
+      }
+      if (accessory) {
+        // 帽子跟著頭起伏；放在地上的配件（車子、行李箱、拐杖）不起伏。
+        local.makeTranslation(0, accessory.grounded ? 0 : lift, 0);
+        accessoryMeshes.get(accessory).mesh.setMatrixAt(accessoryIndex[i], m.multiplyMatrices(place, local));
+      }
     });
-    for (const mesh of citizenMeshes) mesh.instanceMatrix.needsUpdate = true;
+    for (const { mesh } of citizenParts) mesh.instanceMatrix.needsUpdate = true;
+    shadowMesh.instanceMatrix.needsUpdate = true;
+    for (const { mesh } of accessoryMeshes.values()) mesh.instanceMatrix.needsUpdate = true;
 
     for (const vehicle of plan.vehicles) vehiclePoses.set(vehicle, vehiclePose(plan.ring, vehicle, t, plan.ringLength));
     cars.forEach(({ vehicle, index, spec }, i) => {

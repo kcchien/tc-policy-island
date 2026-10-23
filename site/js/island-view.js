@@ -245,9 +245,10 @@ export function createIslandView(stage, {
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
     decor.setNight(lighting.night);
-    const showSmall = camera.position.distanceTo(controls.target) < LOD_DISTANCE;
+    const cameraDistance = camera.position.distanceTo(controls.target);
+    const showSmall = cameraDistance < LOD_DISTANCE;
     for (const mesh of smallDecor) mesh.visible = showSmall;
-    animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon, lighting });
+    animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon, lighting, cameraDistance });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
     frame += 1;

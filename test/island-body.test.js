@@ -187,7 +187,7 @@ test('車道與市民路線都在步道上、彼此不重疊，火車不碰路�
   const { lamps } = islandBody(layoutOf(rawWithSix()));
   const lampRadius = Math.hypot(lamps[0].x - layoutOf(rawWithSix()).tiles[0].position.x, lamps[0].z - layoutOf(rawWithSix()).tiles[0].position.z);
   assert.ok(lampRadius - 0.018 > trainCorner, `路燈 ${lampRadius} 擋到火車 ${trainCorner}`);
-  // 橋的欄杆在兩種車外側（市民只走自己島的步道環，不過橋）。
+  // 橋的欄杆在兩種車外側（市民過橋走兩側的線，見 island-motion.test.js）。
   const vehicles = lanes.filter((l) => l.name !== '市民');
   assert.ok(BRIDGE.width / 2 - 0.008 > Math.max(...vehicles.map((l) => Math.abs(l.center) + l.half)), '車身穿過橋的欄杆');
 });

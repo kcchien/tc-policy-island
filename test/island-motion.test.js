@@ -5,15 +5,19 @@ import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout, islandPoints } from '../site/js/island-layout.js';
 import { homeView } from '../site/js/island-camera.js';
 import {
-  CITIZEN_HEIGHT, CITIZEN_RADIUS, CITIZEN_SCALE, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
+  ACCESSORY_CROWN, ACCESSORY_LOW, ACCESSORY_REACH, ACCESSORY_TOP, CITIZEN_BOB, CITIZEN_CROWN, CITIZEN_FIGURE, CITIZEN_HEIGHT, CITIZEN_RADIUS,
+  CITIZEN_REACH, CITIZEN_REACH_HEIGHT, CITIZEN_ROLES, CITIZEN_SCALE,
+  CITIZEN_ZOOM, citizenZoom, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
   LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
 } from '../site/js/island-motion.js';
-import { islandBody, TILE_SLOTS } from '../site/js/island-body.js';
+import { BRIDGE, islandBody, tileAt, TILE_SLOTS } from '../site/js/island-body.js';
 import { heroPlan, heroSceneFor, partBounds } from '../site/js/island-heroes.js';
 import { decorPlan } from '../site/js/island-decor.js';
+import { plazaLayout } from '../site/js/island-plaza.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
+import { assertFaceVisible } from './fixtures/face.js';
 
 // 一列三格加第二列兩格、一格裝飾格的小島。政見由 policies 指定。
 function rawWith(policies) {
@@ -56,6 +60,106 @@ test('動態配置與政見資料無關：換一份政見資料，配置完全�
     assert.deepEqual(motionPlan(layoutOf(rawWith(MANY)), { level }), motionPlan(layoutOf(rawWith(FEW)), { level }));
     assert.deepEqual(motionPlan(layoutOf(rawWith([])), { level }), motionPlan(layoutOf(rawWith(FEW)), { level }));
   }
+});
+
+test('市民是 Q 版大頭：頭約占身高四成，腿、手臂、身體、頭、髮殼、眼睛各一種零件，腳下有淡淡的假影子', () => {
+  const { parts, height, shadow } = CITIZEN_FIGURE;
+  const head = parts.find((p) => p.part === 'head');
+
+  assert.deepEqual([...new Set(parts.map((p) => p.part))].sort(), ['arm', 'body', 'cheek', 'eye', 'hair', 'head', 'leg', 'mouth']);
+  assertFaceVisible(parts, { forward: 0 });
+  const ratio = (head.radius * 2) / height;
+  assert.ok(ratio >= 0.36 && ratio <= 0.44, `頭占身高 ${ratio.toFixed(2)}`);
+  // 頭頂（含髮殼）就是身高，腳底在 0。
+  const top = Math.max(...parts.map((p) => p.at[1] + (p.radius ?? p.height / 2)));
+  assert.ok(Math.abs(top - height) < 1e-9, `零件最高到 ${top}，身高 ${height}`);
+  assert.equal(parts.filter((p) => p.part === 'leg').length, 2);
+  assert.equal(parts.filter((p) => p.part === 'arm').length, 2);
+  assert.equal(parts.filter((p) => p.part === 'eye').length, 2);
+  assert.ok(shadow.opacity > 0.15 && shadow.opacity < 0.3);
+});
+
+test('市民的角色配件：每格配件大小的組成相同，同類別內依格子順序輪替，與議題區內容和政見無關', () => {
+  const plan = motionPlan(layoutOf(rawWith(FEW)));
+  const roles = areaPlans(plan).map((tile) => tile.citizens.map((c) => c.role));
+
+  assert.deepEqual(CITIZEN_ROLES.map((r) => r.id), ['student', 'elder', 'commuter', 'farmer', 'worker', 'traveler', 'parent']);
+  // 第 1 位是地上的大件（腳踏車、行李箱、嬰兒車），第 2 位戴帽子，第 3 位是拐杖。
+  assert.deepEqual(roles.slice(0, 4), [
+    ['commuter', 'student', 'elder'],
+    ['traveler', 'farmer', 'elder'],
+    ['parent', 'worker', 'elder'],
+    ['commuter', 'student', 'elder'],
+  ]);
+  assert.deepEqual(areaPlans(motionPlan(layoutOf(rawWith(FEW)), { level: 'low' })).map((t) => t.citizens.map((c) => c.role)).slice(0, 2), [['commuter'], ['traveler']]);
+  // 簽章比對類別：換成另一類別的角色時不同，同類別內換角色時相同。
+  const [first] = areaPlans(plan);
+  const swap = (citizen, role) => ({ ...first, citizens: first.citizens.map((c) => (c === citizen ? { ...c, role, group: CITIZEN_ROLES.find((r) => r.id === role).group } : c)) });
+  assert.equal(motionSignature(swap(first.citizens[0], 'parent')), motionSignature(first));
+  assert.notEqual(motionSignature(swap(first.citizens[0], 'farmer')), motionSignature(first));
+  // 換政見、換議題區名稱與說明，配件分配不變。
+  const renamed = rawWith(MANY);
+  renamed.issueAreas = renamed.issueAreas.map((a, i) => ({ ...a, name: `改名${i}`, description: '另一段說明', departments: ['另一局'] }));
+  const other = motionPlan(layoutOf(renamed));
+  assert.deepEqual(areaPlans(other).map((tile) => tile.citizens.map((c) => c.role)), roles);
+  // 每種角色都有配件。
+  assert.ok(CITIZEN_ROLES.every((r) => r.accessory));
+});
+
+test('市民沿路網走：繞自己島的步道環，途中走上一座橋到拱頂折返，去回各走一側，不進鄰島；優先走沒有環線車輛的橋', () => {
+  for (const layout of [layoutOf(rawWith(FEW)), islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))]) {
+    const plan = motionPlan(layout);
+    const { bridges } = islandBody(layout);
+    const ringPoints = plan.ring.map(([x, z]) => `${x.toFixed(6)},${z.toFixed(6)}`);
+    const onRing = (bridge) => ringPoints.includes(bridge.from.map((v, i) => ((v + bridge.to[i]) / 2).toFixed(6)).join(','));
+    for (const tile of areaPlans(plan)) {
+      const own = bridges.filter((b) => b.tiles.includes(tile.id));
+      const bridge = own.find((b) => b.tiles.includes(tile.spur.tileId));
+      assert.ok(bridge, `${tile.id} 的過橋對象 ${tile.spur.tileId} 不是鄰島`);
+      if (own.some((b) => !onRing(b))) assert.ok(!onRing(bridge), `${tile.id} 有沒有車的橋卻走環線的橋`);
+      // 路線上的點：只在自己島或橋上（橋上拱起），不走進鄰島，每座島上只有自己的市民。
+      const visited = new Set(tile.path.map(([x, z]) => tileAt(layout, { x, z })));
+      assert.deepEqual([...visited].sort(), [null, tile.id].sort(), tile.id);
+      assert.ok(Math.max(...tile.path.map(([, , y]) => y)) >= BRIDGE.rise - 1e-9, `${tile.id} 沒走到拱頂`);
+      assert.ok(tile.path.every(([x, z, y]) => tileAt(layout, { x, z }) !== null || y > 0), `${tile.id} 在水道上方卻沒拱起`);
+      // 橋上去回兩條線分開，都在橋面內。
+      const [fx, fz] = bridge.from;
+      const [dx, dz] = [(bridge.to[0] - fx) / bridge.length, (bridge.to[1] - fz) / bridge.length];
+      const sides = tile.path.filter(([, , y]) => y > 0).map(([x, z]) => (x - fx) * -dz + (z - fz) * dx);
+      assert.ok(Math.min(...sides) < -0.02 && Math.max(...sides) > 0.02, `${tile.id} 去回沒有分兩側`);
+      assert.ok(sides.every((d) => Math.abs(d) + CITIZEN_RADIUS < BRIDGE.width / 2), `${tile.id} 走出橋面`);
+      // 拱起只在橋的兩端之間。
+      const along = tile.path.filter(([, , y]) => y > 0).map(([x, z]) => (x - fx) * dx + (z - fz) * dz);
+      assert.ok(along.every((s) => s > 0 && s < bridge.length), `${tile.id} 拱起超出橋`);
+    }
+  }
+});
+
+test('動態簽章看路線的形狀：轉向不同鄰島的格子相同，過橋的路線變短就不同', () => {
+  const tiles = areaPlans(motionPlan(islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))));
+  assert.ok(new Set(tiles.map((t) => t.spur.angle)).size > 1, '正式資料應有轉向不同鄰島的格子');
+  assert.equal(new Set(tiles.map(motionSignature)).size, 1);
+  const shorter = { ...tiles[1], path: tiles[1].path.map(([x, z, y]) => [x + (y > 0 ? 0.01 : 0), z, y]) };
+  assert.notEqual(motionSignature(shorter), motionSignature(tiles[0]));
+});
+
+test('鏡頭拉遠時市民放大：近看原尺寸，越遠越大，有上限；遮擋與車道檢查用上限的尺寸', () => {
+  assert.equal(citizenZoom(5), 1);
+  assert.equal(citizenZoom(CITIZEN_ZOOM.from), 1);
+  assert.ok(citizenZoom(CITIZEN_ZOOM.from * 1.1) > 1);
+  assert.equal(citizenZoom(500), CITIZEN_ZOOM.max);
+  assert.ok(CITIZEN_ZOOM.max > 1.1 && CITIZEN_ZOOM.max <= 1.45);
+  // 尺寸上限：身高含配件、起伏與離地，左右半寬（手臂外緣），配件伸出的範圍。
+  const top = CITIZEN_SCALE * CITIZEN_ZOOM.max;
+  assert.ok(Math.abs(CITIZEN_HEIGHT - (0.006 + (ACCESSORY_TOP + CITIZEN_BOB) * top)) < 1e-12);
+  assert.ok(CITIZEN_REACH >= ACCESSORY_REACH * top - 1e-12);
+  assert.ok(CITIZEN_CROWN >= ACCESSORY_CROWN * top - 1e-12);
+  assert.ok(Math.abs(CITIZEN_REACH_HEIGHT - (0.006 + (ACCESSORY_LOW + CITIZEN_BOB) * top)) < 1e-12);
+  // 頭與髮殼在帽子的範圍內。
+  const crown = Math.max(...CITIZEN_FIGURE.parts.filter((p) => p.shape !== 'box').map((p) => Math.hypot(p.at[0], p.at[2]) + (p.radius ?? 0)));
+  assert.ok(crown <= ACCESSORY_CROWN, `頭部伸出 ${crown}`);
+  const armOuter = Math.max(...CITIZEN_FIGURE.parts.filter((p) => p.part === 'arm').map((p) => Math.abs(p.at[2]) + p.width / 2));
+  assert.ok(CITIZEN_RADIUS >= armOuter * top - 1e-12);
 });
 
 test('循環動畫的題材依格子順序輪替，裝飾格沒有動態', () => {
@@ -122,7 +226,17 @@ test('市民、車輛與循環動畫都是時間的函式：同一時間同一�
   assert.deepEqual(citizenPose(tile, citizen, 3.2), citizenPose(tile, citizen, 3.2));
   assert.notDeepEqual(citizenPose(tile, citizen, 0), citizenPose(tile, citizen, 2));
   const swings = Array.from({ length: 50 }, (_, i) => citizenPose(tile, citizen, i * 0.05).legSwing);
-  assert.ok(Math.max(...swings) > 0.3 && Math.min(...swings) < -0.3, '走路時腿要前後擺');
+  assert.ok(Math.max(...swings) > 0.5 && Math.min(...swings) < -0.5, '走路時腿要前後擺約 ±0.55');
+  assert.ok(Math.max(...swings) <= 0.55 + 1e-9);
+  const poses = Array.from({ length: 50 }, (_, i) => citizenPose(tile, citizen, i * 0.05));
+  // 手臂與腿反向擺，幅度約 ±0.45；身體隨步伐上下起伏，不會沉到地面以下。
+  assert.ok(poses.every((p) => Math.sign(p.armSwing) === -Math.sign(p.legSwing)));
+  assert.ok(Math.max(...poses.map((p) => p.armSwing)) > 0.4 && Math.max(...poses.map((p) => p.armSwing)) <= 0.45 + 1e-9);
+  const bobs = poses.map((p) => p.bob);
+  assert.ok(Math.min(...bobs) >= 0 && Math.max(...bobs) > 0.004 && Math.max(...bobs) <= CITIZEN_BOB + 1e-9);
+  // 過橋時跟著橋面拱起，在島上時貼地。
+  const lifts = Array.from({ length: 400 }, (_, i) => citizenPose(tile, citizen, (i / 400) * (tile.pathLength / citizen.speed)).y);
+  assert.ok(Math.max(...lifts) > 0.04 && Math.min(...lifts) === 0);
 
   const train = plan.vehicles[0];
   assert.notDeepEqual(vehiclePose(plan.ring, train, 0), vehiclePose(plan.ring, train, 1));
@@ -139,7 +253,7 @@ test('道具與市民放大到全景看得到，每格的倍率相同，倍率�
   const tiles = areaPlans(motionPlan(layoutOf(rawWith(FEW))));
 
   assert.ok(LOOP_SCALE >= 2, `道具倍率 ${LOOP_SCALE}`);
-  assert.ok(CITIZEN_SCALE >= 1.2, `市民倍率 ${CITIZEN_SCALE}`);
+  assert.ok(CITIZEN_SCALE * CITIZEN_ZOOM.max >= 1.2, `市民全景倍率 ${CITIZEN_SCALE * CITIZEN_ZOOM.max}`);
   for (const tile of tiles) {
     assert.ok(tile.loops.every((loop) => loop.scale === LOOP_SCALE), tile.id);
     assert.ok(tile.citizens.every((citizen) => citizen.scale === CITIZEN_SCALE), tile.id);
@@ -148,6 +262,29 @@ test('道具與市民放大到全景看得到，每格的倍率相同，倍率�
   assert.notEqual(motionSignature(bigger), motionSignature(tiles[0]), '只有一格道具比較大時，簽章要不同');
   const taller = { ...tiles[1], citizens: tiles[1].citizens.map((c) => ({ ...c, scale: c.scale * 1.5 })) };
   assert.notEqual(motionSignature(taller), motionSignature(tiles[0]), '只有一格市民比較大時，簽章要不同');
+});
+
+test('市民路線與候選人人物不和靜態裝飾重疊：正式資料的每一格', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  // 踏石平貼地面，走過去不算重疊。
+  const items = decorPlan(layout).tiles.flatMap((tile) => tile.items
+    .filter((item) => item.kind !== 'stone')
+    .map((item) => ({ ...item, x: tile.center.x + item.x, z: tile.center.z + item.z, tileId: tile.id })));
+  const near = (x, z, radius) => items.filter((item) => Math.hypot(item.x - x, item.z - z) < item.radius + radius);
+
+  for (const tile of areaPlans(motionPlan(layout))) {
+    const steps = Math.ceil(tile.pathLength / 0.01);
+    for (let i = 0; i < steps; i++) {
+      const { x, z } = pointAlong(tile.path, i * 0.01, { total: tile.pathLength });
+      const hit = near(x, z, CITIZEN_RADIUS);
+      assert.deepEqual(hit.map((item) => `${item.tileId}/${item.kind}`), [], `${tile.id} 的市民在 (${x.toFixed(2)}, ${z.toFixed(2)}) 碰到裝飾`);
+    }
+  }
+  const plaza = plazaLayout(layout);
+  for (const figure of plaza.figures) {
+    const hit = near(figure.position.x, figure.position.z, figure.padRadius);
+    assert.deepEqual(hit.map((item) => item.kind), [], `${figure.candidateId} 的人物底座碰到裝飾`);
+  }
 });
 
 test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺到最遠也不伸進元素區', () => {
@@ -202,7 +339,7 @@ test('放大後的道具、市民、主題場景、在地感元素與靜態裝�
     }),
     ...Array.from({ length: Math.ceil(tile.pathLength / 0.05) }, (_, i) => pointAlong(tile.path, i * 0.05, { total: tile.pathLength }))
       .filter(() => tile.citizens.length > 0)
-      .map(({ x, z }) => ({ x, z, radius: CITIZEN_RADIUS, height: CITIZEN_HEIGHT })),
+      .flatMap(({ x, z }) => [{ x, z, radius: CITIZEN_CROWN, height: CITIZEN_HEIGHT }, { x, z, radius: CITIZEN_REACH, height: CITIZEN_REACH_HEIGHT }]),
   ]);
   // 主題場景：每個零件的外框照擺放（每座同倍率，朝向不轉）放大平移。在地感元素以外接元素區的圓柱近似。
   for (const hero of heroPlan(layout)) {
