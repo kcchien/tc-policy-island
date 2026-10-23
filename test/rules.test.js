@@ -13,7 +13,8 @@ import { openSite } from '../scripts/gates/site.js';
 import { PROJECT_NAME } from '../scripts/lib/deploy.js';
 import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
-import { extractColors, forbiddenRangesOf, loadForbiddenColors } from '../scripts/lib/colors.js';
+import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
+import { blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES } from '../site/js/island-daylight.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -97,9 +98,9 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
   assert.deepEqual(names.filter((name) => scan(name).length > 0), []);
 });
 
-test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
+test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
   const { ranges } = loadForbiddenColors();
-  const files = ['site/js/island-models.js', 'site/js/island-view.js'];
+  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js'];
   let scanned = 0;
   for (const file of files) {
     const text = readFileSync(repoPath(file), 'utf8');
@@ -110,6 +111,48 @@ test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不�
     scanned += colors.length;
   }
   assert.ok(scanned >= 40, `只掃到 ${scanned} 個色碼`);
+});
+
+test('晝夜切換途中的天空、霧、光照與水色，任兩個時段之間的補間色也不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  const ids = Object.keys(KEYFRAMES);
+  const hits = [];
+  for (const a of ids) {
+    for (const b of ids) {
+      for (let k = 0; k <= 1; k += 0.05) {
+        const lighting = blendLighting(KEYFRAMES[a], KEYFRAMES[b], k);
+        for (const key of COLOR_KEYS) {
+          const hex = lighting[key];
+          const color = { ...rgbToHsl({ r: (hex >> 16) & 0xff, g: (hex >> 8) & 0xff, b: hex & 0xff }), alpha: 1 };
+          for (const range of forbiddenRangesOf(color, ranges)) hits.push(`${a}→${b} ${k.toFixed(2)} ${key} ${hex.toString(16)} ${range.name}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(hits, []);
+});
+
+test('發光件（窗、燈泡）在各時段實際呈現的顏色（色碼乘上發光倍率，超過 1 截掉）不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  // three.js 的色碼是 sRGB，倍率乘在線性空間，畫面輸出再轉回 sRGB。
+  const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const toSrgb = (c) => (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055);
+  const rendered = (hex, level) => Object.fromEntries(['r', 'g', 'b'].map((ch, i) => {
+    const c = ((hex >> (16 - i * 8)) & 0xff) / 255;
+    return [ch, Math.round(toSrgb(Math.min(1, toLinear(c) * level)) * 255)];
+  }));
+  // island-models.js 引用 three.js，Node 載入不了，從原始碼讀 PALETTE 的發光色碼。
+  const models = readFileSync(repoPath('site/js/island-models.js'), 'utf8');
+  const glows = [...models.matchAll(/^\s+(\w+Glow): 0x([0-9a-f]{6}),/gm)].map(([, name, hex]) => [name, parseInt(hex, 16)]);
+  assert.deepEqual(glows.map(([name]) => name), ['markerGlow', 'windowGlow', 'lampGlow']);
+  const hits = [];
+  for (const [name, hex] of glows.filter(([name]) => name !== 'markerGlow')) {
+    for (const [time, lighting] of Object.entries(KEYFRAMES)) {
+      const rgb = rendered(hex, glowLevel(lighting.night));
+      for (const range of forbiddenRangesOf({ ...rgbToHsl(rgb), alpha: 1 }, ranges)) hits.push(`${name} ${time} rgb(${rgb.r},${rgb.g},${rgb.b}) ${range.name}`);
+    }
+  }
+  assert.deepEqual(hits, []);
 });
 
 test('本 repo 的網站文案與配色，以正式原始資料建置後通過品牌用語掃描與禁用色檢查', () => {
