@@ -19,10 +19,10 @@ test('桌機預設高畫質：像素比上限 1.75、陰影每幀更新', () => 
   );
 });
 
-test('手機或 800px 以下預設中畫質', () => {
+test('手機或 800px 以下預設中畫質：陰影每 2 幀更新，陰影那一趟的繪製呼叫減半', () => {
   const phone = initialQuality({ width: 390, coarsePointer: true, devicePixelRatio: 3, userAgent: IPHONE_UA });
   const narrow = initialQuality({ width: 760, coarsePointer: false, devicePixelRatio: 1, userAgent: DESKTOP_UA });
-  assert.deepEqual([phone.level, phone.pixelRatio, phone.shadowMapSize, phone.antialias], ['medium', 1.35, 1024, false]);
+  assert.deepEqual([phone.level, phone.pixelRatio, phone.shadowMapSize, phone.antialias, phone.shadowEvery], ['medium', 1.35, 1024, false, 2]);
   assert.deepEqual([narrow.level, narrow.pixelRatio, narrow.antialias], ['medium', 1, true]);
 });
 

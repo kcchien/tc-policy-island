@@ -41,7 +41,8 @@ test('外圍陸地的色調：白天不改色，黃昏變暗偏暖，夜晚最�
   assert.deepEqual(day, [1, 1, 1]);
   const mean = (rgb) => (rgb[0] + rgb[1] + rgb[2]) / 3;
   assert.ok(mean(dawn) < 1 && mean(dusk) < 1);
-  assert.ok(mean(night) < 0.6, `夜晚平均 ${mean(night).toFixed(2)}`);
+  // 夜晚壓暗但看得清楚，與島的色調一致：倍率太低時外圍幾乎全黑（實測 0.47 時外圍亮度只有島的三分之一）。
+  assert.ok(mean(night) > 0.7 && mean(night) < 0.8, `夜晚平均 ${mean(night).toFixed(2)}`);
   assert.ok(mean(night) < mean(dusk) && mean(dusk) <= mean(dawn) + 0.05);
   assert.ok(dusk[0] > dusk[2], '黃昏偏暖：紅大於藍');
   assert.ok(night[2] > night[0], '夜晚偏冷：藍大於紅');

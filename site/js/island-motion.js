@@ -132,8 +132,9 @@ function hexVertices(apothem) {
   });
 }
 
-// 過橋往返時去、回兩條線離橋中線的距離，與橋上拱起取的分段數。
-const SPUR_LANE = 0.04;
+// 過橋往返時去、回兩條線離橋中線的距離，與橋上拱起取的分段數。環線來回經過同一座橋時兩側都有車，
+// 市民走在兩種車道外側（火車車身外緣再留 0.01），含帽子的半徑也不碰車；橋寬（island-body.js 的 BRIDGE）依此加寬。
+export const SPUR_LANE = RING_LANES.train + VEHICLE_HALF_WIDTH.train + 0.01 + CITIZEN_CROWN;
 const SPUR_STEPS = 8;
 
 // 市民繞的步道環內側一圈（相對格心），點是 [x, z, y]。
@@ -146,9 +147,10 @@ function citizenRoute(centers) {
   const span = centers - 2 * WALKWAY_APOTHEM;
   const crossing = Array.from({ length: SPUR_STEPS / 2 }, (_, k) => (k + 1) / SPUR_STEPS)
     .map((t) => [WALKWAY_APOTHEM + span * t, bridgeLift(t)]);
-  // 往橋上走在北側（-z），回程走南側；頂點順序經過東邊（最後一個頂點到第一個）時接上。
+  // 去回都走北側（-z）的人行道，在拱頂原地折返，不橫越中間的車道；頂點順序經過東邊（最後一個頂點到第一個）時接上。
+  // 市民在路線上的間隔遠大於過橋那一段，同一時間一條人行道上最多一位，去回同一條線不會相撞。
   const out = [[CITIZEN_APOTHEM, 0], [WALKWAY_APOTHEM, 0], ...crossing].map(([x, y]) => [x, -SPUR_LANE, y]);
-  const back = out.map(([x, , y]) => [x, SPUR_LANE, y]).reverse();
+  const back = out.slice(0, -1).reverse();
   return [...citizenRing(), ...out, ...back];
 }
 

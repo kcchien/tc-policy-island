@@ -18,7 +18,7 @@ import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
 import { createMotion } from './island-motion-view.js';
 import {
-  figureModel, localElementModel, markerSign, setMarkerLit, TILE_SURFACE,
+  batchMarkerFaces, figureModel, localElementModel, markerSign, setMarkerLit, TILE_SURFACE,
 } from './island-models.js';
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
@@ -75,7 +75,6 @@ export function createIslandView(stage, {
   stage.append(renderer.domElement, labelRenderer.domElement);
 
   const scene = new THREE.Scene();
-
   const layout = islandLayout(vm);
   const plaza = plazaLayout(layout);
   const { bounds } = layout;
@@ -139,6 +138,7 @@ export function createIslandView(stage, {
     }
     scene.add(g);
   }
+  const markerFaces = batchMarkerFaces(scene, [...tiles.values()].flatMap((tile) => tile.markers));
   // 候選人人物：三人同一款，依排序規則並排在廣場。人物不移動，只有待機動畫。
   // 頭上名牌只有形狀；姓名寫在廣場南端的廣場名牌，三人並列（姓名放頭上會互疊）。
   const plate = (info) => [el('b', { class: 'island-label-number' }, info.symbol), el('span', { class: 'island-label-name' }, info.name)];
@@ -184,10 +184,10 @@ export function createIslandView(stage, {
   // 每格的循環道具、市民、環線車輛（island-motion-view.js），配置不讀政見。
   const motion = createMotion(scene, layout, { level: quality.level, groupOf: (id) => tiles.get(id)?.group, glowMaterial: environment.glowMaterial });
   animator.add(motion.update);
-  // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
+  // 靜態零件依材質合併成幾個網格（發光件另成 InstancedMesh），繪製呼叫數只看材質種類，不看零件數。
   const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
   pickable.push(...kit.meshes);
-  // 鏡頭拉遠時隱藏的小物件（長椅、盆栽、踏石等），合批後是幾個獨立的 InstancedMesh。
+  // 鏡頭拉遠時隱藏的小物件（長椅、盆栽、踏石等），合批後是幾個獨立的網格。
   const smallDecor = kit.meshes.filter((mesh) => mesh.userData.lod === 'small');
   // 外圍地形與環境（不可點選）；雲、霧、鳥隨動畫時間移動。
   const outskirts = createOutskirts(scene, { layout, quality, environment });
@@ -253,6 +253,9 @@ export function createIslandView(stage, {
     const animating = animator.running;
     frame += 1;
     renderer.shadowMap.needsUpdate = !animating || frame % shadowEvery === 0;
+    // 標記牌面跟著格子抬高與亮暗：先更新世界矩陣再寫進合批。
+    scene.updateMatrixWorld();
+    markerFaces.sync();
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
     layoutLabels();
@@ -367,7 +370,7 @@ export function createIslandView(stage, {
     remeasureLabels();
     // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
-    const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
+    const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect });
     Object.assign(controls, cameraLimits(bounds, view.distance));
     home = { ...view, target: new THREE.Vector3(view.target.x, 0, view.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。
@@ -446,12 +449,12 @@ export function createIslandView(stage, {
   }
 
   // 射線打到的第一個議題區格子或候選人人物，回傳 { areaId } 或 { candidateId }。
-  // 合批的零件從實例查回議題區，其餘往上找格子群組。裝飾格與路燈的零件沒有議題區，射線穿過去。
+  // 合批的零件從零件庫查回議題區，其餘往上找格子群組。裝飾格與路燈的零件沒有議題區，射線穿過去。
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const targetOf = (hit) => {
     if (hit.object.userData.candidateId) return { candidateId: hit.object.userData.candidateId };
-    if (hit.object.isInstancedMesh) {
+    if (hit.object.userData.kit) {
       const areaId = kit.ownerOf(hit);
       return areaId ? { areaId } : null;
     }
@@ -582,8 +585,8 @@ export function createIslandView(stage, {
       return {
         drawCalls: renderer.info.render.calls,
         triangles: renderer.info.render.triangles,
-        // 合批的零件數與 InstancedMesh 數（每個一次繪製呼叫）。
-        parts: kit.meshes.reduce((sum, mesh) => sum + mesh.count, 0),
+        // 合批的零件數與合批網格數（每個一次繪製呼叫）。
+        parts: kit.meshes.reduce((sum, mesh) => sum + mesh.userData.parts, 0),
         partMeshes: kit.meshes.length,
         pixelRatio: renderer.getPixelRatio(),
         quality: quality.level,

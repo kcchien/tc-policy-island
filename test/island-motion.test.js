@@ -8,7 +8,7 @@ import {
   ACCESSORY_CROWN, ACCESSORY_LOW, ACCESSORY_REACH, ACCESSORY_TOP, CITIZEN_BOB, CITIZEN_CROWN, CITIZEN_FIGURE, CITIZEN_HEIGHT, CITIZEN_RADIUS,
   CITIZEN_REACH, CITIZEN_REACH_HEIGHT, CITIZEN_ROLES, CITIZEN_SCALE,
   CITIZEN_ZOOM, citizenZoom, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
-  LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
+  LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, RING_LANES, VEHICLE_HALF_WIDTH, vehiclePose,
 } from '../site/js/island-motion.js';
 import { BRIDGE, islandBody, tileAt, TILE_SLOTS } from '../site/js/island-body.js';
 import { heroPlan, heroSceneFor, partBounds } from '../site/js/island-heroes.js';
@@ -106,7 +106,7 @@ test('市民的角色配件：每格配件大小的組成相同，同類別內�
   assert.ok(CITIZEN_ROLES.every((r) => r.accessory));
 });
 
-test('市民沿路網走：繞自己島的步道環，途中走上一座橋到拱頂折返，去回各走一側，不進鄰島；優先走沒有環線車輛的橋', () => {
+test('市民沿路網走：繞自己島的步道環，途中走上一座橋到拱頂折返，去回走同一側人行道，不進鄰島；優先走沒有環線車輛的橋', () => {
   for (const layout of [layoutOf(rawWith(FEW)), islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))]) {
     const plan = motionPlan(layout);
     const { bridges } = islandBody(layout);
@@ -122,15 +122,69 @@ test('市民沿路網走：繞自己島的步道環，途中走上一座橋到�
       assert.deepEqual([...visited].sort(), [null, tile.id].sort(), tile.id);
       assert.ok(Math.max(...tile.path.map(([, , y]) => y)) >= BRIDGE.rise - 1e-9, `${tile.id} 沒走到拱頂`);
       assert.ok(tile.path.every(([x, z, y]) => tileAt(layout, { x, z }) !== null || y > 0), `${tile.id} 在水道上方卻沒拱起`);
-      // 橋上去回兩條線分開，都在橋面內。
+      // 橋上去回走同一條人行道（不在拱頂橫越車道），在橋面內。
       const [fx, fz] = bridge.from;
       const [dx, dz] = [(bridge.to[0] - fx) / bridge.length, (bridge.to[1] - fz) / bridge.length];
       const sides = tile.path.filter(([, , y]) => y > 0).map(([x, z]) => (x - fx) * -dz + (z - fz) * dx);
-      assert.ok(Math.min(...sides) < -0.02 && Math.max(...sides) > 0.02, `${tile.id} 去回沒有分兩側`);
+      assert.ok(Math.max(...sides) - Math.min(...sides) < 1e-9, `${tile.id} 去回不在同一條人行道`);
       assert.ok(sides.every((d) => Math.abs(d) + CITIZEN_RADIUS < BRIDGE.width / 2), `${tile.id} 走出橋面`);
       // 拱起只在橋的兩端之間。
       const along = tile.path.filter(([, , y]) => y > 0).map(([x, z]) => (x - fx) * dx + (z - fz) * dz);
       assert.ok(along.every((s) => s > 0 && s < bridge.length), `${tile.id} 拱起超出橋`);
+    }
+  }
+});
+
+test('每座橋上市民路線與環線車道不重疊，都在欄杆內側（正式資料含每座橋都有環線經過的格子）', () => {
+  for (const layout of [layoutOf(rawWith(FEW)), islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))))]) {
+    const plan = motionPlan(layout);
+    const { bridges } = islandBody(layout);
+    // 橋上的點換成橋的座標：along 從 from 量起，side 是離橋中線的距離。
+    const frames = bridges.map((bridge) => {
+      const [fx, fz] = bridge.from;
+      const [dx, dz] = [(bridge.to[0] - fx) / bridge.length, (bridge.to[1] - fz) / bridge.length];
+      return { bridge, at: (x, z) => ({ along: (x - fx) * dx + (z - fz) * dz, side: (x - fx) * -dz + (z - fz) * dx }), vehicles: [], citizens: [] };
+    });
+    const onBridge = (x, z) => {
+      for (const frame of frames) {
+        const { along, side } = frame.at(x, z);
+        if (along > 0 && along < frame.bridge.length && Math.abs(side) < BRIDGE.width) return { frame, side };
+      }
+      return null;
+    };
+    // 環線每 0.005 取一點，兩種車道都算（環線來回經過同一座橋時兩側都有車）。
+    for (const kind of ['train', 'bus']) {
+      for (let s = 0; s < plan.ringLength; s += 0.005) {
+        const pose = pointAlong(plan.ring, s, { lane: RING_LANES[kind], total: plan.ringLength });
+        const hit = pose.y > 0 && onBridge(pose.x, pose.z);
+        if (hit) hit.frame.vehicles.push([hit.side - VEHICLE_HALF_WIDTH[kind], hit.side + VEHICLE_HALF_WIDTH[kind]]);
+      }
+    }
+    for (const tile of areaPlans(plan)) {
+      for (let s = 0; s < tile.pathLength; s += 0.005) {
+        const pose = pointAlong(tile.path, s, { total: tile.pathLength });
+        const hit = pose.y > 0 && onBridge(pose.x, pose.z);
+        // 市民的橫向範圍取含帽子的半徑。
+        if (hit) hit.frame.citizens.push({ tileId: tile.id, span: [hit.side - CITIZEN_CROWN, hit.side + CITIZEN_CROWN] });
+      }
+    }
+    // 去回同一條人行道：同一格的市民不會同時在橋上，不會迎面相撞。
+    for (const tile of areaPlans(plan)) {
+      const period = tile.pathLength / tile.citizens[0].speed;
+      for (let t = 0; t < period; t += 0.05) {
+        const up = tile.citizens.filter((c) => citizenPose(tile, c, t).y > 0).length;
+        assert.ok(up <= 1, `${tile.id} 在 ${t.toFixed(2)} 秒有 ${up} 位市民同時在橋上`);
+      }
+    }
+    const busy = frames.filter((f) => f.vehicles.length > 0 && f.citizens.length > 0);
+    if (layout.tiles.length > 10) assert.ok(busy.length >= 3, '正式資料應有市民與車輛共用的橋');
+    const rail = BRIDGE.width / 2 - 0.008;
+    for (const frame of frames) {
+      for (const [lo, hi] of frame.vehicles) assert.ok(lo > -rail && hi < rail, `車身穿過 ${frame.bridge.tiles} 橋的欄杆`);
+      for (const { tileId, span: [lo, hi] } of frame.citizens) {
+        assert.ok(lo > -rail && hi < rail, `${tileId} 的市民走出 ${frame.bridge.tiles} 橋的欄杆`);
+        for (const [vlo, vhi] of frame.vehicles) assert.ok(hi <= vlo || lo >= vhi, `${tileId} 的市民在 ${frame.bridge.tiles} 橋上與車道重疊`);
+      }
     }
   }
 });
@@ -363,8 +417,8 @@ test('放大後的道具、市民、主題場景、在地感元素與靜態裝�
   }
 
   // 橫式桌面與直式手機（扣掉浮動元件後的可見範圍長寬比）。
-  for (const aspect of [1.6, 1.2, 0.6, 0.5, 0.46]) {
-    const view = homeView(outline, { fov: 32, aspect, fill: 0.8 });
+  for (const aspect of [2.6, 2.2, 2.0, 1.9, 1.8, 1.6, 1.4, 1.2, 1.0, 0.9, 0.6, 0.5, 0.46]) {
+    const view = homeView(outline, { fov: 32, aspect });
     const camera = [
       view.target.x + view.distance * Math.sin(view.polar) * Math.sin(view.azimuth),
       view.distance * Math.cos(view.polar),

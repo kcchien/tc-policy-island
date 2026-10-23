@@ -42,7 +42,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主題場景位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
   js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
   js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
-  js/island-models.js  在地感元素、標記（markerSign 小立牌）與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
+  js/island-models.js  在地感元素、標記（markerSign 小立牌，牌面由 batchMarkerFaces 合批成每種形狀亮灰各一個 InstancedMesh）與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-decor.js   靜態裝飾配置（Node 可測）：每格的主題場景擺放、路燈、大樹（樹種依格子位置，相鄰格不同）、花台、長椅、盆栽與踏石的位置，每種裝飾的高度與寬度上限、小物件的隱藏距離（LOD_DISTANCE）；不讀政見，受關卡「裝飾數量固定」檢查（關卡也要載入它 import 的 island-body、island-heroes、island-layout、island-motion、island-plaza）
   js/island-decor-models.js 靜態裝飾的零件資料與色碼 DECOR_COLORS（Node 可測，格式同主題場景）
   js/island-decor-view.js 靜態裝飾畫成 3D：主題場景、裝飾零件（之後合批，小物件另成幾桶依鏡頭距離隱藏）、夜間路燈光池
@@ -54,8 +54,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-labels.js  名牌避讓（Node 可測，不 import 其他模組）：placeLabels 依畫面位置決定名牌完整、只留編號或隱藏，8px 遲滯，三位候選人人物名牌同組同進退；island-view.js 在鏡頭或介面變動後呼叫，避開 main.js 給的浮動元件矩形
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
-  js/island-parts.js   零件分桶規則與實例縮放微抖動（Node 可測）
-  js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動；祖先標 userData.lod 的零件另外分桶）
+  js/island-parts.js   零件分桶規則、投影規則 castsShadow（只有主題場景與大樹投影）與實例縮放微抖動（Node 可測）
+  js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批：非發光零件依材質、LOD、投影合併成一個網格（頂點色與議題區序號，選取抬高在著色器做，點選依議題區區段檢查），發光件依形體成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動；祖先標 userData.lod 的零件另外分桶）
   js/island-heroes.js  主題場景（Node 可測）：20 個議題區各一座的零件資料（單位空間）、只依識別碼選場景、擺放（heroPlan，每島同倍率放進主題場景位置）、色碼
   js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
   js/island-environment.js 天空著色器（漸層、太陽光暈、夜晚星星）、太陽、半球光與補光、霧、水面著色器（深淺漂移、遠處加深、閃光，waterMaterial 可給其他物件共用）、夜間發光材質

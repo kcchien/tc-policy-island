@@ -13,8 +13,13 @@ const OFFSET_RATE = 6;
 const MIN_VISIBLE = 0.2;
 // 預設視角的俯角（與正上方的夾角）。直式畫面較低、並在 PORTRAIT_AZIMUTHS 裡挑讓島最大的方位角，
 // 讓島的對角線沿著直式螢幕擺；橫式維持正南方。
-const POLAR_LANDSCAPE = 0.68;
+// 橫式的俯角較低、看得到島的立體感；超寬畫面（可視區長寬比超過 POLAR_WIDE.from）鏡頭更近，
+// 走在格子南緣的市民會擋到自家標記，俯角逐步回到 POLAR_WIDE.polar。
+const POLAR_LANDSCAPE = 0.82;
+const POLAR_WIDE = { from: 1.8, to: 2.0, polar: 0.68 };
 const POLAR_PORTRAIT = 0.9;
+// 預設視角裡島最長邊占可視區的比例。橫式畫面的島東西長，幾乎填滿可視區寬度；直式另轉方位角斜向填滿。
+export const FILL = { landscape: 0.9, portrait: 0.8 };
 // 最多轉約 57 度，東西向長條的島沿直式螢幕的對角線擺（390 × 640 的對角線約 58 度）。
 const PORTRAIT_AZIMUTHS = Array.from({ length: 41 }, (_, i) => (i - 20) / 20);
 // 長寬比小於這個值算直式。
@@ -110,11 +115,14 @@ export function approachInsets(current, target, dt, { reducedMotion = false } = 
 
 export const sameInsets = (a, b) => Object.keys(ZERO).every((side) => a[side] === b[side]);
 
-// 預設視角：橫式畫面從正南方、較高的俯角看；直式畫面用較低的俯角，並挑讓島最大（距離最近）的方位角。
-// azimuths 可指定候選方位角（測試用）。回傳 { polar, azimuth, target, distance }。
-export function homeView(points, { fov, aspect, fill = 0.8, azimuths = PORTRAIT_AZIMUTHS }) {
+// 預設視角：橫式畫面從正南方看、島占可視區寬度 FILL.landscape；直式畫面用較低的俯角，並挑讓島最大（距離最近）的方位角。
+// fill 是島最長邊占可視區的比例，不給時依長寬比取 FILL；azimuths 可指定候選方位角（測試用）。
+// 回傳 { polar, azimuth, target, distance }。
+export function homeView(points, { fov, aspect, fill, azimuths = PORTRAIT_AZIMUTHS }) {
   const portrait = aspect < PORTRAIT_BELOW;
-  const polar = portrait ? POLAR_PORTRAIT : POLAR_LANDSCAPE;
+  fill ??= portrait ? FILL.portrait : FILL.landscape;
+  const wide = Math.min(1, Math.max(0, (aspect - POLAR_WIDE.from) / (POLAR_WIDE.to - POLAR_WIDE.from)));
+  const polar = portrait ? POLAR_PORTRAIT : lerp(POLAR_LANDSCAPE, POLAR_WIDE.polar, wide);
   const candidates = portrait ? azimuths : [0];
   let best = null;
   for (const azimuth of candidates) {
