@@ -103,7 +103,7 @@ export function patchToUnicode(pdf, baseFont, codes) {
   return { pdf: Buffer.concat([pdf, Buffer.from(update, 'latin1')]), patched };
 }
 
-export const REPLACEMENT_CHAR = '�';
+const REPLACEMENT_CHAR = '�';
 
 // PDF 的一頁 → 出處快照文字。glyphMap 是字型對照檔的內容 { fonts: [{ baseFont, codes }] }，
 // 有給就先修補 ToUnicode 再轉。用 poppler 的 pdftotext（預設閱讀順序模式）。

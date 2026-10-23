@@ -119,7 +119,7 @@ export function makeRaw() {
       {
         id: `profile-src-${candidateId}`,
         candidateId,
-        url: `https://example.org/${candidateId}/bulletin.pdf`,
+        url: `https://bulletin.cec.gov.tw/test-fixture/${candidateId}.pdf`,
         archiveUrl: null,
         archiveError: '測試夾具未存檔',
         snapshotPath: `data/snapshots/profile-src-${candidateId}.txt`,

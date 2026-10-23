@@ -6,10 +6,9 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 import { makePdf, TEST_FONT } from './fixtures/make-pdf.js';
 
-const FETCH_SCRIPT =fileURLToPath(new URL('../scripts/fetch-source.js', import.meta.url));
+const FETCH_SCRIPT = fileURLToPath(new URL('../scripts/fetch-source.js', import.meta.url));
 
 function workspace() {
   const dir = mkdtempSync(join(tmpdir(), 'fetch-source-'));

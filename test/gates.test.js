@@ -148,6 +148,19 @@ test('三位候選人的候選人資料欄位不同時不通過', () => {
   assert.match(output, /三位候選人的候選人資料欄位不同：cand-b 多了 selfIntroduction/);
 });
 
+test('候選人資料的出處不是中選會的選舉公報時不通過', () => {
+  const site = makeSite((dataset) => {
+    dataset.sources.find((s) => s.id === 'profile-src-cand-a').sourceType = 'official-website';
+    dataset.sources.find((s) => s.id === 'profile-src-cand-b').url = 'https://news.example.org/cand-b.pdf';
+  }, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /候選人 cand-a：候選人資料的出處 profile-src-cand-a 不是選舉公報（來源類型 official-website）/);
+  assert.match(output, /候選人 cand-b：候選人資料的出處 profile-src-cand-b 不是中選會網站（news\.example\.org）/);
+});
+
 test('經歷或學歷不在出處快照中時不通過，出處快照不在網站目錄時也不通過', () => {
   const files = { ...COMPLIANT_FILES };
   delete files['data/snapshots/profile-src-cand-b.txt'];

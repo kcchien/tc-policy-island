@@ -108,6 +108,16 @@ test('候選人資料第一層：改寫或不在快照中的經歷不通過，�
   assert.deepEqual(result.problems, ['experience[1] 未逐字出現在出處 src-bulletin 的快照中']);
 });
 
+test('候選人資料第一層比政見嚴格：只忽略空白與換行，標點或全形半形不同都不通過', () => {
+  const snapshots = new Map([['src-bulletin', BULLETIN]]);
+  const check = (experience) => checkProfileLayer1(bulletinProfile({ experience: [experience] }), snapshots).status;
+
+  assert.equal(check('第 8、9屆範例市議員'), 'pass');
+  assert.equal(check('第8 9屆範例市議員'), 'fail');
+  assert.equal(check('第8，9屆範例市議員'), 'fail');
+  assert.equal(check('第８、９屆範例市議員'), 'fail');
+});
+
 test('候選人資料第一層：快照缺失、學歷或經歷是空的都不通過', () => {
   assert.equal(checkProfileLayer1(bulletinProfile(), new Map([['src-bulletin', null]])).status, 'fail');
   assert.deepEqual(

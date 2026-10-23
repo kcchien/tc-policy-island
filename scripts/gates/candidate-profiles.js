@@ -35,8 +35,11 @@ function fieldFailures(candidates) {
   return failures;
 }
 
-// 讀網站目錄裡的出處快照（建置時複製的副本），學歷與經歷須逐字出現在其中。
-function verbatimFailures(site, candidates, sourcesById) {
+// 候選人資料只用中選會來源（ADR 0001）：出處須是選舉公報，網址在中選會網站。
+const isCecHost = (host) => host === 'cec.gov.tw' || host.endsWith('.cec.gov.tw');
+
+// 出處須來自中選會；讀網站目錄裡的出處快照（建置時複製的副本），學歷與經歷須逐字出現在其中。
+function sourceFailures(site, candidates, sourcesById) {
   const failures = [];
   for (const c of candidates) {
     const source = sourcesById.get(c.profile.sourceId);
@@ -44,6 +47,11 @@ function verbatimFailures(site, candidates, sourcesById) {
       failures.push(`候選人 ${c.id}：候選人資料的出處 ${c.profile.sourceId} 不在公開資料集`);
       continue;
     }
+    if (source.sourceType !== 'election-bulletin') {
+      failures.push(`候選人 ${c.id}：候選人資料的出處 ${source.id} 不是選舉公報（來源類型 ${source.sourceType}）`);
+    }
+    const host = URL.canParse(source.url) ? new URL(source.url).hostname : source.url;
+    if (!isCecHost(host)) failures.push(`候選人 ${c.id}：候選人資料的出處 ${source.id} 不是中選會網站（${host}）`);
     const path = `${dirname(DATASET_PATH)}/${SNAPSHOT_DIR}/${snapshotFileName(source)}`;
     if (!site.files().includes(path)) {
       failures.push(`候選人 ${c.id}：出處 ${source.id} 的出處快照 ${path} 不在網站目錄`);
@@ -57,7 +65,7 @@ function verbatimFailures(site, candidates, sourcesById) {
 
 export default {
   id: 'candidate-profiles',
-  name: '候選人資料欄位齊全且三人相同，學歷與經歷逐字出自出處快照',
+  name: '候選人資料欄位齊全且三人相同，出自中選會選舉公報，學歷與經歷逐字出自出處快照',
   check(site) {
     const dataset = site.dataset();
     const missing = dataset.candidates.filter((c) => !c.profile);
@@ -65,6 +73,6 @@ export default {
     const withProfile = dataset.candidates.filter((c) => c.profile);
     const sourcesById = new Map(dataset.sources.map((s) => [s.id, s]));
     const complete = withProfile.filter((c) => Array.isArray(c.profile.education) && Array.isArray(c.profile.experience));
-    return [...failures, ...fieldFailures(withProfile), ...verbatimFailures(site, complete, sourcesById)];
+    return [...failures, ...fieldFailures(withProfile), ...sourceFailures(site, complete, sourcesById)];
   },
 };
