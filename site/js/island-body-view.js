@@ -4,7 +4,9 @@
 // 側壁用水面材質、淺水與泡沫環半透明，這三種自己建 InstancedMesh。
 
 import * as THREE from 'three';
-import { BRIDGE, bridgeLift, ISLAND_RADIUS, islandBody, WALKWAY } from './island-body.js';
+import {
+  BRIDGE, bridgeLift, CHANNEL_WIDTH, cornerAngle, ISLAND_APOTHEM, ISLAND_RADIUS, islandBody, WALKWAY, WALKWAY_APOTHEM,
+} from './island-body.js';
 import { sharedGeometry } from './island-kit.js';
 import { material, streetLamps, TILE_SURFACE } from './island-models.js';
 import { SEA_LEVEL } from './island-terrain.js';
@@ -33,28 +35,28 @@ export const BODY_PALETTE = {
 };
 
 const hex = (color) => `#${color.toString(16).padStart(6, '0')}`;
-const APOTHEM = (ISLAND_RADIUS * Math.sqrt(3)) / 2;
 // 側壁從水面下延伸到圖案帶下緣；圖案帶在頂面下 BAND_HEIGHT 的範圍。
 const BAND_HEIGHT = 0.08;
 const BAND_DEPTH = 0.03;
 const BAND_BLOCKS = 8;
 const WALL_BOTTOM = SEA_LEVEL - 0.3;
 // 路緣高出頂面、步道略高出頂面，避免與頂面 z-fighting。
-const CURB_WIDTH = 0.035;
+const CURB_WIDTH = 0.017;
 const CURB_HEIGHT = 0.025;
 const WALK_LIFT = 0.006;
-// 島外的淺水環與泡沫環（離島緣的寬度）。
-const SHALLOW_WIDTH = 0.43;
-const FOAM_WIDTH = 0.1;
+// 島外的淺水環與泡沫環（離島緣的寬度）。淺水環寬半條水道，相鄰兩島的淺水環在水道正中相接、不重疊
+// （兩層半透明疊在一起會比外圍深一截）。
+const SHALLOW_WIDTH = CHANNEL_WIDTH / 2;
+const FOAM_WIDTH = 0.08;
 // 地面貼圖的世界座標比例：每 GROUND_TILE 場景單位重複一次，紋路跨島連續。
 const GROUND_TILE = 1.4;
 
+// 邊心距換成外接半徑（六角環的幾何用外接半徑）。
+const radiusOf = (apothem) => apothem / Math.cos(Math.PI / 6);
+
 // 尖頂六角形（頂點朝南北）的平面形狀：Shape 在 x-y 平面，轉平後 y 對應 -z，頂點仍在 ±30 度、±90 度、±150 度。
 function hexShape(radius) {
-  return new THREE.Shape(Array.from({ length: 6 }, (_, i) => {
-    const a = Math.PI / 6 + (i * Math.PI) / 3;
-    return new THREE.Vector2(Math.cos(a) * radius, Math.sin(a) * radius);
-  }));
+  return new THREE.Shape(Array.from({ length: 6 }, (_, i) => new THREE.Vector2(Math.cos(cornerAngle(i)) * radius, Math.sin(cornerAngle(i)) * radius)));
 }
 
 // 六角環的實心框（外接半徑 outer、inner），高 height，底面在 y = 0。
@@ -153,9 +155,9 @@ function bandBlocks(group, color) {
       const t = (k + 0.5) / BAND_BLOCKS - 0.5;
       const along = t * ISLAND_RADIUS;
       part(group, 'box', unitBox, k % 2 === 0 ? color : BODY_PALETTE.bandLight, {
-        x: nx * (APOTHEM - BAND_DEPTH / 2 + 0.002) - nz * along,
+        x: nx * (ISLAND_APOTHEM - BAND_DEPTH / 2 + 0.002) - nz * along,
         y: TILE_SURFACE - BAND_HEIGHT / 2,
-        z: nz * (APOTHEM - BAND_DEPTH / 2 + 0.002) + nx * along,
+        z: nz * (ISLAND_APOTHEM - BAND_DEPTH / 2 + 0.002) + nx * along,
         rotY: -a,
         scale: [BAND_DEPTH, BAND_HEIGHT, length * 0.98],
       });
@@ -187,12 +189,14 @@ function bridgeParts(parent, { from, to, length }) {
 
 // scene 是島嶼場景；layout 是 islandLayout 的結果；groupOf(tileId) 回傳每格的群組（所有格子，含裝飾格）。
 // waterMaterial 是水面材質（island-environment.js），側壁共用它，看起來像浮在淺海上。
-// plazaId 是候選人廣場那格。回傳 { tops, setLift(tileId, y), colors }。
+// plazaId 是候選人廣場那格。回傳 { paint(tileId, { selected, dimmed }), setLift(tileId, y) } 給選取用。
 export function createIslandBody(scene, layout, { groupOf, waterMaterial, plazaId }) {
   const body = islandBody(layout);
   const textures = [0, 1, 2].map(groundTexture);
   const tops = new Map();
   const baseColor = new Map();
+  const walkOuter = radiusOf(WALKWAY_APOTHEM + WALKWAY.width / 2);
+  const walkInner = radiusOf(WALKWAY_APOTHEM - WALKWAY.width / 2);
 
   layout.tiles.forEach((tile, index) => {
     const group = groupOf(tile.id);
@@ -202,19 +206,16 @@ export function createIslandBody(scene, layout, { groupOf, waterMaterial, plazaI
     tops.set(tile.id, top);
     baseColor.set(tile.id, color);
     bandBlocks(group, BODY_PALETTE.band[index % BODY_PALETTE.band.length]);
-    part(group, 'island-curb', () => hexFrame(ISLAND_RADIUS, ISLAND_RADIUS - CURB_WIDTH / Math.cos(Math.PI / 6), CURB_HEIGHT), BODY_PALETTE.curb, { y: TILE_SURFACE });
-    const walkOuter = (WALKWAY.radius * Math.sqrt(3) / 2 + WALKWAY.width / 2) / Math.cos(Math.PI / 6);
-    const walkInner = (WALKWAY.radius * Math.sqrt(3) / 2 - WALKWAY.width / 2) / Math.cos(Math.PI / 6);
+    part(group, 'island-curb', () => hexFrame(ISLAND_RADIUS, ISLAND_RADIUS - radiusOf(CURB_WIDTH), CURB_HEIGHT), BODY_PALETTE.curb, { y: TILE_SURFACE });
     part(group, 'island-walkway', () => hexFrame(walkOuter, walkInner, WALK_LIFT), BODY_PALETTE.walkway, { y: TILE_SURFACE });
     // 步道的接縫：每條邊三道橫向細縫，看得出是鋪面。
     for (let side = 0; side < 6; side++) {
       const a = (side * Math.PI) / 3;
-      const d = (WALKWAY.radius * Math.sqrt(3)) / 2;
       for (const along of [-0.35, 0, 0.35]) {
         part(group, 'box', unitBox, BODY_PALETTE.walkwayJoint, {
-          x: Math.cos(a) * d - Math.sin(a) * along * WALKWAY.radius,
+          x: Math.cos(a) * WALKWAY_APOTHEM - Math.sin(a) * along * WALKWAY.radius,
           y: TILE_SURFACE + WALK_LIFT + 0.001,
-          z: Math.sin(a) * d + Math.cos(a) * along * WALKWAY.radius,
+          z: Math.sin(a) * WALKWAY_APOTHEM + Math.cos(a) * along * WALKWAY.radius,
           rotY: -a,
           scale: [WALKWAY.width * 0.96, 0.002, 0.012],
         });
@@ -251,13 +252,11 @@ export function createIslandBody(scene, layout, { groupOf, waterMaterial, plazaI
     mesh.receiveShadow = true;
     scene.add(mesh);
   };
-  ring(ISLAND_RADIUS, ISLAND_RADIUS + SHALLOW_WIDTH / Math.cos(Math.PI / 6), BODY_PALETTE.shallow, 0.35, SEA_LEVEL + 0.004);
-  ring(ISLAND_RADIUS, ISLAND_RADIUS + FOAM_WIDTH / Math.cos(Math.PI / 6), BODY_PALETTE.foam, 0.55, SEA_LEVEL + 0.008);
+  ring(ISLAND_RADIUS, radiusOf(ISLAND_APOTHEM + SHALLOW_WIDTH), BODY_PALETTE.shallow, 0.35, SEA_LEVEL + 0.004);
+  ring(ISLAND_RADIUS, radiusOf(ISLAND_APOTHEM + FOAM_WIDTH), BODY_PALETTE.foam, 0.55, SEA_LEVEL + 0.008);
 
   const indexOf = new Map(layout.tiles.map((t, i) => [t.id, i]));
   return {
-    body,
-    tops,
     // 島頂面的底色：selected 選中、dimmed 被篩選淡化，否則回到原本的底色。
     paint(tileId, { selected = false, dimmed = false } = {}) {
       const color = selected ? BODY_PALETTE.topSelected : dimmed ? BODY_PALETTE.topDimmed : baseColor.get(tileId);

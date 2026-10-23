@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
-import { CHANNEL_WIDTH, ISLAND_RADIUS, islandBody, WALKWAY } from '../site/js/island-body.js';
-import { LOOP_CORE, LOOP_SPOTS } from '../site/js/island-motion.js';
+import { BRIDGE, CHANNEL_WIDTH, ISLAND_RADIUS, islandBody, tileAt, WALKWAY, WALKWAY_APOTHEM } from '../site/js/island-body.js';
+import {
+  CITIZEN_APOTHEM, CITIZEN_RADIUS, LOOP_CORE, LOOP_SPOTS, RING_LANES, VEHICLE_HALF_WIDTH,
+} from '../site/js/island-motion.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw } from './fixtures/make-raw.js';
@@ -155,6 +157,39 @@ test('路燈：每島六盞，在島的六個頂點、步道環外緣與島緣�
       assert.ok(Math.abs((((angle - 30) % 60) + 60) % 60) < 1e-6 || Math.abs((((angle - 30) % 60) + 60) % 60 - 60) < 1e-6, `角度 ${angle}`);
     }
   }
+});
+
+test('點在哪座島上：步道環的頂點與邊中點算本島，橋面中段與水道不屬於任何島', () => {
+  const layout = layoutOf(rawWithSix());
+  const { network, bridges } = islandBody(layout);
+  for (const node of network.nodes) assert.equal(tileAt(layout, node), node.tileId, node.id);
+  for (const { from, to } of bridges) {
+    const middle = { x: (from[0] + to[0]) / 2, z: (from[1] + to[1]) / 2 };
+    assert.equal(tileAt(layout, middle), null);
+  }
+});
+
+test('車道與市民路線都在步道上、彼此不重疊，火車不碰路燈，橋夠寬', () => {
+  const half = WALKWAY.width / 2;
+  const lanes = [
+    { name: '市民', center: -(WALKWAY_APOTHEM - CITIZEN_APOTHEM), half: CITIZEN_RADIUS },
+    { name: '公車', center: RING_LANES.bus, half: VEHICLE_HALF_WIDTH.bus },
+    { name: '火車', center: RING_LANES.train, half: VEHICLE_HALF_WIDTH.train },
+  ];
+  for (const lane of lanes) {
+    assert.ok(lane.center - lane.half >= -half - 0.012 && lane.center + lane.half <= half + 1e-9, `${lane.name}超出步道`);
+  }
+  for (let i = 1; i < lanes.length; i++) {
+    assert.ok(lanes[i].center - lanes[i].half >= lanes[i - 1].center + lanes[i - 1].half - 0.01, `${lanes[i - 1].name}與${lanes[i].name}重疊`);
+  }
+  // 火車在頂點轉角的外緣（離格心）不碰到路燈柱。
+  const trainCorner = (WALKWAY_APOTHEM + RING_LANES.train + VEHICLE_HALF_WIDTH.train) / (Math.sqrt(3) / 2);
+  const { lamps } = islandBody(layoutOf(rawWithSix()));
+  const lampRadius = Math.hypot(lamps[0].x - layoutOf(rawWithSix()).tiles[0].position.x, lamps[0].z - layoutOf(rawWithSix()).tiles[0].position.z);
+  assert.ok(lampRadius - 0.018 > trainCorner, `路燈 ${lampRadius} 擋到火車 ${trainCorner}`);
+  // 橋的欄杆在兩種車外側（市民只走自己島的步道環，不過橋）。
+  const vehicles = lanes.filter((l) => l.name !== '市民');
+  assert.ok(BRIDGE.width / 2 - 0.008 > Math.max(...vehicles.map((l) => Math.abs(l.center) + l.half)), '車身穿過橋的欄杆');
 });
 
 function assertNear([x, z], [ex, ez]) {

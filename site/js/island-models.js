@@ -8,11 +8,8 @@ import { glowSourceMaterial, sharedGeometry } from './island-kit.js';
 export const PALETTE = {
   water: 0x7d9a98,
   shallow: 0x98aeaa,
-  landTop: 0xc99a83,
+  // 選取外框的深赭色（島頂面的顏色在 island-body-view.js 的 BODY_PALETTE）。
   landSide: 0x8e4b32,
-  landSelected: 0xd9b59c,
-  landDimmed: 0xb3aba2,
-  decorativeTop: 0xbba893,
   mud: 0x8f7a64,
   rock: 0x8a7f74,
   rockDark: 0x6e655d,
@@ -49,8 +46,7 @@ export const PALETTE = {
   // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
   lampGlow: 0xe8d488,
   lampPost: 0x4f4a45,
-  // 候選人廣場：鋪面、人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
-  plazaTop: 0xcfc4b2,
+  // 候選人廣場：人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
 };
@@ -95,9 +91,9 @@ const group = (...children) => {
 export const TILE_SURFACE = 0.44;
 
 // 路燈：燈柱加燈泡，夜裡燈泡亮起。每盞都一樣，與議題區內容無關。
-// corners 是 [x, z]，相對傳回群組的原點（island-body.js 的路燈位置每島六盞）。
-export function streetLamps(corners) {
-  const lamps = corners.flatMap(([x, z]) => [
+// positions 是 [x, z]，相對傳回群組的原點（island-body.js 的路燈位置每島六盞）。
+export function streetLamps(positions) {
+  const lamps = positions.flatMap(([x, z]) => [
     mesh(cyl(0.012, 0.018, 0.3, 5), PALETTE.lampPost, { x, y: TILE_SURFACE + 0.15, z }),
     glowMesh(sphere(0.035, 6, 4), PALETTE.lampGlow, { x, y: TILE_SURFACE + 0.32, z }),
   ]);

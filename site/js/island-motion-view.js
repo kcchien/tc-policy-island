@@ -4,7 +4,8 @@
 // 會動的零件每種一個 InstancedMesh，每幀由動畫迴圈更新矩陣，繪製呼叫數不隨格子數增加。
 
 import * as THREE from 'three';
-import { citizenPose, loopPose, motionPlan, vehiclePose } from './island-motion.js';
+import { citizenPose, loopPose, motionPlan, VEHICLE_HALF_WIDTH, vehiclePose } from './island-motion.js';
+import { tileAt } from './island-body.js';
 import { material, PALETTE, PARTS, TILE_SURFACE } from './island-models.js';
 
 // 3D 材質色碼，受禁用色檢查（ADR 0001）。衣服只用低飽和的大地色，不用任何政黨或候選人的識別色。
@@ -179,8 +180,8 @@ const CITIZEN = {
 
 // 車輛：車身、車頂、兩側窗帶（夜裡發光）、車燈（夜裡發光）。長度方向沿 +x。
 const VEHICLES = {
-  train: { length: 0.32, width: 0.07, height: 0.07, color: MOTION_PALETTE.train, roof: MOTION_PALETTE.trainRoof },
-  bus: { length: 0.22, width: 0.065, height: 0.075, color: MOTION_PALETTE.bus, roof: MOTION_PALETTE.busRoof },
+  train: { length: 0.32, width: 2 * VEHICLE_HALF_WIDTH.train, height: 0.07, color: MOTION_PALETTE.train, roof: MOTION_PALETTE.trainRoof },
+  bus: { length: 0.22, width: 2 * VEHICLE_HALF_WIDTH.bus, height: 0.075, color: MOTION_PALETTE.bus, roof: MOTION_PALETTE.busRoof },
 };
 
 // scene 是島嶼場景；layout 是 islandLayout 的結果；groupOf(areaId) 回傳該格的群組（靜態零件放進去，選取抬高時跟著動）。
@@ -189,9 +190,6 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   const plan = motionPlan(layout, { level });
   const areas = plan.tiles.filter((t) => t.kind === 'area');
   const liftOf = (id) => groupOf(id)?.position.y ?? 0;
-
-  // 車輛所在的島（選取時跟著抬高）；在橋上時不屬於任何島。
-  const tileUnder = (x, z) => plan.tiles.find((t) => Math.hypot(x - t.center.x, z - t.center.z) < layout.hexSize)?.id;
 
   // 循環道具的底座放進格子群組（相對格心），零件庫合批時記得是哪一格。
   for (const tile of areas) {
@@ -289,8 +287,8 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     for (const vehicle of plan.vehicles) vehiclePoses.set(vehicle, vehiclePose(plan.ring, vehicle, t, plan.ringLength));
     cars.forEach(({ vehicle, index, spec }, i) => {
       const pose = vehiclePoses.get(vehicle)[index];
-      // 車輛走在步道環上，過橋時跟著拱起（pose.y）。
-      placeAt(pose.x, TILE_SURFACE + VEHICLE_LIFT + pose.y + liftOf(tileUnder(pose.x, pose.z)), pose.z, pose.heading);
+      // 車輛走在步道環上，過橋時跟著拱起（pose.y）；在選中的島上跟著抬高，在橋面中段不屬於任何島。
+      placeAt(pose.x, TILE_SURFACE + VEHICLE_LIFT + pose.y + liftOf(tileAt(layout, pose)), pose.z, pose.heading);
       carBody.setMatrixAt(i, m.multiplyMatrices(place, local.makeScale(spec.length, spec.height * 0.85, spec.width)));
       local.makeScale(spec.length * 0.96, spec.height * 0.15, spec.width * 0.9).setPosition(0, spec.height * 0.85, 0);
       carRoof.setMatrixAt(i, m.multiplyMatrices(place, local));

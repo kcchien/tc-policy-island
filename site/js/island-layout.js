@@ -2,6 +2,8 @@
 // 只做計算，不碰 three.js 與 DOM，瀏覽器與 Node 共用，不得引用 node: 模組。
 // 格子配置的做法見 docs/rules/island-layout.md。
 
+import { GRID_SPACING, ISLAND_RADIUS, TILE_SLOTS } from './island-body.js';
+
 // 候選人依排序配形狀，三人同色同尺寸，只以形狀區分（ADR 0001）。
 // sides 是多邊形邊數（0 為圓），start 是第一個頂點的方位角：三角形尖端朝北（-z），正方形邊與格線平行。
 export const MARKER_SHAPES = [
@@ -9,8 +11,6 @@ export const MARKER_SHAPES = [
   { shape: 'triangle', symbol: '△', sides: 3, start: -Math.PI / 2 },
   { shape: 'square', symbol: '□', sides: 4, start: Math.PI / 4 },
 ];
-
-import { GRID_SPACING, ISLAND_RADIUS, TILE_SLOTS } from './island-body.js';
 
 // 每座島格心到頂點的距離（場景單位）。島與島之間隔著水道，格心的間距見 axialToPosition。
 export const HEX_SIZE = ISLAND_RADIUS;

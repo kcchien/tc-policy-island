@@ -5,16 +5,21 @@
 // 每格是一座尖頂六角小島（頂點朝南北）。ISLAND_RADIUS 是島頂面的外接半徑；相鄰兩島的對邊之間隔 CHANNEL_WIDTH 的水道。
 export const ISLAND_RADIUS = 1.25;
 export const CHANNEL_WIDTH = 0.28;
-const APOTHEM = (ISLAND_RADIUS * Math.sqrt(3)) / 2;
+// 尖頂六角形的邊心距（格心到邊的距離）是外接半徑的 √3/2 倍。
+export const apothemOf = (radius) => (radius * Math.sqrt(3)) / 2;
+export const ISLAND_APOTHEM = apothemOf(ISLAND_RADIUS);
 // 軸向座標換平面座標用的格距：相鄰格心距離是 √3 倍格距，等於兩個邊心距加水道。
-export const GRID_SPACING = (2 * APOTHEM + CHANNEL_WIDTH) / Math.sqrt(3);
+export const GRID_SPACING = (2 * ISLAND_APOTHEM + CHANNEL_WIDTH) / Math.sqrt(3);
 
 // 步道環：島緣內側一圈尖頂六角形的步道，radius 是中線的外接半徑，width 是路寬。
-// 外緣離島緣留一道路緣（約 0.03）；內緣離格心的邊心距約 0.89，三個標記（island-layout.js）剛好在內側。
-export const WALKWAY = { radius: 1.12, width: 0.16 };
+// 路寬容得下市民、公車、火車三條線（island-motion.js 的車道）；外緣離島緣留一道窄路緣（約 0.017），
+// 內緣離格心的邊心距約 0.875，三個標記（island-layout.js）剛好在內側。
+export const WALKWAY = { radius: 1.12, width: 0.19 };
+// 步道中線的邊心距：橋頭（邊中點）與市民路線都從這裡算。
+export const WALKWAY_APOTHEM = apothemOf(WALKWAY.radius);
 
-// 路燈離格心的距離（頂點方向）：步道環外緣在頂點處約 1.21，島緣 1.25。
-const LAMP_RADIUS = 1.23;
+// 路燈離格心的距離（頂點方向）：火車在轉角外緣約 1.22，島緣 1.25。
+const LAMP_RADIUS = 1.24;
 
 // 島上的位置（相對格心，場景單位）。每個議題區島都相同，與政見無關（ADR 0001）。
 // hero：主題場景（island-heroes.js）。模型在單位空間設計（底面 x、z 在 ±0.5、高 0~maxHeight），放大 size 倍後底面中心放在 (x, z)。
@@ -34,7 +39,7 @@ export const TILE_SLOTS = {
 
 // 尖頂六角形的方位角：頂點從東南（30 度）起每 60 度一個，邊中點從正東（0 度）起。
 // 角度依俯視 +x 往東、+z 往南量，與 island-layout.js 的頂點順序相同。
-const cornerAngle = (i) => Math.PI / 6 + (i * Math.PI) / 3;
+export const cornerAngle = (i) => Math.PI / 6 + (i * Math.PI) / 3;
 const sideAngle = (i) => (i * Math.PI) / 3;
 
 // 相鄰的六個方向（軸向座標差），順序與 sideAngle 相同：東、東北、西北、西、西南、東南。
@@ -47,7 +52,6 @@ const axialKey = ([q, r]) => `${q},${r}`;
 // bridges：每對相鄰島一座橋，tiles 是兩島識別碼，from、to 是兩島步道環面對面那條邊的中點 [x, z]，length 是橋長。
 export function islandBody(layout) {
   const byAxial = new Map(layout.tiles.map((tile) => [axialKey(tile.axial), tile]));
-  const walkApothem = (WALKWAY.radius * Math.sqrt(3)) / 2;
   const sidePoint = ({ position }, side, distance) =>
     [position.x + Math.cos(sideAngle(side)) * distance, position.z + Math.sin(sideAngle(side)) * distance];
   const bridges = [];
@@ -57,8 +61,8 @@ export function islandBody(layout) {
       const [dq, dr] = SIDE_DIRECTIONS[side];
       const other = byAxial.get(axialKey([tile.axial[0] + dq, tile.axial[1] + dr]));
       if (!other) continue;
-      const from = sidePoint(tile, side, walkApothem);
-      const to = sidePoint(other, side + 3, walkApothem);
+      const from = sidePoint(tile, side, WALKWAY_APOTHEM);
+      const to = sidePoint(other, side + 3, WALKWAY_APOTHEM);
       bridges.push({
         tiles: [tile.id, other.id],
         nodes: [sideNodeId(tile.id, side), sideNodeId(other.id, side + 3)],
@@ -75,7 +79,7 @@ export function islandBody(layout) {
   for (const tile of layout.tiles) {
     const ring = [];
     for (let i = 0; i < 6; i++) {
-      const [sx, sz] = sidePoint(tile, i, walkApothem);
+      const [sx, sz] = sidePoint(tile, i, WALKWAY_APOTHEM);
       ring.push({ id: sideNodeId(tile.id, i), tileId: tile.id, x: sx, z: sz });
       const a = cornerAngle(i);
       ring.push({ id: `${tile.id}:c${i}`, tileId: tile.id, x: tile.position.x + Math.cos(a) * WALKWAY.radius, z: tile.position.z + Math.sin(a) * WALKWAY.radius });
@@ -96,8 +100,20 @@ export function islandBody(layout) {
 
 const sideNodeId = (tileId, side) => `${tileId}:s${side % 6}`;
 
-// 拱橋：橋面由 planks 片甲板組成，橋面中間拱起 rise（場景單位），兩端貼齊步道。
-export const BRIDGE = { planks: 9, rise: 0.06, width: 0.15 };
+// 拱橋：橋面由 planks 片甲板組成，橋面中間拱起 rise（場景單位），兩端貼齊步道。寬度讓公車與火車在欄杆內側。
+export const BRIDGE = { planks: 9, rise: 0.06, width: 0.2 };
+
+// 點 { x, z } 在哪座島的頂面上（尖頂六角形內），回傳格子識別碼；在水道或橋面中段時回傳 null。
+// 選取抬高時，車輛用它判斷要不要跟著抬。
+export function tileAt(layout, { x, z }) {
+  for (const tile of layout.tiles) {
+    const [dx, dz] = [x - tile.position.x, z - tile.position.z];
+    let reach = 0;
+    for (let side = 0; side < 6; side++) reach = Math.max(reach, dx * Math.cos(sideAngle(side)) + dz * Math.sin(sideAngle(side)));
+    if (reach <= ISLAND_APOTHEM) return tile.id;
+  }
+  return null;
+}
 // 橋上 t（0~1，從一端到另一端）處的拱起高度。
 export const bridgeLift = (t) => BRIDGE.rise * Math.sin(Math.PI * Math.min(1, Math.max(0, t)));
 // 環線過橋時取的分段數，車輛沿拱起的折線走。
