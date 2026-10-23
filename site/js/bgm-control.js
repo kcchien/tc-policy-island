@@ -1,16 +1,25 @@
-// 工具列的背景音樂開關與音量滑桿。預設靜音、不自動播放；第一次開啟時才載入播放器並建立 AudioContext。
-// 分頁隱藏時暫停，回來後若原本開著就接著播。開關與音量記在 localStorage（讀寫失敗就不記）。
+// 工具列的背景音樂開關與音量滑桿。預設靜音，只有按下開關才播放，進站時一律不出聲
+// （不論上次是否開著、有沒有開啟「減少動態」）。第一次開啟時才建立 AudioContext，
+// 而且在點擊當下同步建立，瀏覽器才會認定是使用者的操作。
+// 分頁隱藏時暫停，回來後若原本開著就接著播。音量記在 localStorage（讀寫失敗就不記）。
 
-import { musicStartup, parseVolume } from './bgm-schedule.js';
+import { createBgmPlayer } from './bgm-player.js';
 
-const MUSIC_KEY = 'policy-island:music';
 const VOLUME_KEY = 'policy-island:music-volume';
+export const DEFAULT_VOLUME = 0.4;
 
 // 開關用 aria-pressed 表示開或關，名稱固定。
-export const MUSIC_TEXT = {
+const MUSIC_TEXT = {
   button: '背景音樂',
   volume: '音樂音量',
 };
+
+export function parseVolume(stored) {
+  if (stored === null || stored === undefined || stored === '') return DEFAULT_VOLUME;
+  const value = Number(stored);
+  if (!Number.isFinite(value)) return DEFAULT_VOLUME;
+  return Math.min(1, Math.max(0, value));
+}
 
 function readStorage(key) {
   try {
@@ -24,15 +33,14 @@ function writeStorage(key, value) {
   try {
     window.localStorage.setItem(key, value);
   } catch {
-    // 記不住就下次預設靜音。
+    // 記不住就下次用預設音量。
   }
 }
 
-export function setupMusicToggle({ button, volumeInput, reducedMotion }) {
-  let player = null;
+export function setupMusicToggle({ button, volumeInput }) {
   let on = false;
-  const volume = parseVolume(readStorage(VOLUME_KEY));
-  volumeInput.value = String(volume);
+  const player = createBgmPlayer({ volume: parseVolume(readStorage(VOLUME_KEY)) });
+  volumeInput.value = String(player.volume);
   volumeInput.setAttribute('aria-label', MUSIC_TEXT.volume);
   button.setAttribute('aria-label', MUSIC_TEXT.button);
 
@@ -41,54 +49,20 @@ export function setupMusicToggle({ button, volumeInput, reducedMotion }) {
     button.closest('.music-group')?.classList.toggle('is-on', on);
   };
 
-  const ensurePlayer = async () => {
-    if (!player) {
-      const { createBgmPlayer } = await import('./bgm-player.js');
-      player ??= createBgmPlayer({ volume: Number(volumeInput.value) });
-    }
-    return player;
-  };
-
-  const setOn = async (next, { remember = true } = {}) => {
-    on = next;
+  button.addEventListener('click', () => {
+    on = !on;
     render();
-    if (remember) writeStorage(MUSIC_KEY, on ? 'on' : 'off');
-    if (on && !document.hidden) await (await ensurePlayer()).play();
-    else await player?.pause();
-  };
-
-  button.addEventListener('click', () => setOn(!on));
+    if (on) player.play();
+    else player.pause();
+  });
   volumeInput.addEventListener('input', () => {
     const value = parseVolume(volumeInput.value);
     writeStorage(VOLUME_KEY, String(value));
-    player?.setVolume(value);
+    player.setVolume(value);
   });
   document.addEventListener('visibilitychange', () => {
-    if (!player) return;
     if (document.hidden) player.pause();
     else if (on) player.play();
   });
-
-  // 上次開著音樂離開：等使用者第一次點擊或按鍵才恢復（不在進站時自動出聲）。
-  const startup = musicStartup({ stored: readStorage(MUSIC_KEY), reducedMotion: reducedMotion() });
-  if (startup.resumeOnGesture) {
-    const resume = (event) => {
-      window.removeEventListener('pointerdown', resume, true);
-      window.removeEventListener('keydown', resume, true);
-      // 這次操作本身就是按音樂開關時，交給開關處理。
-      if (button.contains(event.target)) return;
-      if (!on) setOn(true, { remember: false });
-    };
-    window.addEventListener('pointerdown', resume, true);
-    window.addEventListener('keydown', resume, true);
-  }
   render();
-  return {
-    get on() {
-      return on;
-    },
-    get playing() {
-      return Boolean(player?.playing);
-    },
-  };
 }

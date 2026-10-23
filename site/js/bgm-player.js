@@ -32,33 +32,40 @@ export function createBgmPlayer({ volume, score = buildScore() }) {
   let timer = null;
   let level = volume;
 
+  // 主執行緒被 3D 場景卡住時，已經過時的格子直接跳過，不擠在同一瞬間補播。
   const tick = () => {
-    for (const planned of planSteps(score, cursor, context.currentTime + LOOKAHEAD)) {
-      synth.playStep(score, planned, stepSeconds(score));
+    const now = context.currentTime;
+    for (const planned of planSteps(score, cursor, now + LOOKAHEAD)) {
+      if (planned.time >= now) synth.playStep(score, planned, stepSeconds(score));
     }
   };
 
+  // 最後一次要求的是播放還是暫停；恢復音訊要等一下，等完以最後的要求為準。
+  let wanted = false;
+
   return {
-    get playing() {
-      return timer !== null;
+    get volume() {
+      return level;
     },
+    // play 要在使用者點擊的事件裡同步呼叫：AudioContext 在第一個 await 之前建立。
     async play() {
-      if (timer !== null) return;
+      wanted = true;
       if (!context) {
         context = new AudioContextClass();
         master = createOutput(context, level);
         synth = createSynth(context, master);
         cursor = createCursor(context.currentTime + 0.1);
       }
-      timer = setInterval(tick, TICK_MS);
       await context.resume();
+      if (!wanted || timer !== null) return;
+      timer = setInterval(tick, TICK_MS);
       tick();
     },
     async pause() {
-      if (timer === null) return;
+      wanted = false;
       clearInterval(timer);
       timer = null;
-      await context.suspend();
+      await context?.suspend();
     },
     setVolume(value) {
       level = value;

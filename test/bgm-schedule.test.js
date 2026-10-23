@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildScore, BGM_SEED } from '../site/js/bgm-score.js';
-import { createCursor, planSteps, musicStartup, parseVolume, DEFAULT_VOLUME } from '../site/js/bgm-schedule.js';
+import { createCursor, planSteps } from '../site/js/bgm-schedule.js';
+import { parseVolume, DEFAULT_VOLUME } from '../site/js/bgm-control.js';
 
 const score = buildScore(BGM_SEED);
 // 88 BPM 的十六分音符：60 / 88 / 4 秒。
@@ -30,13 +31,6 @@ test('排程時間由起點與格數直接算出，排了一千個循環也不�
   assert.deepEqual(startOfLoop.map((s) => s.step), [0], '循環接縫回到第 0 格');
   assert.ok(Math.abs(startOfLoop[0].time - loops * loopSeconds) < 1e-6, `第 ${loops} 輪開頭在 ${startOfLoop[0].time}`);
   assert.ok(Math.abs(last.time - (loops * loopSeconds - STEP + STEP * score.swing)) < 1e-6);
-});
-
-test('預設靜音；記住開啟且沒有減少動態時，等使用者第一次操作才恢復播放', () => {
-  assert.deepEqual(musicStartup({ stored: null, reducedMotion: false }), { on: false, resumeOnGesture: false });
-  assert.deepEqual(musicStartup({ stored: 'off', reducedMotion: false }), { on: false, resumeOnGesture: false });
-  assert.deepEqual(musicStartup({ stored: 'on', reducedMotion: false }), { on: false, resumeOnGesture: true });
-  assert.deepEqual(musicStartup({ stored: 'on', reducedMotion: true }), { on: false, resumeOnGesture: false });
 });
 
 test('記住的音量讀不到或不合理時用預設音量，超出範圍就夾在 0 到 1', () => {

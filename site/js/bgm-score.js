@@ -33,6 +33,12 @@ const CHORDS = {
   'G6/B': { root: 2, degrees: [5, 7, 8, 9] },
 };
 const PROGRESSION = ['Em7', 'Em7', 'Am7sus4', 'D6sus2', 'Em7', 'G6/B', 'Am7sus4', 'D6sus2'];
+const chordOf = (bar) => CHORDS[PROGRESSION[bar % BARS_PER_ROUND]];
+
+// 第 4 輪最後兩小節是過門：BREAK_BAR 抽掉大鼓小鼓，下一小節用小鼓滾奏接回循環開頭。
+const LOOP_BARS = BARS_PER_ROUND * ROUNDS;
+const BREAK_BAR = LOOP_BARS - 2;
+const FILL_BAR = LOOP_BARS - 1;
 
 // 固定種子的亂數（mulberry32），每次載入得到相同的序列。
 function createRandom(seed) {
@@ -65,12 +71,12 @@ function drumBar(random, bar) {
   const hits = [];
   const hit = (step, voice, velocity) => hits.push({ step, voice, velocity });
 
-  // 第 4 輪最後兩小節是過門：先抽掉大鼓小鼓，只留輕輕的 hi-hat，再用小鼓滾奏接回循環開頭。
-  if (bar === BARS_PER_ROUND * ROUNDS - 2) {
+  // 過門：先只留輕輕的 hi-hat，再用小鼓滾奏接回循環開頭。
+  if (bar === BREAK_BAR) {
     for (let step = 0; step < STEPS_PER_BAR; step += 4) hit(step, 'hat', 0.25);
     return hits;
   }
-  if (bar === BARS_PER_ROUND * ROUNDS - 1) {
+  if (bar === FILL_BAR) {
     hit(0, 'kick', 0.9);
     for (const [step, velocity] of [[8, 0.35], [10, 0.45], [12, 0.55], [13, 0.6], [14, 0.7], [15, 0.85]]) hit(step, 'snare', velocity);
     hit(14, 'scratch', 0.5);
@@ -88,10 +94,8 @@ function drumBar(random, bar) {
   hit(4, 'snare', 0.9);
   hit(12, 'snare', 0.9);
   if (random() < 0.4) hit(pick(random, [9, 11]), 'snare', 0.2);
-  if (round === 2 || inRound === 7) {
-    hit(4, 'clap', 0.6);
-    hit(12, 'clap', 0.6);
-  }
+  // 拍手只在每 4 小節的最後一小節疊在第 4 拍的小鼓上。
+  if (inRound % 4 === 3) hit(12, 'clap', 0.6);
   if (round === 1 && inRound === 7) hit(14, 'scratch', 0.45);
   return hits;
 }
@@ -107,11 +111,9 @@ const BASS_PATTERNS = [
 const bassDegree = (chord) => chord.root - (chord.root < 3 ? 5 : 10);
 
 function bassBar(random, bar) {
-  const chord = CHORDS[PROGRESSION[bar % BARS_PER_ROUND]];
-  const next = CHORDS[PROGRESSION[(bar + 1) % BARS_PER_ROUND]];
-  const root = bassDegree(chord);
-  const nextRoot = bassDegree(next);
-  const pattern = bar === BARS_PER_ROUND * ROUNDS - 2 ? [[8, 'root'], [8, null]] : pick(random, BASS_PATTERNS);
+  const root = bassDegree(chordOf(bar));
+  const nextRoot = bassDegree(chordOf(bar + 1));
+  const pattern = bar === BREAK_BAR ? [[8, 'root'], [8, null]] : pick(random, BASS_PATTERNS);
   const pitch = {
     root,
     up: root + 3,
@@ -122,8 +124,7 @@ function bassBar(random, bar) {
 
 // 和弦鋪底：電鋼琴在第 1 拍與第 3 拍後半各按一次。
 function keysBar(bar) {
-  const chord = CHORDS[PROGRESSION[bar % BARS_PER_ROUND]];
-  const notes = chord.degrees.map(degreeToMidi);
+  const notes = chordOf(bar).degrees.map(degreeToMidi);
   return [
     { step: 0, length: 7, notes, velocity: 0.5 },
     { step: 10, length: 5, notes, velocity: 0.35 },
@@ -161,7 +162,7 @@ function melody(random, rhythms, restChance) {
   const phrase = (start, rhythmPair, bars) => {
     let degree = start;
     return bars.map((bar, i) => {
-      const chord = CHORDS[PROGRESSION[bar]];
+      const chord = chordOf(bar);
       const lengths = rhythmPair[i];
       const pitches = lengths.map((_, n) => {
         if (n === 0) degree = nearestChordTone(degree, chord);
@@ -191,19 +192,14 @@ export function buildScore(seed = BGM_SEED) {
   const random = createRandom(seed);
   const pluck = melody(random, PLUCK_RHYTHMS, 0.15);
   const bowed = melody(random, BOWED_RHYTHMS, 0);
-  const totalBars = BARS_PER_ROUND * ROUNDS;
   const bars = [];
-  for (let bar = 0; bar < totalBars; bar += 1) {
+  for (let bar = 0; bar < LOOP_BARS; bar += 1) {
     const round = Math.floor(bar / BARS_PER_ROUND);
     const inRound = bar % BARS_PER_ROUND;
-    const breakdown = bar >= totalBars - 2;
-    // 第 1 輪只有鼓、貝斯、和弦；第 2 輪加撥弦旋律；第 3 輪換拉弦；第 4 輪兩者一起，拉弦較輕。
-    const lead = round === 1 || (round === 3 && !breakdown)
-      ? toSlots(pluck[inRound].lengths, pluck[inRound].pitches, 0.7)
-      : silentBar();
-    const bowedSlots = round === 2 || (round === 3 && !breakdown)
-      ? toSlots(bowed[inRound].lengths, bowed[inRound].pitches, round === 3 ? 0.35 : 0.6)
-      : silentBar();
+    // 第 1 輪只有鼓、貝斯、和弦；第 2 輪加撥弦旋律；第 3 輪換拉弦；第 4 輪兩者一起、拉弦較輕，
+    // 過門時只留撥弦，最後一小節只剩小鼓滾奏。
+    const pluckOn = round === 1 || (round === 3 && bar !== FILL_BAR);
+    const bowedOn = round === 2 || (round === 3 && bar < BREAK_BAR);
     bars.push({
       index: bar,
       round,
@@ -211,8 +207,8 @@ export function buildScore(seed = BGM_SEED) {
       drums: drumBar(random, bar),
       bass: bassBar(random, bar),
       keys: keysBar(bar),
-      lead: breakdown && bar === totalBars - 2 ? toSlots(pluck[inRound].lengths, pluck[inRound].pitches, 0.6) : lead,
-      bowed: bowedSlots,
+      lead: pluckOn ? toSlots(pluck[inRound].lengths, pluck[inRound].pitches, bar === BREAK_BAR ? 0.6 : 0.7) : silentBar(),
+      bowed: bowedOn ? toSlots(bowed[inRound].lengths, bowed[inRound].pitches, round === 3 ? 0.35 : 0.6) : silentBar(),
     });
   }
   return { seed, bpm: BPM, stepsPerBar: STEPS_PER_BAR, swing: SWING, bars };

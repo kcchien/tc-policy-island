@@ -54,11 +54,12 @@ export function createSynth(context, destination) {
     node.Q.value = q;
     return node;
   };
+  // to 省略時不接輸出，例如只用來推動顫音的低頻振盪器。
   const osc = (type, frequency, time, duration, to) => {
     const node = context.createOscillator();
     node.type = type;
     node.frequency.setValueAtTime(frequency, time);
-    node.connect(to);
+    if (to) node.connect(to);
     node.start(time);
     node.stop(time + duration + 0.05);
     return node;
@@ -175,7 +176,7 @@ export function createSynth(context, destination) {
     amp.gain.exponentialRampToValueAtTime(0.0001, end + 0.12);
     const voice = osc('sawtooth', frequency * 0.985, time, duration + 0.12, tone);
     voice.frequency.exponentialRampToValueAtTime(frequency, time + 0.07);
-    const vibrato = osc('sine', 5.5, time, duration + 0.12, gainNode(0));
+    const vibrato = osc('sine', 5.5, time, duration + 0.12);
     const depth = context.createGain();
     depth.gain.setValueAtTime(0, time);
     depth.gain.linearRampToValueAtTime(frequency * 0.006, time + Math.min(0.35, duration));

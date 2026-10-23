@@ -216,7 +216,6 @@ function startApp(vm, state, initialView) {
   setupMusicToggle({
     button: document.getElementById('tool-music'),
     volumeInput: document.getElementById('tool-music-volume'),
-    reducedMotion: () => reducedMotionQuery.matches,
   });
 
   const renderIslandPanel = () => {
