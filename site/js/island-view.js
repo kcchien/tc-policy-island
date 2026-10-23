@@ -45,10 +45,12 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 // insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
 // obstacles() 回傳浮動元件與卡片的視窗矩形（getBoundingClientRect），名牌會避開。
+// timeOfDay 是一開始的時段（不補間，直接是這個時段），省略時是白天。
 export function createIslandView(stage, {
   vm, reducedMotion, onSelectArea, onSelectCandidate,
   insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
   obstacles = () => [],
+  timeOfDay,
 }) {
   const quality = initialQuality({
     width: window.innerWidth,
@@ -80,8 +82,8 @@ export function createIslandView(stage, {
   const outline = islandPoints(layout, { surface: TILE_SURFACE, top: MODEL_TOP });
   const center = new THREE.Vector3(bounds.center.x, 0, bounds.center.z);
 
-  // 晝夜（預設白天）、天空、光照與發光材質。
-  const daylight = createDaylight();
+  // 晝夜、天空、光照與發光材質。
+  const daylight = createDaylight({ initial: timeOfDay });
   const environment = createEnvironment(scene, { center, radius: bounds.radius, quality, waterRadius: outskirtsWaterRadius(bounds) });
   // 裝飾動畫的時間；後續的動畫用 animator.add 註冊（見 island-clock.js）。
   const animator = createAnimator({ reducedMotion });
@@ -245,7 +247,7 @@ export function createIslandView(stage, {
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
-    animator.tick(now, { night: lighting.night, fog: lighting.fog });
+    animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon, lighting });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
     frame += 1;
