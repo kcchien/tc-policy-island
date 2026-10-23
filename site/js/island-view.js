@@ -10,6 +10,8 @@ import { createDaylight } from './island-daylight.js';
 import { createAnimator } from './island-clock.js';
 import { createEnvironment } from './island-environment.js';
 import { instancify } from './island-kit.js';
+import { createOutskirts } from './island-outskirts.js';
+import { outskirtsWaterRadius } from './island-terrain.js';
 import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE } from './island-models.js';
 import { el } from './dom.js';
 
@@ -64,7 +66,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
 
   // 晝夜（預設白天）、天空、光照與發光材質。
   const daylight = createDaylight();
-  const environment = createEnvironment(scene, { center, radius: bounds.radius, quality });
+  const environment = createEnvironment(scene, { center, radius: bounds.radius, quality, waterRadius: outskirtsWaterRadius(bounds) });
   // 裝飾動畫的時間；後續的動畫用 animator.add 註冊（見 island-clock.js）。
   const animator = createAnimator({ reducedMotion });
   const governor = createFpsGovernor(quality);
@@ -116,6 +118,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
   const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
   pickable.push(...kit.meshes);
+  // 外圍地形與環境（不可點選）；雲、霧、鳥隨動畫時間移動。
+  const outskirts = createOutskirts(scene, { layout, quality, environment });
+  animator.add(outskirts.update);
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 400);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -148,7 +153,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
-    animator.tick(now, { night: lighting.night });
+    animator.tick(now, { night: lighting.night, fog: lighting.fog });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
     frame += 1;

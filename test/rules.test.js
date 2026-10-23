@@ -15,6 +15,7 @@ import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
 import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
 import { blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES } from '../site/js/island-daylight.js';
+import { terrainColor } from '../site/js/island-terrain.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -100,7 +101,7 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
 
 test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
   const { ranges } = loadForbiddenColors();
-  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js'];
+  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js', 'site/js/island-terrain.js', 'site/js/island-outskirts.js'];
   let scanned = 0;
   for (const file of files) {
     const text = readFileSync(repoPath(file), 'utf8');
@@ -111,6 +112,17 @@ test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用�
     scanned += colors.length;
   }
   assert.ok(scanned >= 40, `只掃到 ${scanned} 個色碼`);
+});
+
+test('外圍地形依高度內插的地面色，從海床到稜線每一段都不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  const hits = [];
+  for (let h = -2; h <= 20; h += 0.05) {
+    const hex = terrainColor(h);
+    const color = { ...rgbToHsl({ r: (hex >> 16) & 0xff, g: (hex >> 8) & 0xff, b: hex & 0xff }), alpha: 1 };
+    for (const range of forbiddenRangesOf(color, ranges)) hits.push(`${h.toFixed(2)} ${hex.toString(16)} ${range.name}`);
+  }
+  assert.deepEqual(hits, []);
 });
 
 test('晝夜切換途中的天空、霧、光照與水色，任兩個時段之間的補間色也不落在禁用範圍內', () => {
