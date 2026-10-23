@@ -1033,7 +1033,7 @@
 
 網址：https://taichungway.tw/press-release-mice-economy-168
 
-結果：收錄（出處 chiang-pr-mice-economy-168）。
+結果：收錄（出處 chiang-pr-mice-economy）。
 
 | 摘錄 | 結果 |
 |---|---|
