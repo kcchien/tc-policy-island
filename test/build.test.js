@@ -67,3 +67,15 @@ test('原始資料結構錯誤時，建置指令以非零結束碼退出並列�
   assert.notEqual(code, 0);
   assert.match(output, /政見 sample-jia-001：issueAreaId 指向不存在的議題區 no-such-area/);
 });
+
+test('建置指令把整理方法頁引用的 repo 文件逐字複製到公開資料集旁，並寫出實際複製的清單', () => {
+  const { code, output, out } = build(SAMPLE_RAW);
+
+  assert.equal(code, 0, output);
+  const dir = dirname(out);
+  const original = readFileSync(new URL('../docs/rules/classification-rules.md', import.meta.url));
+  assert.ok(readFileSync(join(dir, 'repo-files', 'docs', 'rules', 'classification-rules.md')).equals(original));
+  const manifest = JSON.parse(readFileSync(join(dir, 'repo-files.json'), 'utf8'));
+  assert.ok(manifest.documents.includes('data/verification/checklist.json'));
+  assert.ok(manifest.documents.includes('data/extraction/instructions.md'));
+});
