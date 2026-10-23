@@ -1384,7 +1384,13 @@ body[data-view="island"] .policy-card::backdrop {
   font-size: 1rem;
 }
 
-.repo-document-path,
+/* 白話說明獨占一行，接在標題下方。 */
+.repo-document-description {
+  flex-basis: 100%;
+  color: var(--charcoal-soft);
+  font-size: 0.875rem;
+}
+
 .repo-id {
   color: var(--charcoal-soft);
   font-family: var(--font-mono);
