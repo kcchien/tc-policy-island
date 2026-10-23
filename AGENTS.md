@@ -44,7 +44,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
   js/island-models.js  在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
-  js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、太陽光暈、光照與補光、霧、淺水與深水、夜間係數）、著色器混色比例、1.4 秒補間、自動時段 timeOfDayAt（台灣時間 05–08 清晨、08–16 白天、16–19 黃昏、其餘夜晚）（Node 可測，色碼受禁用色檢查）
+  js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、太陽光暈、光照與補光、霧、淺水與深水、外圍陸地色調、夜間係數）、著色器混色比例、外圍陸地色調倍率 landShade、1.4 秒補間、自動時段 timeOfDayAt（台灣時間 05–08 清晨、08–16 白天、16–19 黃昏、其餘夜晚）（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
   js/island-clock.js   動畫迴圈時間：統一推進、暫停、減少動態停在固定畫格；後續動畫一律用它註冊（Node 可測）
   js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、預設視角（直式畫面較低俯角並轉方位角）
@@ -57,7 +57,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
   js/island-environment.js 天空著色器（漸層、太陽光暈、夜晚星星）、太陽、半球光與補光、霧、水面著色器（深淺漂移、遠處加深、閃光，waterMaterial 可給其他物件共用）、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈並做梯田）、地面色、各畫質的背景樹（針葉與闊葉，數千棵）、霧、聚落、雲、海上小島與帆船數量、樹群、聚落、霧團、雲、飛鳥、三圈遠山剪影與其顏色、小島燈塔帆船，與依動畫時間的位置與水面時間；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
-  js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、背景樹（不投影）與聚落 InstancedMesh、霧團、雲與雲影、飛鳥、遠山剪影、小島燈塔帆船；用 addAnimation 的時間移動，水面時間也從這裡交給環境
+  js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、背景樹（不投影）與聚落（部分小屋亮窗燈）InstancedMesh、受光材質每幀乘上時段的陸地色調、霧團、雲與雲影、飛鳥、遠山剪影、小島燈塔帆船；用 addAnimation 的時間移動，水面時間也從這裡交給環境
   js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民（走自己島的步道環）、環線（沿步道環與橋的外圈）與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查（關卡也要載入它 import 的 island-body.js）
   js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車，會動的零件每種一個 InstancedMesh
   js/bgm-score.js      背景音樂的樂曲（Node 可測）：固定種子產生的 32 小節循環，G 宮五聲音階，鼓組、貝斯、和弦、撥弦與拉弦旋律都是純資料
