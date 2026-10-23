@@ -1,8 +1,61 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  blendLighting, createDaylight, DEFAULT_TIME_OF_DAY, glowLevel, KEYFRAMES, TIMES_OF_DAY, TRANSITION_MS,
+  blendLighting, createDaylight, DEFAULT_TIME_OF_DAY, glowLevel, KEYFRAMES, landShade, timeOfDayAt, TIMES_OF_DAY, TRANSITION_MS,
 } from '../site/js/island-daylight.js';
+
+// 台灣時間（UTC+8）的某日某時某分，換成毫秒時間戳。
+const taipei = (day, hour, minute = 0) => Date.UTC(2026, 9, day, hour - 8, minute);
+
+test('自動時段依台灣時間：05–08 清晨、08–16 白天、16–19 黃昏、19–05 夜晚，邊界那一分鐘屬於下一段', () => {
+  const cases = [
+    [0, 0, 'night'], [4, 59, 'night'], [5, 0, 'dawn'], [7, 59, 'dawn'], [8, 0, 'day'], [12, 0, 'day'],
+    [15, 59, 'day'], [16, 0, 'dusk'], [18, 59, 'dusk'], [19, 0, 'night'], [23, 59, 'night'],
+  ];
+  for (const [hour, minute, id] of cases) assert.equal(timeOfDayAt(taipei(23, hour, minute)), id, `${hour}:${minute}`);
+});
+
+test('自動時段跨日：UTC 的前一天晚上已是台灣的隔天清晨；不看瀏覽者的時區', () => {
+  // UTC 10/23 21:00 是台灣 10/24 05:00；UTC 10/23 10:59 是台灣 10/23 18:59。
+  assert.equal(timeOfDayAt(Date.UTC(2026, 9, 23, 21, 0)), 'dawn');
+  assert.equal(timeOfDayAt(Date.UTC(2026, 9, 23, 20, 59)), 'night');
+  assert.equal(timeOfDayAt(Date.UTC(2026, 9, 23, 10, 59)), 'dusk');
+  assert.equal(timeOfDayAt(Date.UTC(2026, 9, 23, 11, 0)), 'night');
+  // 跨年與 Date 物件也一樣。
+  assert.equal(timeOfDayAt(new Date(Date.UTC(2026, 11, 31, 16, 0))), 'night');
+  assert.equal(timeOfDayAt(new Date(Date.UTC(2026, 11, 31, 23, 30))), 'dawn');
+});
+
+test('每個關鍵影格都有天空、太陽光暈、半球光、補光、淺水與深水色，霧色等於地平線色', () => {
+  for (const [id, k] of Object.entries(KEYFRAMES)) {
+    for (const key of ['skyTop', 'skyHorizon', 'sunGlow', 'hemiSky', 'hemiGround', 'fillColor', 'waterShallow', 'waterDeep']) {
+      assert.equal(typeof k[key], 'number', `${id}.${key}`);
+    }
+    assert.equal(k.fog, k.skyHorizon, `${id} 的霧色等於地平線色，遠景融進天空`);
+    assert.ok(k.fillIntensity > 0 && k.fillIntensity < k.sunIntensity, `${id} 補光比太陽弱`);
+  }
+});
+
+test('外圍陸地的色調：白天不改色，黃昏變暗偏暖，夜晚最暗偏冷；補間途中平順變化', () => {
+  const [day, dawn, dusk, night] = ['day', 'dawn', 'dusk', 'night'].map((id) => landShade(KEYFRAMES[id]));
+  assert.deepEqual(day, [1, 1, 1]);
+  const mean = (rgb) => (rgb[0] + rgb[1] + rgb[2]) / 3;
+  assert.ok(mean(dawn) < 1 && mean(dusk) < 1);
+  assert.ok(mean(night) < 0.6, `夜晚平均 ${mean(night).toFixed(2)}`);
+  assert.ok(mean(night) < mean(dusk) && mean(dusk) <= mean(dawn) + 0.05);
+  assert.ok(dusk[0] > dusk[2], '黃昏偏暖：紅大於藍');
+  assert.ok(night[2] > night[0], '夜晚偏冷：藍大於紅');
+  const half = landShade(blendLighting(KEYFRAMES.day, KEYFRAMES.night, 0.5));
+  assert.ok(mean(half) < 1 && mean(half) > mean(night));
+});
+
+test('光照強度照參考的結構：白天太陽最強，夜晚太陽最弱但半球光最強（冷色但看得清楚）', () => {
+  const { dawn, day, dusk, night } = KEYFRAMES;
+  assert.ok(day.sunIntensity > dawn.sunIntensity && day.sunIntensity > dusk.sunIntensity && dusk.sunIntensity > night.sunIntensity);
+  assert.ok(night.hemiIntensity > day.hemiIntensity);
+  assert.equal(day.night, 0);
+  assert.equal(night.night, 1);
+});
 
 test('四個時段依清晨、白天、黃昏、夜晚排列，預設白天', () => {
   assert.deepEqual(TIMES_OF_DAY.map((t) => t.id), ['dawn', 'day', 'dusk', 'night']);

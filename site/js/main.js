@@ -7,6 +7,7 @@ import { renderTable } from './table-view.js';
 import { renderIslandList, renderLegend } from './island-list.js';
 import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
+import { timeOfDayAt } from './island-daylight.js';
 import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 
@@ -16,8 +17,11 @@ const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 // 與 main.css 的手機斷點相同：底部膠囊工具列、索引與卡片改為底部抽屜。
 const mobileQuery = window.matchMedia('(max-width: 800px)');
 
-// 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責，預設白天。
+// 時段按鈕的順序與名稱。實際光照由島嶼檢視的 setTimeOfDay 負責。
+// 預設「自動」：依台灣時間選時段（timeOfDayAt），每分鐘檢查一次；點其他時段改為手動。
 const TIMES = ['dawn', 'day', 'dusk', 'night'].map((id) => ({ id, name: TIME_NAMES[id] }));
+const AUTO_TIME = { id: 'auto', name: TIME_NAMES.auto };
+const AUTO_CHECK_MS = 60 * 1000;
 
 function supportsWebGL() {
   try {
@@ -115,7 +119,8 @@ function startApp(vm, state, initialView) {
   // 目前選中的議題區。關閉卡片後仍保留，切換檢視時沿用。
   let selectedArea = null;
   let island = null;
-  const hud = { time: 'day', paused: false, labels: true };
+  // timeMode 是 'auto' 或手動選的時段；time 是實際套用的時段。
+  const hud = { timeMode: AUTO_TIME.id, time: timeOfDayAt(Date.now()), paused: false, labels: true };
 
   const updateUrl = () => history.replaceState(null, '', formatSearch(state) || location.pathname);
 
@@ -135,6 +140,9 @@ function startApp(vm, state, initialView) {
     },
   });
   document.body.append(candidateDialog.element);
+  // 名牌要避開的浮動元件（見 stageObstacles）開關時，請島嶼檢視重排名牌。鏡頭沒動時不會自己重排。
+  const refreshLabels = () => withIsland((controller) => controller.refreshLabels());
+  candidateDialog.element.addEventListener('close', refreshLabels);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
@@ -144,6 +152,7 @@ function startApp(vm, state, initialView) {
     indexToggle.setAttribute('aria-expanded', String(open));
     if (open) indexClose.focus();
     else if (returnFocus) indexToggle.focus();
+    refreshLabels();
   };
   indexToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
   indexClose.addEventListener('click', () => setPanelOpen(false, { returnFocus: true }));
@@ -161,17 +170,40 @@ function startApp(vm, state, initialView) {
     return { top: bar.bottom, right: Math.max(0, width - panel.getBoundingClientRect().left), bottom: 0, left: 0 };
   };
 
+  // 名牌要避開的浮動元件：標題卡、工具列（桌面是各組按鈕，手機是整條膠囊列）、索引面板、說明文字與開著的卡片。
+  const stageObstacles = () => {
+    const nodes = [
+      titleCard,
+      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
+      panel,
+      document.getElementById('view-note'),
+      card.element.open && card.element,
+      candidateDialog.element.open && candidateDialog.element,
+    ];
+    return nodes.filter(Boolean).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+  };
+
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
   const withIsland = (fn) => island?.then((controller) => controller && fn(controller));
   const applyTime = () => {
+    const auto = hud.timeMode === AUTO_TIME.id;
+    hud.time = auto ? timeOfDayAt(Date.now()) : hud.timeMode;
     const current = TIMES.find((t) => t.id === hud.time);
     for (const button of document.querySelectorAll('[data-time]')) {
-      button.setAttribute('aria-pressed', String(button.dataset.time === hud.time));
+      button.setAttribute('aria-pressed', String(button.dataset.time === hud.timeMode));
     }
-    document.getElementById('tool-time-cycle-label').textContent = current.name;
-    document.getElementById('tool-time-cycle').setAttribute('aria-label', ISLAND_TEXT.timeCycle(current.name));
+    document.getElementById('tool-time-cycle-label').textContent = auto ? AUTO_TIME.name : current.name;
+    document.getElementById('tool-time-cycle').setAttribute('aria-label', auto ? ISLAND_TEXT.timeCycleAuto(current.name) : ISLAND_TEXT.timeCycle(current.name));
     withIsland((controller) => controller.setTimeOfDay?.(hud.time));
   };
+  // 自動模式下跨過時段邊界時切換（島嶼檢視負責補間，減少動態時直接切換）。分頁回到前景時也馬上檢查。
+  const checkAutoTime = () => {
+    if (hud.timeMode === AUTO_TIME.id && timeOfDayAt(Date.now()) !== hud.time) applyTime();
+  };
+  setInterval(checkAutoTime, AUTO_CHECK_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) checkAutoTime();
+  });
   const applyPaused = () => {
     const button = document.getElementById('tool-pause');
     button.setAttribute('aria-pressed', String(hud.paused));
@@ -181,16 +213,19 @@ function startApp(vm, state, initialView) {
   const applyLabels = () => {
     document.getElementById('tool-labels').setAttribute('aria-pressed', String(hud.labels));
     stage.classList.toggle('labels-off', !hud.labels);
+    refreshLabels();
   };
   for (const button of document.querySelectorAll('[data-time]')) {
     button.addEventListener('click', () => {
-      hud.time = button.dataset.time;
+      hud.timeMode = button.dataset.time;
       applyTime();
     });
   }
+  // 手機的時段循環鈕：自動 → 清晨 → 白天 → 黃昏 → 夜晚 → 自動。
   document.getElementById('tool-time-cycle').addEventListener('click', () => {
-    const index = TIMES.findIndex((t) => t.id === hud.time);
-    hud.time = TIMES[(index + 1) % TIMES.length].id;
+    const modes = [AUTO_TIME, ...TIMES];
+    const index = modes.findIndex((t) => t.id === hud.timeMode);
+    hud.timeMode = modes[(index + 1) % modes.length].id;
     applyTime();
   });
   document.getElementById('tool-pause').addEventListener('click', () => {
@@ -221,6 +256,8 @@ function startApp(vm, state, initialView) {
           onSelectArea: (areaId) => openCard(areaId, null),
           onSelectCandidate: openCandidateCard,
           insets: stageInsets,
+          obstacles: stageObstacles,
+          timeOfDay: hud.time,
         });
         controller.update(filtered);
         // 卡片開關、手機抽屜換段或拖曳時，畫面偏移跟著卡片遮住的範圍走。
@@ -260,6 +297,7 @@ function startApp(vm, state, initialView) {
     state.candidate = candidateId;
     updateUrl();
     candidateDialog.open(vm, candidateId);
+    refreshLabels();
     return true;
   };
 
@@ -272,7 +310,7 @@ function startApp(vm, state, initialView) {
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const show = () => card.open(row, vm, { focusPolicyId: policyId });
+    const show = () => card.open(row, vm, { focusPolicyId: policyId, filter: { query: state.query, district: state.district } });
     if (view === 'island') {
       setPanelOpen(false);
       renderIslandPanel();

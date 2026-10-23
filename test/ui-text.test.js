@@ -35,6 +35,13 @@ test('卡片欄位顯示此區政見數與原始政見條目總數，尚未統�
   assert.equal(UI.candidateCountText(0, { total: null }), '此議題區 0 筆政見，原始政見條目尚未統計');
 });
 
+test('政見卡片內篩選時，欄頭另列符合篩選的筆數，篩選總結列出三欄合計', () => {
+  assert.equal(UI.POLICY_CARD_TEXT.columnMatch(3), '符合篩選條件 3 筆');
+  assert.equal(UI.POLICY_CARD_TEXT.filterStatus({ active: false, matchCount: 5 }), '');
+  assert.equal(UI.POLICY_CARD_TEXT.filterStatus({ active: true, matchCount: 0 }), '這個議題區沒有符合篩選條件的政見。');
+  assert.equal(UI.POLICY_CARD_TEXT.filterStatus({ active: true, matchCount: 5 }), '這個議題區符合篩選條件的政見共 5 筆。');
+});
+
 test('整理方法頁的每份公開原文都有白話標題與說明', () => {
   for (const doc of REPO_DOCUMENTS) {
     const text = UI.REPO_DOCUMENT_TEXT[doc.id];

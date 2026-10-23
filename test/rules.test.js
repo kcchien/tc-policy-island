@@ -14,8 +14,10 @@ import { PROJECT_NAME } from '../scripts/lib/deploy.js';
 import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
 import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
-import { blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES } from '../site/js/island-daylight.js';
-import { terrainColor } from '../site/js/island-terrain.js';
+import {
+  blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES, landShade, SKY_HALO, STAR_COLOR, WATER_SPARKLE, WATER_STARS,
+} from '../site/js/island-daylight.js';
+import { RIDGE_RINGS, silhouetteColor, TERRAIN_PALETTE, terrainColor } from '../site/js/island-terrain.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -145,6 +147,78 @@ test('晝夜切換途中的天空、霧、光照與水色，任兩個時段之�
     }
   }
   assert.deepEqual(hits, []);
+});
+
+test('天空的太陽光暈與星星、水面的深淺漂移與閃光、遠山剪影，在任兩個時段的補間途中呈現的顏色都不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  // 著色器在線性空間混色（three.js 把 sRGB 色碼轉成線性），輸出再轉回 sRGB。
+  const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const toSrgb = (c) => (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055);
+  const linear = (hex) => [16, 8, 0].map((shift) => toLinear(((hex >> shift) & 0xff) / 255));
+  const mix = (a, b, k) => {
+    const [la, lb] = [linear(a), linear(b)];
+    const [r, g, bl] = la.map((v, i) => Math.round(toSrgb(v + (lb[i] - v) * k) * 255));
+    return { r, g, b: bl };
+  };
+  const ids = Object.keys(KEYFRAMES);
+  const hits = [];
+  const check = (label, rgb) => {
+    for (const range of forbiddenRangesOf({ ...rgbToHsl(rgb), alpha: 1 }, ranges)) hits.push(`${label} rgb(${rgb.r},${rgb.g},${rgb.b}) ${range.name}`);
+  };
+  for (const a of ids) {
+    for (const b of ids) {
+      for (let k = 0; k <= 1; k += 0.1) {
+        const l = blendLighting(KEYFRAMES[a], KEYFRAMES[b], k);
+        const at = `${a}→${b} ${k.toFixed(1)}`;
+        for (let j = 0; j <= 1.0001; j += 0.1) {
+          // 天空：天頂到地平線之間，再往太陽光暈色混到 SKY_HALO；星星往星色混，最多混滿。
+          const sky = mix(l.skyHorizon, l.skyTop, j);
+          const skyHex = (sky.r << 16) | (sky.g << 8) | sky.b;
+          check(`${at} 天空 ${j.toFixed(1)}`, sky);
+          check(`${at} 光暈 ${j.toFixed(1)}`, mix(skyHex, l.sunGlow, SKY_HALO * j));
+          check(`${at} 星星 ${j.toFixed(1)}`, mix(skyHex, STAR_COLOR, j));
+          // 水面：淺到深，再往閃光色（太陽光暈色）混到 WATER_SPARKLE。
+          const water = mix(l.waterShallow, l.waterDeep, j);
+          check(`${at} 水 ${j.toFixed(1)}`, water);
+          const waterHex = (water.r << 16) | (water.g << 8) | water.b;
+          check(`${at} 閃光 ${j.toFixed(1)}`, mix(waterHex, l.sunGlow, WATER_SPARKLE * j));
+          check(`${at} 星光倒影 ${j.toFixed(1)}`, mix(waterHex, STAR_COLOR, WATER_STARS * j));
+        }
+        for (let ring = 0; ring < RIDGE_RINGS; ring++) {
+          const hex = silhouetteColor(l, ring);
+          check(`${at} 遠山第 ${ring + 1} 圈`, { r: (hex >> 16) & 0xff, g: (hex >> 8) & 0xff, b: hex & 0xff });
+        }
+      }
+    }
+  }
+  assert.deepEqual(hits.slice(0, 20), []);
+});
+
+test('外圍地面、樹、聚落、小島、船與雲的色碼乘上任兩時段補間途中的陸地色調後，都不落在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  // 色調在 sRGB 給定，three.js 轉成線性後與材質色相乘，畫面輸出再轉回 sRGB。
+  const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const toSrgb = (c) => (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055);
+  const colors = Object.entries(TERRAIN_PALETTE)
+    .filter(([key]) => !key.startsWith('farRidge'))
+    .flatMap(([key, value]) => [value].flat().map((hex) => [key, hex]));
+  const ids = Object.keys(KEYFRAMES);
+  const hits = [];
+  for (const a of ids) {
+    for (const b of ids) {
+      for (let k = 0; k <= 1; k += 0.1) {
+        const shade = landShade(blendLighting(KEYFRAMES[a], KEYFRAMES[b], k));
+        for (const [key, hex] of colors) {
+          const [r, g, bl] = [16, 8, 0].map((shift, i) => Math.round(toSrgb(toLinear(((hex >> shift) & 0xff) / 255) * toLinear(shade[i])) * 255));
+          for (const range of forbiddenRangesOf({ ...rgbToHsl({ r, g, b: bl }), alpha: 1 }, ranges)) {
+            hits.push(`${a}→${b} ${k.toFixed(1)} ${key} ${hex.toString(16)} → rgb(${r},${g},${bl}) ${range.name}`);
+          }
+        }
+      }
+    }
+  }
+  assert.ok(colors.length >= 30);
+  assert.deepEqual(hits.slice(0, 20), []);
 });
 
 test('發光件（窗、燈泡）在各時段實際呈現的顏色（色碼乘上發光倍率，超過 1 截掉）不落在禁用範圍內', () => {

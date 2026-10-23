@@ -67,9 +67,29 @@ export const POLICY_CARD_TEXT = {
   policyLink: '這筆政見的連結',
   areaDescription: (description, departments) => `${description}（對應局處：${departments.join('、')}）`,
   conflict: '出處說法不一：',
+  conflictFlag: '出處說法不一',
   districts: '適用行政區',
+  districtsLine: (names) => `適用行政區：${names}`,
   noDistricts: '未指定',
   verification: '核對紀錄',
+  eyebrow: '議題區',
+  tabsLabel: '候選人',
+  enlarge: '放大卡片',
+  shrink: '縮小卡片',
+  expandAll: '全部展開',
+  collapseAll: '全部收合',
+  // 卡片內的篩選，三欄一起套用。
+  filtersLabel: '在這個議題區篩選政見',
+  searchLabel: '在這個議題區找政見的關鍵字',
+  searchPlaceholder: '在這個議題區找關鍵字',
+  allDistricts: '全部行政區',
+  // 篩選時欄頭的第二行，三欄同一句型。
+  columnMatch: (matchCount) => `符合篩選條件 ${matchCount} 筆`,
+  filterStatus({ active, matchCount }) {
+    if (!active) return '';
+    if (matchCount === 0) return '這個議題區沒有符合篩選條件的政見。';
+    return `這個議題區符合篩選條件的政見共 ${matchCount} 筆。`;
+  },
 };
 
 // 候選人資料卡。
@@ -106,10 +126,12 @@ export const MARKER_TEXT = {
 };
 
 // 島嶼檢視與工具列。
-export const TIME_NAMES = { dawn: '清晨', day: '白天', dusk: '黃昏', night: '夜晚' };
+// auto 是「自動」：依台灣時間選時段。
+export const TIME_NAMES = { auto: '自動', dawn: '清晨', day: '白天', dusk: '黃昏', night: '夜晚' };
 export const ISLAND_TEXT = {
   plaza: '候選人廣場',
   timeCycle: (name) => `切換時段，目前${name}`,
+  timeCycleAuto: (name) => `切換時段，目前自動（${name}）`,
   pause: '暫停',
   play: '播放',
   loadFailed: '島嶼檢視載入失敗，已改用表格檢視。',

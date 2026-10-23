@@ -34,29 +34,30 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/view-model.js     檢視模型：議題區 × 候選人矩陣
   js/table-view.js     表格檢視
   js/filter.js         搜尋與行政區篩選（filterViewModel）
-  js/policy-card.js    政見卡片（兩種檢視共用）
+  js/policy-card.js    政見卡片（兩種檢視共用）：三欄各自捲動、欄頭固定，政見預設只顯示摘要與行政區、點開看原文與核對紀錄，欄內篩選（filter.js 的 policyMatcher），手機改候選人分頁，桌面島嶼檢視可放大成全高
   js/candidate-card.js 候選人資料卡：內容純函式 profileCardContent（Node 可測）、三張同尺寸卡片、對話框（索引候選人分頁、表格欄頭、網址共用）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
-  js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
+  js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主題場景位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
   js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
   js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
   js/island-models.js  在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
-  js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
+  js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、太陽光暈、光照與補光、霧、淺水與深水、外圍陸地色調、夜間係數）、著色器混色比例、外圍陸地色調倍率 landShade、1.4 秒補間、自動時段 timeOfDayAt（台灣時間 05–08 清晨、08–16 白天、16–19 黃昏、其餘夜晚）（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
   js/island-clock.js   動畫迴圈時間：統一推進、暫停、減少動態停在固定畫格；後續動畫一律用它註冊（Node 可測）
   js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、預設視角（直式畫面較低俯角並轉方位角）
+  js/island-labels.js  名牌避讓（Node 可測，不 import 其他模組）：placeLabels 依畫面位置決定名牌完整、只留編號或隱藏，8px 遲滯，三位候選人人物名牌同組同進退；island-view.js 在鏡頭或介面變動後呼叫，避開 main.js 給的浮動元件矩形
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
   js/island-parts.js   零件分桶規則與實例縮放微抖動（Node 可測）
   js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動）
   js/island-heroes.js  主題場景（Node 可測）：20 個議題區各一座的零件資料（單位空間）、只依識別碼選場景、擺放（heroPlan，島體提供主題場景位置前暫放在元素區西半）、色碼
   js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
-  js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
-  js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈）、地面色、各畫質的樹、霧、聚落數量、樹群、聚落、霧團、雲、飛鳥與依動畫時間的位置；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
-  js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
+  js/island-environment.js 天空著色器（漸層、太陽光暈、夜晚星星）、太陽、半球光與補光、霧、水面著色器（深淺漂移、遠處加深、閃光，waterMaterial 可給其他物件共用）、夜間發光材質
+  js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈並做梯田）、地面色、各畫質的背景樹（針葉與闊葉，數千棵）、霧、聚落、雲、海上小島與帆船數量、樹群、聚落、霧團、雲、飛鳥、三圈遠山剪影與其顏色、小島燈塔帆船，與依動畫時間的位置與水面時間；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
+  js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、背景樹（不投影）與聚落（部分小屋亮窗燈）InstancedMesh、受光材質每幀乘上時段的陸地色調、霧團、雲與雲影、飛鳥、遠山剪影、小島燈塔帆船；用 addAnimation 的時間移動，水面時間也從這裡交給環境
   js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民（走自己島的步道環）、環線（沿步道環與橋的外圈）與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查（關卡也要載入它 import 的 island-body.js）
   js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車，會動的零件每種一個 InstancedMesh
   js/bgm-score.js      背景音樂的樂曲（Node 可測）：固定種子產生的 32 小節循環，G 宮五聲音階，鼓組、貝斯、和弦、撥弦與拉弦旋律都是純資料
