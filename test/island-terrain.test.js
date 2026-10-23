@@ -41,13 +41,28 @@ test('西側是海、東側是山稜：島西方的地面在水面下，島東�
   assert.ok(east[2] > 8, '遠處的山稜至少 8 單位高');
 });
 
-test('島的東半部直接接著平原，南北兩側與東側緊鄰島邊的地面都在水面上，不形成包夾的水道', () => {
+test('島的東半部接著平原，南北兩側與東側離島邊 1.6 的地面都在水面上，只留環線堤那一圈窄水面', () => {
   const layout = layoutOf();
   const plan = planOutskirts(layout);
   const { maxX, minZ, maxZ, center } = layout.bounds;
 
-  const near = [[maxX + 0.8, center.z], [maxX - 1, minZ - 0.8], [maxX - 1, maxZ + 0.8]];
+  const near = [[maxX + 1.6, center.z], [maxX - 1, minZ - 1.6], [maxX - 1, maxZ + 1.6]];
   for (const [x, z] of near) assert.ok(plan.heightAt(x, z) > SEA_LEVEL, `(${x.toFixed(1)}, ${z.toFixed(1)}) 應是陸地`);
+});
+
+test('格子外緣一圈（環線堤的位置）的地面在水面下，外圍平地不蓋住環線', () => {
+  const layout = layoutOf();
+  const plan = planOutskirts(layout);
+  const centers = layout.tiles.map((t) => t.position);
+  // 每格六條邊的中點往外推 0.17（環線離格線的距離），推出去後不在別格裡的就是島的外緣。
+  const ring = layout.tiles.flatMap(({ position }) => Array.from({ length: 6 }, (_, i) => {
+    const a = (i * Math.PI) / 3;
+    const r = (layout.hexSize * Math.sqrt(3)) / 2 + 0.17;
+    return [position.x + Math.cos(a) * r, position.z + Math.sin(a) * r];
+  })).filter(([x, z]) => centers.every((c) => Math.hypot(x - c.x, z - c.z) > layout.hexSize));
+
+  assert.ok(ring.length > 6);
+  for (const [x, z] of ring) assert.ok(plan.heightAt(x, z) < SEA_LEVEL, `(${x.toFixed(2)}, ${z.toFixed(2)}) ${plan.heightAt(x, z).toFixed(2)}`);
 });
 
 test('東側的山離島越遠越高：近島處是低矮丘陵，遠處有明顯隆起的主峰', () => {

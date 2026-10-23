@@ -39,6 +39,8 @@ export const TERRAIN_PALETTE = {
 const MARGIN = 0.6;
 const SLOPE_SAFETY = 0.92;
 const FLOOR = 0.3;
+// 環線堤離格子邊緣約 0.17、寬 0.17；這個距離內的地面留在水面下。
+const RING_CLEAR = 0.45;
 // 平原的高度範圍：田塊、聚落與平地的樹群都在這之間。
 const PLAIN_TOP = 1;
 // 樹只種到這個高度（再上去是岩與稜線）。
@@ -151,7 +153,13 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
     return best - hexSize;
   };
   const slopeLimit = (x, z, pad = 0) => slope * Math.max(0, distanceToIsland(x, z) - pad - MARGIN);
-  const clearanceAt = (x, z) => Math.max(FLOOR, slopeLimit(x, z));
+  // 格子外緣 RING_CLEAR 內壓到水面下，留一圈窄水面給環線堤（island-motion-view.js，堤頂 0.18），
+  // 再到 RING_CLEAR + 0.8 平順升到 FLOOR。
+  const clearanceAt = (x, z) => {
+    const d = distanceToIsland(x, z);
+    const near = SEA_LEVEL - 0.04 + (FLOOR - SEA_LEVEL + 0.04) * smoothstep(RING_CLEAR, RING_CLEAR + 0.8, d);
+    return Math.max(near, slopeLimit(x, z));
+  };
 
   // 海岸線：南北向、略往東北偏，大約通過島的西側三分之一；以西是台灣海峽方向的海，島的西端浮在海上。
   const westEdge = bounds.minX - cx;
