@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { REPO_DOCUMENTS, repoFileSitePath } from '../site/js/repo-documents.js';
-import { makeRaw, pendingVerification } from './fixtures/make-raw.js';
+import { makeRaw, pendingVerification, profileSnapshot } from './fixtures/make-raw.js';
 
 const GATES_SCRIPT = fileURLToPath(new URL('../scripts/gates.js', import.meta.url));
 
@@ -31,6 +31,10 @@ const repoFile = (path) => readFileSync(fileURLToPath(new URL(`../${path}`, impo
 const REPO_FILES = Object.fromEntries(REPO_DOCUMENTS.filter((doc) => !doc.optional)
   .map((doc) => [repoFileSitePath(doc.path), repoFile(doc.path)]));
 
+// 建置時複製到網站目錄的候選人資料出處快照。
+const PROFILE_SNAPSHOTS = Object.fromEntries(['cand-a', 'cand-b', 'cand-c']
+  .map((id) => [`data/snapshots/profile-src-${id}.txt`, profileSnapshot(id)]));
+
 // 合規網站文案與配色，取自本站實際使用的寫法。
 const COMPLIANT_FILES = {
   'index.html': '<!doctype html><title>台中政見島</title><p>由 AI 依公開資料整理，與任何候選人或政黨無關。</p>',
@@ -38,6 +42,7 @@ const COMPLIANT_FILES = {
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
   'js/island-motion.js': repoFile('site/js/island-motion.js'),
   ...REPO_FILES,
+  ...PROFILE_SNAPSHOTS,
 };
 
 function runGates(siteDir) {
@@ -116,6 +121,61 @@ test('候選人順序不符排序規則時，關卡不通過', () => {
   assert.match(output, /候選人順序應為 cand-a、cand-b、cand-c（依姓名筆畫），實際為 cand-c、cand-b、cand-a/);
 });
 
+const candidateIn = (dataset, id) => dataset.candidates.find((c) => c.id === id);
+
+test('候選人資料缺少欄位或沒有公開時，候選人資料關卡不通過並指出候選人與欄位', () => {
+  const site = makeSite((dataset) => {
+    candidateIn(dataset, 'cand-a').profile.experience = [];
+    delete candidateIn(dataset, 'cand-b').profile.electionYear;
+    candidateIn(dataset, 'cand-c').profile = null;
+  }, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /候選人 cand-a 的候選人資料缺少經歷/);
+  assert.match(output, /候選人 cand-b 的候選人資料缺少選舉年份/);
+  assert.match(output, /候選人 cand-c 沒有公開的候選人資料/);
+});
+
+test('三位候選人的候選人資料欄位不同時不通過', () => {
+  const site = makeSite((dataset) => {
+    candidateIn(dataset, 'cand-b').profile.selfIntroduction = '自我介紹';
+  }, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /三位候選人的候選人資料欄位不同：cand-b 多了 selfIntroduction/);
+});
+
+test('候選人資料的出處不是中選會的選舉公報時不通過', () => {
+  const site = makeSite((dataset) => {
+    dataset.sources.find((s) => s.id === 'profile-src-cand-a').sourceType = 'official-website';
+    dataset.sources.find((s) => s.id === 'profile-src-cand-b').url = 'https://news.example.org/cand-b.pdf';
+  }, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /候選人 cand-a：候選人資料的出處 profile-src-cand-a 不是選舉公報（來源類型 official-website）/);
+  assert.match(output, /候選人 cand-b：候選人資料的出處 profile-src-cand-b 不是中選會網站（news\.example\.org）/);
+});
+
+test('經歷或學歷不在出處快照中時不通過，出處快照不在網站目錄時也不通過', () => {
+  const files = { ...COMPLIANT_FILES };
+  delete files['data/snapshots/profile-src-cand-b.txt'];
+  const site = makeSite((dataset) => {
+    candidateIn(dataset, 'cand-a').profile.experience[1] = 'cand-a 測試里里長（連任三屆）';
+  }, files);
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /候選人 cand-a：experience\[1\] 未逐字出現在出處 profile-src-cand-a 的快照中/);
+  assert.match(output, /候選人 cand-b：出處 profile-src-cand-b 的出處快照 data\/snapshots\/profile-src-cand-b.txt 不在網站目錄/);
+});
+
 // 品牌用語掃描與禁用色檢查讀正式清單 data/rules/。以下用清單中確定收錄的詞與色相測試。
 
 test('摘要含品牌用語時，品牌用語掃描不通過並指出政見與詞', () => {
@@ -140,6 +200,22 @@ test('原文引述、出處標題與網址含品牌用語時不擋，摘要用�
   const { code, output } = runGates(site);
 
   assert.equal(code, 0, output);
+});
+
+test('候選人資料的學歷與經歷照原文含品牌用語時不擋，比照原文引述；選舉別與出處快照說明照掃', () => {
+  const verbatim = makeSite((dataset) => {
+    dataset.candidates[0].profile.education = ['六星大學學士'];
+    dataset.candidates[0].profile.experience = ['Taichung Way 推動委員'];
+  });
+  const written = makeSite((dataset) => {
+    dataset.candidates[0].profile.electionName = '六星選舉';
+  });
+
+  const verbatimResult = runGates(verbatim);
+  const writtenResult = runGates(written);
+
+  assert.doesNotMatch(verbatimResult.output, /品牌用語「/);
+  assert.match(writtenResult.output, /profile\.electionName：含品牌用語「六星」/);
 });
 
 test('網站文案含陣營高頻詞時不通過', () => {

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPublicDataset, DatasetValidationError } from '../site/js/dataset.js';
-import { makeRaw, policy, localElement, passedVerification, pendingVerification } from './fixtures/make-raw.js';
+import { makeRaw, policy, localElement, passedVerification, pendingVerification, profile, profileVerification } from './fixtures/make-raw.js';
 
 test('未通過兩層核對的政見不會出現在公開資料集', () => {
   const raw = makeRaw();
@@ -102,9 +102,66 @@ test('只被未核對政見引用的出處不會出現在公開資料集', () =>
   const dataset = buildPublicDataset(raw);
 
   assert.deepEqual(
-    dataset.sources.map((s) => s.id).sort(),
+    dataset.sources.map((s) => s.id).filter((id) => !id.startsWith('profile-')).sort(),
     ['src-cand-a', 'src-cand-b', 'src-raw-items'],
   );
+});
+
+test('公開資料集帶出通過逐字比對的候選人資料與其出處', () => {
+  const dataset = buildPublicDataset(makeRaw());
+
+  const published = dataset.candidates.find((c) => c.id === 'cand-a');
+  assert.deepEqual(published.profile, profile('cand-a'));
+  assert.ok(dataset.sources.some((s) => s.id === 'profile-src-cand-a'));
+});
+
+test('候選人資料未核對或逐字比對不通過時不公開，其出處也不公開', () => {
+  const raw = makeRaw();
+  raw.candidates.find((c) => c.id === 'cand-a').profile = profile('cand-a', profileVerification('fail'));
+  raw.candidates.find((c) => c.id === 'cand-b').profile = profile('cand-b', profileVerification('pending'));
+
+  const dataset = buildPublicDataset(raw);
+
+  const byId = new Map(dataset.candidates.map((c) => [c.id, c]));
+  assert.equal(byId.get('cand-a').profile, null);
+  assert.equal(byId.get('cand-b').profile, null);
+  assert.deepEqual(byId.get('cand-c').profile, profile('cand-c'));
+  assert.deepEqual(
+    dataset.sources.map((s) => s.id).filter((id) => id.startsWith('profile-')),
+    ['profile-src-cand-c'],
+  );
+});
+
+test('尚未收錄候選人資料的候選人 profile 為 null，仍可建置', () => {
+  const raw = makeRaw();
+  raw.candidates[0].profile = null;
+
+  assert.equal(buildPublicDataset(raw).candidates.find((c) => c.id === 'cand-b').profile, null);
+});
+
+test('候選人資料缺欄位、型別錯誤或出處不屬於該候選人時，錯誤訊息指出候選人與欄位', () => {
+  const raw = makeRaw();
+  const byId = new Map(raw.candidates.map((c) => [c.id, c]));
+  delete byId.get('cand-a').profile.experience;
+  byId.get('cand-b').profile.birthYear = '六十一年';
+  byId.get('cand-c').profile.sourceId = 'profile-src-cand-a';
+
+  assert.deepEqual(validationErrors(raw), [
+    '候選人 cand-b：欄位 profile.birthYear 應為正整數，實際為 "六十一年"',
+    '候選人 cand-a：缺少欄位 profile.experience',
+    '候選人 cand-c：profile.sourceId 的出處 profile-src-cand-a 屬於候選人 cand-a',
+  ]);
+});
+
+test('候選人資料指向不存在的出處或逐字比對已有結果卻缺日期時拒絕建置', () => {
+  const raw = makeRaw();
+  raw.candidates[0].profile.sourceId = 'src-x';
+  raw.candidates[1].profile.verification.layer1.checkedAt = null;
+
+  assert.deepEqual(validationErrors(raw), [
+    '候選人 cand-b：profile.sourceId 指向不存在的出處 src-x',
+    '候選人 cand-c：候選人資料逐字比對已有結果，profile.verification.layer1.checkedAt 不得為 null',
+  ]);
 });
 
 test('政見指向不存在的候選人、議題區或出處時列出每一處', () => {

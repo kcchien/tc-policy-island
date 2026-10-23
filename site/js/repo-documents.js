@@ -20,6 +20,7 @@ export const REPO_DOCUMENTS = [
   { id: 'checklist', path: 'data/verification/checklist.json', title: '檢核表', format: 'checklist' },
   { id: 'layer2-prompt', path: 'data/verification/layer2-prompt.md', title: '核對第二層提示詞', format: 'text' },
   { id: 'extraction-instructions', path: 'data/extraction/instructions.md', title: '政見抽取指示', format: 'markdown' },
+  { id: 'candidate-profiles', path: 'data/extraction/candidate-profiles.md', title: '候選人資料抽取方法', format: 'markdown' },
   { id: 'verification-report', path: 'data/verification/report.md', title: '核對報告', format: 'markdown', optional: true },
   { id: 'local-elements', path: 'docs/rules/local-elements.md', title: '元素清單', format: 'markdown' },
   { id: 'brand-terms-rules', path: 'docs/rules/brand-terms.md', title: '品牌用語清單說明', format: 'markdown' },

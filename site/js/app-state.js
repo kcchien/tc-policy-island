@@ -3,7 +3,7 @@
 
 export const VIEWS = ['island', 'table'];
 
-// 網址參數：view 檢視、area 議題區識別碼、policy 政見識別碼、q 關鍵字、district 適用行政區。
+// 網址參數：view 檢視、area 議題區識別碼、policy 政見識別碼、candidate 候選人識別碼（候選人資料卡）、q 關鍵字、district 適用行政區。
 export function parseSearch(search) {
   const params = new URLSearchParams(search);
   const view = params.get('view');
@@ -11,16 +11,18 @@ export function parseSearch(search) {
     view: VIEWS.includes(view) ? view : null,
     area: params.get('area') || null,
     policy: params.get('policy') || null,
+    candidate: params.get('candidate') || null,
     query: params.get('q') ?? '',
     district: params.get('district') ?? '',
   };
 }
 
-export function formatSearch({ view, area, policy, query, district }) {
+export function formatSearch({ view, area, policy, candidate, query, district }) {
   const params = new URLSearchParams();
   if (view) params.set('view', view);
   if (area) params.set('area', area);
   if (policy) params.set('policy', policy);
+  if (candidate) params.set('candidate', candidate);
   if (query) params.set('q', query);
   if (district) params.set('district', district);
   const text = params.toString();

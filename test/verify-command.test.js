@@ -233,3 +233,41 @@ test('品牌用語清單不存在時以非零結束碼退出', () => {
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /brand-terms/);
 });
+
+const readCandidates = (rawDir) => JSON.parse(readFileSync(join(rawDir, 'candidates.json'), 'utf8'));
+const profileOf = (rawDir, id) => readCandidates(rawDir).find((c) => c.id === id).profile;
+
+function editProfile(rawDir, id, change) {
+  const candidates = readCandidates(rawDir);
+  change(candidates.find((c) => c.id === id).profile);
+  writeFileSync(join(rawDir, 'candidates.json'), JSON.stringify(candidates));
+}
+
+test('核對指令也對候選人資料跑逐字比對，結果寫回 candidates.json，不通過時指出哪一項', () => {
+  const rawDir = copySample();
+  editProfile(rawDir, 'sample-yi', (profile) => {
+    profile.verification = { layer1: { status: 'pending', checkedAt: null } };
+    profile.experience[1] = '範例志工隊總隊長';
+  });
+
+  const { code, output } = verify(rawDir);
+
+  assert.equal(code, 0, output);
+  assert.deepEqual(profileOf(rawDir, 'sample-jia').verification, { layer1: { status: 'pass', checkedAt: '2026-10-24' } });
+  assert.deepEqual(profileOf(rawDir, 'sample-yi').verification, { layer1: { status: 'fail', checkedAt: '2026-10-24' } });
+  assert.match(output, /sample-yi 候選人資料：逐字比對不通過；experience\[1\] 未逐字出現在出處 sample-bulletin-yi 的快照中/);
+});
+
+test('--profiles-only 只比對候選人資料，不核對政見、不呼叫 claude；--candidate 限定候選人', () => {
+  const rawDir = copySample();
+  const policiesBefore = readPolicies(rawDir, 'sample-jia');
+  const bingBefore = profileOf(rawDir, 'sample-bing');
+
+  const { code, output, calls } = verify(rawDir, ['--profiles-only', '--candidate', 'sample-jia', '--date', '2026-10-25']);
+
+  assert.equal(code, 0, output);
+  assert.equal(calls.length, 0);
+  assert.deepEqual(readPolicies(rawDir, 'sample-jia'), policiesBefore);
+  assert.equal(profileOf(rawDir, 'sample-jia').verification.layer1.checkedAt, '2026-10-25');
+  assert.deepEqual(profileOf(rawDir, 'sample-bing'), bingBefore);
+});

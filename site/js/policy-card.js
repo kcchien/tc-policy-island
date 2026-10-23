@@ -2,13 +2,16 @@
 // 桌面為置中對話框，800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js）。
 
 import { el } from './dom.js';
-import { bindSheetDrag, snapSheet } from './sheet.js';
+import { bindSheetDialog } from './sheet.js';
 
 const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
 
+// 第一層（逐字比對）的結果與日期，政見卡片與候選人資料卡共用。
+export const layer1StatusText = ({ status, checkedAt }) => `${STATUS_TEXT[status]}${checkedAt ? `（${checkedAt}）` : ''}`;
+
 export function verificationText({ layer1, layer2 }) {
   return [
-    `第一層 逐字比對：${STATUS_TEXT[layer1.status]}${layer1.checkedAt ? `（${layer1.checkedAt}）` : ''}`,
+    `第一層 逐字比對：${layer1StatusText(layer1)}`,
     `第二層 檢核表${layer2.checklistVersion ? `（版本 ${layer2.checklistVersion}）` : ''}：${STATUS_TEXT[layer2.status]}` +
       (layer2.checkedAt ? `（${layer2.model}，${layer2.checkedAt}）` : ''),
   ];
@@ -96,7 +99,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': '切換卡片高度' });
   const dialog = el(
     'dialog',
-    { class: 'policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },
+    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },
     el(
       'div',
       { class: 'card-inner' },
@@ -105,21 +108,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       body,
     ),
   );
-  const snapTo = (snap) => {
-    if (snap === 'closed') dialog.close();
-    else dialog.dataset.snap = snap;
-  };
-  bindSheetDrag(handle, dialog, { onSnap: snapTo });
-  // 觸控與滑鼠由 bindSheetDrag 處理；鍵盤操作的 click（detail 為 0）在這裡切換。
-  handle.addEventListener('click', (event) => {
-    if (event.detail === 0) snapTo(snapSheet({ from: dialog.dataset.snap, fraction: 0, moved: false }));
-  });
-  closeButton.addEventListener('click', () => dialog.close());
-  // 點對話框外的遮罩關閉。
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
-  });
-  dialog.addEventListener('close', () => onClose());
+  bindSheetDialog(dialog, { handle, closeButton, onClose });
 
   return {
     element: dialog,

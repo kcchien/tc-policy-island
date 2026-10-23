@@ -6,7 +6,14 @@ import { el } from './dom.js';
 import { NO_MATCH_TEXT } from './filter.js';
 import { rawPolicyItemsText } from './policy-card.js';
 
-function candidateHeader(candidate) {
+function candidateButton(candidate, label, onOpenCandidate) {
+  const button = el('button', { type: 'button', class: 'area-open candidate-open' }, label);
+  button.addEventListener('click', () => onOpenCandidate(candidate.id));
+  return button;
+}
+
+function candidateHeader(candidate, onOpenCandidate) {
+  const button = candidateButton(candidate, '看候選人資料', onOpenCandidate);
   const meta = [
     candidate.party,
     candidate.ballotNumber === null ? null : `${candidate.ballotNumber} 號`,
@@ -18,6 +25,8 @@ function candidateHeader(candidate) {
     { scope: 'col', role: 'columnheader', class: 'candidate-col' },
     el('span', { class: 'candidate-name' }, candidate.name),
     ...meta.map((text) => el('span', { class: 'candidate-meta' }, text)),
+    // 按鈕放在資料狀態說明之前，三欄的按鈕才會在同一高度。
+    button,
     candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
   );
 }
@@ -64,9 +73,21 @@ function areaHeader(row, onOpenCard) {
   );
 }
 
-export function renderTable(container, vm, { onOpenCard }) {
+// 800px 以下欄標題隱藏，改由表格上方這排同尺寸按鈕開候選人資料卡；桌面由 CSS 隱藏。
+function candidateStrip(candidates, onOpenCandidate) {
+  return el(
+    'nav',
+    { class: 'candidate-strip', 'aria-label': '看候選人資料' },
+    el('span', { class: 'candidate-strip-label' }, '看候選人資料'),
+    el('span', { class: 'candidate-strip-buttons' }, candidates.map((candidate) => candidateButton(candidate, candidate.name, onOpenCandidate))),
+  );
+}
+
+// onOpenCard(areaId, policyId) 開政見卡片；onOpenCandidate(candidateId) 開候選人資料卡。
+export function renderTable(container, vm, { onOpenCard, onOpenCandidate }) {
+  const strip = candidateStrip(vm.candidates, onOpenCandidate);
   if (vm.rows.length === 0) {
-    container.replaceChildren(el('p', { class: 'empty-result' }, NO_MATCH_TEXT));
+    container.replaceChildren(strip, el('p', { class: 'empty-result' }, NO_MATCH_TEXT));
     return;
   }
   const table = el(
@@ -77,7 +98,7 @@ export function renderTable(container, vm, { onOpenCard }) {
     el(
       'thead',
       { role: 'rowgroup' },
-      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, '議題區'), vm.candidates.map(candidateHeader)),
+      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, '議題區'), vm.candidates.map((candidate) => candidateHeader(candidate, onOpenCandidate))),
     ),
     el(
       'tbody',
@@ -98,5 +119,5 @@ export function renderTable(container, vm, { onOpenCard }) {
       ),
     ),
   );
-  container.replaceChildren(table);
+  container.replaceChildren(strip, table);
 }

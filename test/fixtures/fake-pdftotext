@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+// 抓取指令測試用的假 pdftotext（沒有 .js 副檔名，node --test 不會當成測試檔執行）。
+// 參數同 pdftotext：-f <頁> -l <頁> -enc UTF-8 <輸入 PDF> <輸出文字檔>。
+// 輸出頁碼與測試字型 F356、F357 目前的對照文字，結尾加換頁字元，模擬 pdftotext 的頁尾。
+import { readFileSync, writeFileSync } from 'node:fs';
+import { toUnicodeEntries } from '../../scripts/lib/pdf-text.js';
+
+const args = process.argv.slice(2);
+const page = args[args.indexOf('-f') + 1];
+const [input, output] = args.slice(-2);
+const entries = toUnicodeEntries(readFileSync(input), 'TestSerif-Light');
+writeFileSync(output, `第 ${page} 頁\r\n範例里里長拜訪 ${entries.get('F357')}${entries.get('F356')} 戶\r\n\f`);

@@ -1,0 +1,20 @@
+{
+  "description": "第11屆立法委員選舉選舉公報（臺中市第2選舉區）PDF 的字型 NotoSerifCJKtc-Light，ToUnicode 把 CID F356 到 F35F 對到 U+FFFD。這 10 個字形在 CIDFont 寬度表中是連續、同寬（536）的一組，依序為數字 0 到 9。推定方法與目視比對結果見 data/extraction/records/hung-li-hua.md「候選人資料」。",
+  "fonts": [
+    {
+      "baseFont": "NotoSerifCJKtc-Light",
+      "codes": {
+        "F356": "0",
+        "F357": "1",
+        "F358": "2",
+        "F359": "3",
+        "F35A": "4",
+        "F35B": "5",
+        "F35C": "6",
+        "F35D": "7",
+        "F35E": "8",
+        "F35F": "9"
+      }
+    }
+  ]
+}

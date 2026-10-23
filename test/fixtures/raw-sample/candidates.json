@@ -6,7 +6,16 @@
     "ballotNumber": null,
     "nameStrokes": 8,
     "rawPolicyItems": { "total": 0, "sourceIds": [] },
-    "dataStatus": "尚無一手來源（範例）"
+    "dataStatus": "尚無一手來源（範例）",
+    "profile": {
+      "birthYear": 1961,
+      "education": ["範例國中、範例高級中學"],
+      "experience": ["範例商行負責人，範例同鄉會總幹事。"],
+      "sourceId": "sample-bulletin-bing",
+      "electionYear": 2024,
+      "electionName": "範例選舉（範例第3選舉區）",
+      "verification": { "layer1": { "status": "pass", "checkedAt": "2026-10-23" } }
+    }
   },
   {
     "id": "sample-jia",
@@ -15,7 +24,16 @@
     "ballotNumber": null,
     "nameStrokes": 3,
     "rawPolicyItems": { "total": 2, "sourceIds": ["sample-src-jia"] },
-    "dataStatus": null
+    "dataStatus": null,
+    "profile": {
+      "birthYear": 1972,
+      "education": ["範例大學公共行政學系學士", "範例高中"],
+      "experience": ["範例社區發展協會理事長", "範例里里長"],
+      "sourceId": "sample-bulletin-jia",
+      "electionYear": 2024,
+      "electionName": "範例選舉（範例第1選舉區）",
+      "verification": { "layer1": { "status": "pass", "checkedAt": "2026-10-23" } }
+    }
   },
   {
     "id": "sample-yi",
@@ -24,6 +42,15 @@
     "ballotNumber": null,
     "nameStrokes": 5,
     "rawPolicyItems": { "total": 1, "sourceIds": ["sample-src-yi"] },
-    "dataStatus": null
+    "dataStatus": null,
+    "profile": {
+      "birthYear": 1973,
+      "education": ["範例科技大學資訊工程碩士"],
+      "experience": ["範例公司工程師", "範例志工隊隊長"],
+      "sourceId": "sample-bulletin-yi",
+      "electionYear": 2024,
+      "electionName": "範例選舉（範例第2選舉區）",
+      "verification": { "layer1": { "status": "pass", "checkedAt": "2026-10-23" } }
+    }
   }
 ]
