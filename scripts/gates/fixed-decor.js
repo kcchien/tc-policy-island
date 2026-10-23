@@ -6,19 +6,10 @@ import { islandLayout } from '../../site/js/island-layout.js';
 // 什麼算「裝飾相同」與每個議題區該配哪座主題場景，由 repo 的定義決定，不由受檢的網站模組自己決定。
 import { decorSignature } from '../../site/js/island-decor.js';
 import { heroSceneFor } from '../../site/js/island-heroes.js';
+import { policyVariants } from '../lib/policy-variants.js';
 
 // 網站上的裝飾配置模組。關卡直接載入網站目錄裡的這一份，檢查的就是要上線的程式。
 export const DECOR_MODULE = 'js/island-decor.js';
-
-// 同一份公開資料集換幾種政見內容（與「動態數量固定」關卡相同）：配置只依格子決定，換哪一種都必須得到同樣的結果。
-function policyVariants(dataset) {
-  const firstArea = dataset.issueAreas[0]?.id;
-  return [
-    { name: '沒有任何政見', policies: [] },
-    { name: '政見全部集中在第一個議題區', policies: dataset.policies.map((p) => ({ ...p, issueAreaId: firstArea })) },
-    { name: '每條政見重複三次', policies: dataset.policies.flatMap((p) => [0, 1, 2].map((i) => ({ ...p, id: `${p.id}-${i}` }))) },
-  ];
-}
 
 export default {
   id: 'fixed-decor',
@@ -37,6 +28,7 @@ export default {
       return [`裝飾配置的議題區格子 ${areas.map((t) => t.id).join('、')} 與島上的議題區格子不一致`];
     }
 
+    if (areas.length === 0) return [];
     const failures = [];
     // 每格恰好一座主題場景，題材只看議題區識別碼。
     for (const tile of areas) {

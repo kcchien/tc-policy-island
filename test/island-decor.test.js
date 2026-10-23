@@ -10,6 +10,10 @@ import { forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib
 import { WALKWAY } from '../site/js/island-body.js';
 import { LOOP_CORE, LOOP_SPOTS } from '../site/js/island-motion.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
+import { fileURLToPath } from 'node:url';
+import { loadRawData } from '../scripts/lib/raw-data.js';
+
+const RAW_DIR = fileURLToPath(new URL('../data/raw', import.meta.url));
 
 // 一列三格加第二列兩格、兩格裝飾格（第一格是候選人廣場）。政見由 policies 指定。
 function rawWith(policies) {
@@ -86,12 +90,22 @@ test('裝飾都在步道環內側，彼此不重疊，也不壓到主題場景�
   inside.forEach((a, i) => inside.slice(i + 1).forEach((b) => assert.ok(!touches(a, b), `${a.kind} (${a.x}, ${a.z}) 與 ${b.kind} (${b.x}, ${b.z}) 重疊`)));
 });
 
-test('大樹的樹種依格子順序輪替：相鄰兩格不同，五種以上', () => {
-  const plan = decorPlan(layoutOf(rawWith(FEW)));
-  const species = plan.tiles.map((t) => t.species);
-  species.slice(1).forEach((s, i) => assert.notEqual(s, species[i]));
-  assert.ok(new Set(species).size >= 5);
-  for (const s of species) assert.ok(TREE_SPECIES.includes(s));
+test('大樹的樹種依格子位置決定：島上相鄰的兩格不同，正式資料用到五種以上', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  const plan = decorPlan(layout);
+  const byAxial = new Map(layout.tiles.map((t, i) => [t.axial.join(), plan.tiles[i]]));
+  let pairs = 0;
+  for (const tile of layout.tiles) {
+    for (const [dq, dr] of [[1, 0], [0, 1], [-1, 1]]) {
+      const other = byAxial.get([tile.axial[0] + dq, tile.axial[1] + dr].join());
+      if (!other) continue;
+      pairs += 1;
+      assert.notEqual(byAxial.get(tile.axial.join()).species, other.species, `${tile.id} 與 ${other.id} 樹種相同`);
+    }
+  }
+  assert.ok(pairs > 20);
+  assert.ok(new Set(plan.tiles.map((t) => t.species)).size >= 5);
+  for (const t of plan.tiles) assert.ok(TREE_SPECIES.includes(t.species));
 });
 
 test('裝飾格沒有主題場景，候選人廣場只有路燈', () => {

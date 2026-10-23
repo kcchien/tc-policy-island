@@ -9,12 +9,15 @@ import { MARKER_ROW } from './island-layout.js';
 import { LOOP_CORE, LOOP_SPOTS } from './island-motion.js';
 import { plazaLayout } from './island-plaza.js';
 
-// 大樹的樹種，依格子順序輪替（與議題內容無關），相鄰的島樹種不同。
+// 大樹的樹種，依格子的軸向座標決定（與議題內容無關），島上相鄰的兩格樹種不同。
 export const TREE_SPECIES = ['round', 'conifer', 'blossom', 'fruit', 'palm', 'willow'];
+// 六角格的三色著色：(q - r) 除以 3 的餘數，六個鄰格都和自己不同；再依列的奇偶選前三種或後三種，六種都用得到。
+const mod = (n, m) => ((n % m) + m) % m;
+const speciesAt = ([q, r]) => TREE_SPECIES[mod(q - r, 3) + 3 * mod(r, 2)];
 
 // 裝飾的種類。radius 是底部占地的半徑（場景單位，大樹只算樹幹與樹穴），height 是離島面的最高高度，
-// reach 是最寬處的半徑（大樹的樹冠可以伸出占地範圍）。island-decor-view.js 的模型要守住這些範圍，
-// 標記的視線測試靠它們。small 為 true 的小物件在鏡頭拉遠時隱藏（island-decor-view.js 的 LOD 距離）。
+// reach 是最寬處的半徑（大樹的樹冠可以伸出占地範圍）。island-decor-models.js 的模型要守住這些範圍，
+// 標記的視線測試靠它們。small 為 true 的小物件在鏡頭拉遠時隱藏（LOD_DISTANCE）。
 export const DECOR_KINDS = {
   lamp: { radius: 0.02, height: 0.36, reach: 0.035, small: false },
   tree: { radius: 0.05, height: 0.58, reach: 0.16, small: false },
@@ -26,8 +29,9 @@ export const DECOR_KINDS = {
   stone: { radius: 0.03, height: 0.006, reach: 0.03, small: true },
 };
 
-// 小物件（small）在鏡頭離旋轉中心超過這個距離時隱藏。桌面預設視角約 29 還看得到，手機直式的預設視角（約 44 以上）隱藏。
-export const LOD_DISTANCE = 30;
+// 小物件（small）在鏡頭離旋轉中心超過這個距離時隱藏。桌面預設視角約 29 還看得到（留一點餘裕），
+// 手機直式的預設視角（約 44 以上）小物件只剩一兩個像素，隱藏省效能，拉近就出現。
+export const LOD_DISTANCE = 34;
 
 // 步道環內緣（市民走在步道內側，身寬約 0.03）：裝飾的占地要在這條線內側。值是格心到邊的距離。
 export const DECOR_LIMIT = WALKWAY_APOTHEM - WALKWAY.width / 2 - 0.015;
@@ -107,7 +111,7 @@ function decorativeItems(tile, isPlaza) {
   return rimPlants([tile.elementSlot], []);
 }
 
-// 每格的靜態裝飾。layout 是 islandLayout 的結果，只用 tiles 的 id、kind、position、heroSlot、elementSlot。
+// 每格的靜態裝飾。layout 是 islandLayout 的結果，只用 tiles 的 id、kind、axial、position、heroSlot、elementSlot。
 // tiles[]：{ id, kind, center, species（大樹樹種）, hero（議題區格子的主題場景擺放，其他為 null）, items[] }，
 // items 的 x、z 相對格心，yaw 是繞 y 轉的角度（與 three.js 同向）。路燈來自島體（island-body.js）。
 export function decorPlan(layout) {
@@ -115,7 +119,7 @@ export function decorPlan(layout) {
   const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
   const plazaId = plazaLayout(layout).tile?.id;
   const area = areaItems();
-  const tiles = layout.tiles.map(({ id, kind, position, elementSlot }, index) => {
+  const tiles = layout.tiles.map(({ id, kind, axial, position, elementSlot }) => {
     const lamps = body.lamps.filter((lamp) => lamp.tileId === id)
       .map((lamp) => withShape({ kind: 'lamp', x: lamp.x - position.x, z: lamp.z - position.z }));
     const items = kind === 'area' ? area : decorativeItems({ elementSlot }, id === plazaId);
@@ -123,7 +127,7 @@ export function decorPlan(layout) {
       id,
       kind,
       center: { x: position.x, z: position.z },
-      species: TREE_SPECIES[index % TREE_SPECIES.length],
+      species: speciesAt(axial),
       hero: heroes.get(id) ?? null,
       items: [...lamps, ...items.map((item) => ({ ...item }))],
     };

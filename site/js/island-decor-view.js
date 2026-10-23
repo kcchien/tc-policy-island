@@ -6,34 +6,12 @@ import * as THREE from 'three';
 import { decorPlan } from './island-decor.js';
 import { DECOR_COLORS, decorModel } from './island-decor-models.js';
 import { buildHeroScene } from './island-hero-view.js';
-import { glowSourceMaterial, kitShape } from './island-kit.js';
+import { kitPartMesh } from './island-kit.js';
 
 // 光池：路燈下貼地的圓形暖光，加法混合，亮度隨夜間係數。
 const POOL_RADIUS = 0.15;
 const POOL_OPACITY = 0.3;
 const POOL_LIFT = 0.008;
-
-const materials = new Map();
-// 同色共用材質；instancify 只讀顏色，合批後換成黏土材質。
-function clay(color) {
-  if (!materials.has(color)) materials.set(color, new THREE.MeshStandardMaterial({ color }));
-  return materials.get(color);
-}
-
-// 一個零件 → Mesh：平移 at · 繞 y 轉 yaw · rot · 縮放 size（與 island-heroes.js 的 partBounds 相同）。
-function partMesh(part) {
-  const { geometry, glow } = kitShape(part.shape);
-  const color = DECOR_COLORS[part.color];
-  const mesh = new THREE.Mesh(geometry, glow ? glowSourceMaterial(color) : clay(color));
-  const [rx = 0, ry = 0, rz = 0] = part.rot ?? [];
-  const rotation = new THREE.Matrix4().makeRotationY(part.yaw ?? 0)
-    .multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rx, ry, rz)));
-  mesh.matrix.makeTranslation(...part.at).multiply(rotation).scale(new THREE.Vector3(...part.size));
-  mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
-  mesh.castShadow = !glow;
-  mesh.receiveShadow = !glow;
-  return mesh;
-}
 
 // scene 是島嶼場景；layout 是 islandLayout 的結果；groupOf(tileId) 回傳每格的群組（含裝飾格）；surface 是島面高度。
 // 回傳 { setNight(night), setLift(tileId, y) }：光池的亮度與選取抬高。
@@ -49,7 +27,7 @@ export function createDecor(scene, layout, { groupOf, surface }) {
     }
     for (const item of tile.items) {
       const model = new THREE.Group();
-      for (const part of decorModel(item.kind, tile.species)) model.add(partMesh(part));
+      for (const part of decorModel(item.kind, tile.species)) model.add(kitPartMesh(part, DECOR_COLORS));
       model.position.set(item.x, surface, item.z);
       model.rotation.y = item.yaw;
       if (item.small) model.userData.lod = 'small';

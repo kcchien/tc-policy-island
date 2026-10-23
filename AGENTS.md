@@ -43,7 +43,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
   js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
   js/island-models.js  在地感元素、標記（markerSign 小立牌）與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
-  js/island-decor.js   靜態裝飾配置（Node 可測）：每格的主題場景擺放、路燈、大樹（樹種依格子順序輪替）、花台、長椅、盆栽與踏石的位置，每種裝飾的高度與寬度上限、小物件的隱藏距離（LOD_DISTANCE）；不讀政見，受關卡「裝飾數量固定」檢查（關卡也要載入它 import 的 island-body、island-heroes、island-layout、island-motion、island-plaza）
+  js/island-decor.js   靜態裝飾配置（Node 可測）：每格的主題場景擺放、路燈、大樹（樹種依格子位置，相鄰格不同）、花台、長椅、盆栽與踏石的位置，每種裝飾的高度與寬度上限、小物件的隱藏距離（LOD_DISTANCE）；不讀政見，受關卡「裝飾數量固定」檢查（關卡也要載入它 import 的 island-body、island-heroes、island-layout、island-motion、island-plaza）
   js/island-decor-models.js 靜態裝飾的零件資料與色碼 DECOR_COLORS（Node 可測，格式同主題場景）
   js/island-decor-view.js 靜態裝飾畫成 3D：主題場景、裝飾零件（之後合批，小物件另成幾桶依鏡頭距離隱藏）、夜間路燈光池
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）

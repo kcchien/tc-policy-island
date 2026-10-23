@@ -73,6 +73,29 @@ export function glowSourceMaterial(color) {
   return m;
 }
 
+const clayMaterials = new Map();
+// 同色共用材質；instancify 只讀顏色，合批後換成黏土材質。
+function clay(color) {
+  if (!clayMaterials.has(color)) clayMaterials.set(color, new THREE.MeshStandardMaterial({ color }));
+  return clayMaterials.get(color);
+}
+
+// 零件資料（island-heroes.js 的格式 { shape, color, size, at, rot?, yaw? }）→ Mesh，color 依 colors 色表換成色碼。
+// 變換是「平移 at · 繞 y 轉 yaw · rot · 縮放 size」（與 island-heroes.js 的 partBounds 相同）。主題場景與靜態裝飾共用。
+export function kitPartMesh(part, colors) {
+  const { geometry, glow } = kitShape(part.shape);
+  const color = colors[part.color];
+  const mesh = new THREE.Mesh(geometry, glow ? glowSourceMaterial(color) : clay(color));
+  const [rx = 0, ry = 0, rz = 0] = part.rot ?? [];
+  const rotation = new THREE.Matrix4().makeRotationY(part.yaw ?? 0)
+    .multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rx, ry, rz)));
+  mesh.matrix.makeTranslation(...part.at).multiply(rotation).scale(new THREE.Vector3(...part.size));
+  mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
+  mesh.castShadow = !glow;
+  mesh.receiveShadow = !glow;
+  return mesh;
+}
+
 // 主題場景零件庫的形體（kitShape 建的幾何）：用黏土材質並加縮放微抖動。
 // 其他零件（格子、在地感元素、路燈、路面）維持原本的低多邊形 flatShading，不受影響。
 const isClayShape = (shape) => shape.startsWith('kit:');

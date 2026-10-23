@@ -83,7 +83,8 @@ test('主題場景放進每島的主題場景位置：外框在位置範圍內�
     assert.equal(s, slot.size, `${hero.areaId} 放大 ${s}，與位置大小不同`);
     // 外框（單位空間 ±0.5 內）放大後在位置的底面範圍內。
     for (const x of [min[0], max[0]]) assert.ok(Math.abs(hero.transform.x - tile.position.x - slot.x + x * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 東西超出`);
-    for (const z of [min[2], max[2]]) assert.ok(Math.abs(hero.transform.z - tile.position.z - slot.z + z * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 南北超出`);  }
+    for (const z of [min[2], max[2]]) assert.ok(Math.abs(hero.transform.z - tile.position.z - slot.z + z * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 南北超出`);
+  }
 });
 
 test('主題場景的色碼都不落在禁用色範圍', () => {

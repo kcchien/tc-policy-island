@@ -173,6 +173,7 @@ const SURFACE = 0.44;
 // 北側的主題場景與在地感元素最南到哪裡。
 const ELEMENT_MAX_Z = Math.max(TILE_SLOTS.hero.z + TILE_SLOTS.hero.size / 2, TILE_SLOTS.element.area.maxZ);
 const RAW_DIR = fileURLToPath(new URL('../data/raw', import.meta.url));
+// 取立牌立柱的低處（牌面中心約在島面上 0.25），比牌面難看到，檢查較嚴。
 const MARKER_TOP = SURFACE + 0.08;
 // 障礙物是直立圓柱 { x, z, radius, bottom?, height }，或軸對齊的盒子 { min: [x, y, z], max }（y 從格子頂面量起）。
 function blocked(from, camera, obstacle) {
