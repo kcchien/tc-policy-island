@@ -3,8 +3,8 @@
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 
-// 篩選中某格沒有符合的政見。與 no-policies（該候選人在此區未提出相關政見）分開，避免誤導。
-export const NO_MATCH_TEXT = '沒有符合篩選條件的政見';
+// 篩選中某格沒有符合的政見時 status 為 no-matches，畫面用 ui-text.js 的 NO_MATCH_TEXT，
+// 與 no-policies（該候選人在此區未提出相關政見）分開，避免誤導。
 
 // 全形轉半形、英文字母轉小寫。
 const normalize = (text) => text.normalize('NFKC').toLowerCase();

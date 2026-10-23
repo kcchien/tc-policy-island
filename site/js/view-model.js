@@ -2,8 +2,7 @@
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
 import { CANDIDATE_ORDER_RULES, SOURCE_TYPES } from './dataset.js';
-
-export const NO_POLICY_LABEL = '未提出相關政見';
+import { noPolicyText } from './ui-text.js';
 
 // 出處快照放在公開資料集（site/data/dataset.json）旁的 snapshots/，檔名沿用原快照檔名。
 // 建置指令依此複製檔案，卡片依此產生連結。
@@ -59,7 +58,7 @@ export function buildViewModel(dataset) {
   }));
   return {
     meta: dataset.meta,
-    noPolicyText: `${NO_POLICY_LABEL}（截至 ${dataset.meta.dataCutoffDate}）`,
+    noPolicyText: noPolicyText(dataset.meta.dataCutoffDate),
     candidateOrderNote: CANDIDATE_ORDER_RULES[dataset.meta.candidateOrder].note,
     candidates,
     rows,

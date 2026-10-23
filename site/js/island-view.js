@@ -26,6 +26,7 @@ import { figurePose, plazaLayout } from './island-plaza.js';
 import { heroPlan } from './island-heroes.js';
 import { buildHeroScene } from './island-hero-view.js';
 import { el } from './dom.js';
+import { ISLAND_TEXT } from './ui-text.js';
 
 const FOV = 32;
 // 窄畫面的名牌改成直書（見 LABEL_NARROW）。預設視角的俯角與方位角由 island-camera.js 的 homeView 依長寬比決定。
@@ -156,7 +157,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       return button;
     });
     const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' },
-      el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, '候選人廣場'), ...entries)));
+      el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, ISLAND_TEXT.plaza), ...entries)));
     sign.position.set(plaza.sign.x, TILE_SURFACE, plaza.sign.z);
     scene.add(sign);
   }

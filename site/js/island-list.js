@@ -2,17 +2,16 @@
 // 清單的編號與標記狀態與島上的名牌、標記同樣來自 island-layout.js，不呈現政見數量。
 
 import { el } from './dom.js';
-import { NO_MATCH_TEXT } from './filter.js';
-import { NO_POLICY_LABEL } from './view-model.js';
 import { islandLayout, markerLegend } from './island-layout.js';
+import { MARKER_TEXT, NO_MATCH_TEXT, NO_POLICY_LABEL } from './ui-text.js';
 
 function markerBadge(marker, offText) {
-  const state = marker.lit ? '有政見' : offText;
+  const state = marker.lit ? MARKER_TEXT.lit : offText;
   return el(
     'span',
-    { class: `marker-badge${marker.lit ? ' is-lit' : ''}`, 'data-candidate': marker.candidateId, 'data-lit': String(marker.lit), title: `${marker.name}：${state}` },
+    { class: `marker-badge${marker.lit ? ' is-lit' : ''}`, 'data-candidate': marker.candidateId, 'data-lit': String(marker.lit), title: MARKER_TEXT.state(marker.name, state) },
     el('span', { 'aria-hidden': 'true' }, marker.symbol),
-    el('span', { class: 'visually-hidden' }, `${marker.name}${state}`),
+    el('span', { class: 'visually-hidden' }, MARKER_TEXT.spoken(marker.name, state)),
   );
 }
 
@@ -21,7 +20,7 @@ export function renderLegend(container, vm) {
     ...markerLegend(vm).map((entry) =>
       el('li', { class: 'legend-item' }, el('span', { class: 'marker-badge is-lit', 'aria-hidden': 'true' }, entry.symbol), entry.name),
     ),
-    el('li', { class: 'legend-item legend-note' }, '亮起表示有政見，灰色表示沒有；標記不表示政見多寡。'),
+    el('li', { class: 'legend-item legend-note' }, MARKER_TEXT.legendNote),
   );
 }
 
