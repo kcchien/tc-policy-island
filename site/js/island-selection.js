@@ -3,17 +3,20 @@
 
 import * as THREE from 'three';
 import { PALETTE, TILE_SURFACE } from './island-models.js';
+import { SEA_LEVEL } from './island-terrain.js';
+import { CHANNEL_WIDTH, ISLAND_APOTHEM } from './island-body.js';
 
-// 外框沿格子頂面的邊；光環平放在選中格子（抬高）外圈、相鄰格子的頂面上。
-// 外框外緣與格子頂面外緣（hexTile 頂面半徑 0.96~0.98 倍格徑）切齊。
-const OUTLINE_OUTER = 0.97;
-const OUTLINE_WIDTH = 0.07;
-// 外框用格子側面的赭色，光環用稍亮的紅土色；都是 PALETTE 裡已過禁用色檢查的色碼。
+// 外框沿島頂面的邊；光環平放在選中的島外圈的水面上（島之間是水道）。
+// 外框外緣與島頂面外緣（路緣）切齊。
+const OUTLINE_OUTER = 1;
+const OUTLINE_WIDTH = 0.06;
+// 外框用深赭色，光環用稍亮的紅土色；都是 PALETTE 裡已過禁用色檢查的色碼。
 const OUTLINE_COLOR = PALETTE.landSide;
 const RING_COLOR = PALETTE.laterite;
-const RING_INNER = 0.98;
-const RING_OUTER = 1.3;
-const RING_Y = TILE_SURFACE + 0.006;
+// 光環外緣到水道正中為止（以島外接半徑的倍數表示），不伸到鄰島底下。
+const RING_INNER = 1;
+const RING_OUTER = (ISLAND_APOTHEM + CHANNEL_WIDTH / 2) / ISLAND_APOTHEM;
+const RING_Y = SEA_LEVEL + 0.012;
 // 呼吸：透明度在 0.24~0.60 之間，約 2.6 秒一個循環。
 const breath = (t) => 0.42 + Math.sin(t * 2.4) * 0.18;
 const HOVER_OPACITY = 0.55;

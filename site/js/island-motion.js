@@ -2,6 +2,8 @@
 // 動態數量固定（ADR 0001）：每個議題區格子的動態元素數量與強度相同，配置只讀格子的種類、順序與位置，
 // 不讀標記亮暗與政見。上線關卡「動態數量固定」會換一份政見資料重算，結果必須相同。
 
+import { islandBody, outerLoop, WALKWAY_APOTHEM } from './island-body.js';
+
 // 循環動畫的題材，依議題區格子的順序輪替，與議題內容無關。
 export const MOTION_THEMES = [
   { id: 'windmill', name: '風車' },
@@ -28,10 +30,11 @@ export const MOTION_LEVELS = {
 };
 
 // 循環道具的位置（相對格心）：格子東西兩側、標記列北邊，左右對稱，與三個標記的距離對稱。
-// 放大後底座仍不進元素區（z ≤ 0.24，見 island-models.js 的 ELEMENT_AREA）、不碰標記與市民路線，測試會檢查。
+// 放大後底座仍不進北側的主題場景與元素區（z ≤ 0.24，見 island-body.js 的 TILE_SLOTS）、不碰標記與市民路線，測試會檢查。
 export const LOOP_SPOTS = [{ x: -0.7, z: 0.34 }, { x: 0.7, z: 0.34 }];
-// 市民走的路線：沿格子的六條邊，比格線往格內縮一點，避開路燈與標記。值是格心到邊的距離。
-export const CITIZEN_APOTHEM = 0.845;
+// 市民走的路線：沿自己那座島的步道環，走在中線內側 CITIZEN_INSET（車輛走外側車道）。值是格心到邊的距離。
+const CITIZEN_INSET = 0.075;
+export const CITIZEN_APOTHEM = WALKWAY_APOTHEM - CITIZEN_INSET;
 
 // 道具與市民的放大倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率，讓全景第一眼就看得到動態。
 // 倍率是動態強度的一部分，每格相同（motionSignature 會比對）。
@@ -49,10 +52,11 @@ export const LOOP_REACH_FROM = 0.18 * LOOP_SCALE;
 export const CITIZEN_HEIGHT = 0.006 + (0.16 + 0.006) * CITIZEN_SCALE;
 export const CITIZEN_RADIUS = 0.025 * CITIZEN_SCALE;
 
-// 環線（公車與火車）：繞島外緣一圈，在格子外側、貼著水面的堤上，不壓到標記與路燈。
-// 值是環線中心離格線的距離；兩條車道各往內外偏 RING_LANE。
-export const RING_OFFSET = 0.17;
-export const RING_LANE = 0.045;
+// 環線（公車與火車）：沿步道環與橋繞整群島的外側一圈（island-body.js 的 outerLoop），過橋時跟著拱起。
+// 車道是離步道中線往外的距離：火車走外側，公車靠中線，市民走內側，三者不重疊。
+export const RING_LANES = { train: 0.05, bus: -0.012 };
+// 車身半寬（island-motion-view.js 依此建車身），測試用來確認車道不出步道、不穿過橋的欄杆與路燈。
+export const VEHICLE_HALF_WIDTH = { train: 0.035, bus: 0.0325 };
 
 // 尖頂六角格的六個頂點（相對格心），從東南起逆時針（俯視時 +z 朝下，所以是順時針繞）。
 function hexVertices(apothem) {
@@ -89,54 +93,12 @@ export function motionPlan(layout, { level = 'high' } = {}) {
       pathLength: pathLength(path),
     };
   });
-  const { roads, ring } = roadNetwork(layout);
+  const ring = outerLoop(islandBody(layout));
   const vehicles = [
-    ...Array.from({ length: counts.trains }, (_, i) => ({ kind: 'train', phase: i / counts.trains, speed: TRAIN_SPEED, direction: 1, lane: RING_LANE, cars: 3 })),
-    ...Array.from({ length: counts.buses }, (_, i) => ({ kind: 'bus', phase: (i + 0.5) / counts.buses, speed: BUS_SPEED, direction: -1, lane: -RING_LANE, cars: 1 })),
+    ...Array.from({ length: counts.trains }, (_, i) => ({ kind: 'train', phase: i / counts.trains, speed: TRAIN_SPEED, direction: 1, lane: RING_LANES.train, cars: 3 })),
+    ...Array.from({ length: counts.buses }, (_, i) => ({ kind: 'bus', phase: (i + 0.5) / counts.buses, speed: BUS_SPEED, direction: -1, lane: RING_LANES.bus, cars: 1 })),
   ];
-  return { level, tiles, roads, ring, ringLength: pathLength(ring), vehicles };
-}
-
-const keyOf = ([x, z]) => `${Math.round(x * 1e4) + 0},${Math.round(z * 1e4) + 0}`;
-
-// 路網與環線。每條格子邊一段路，shared 表示兩格共用（格子間的路）；
-// 只屬於一格的邊是島的外緣，依格子頂點順序首尾相接成一圈，往外推 RING_OFFSET 就是環線。
-function roadNetwork(layout) {
-  const edges = new Map();
-  for (const { position } of layout.tiles) {
-    const vertices = hexVertices((layout.hexSize * Math.sqrt(3)) / 2).map(([x, z]) => [position.x + x, position.z + z]);
-    vertices.forEach((from, i) => {
-      const to = vertices[(i + 1) % 6];
-      const key = [keyOf(from), keyOf(to)].sort().join('|');
-      const mid = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2];
-      const length = Math.hypot(mid[0] - position.x, mid[1] - position.z);
-      const outward = [(mid[0] - position.x) / length, (mid[1] - position.z) / length];
-      if (edges.has(key)) edges.get(key).shared = true;
-      else edges.set(key, { from, to, shared: false, outward });
-    });
-  }
-  const roads = [...edges.values()];
-
-  // 外緣的邊依起點索引，從任一條開始接成一圈；有多圈時取最長的一圈。
-  const byStart = new Map(roads.filter((r) => !r.shared).map((r) => [keyOf(r.from), r]));
-  const seen = new Set();
-  let longest = [];
-  for (const startKey of byStart.keys()) {
-    const loop = [];
-    for (let key = startKey; !seen.has(key) && byStart.has(key); key = keyOf(byStart.get(key).to)) {
-      seen.add(key);
-      loop.push(byStart.get(key));
-    }
-    if (loop.length > longest.length) longest = loop;
-  }
-  // 每個頂點沿前後兩條邊的外法線平均方向往外推，與兩條邊的距離都是 RING_OFFSET。
-  const ring = longest.map((edge, i) => {
-    const prev = longest[(i - 1 + longest.length) % longest.length].outward;
-    const next = edge.outward;
-    const k = RING_OFFSET / (1 + prev[0] * next[0] + prev[1] * next[1]);
-    return [edge.from[0] + (prev[0] + next[0]) * k, edge.from[1] + (prev[1] + next[1]) * k];
-  });
-  return { roads, ring };
+  return { level, tiles, ring, ringLength: pathLength(ring), vehicles };
 }
 
 // 封閉折線的總長。
@@ -158,7 +120,10 @@ export function pointAlong(points, s, { lane = 0, total = pathLength(points) } =
     if (rest <= length || i === points.length - 1) {
       const k = length === 0 ? 0 : rest / length;
       const [dx, dz] = [(nx - x) / length, (nz - z) / length];
-      return { x: x + (nx - x) * k - dz * lane, z: z + (nz - z) * k + dx * lane, heading: Math.atan2(dz, dx) };
+      const pose = { x: x + (nx - x) * k - dz * lane, z: z + (nz - z) * k + dx * lane, heading: Math.atan2(dz, dx) };
+      // 點有第三個值（高度，例如過橋的拱起）時一併內插。
+      if (points[i].length > 2) pose.y = points[i][2] + (points[(i + 1) % points.length][2] - points[i][2]) * k;
+      return pose;
     }
     rest -= length;
   }

@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, tileCorners, viewOffset,
+  cameraLimits, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, viewOffset,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -121,23 +121,11 @@ test('尖頂六角格：q 往東、r 往南，相鄰格距離相同；裝飾格�
   assert.ok(south.z > a.z);
   const dist = (p, q) => Math.hypot(p.x - q.x, p.z - q.z);
   assert.ok(Math.abs(dist(a, east) - dist(a, south)) < 1e-9);
-  assert.ok(Math.abs(dist(a, east) - Math.sqrt(3) * layout.hexSize) < 1e-9);
+  assert.ok(Math.abs(dist(a, east) - Math.sqrt(3) * layout.spacing) < 1e-9);
+  // 格距比島大：相鄰島之間有水道。
+  assert.ok(layout.spacing > layout.hexSize);
   assert.equal(byId['tile-south'].kind, 'decorative');
   assert.deepEqual(byId['tile-south'].markers, []);
-});
-
-test('格子頂點（路燈位置）：相鄰格共用的頂點只算一次', () => {
-  const two = islandLayout(viewModelOf(makeRaw()));
-  const raw = makeRaw();
-  raw.decorativeTiles = [{ id: 'tile-south', axial: [0, 1], localElementId: null }];
-  const three = islandLayout(viewModelOf(raw));
-
-  // 兩格相鄰共用 2 個頂點：12 - 2；三格兩兩相鄰、中間 1 個頂點三格共用：18 - 3 - 2。
-  assert.equal(tileCorners(two).length, 10);
-  assert.equal(tileCorners(three).length, 13);
-  const [x, z] = tileCorners(two)[0];
-  const nearest = Math.min(...two.tiles.map((t) => Math.hypot(t.position.x - x, t.position.z - z)));
-  assert.ok(Math.abs(nearest - two.hexSize) < 1e-9);
 });
 
 test('島的範圍涵蓋所有格子，中心在範圍正中', () => {
