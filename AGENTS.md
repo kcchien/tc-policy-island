@@ -44,6 +44,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
   js/island-clock.js   動畫迴圈時間：統一推進、暫停、減少動態停在固定畫格；後續動畫一律用它註冊（Node 可測）
+  js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、直式全景的俯角與方位角
+  js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框；控制介面的 setCover 接卡片位置
   js/island-parts.js   零件分桶規則（Node 可測）
   js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質

@@ -219,6 +219,10 @@ function startApp(vm, state, initialView) {
           insets: stageInsets,
         });
         controller.update(filtered);
+        // 卡片開關、手機抽屜換段或拖曳時，畫面偏移跟著卡片遮住的範圍走。
+        const syncCover = () => controller.setCover(card.element.open ? card.element.getBoundingClientRect() : null);
+        new ResizeObserver(syncCover).observe(card.element);
+        card.element.addEventListener('close', syncCover);
         controller.setTimeOfDay?.(hud.time);
         controller.setPaused?.(hud.paused);
         document.getElementById('island-status').remove();

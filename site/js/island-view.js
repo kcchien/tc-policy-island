@@ -4,7 +4,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
+import { cameraLimits, flightPlan, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
+import { approachInsets, combineInsets, coverInsets, createCameraFlight, homeView, isDrag, sameInsets } from './island-camera.js';
+import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
 import { createDaylight } from './island-daylight.js';
 import { createAnimator } from './island-clock.js';
@@ -14,14 +16,10 @@ import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetL
 import { el } from './dom.js';
 
 const FOV = 32;
-// 預設視角的仰角（與正上方的夾角）。窄畫面看得比較正上方，上下兩列的名牌才拉得開。
-const POLAR_WIDE = 0.68;
-const POLAR_NARROW = 0.42;
+// 窄畫面的名牌改成直書（見 LABEL_NARROW）。全景的俯角與方位角由 island-camera.js 的 homeView 依長寬比決定。
 const NARROW_WIDTH = 600;
 // 飛到議題區時鏡頭與格子的距離。
 const FOCUS_DISTANCE = 14;
-// 按下與放開的位移在這個像素內才算點選，超過算拖曳旋轉。
-const CLICK_SLOP = 6;
 // 議題區名牌的錨點（相對格心）。寬畫面的橫書名牌浮在元素北側上方；
 // 窄畫面的直書名牌往上長，錨點放在格心正北，名牌落在南北兩列格子的標記之間，不蓋住標記。
 const LABEL_WIDE = new THREE.Vector3(0, TILE_SURFACE + 1.35, -0.45);
@@ -116,6 +114,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
   const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
   pickable.push(...kit.meshes);
+  const selection = createSelection(scene, { hexSize: layout.hexSize, addAnimation: (fn) => animator.add(fn) });
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 400);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -125,7 +124,14 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   controls.zoomSpeed = 0.8;
 
   let renderPending = false;
-  let flight = null;
+  const flight = createCameraFlight();
+  // 畫面偏移：base 是工具列與索引面板（resize 時讀），cover 是政見卡片遮住的範圍（setCover），
+  // shown 是目前畫面用的卡片偏移，每幀平滑跟上 cover。
+  let baseInsets = { top: 0, right: 0, bottom: 0, left: 0 };
+  let cover = { ...baseInsets };
+  let shown = { ...baseInsets };
+  let stageSize = { width: 0, height: 0 };
+  let lastFrame = null;
   // 最近一次飛往的議題區格心；還沒飛過時是 null，旋轉中心就是預設視角的中心。
   let focus = null;
   // 使用者縮遠時把旋轉中心移回預設視角的中心（orbitCenter），鏡頭與中心一起平移，視角不變。
@@ -142,8 +148,20 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   const render = () => {
     renderPending = false;
     const now = performance.now();
-    if (flight) stepFlight(now);
-    else recenter();
+    const dt = lastFrame === null ? 0 : Math.min(0.25, (now - lastFrame) / 1000);
+    lastFrame = now;
+    const pose = flight.step(now);
+    if (pose) {
+      controls.target.copy(pose.target);
+      camera.position.copy(pose.position);
+    } else {
+      recenter();
+    }
+    const shifting = !sameInsets(shown, cover);
+    if (shifting) {
+      shown = approachInsets(shown, cover, dt, { reducedMotion: reducedMotion() });
+      applyOffset();
+    }
     const moving = controls.update();
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
@@ -156,13 +174,14 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
     // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
-    const continuous = moving || flight || !settled || animating;
+    const continuous = moving || flight.active || shifting || !settled || animating;
     if (continuous) {
       const next = governor.frame(now);
       if (next) applyQuality(next);
       requestRender();
     } else {
       governor.pause();
+      lastFrame = null;
     }
   };
   // 執行中降級：降像素比、關毛玻璃（.lowfx）、降低陰影更新頻率。
@@ -180,26 +199,34 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
 
   // 依畫面大小決定預設視角（島置中、占畫布約 80%）與距離限制。不能平移，鏡頭只繞著目前的議題區或預設中心轉。
   let home = null;
-  const resize = () => {
-    const { width, height } = stage.getBoundingClientRect();
+  // 投影中心移到沒被遮住的區域正中（浮動元件加上卡片）。只移投影中心，鏡頭位置與畫面縮放都不變。
+  function applyOffset() {
+    const { width, height } = stageSize;
     if (width === 0 || height === 0) return;
-    renderer.setSize(width, height);
-    labelRenderer.setSize(width, height);
-    // 浮動元件遮住的邊緣不算進構圖：投影中心移到沒被遮住的區域正中。
-    const offset = viewOffset({ width, height, insets: insets() });
-    const aspect = offset.visibleAspect;
+    const offset = viewOffset({ width, height, insets: combineInsets(baseInsets, shown, stageSize), canvasFov: FOV });
+    camera.fov = offset.fov;
     camera.aspect = offset.fullWidth / offset.fullHeight;
     camera.setViewOffset(offset.fullWidth, offset.fullHeight, offset.x, offset.y, width, height);
     camera.updateProjectionMatrix();
+  }
+
+  const resize = () => {
+    const { width, height } = stage.getBoundingClientRect();
+    if (width === 0 || height === 0) return;
+    stageSize = { width, height };
+    renderer.setSize(width, height);
+    labelRenderer.setSize(width, height);
+    baseInsets = insets();
+    applyOffset();
     const narrow = width <= NARROW_WIDTH;
-    const polar = narrow ? POLAR_NARROW : POLAR_WIDE;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
-    const visibleFov = (360 / Math.PI) * Math.atan(Math.tan((FOV * Math.PI) / 360) * offset.fovScale);
-    const frame = frameIsland(outline, { fov: visibleFov, aspect, polar, fill: 0.8 });
-    Object.assign(controls, cameraLimits(bounds, frame.distance));
-    home = { polar, distance: frame.distance, target: new THREE.Vector3(frame.target.x, 0, frame.target.z) };
+    // 全景只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
+    const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
+    const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
+    Object.assign(controls, cameraLimits(bounds, view.distance));
+    home = { ...view, target: new THREE.Vector3(view.target.x, 0, view.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。
-    if (!touched && !flight) placeCamera(home.target, polar, home.distance);
+    if (!touched && !flight.active) placeCamera(home);
     requestRender();
   };
   let touched = false;
@@ -207,52 +234,41 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     touched = true;
   });
 
-  function placeCamera(target, polar, distance) {
+  function placeCamera({ target, polar, azimuth, distance }) {
     controls.target.copy(target);
-    camera.position.set(target.x, target.y + Math.cos(polar) * distance, target.z + Math.sin(polar) * distance);
+    camera.position.copy(target).add(new THREE.Vector3().setFromSphericalCoords(distance, polar, azimuth));
     camera.lookAt(target);
   }
 
-  function stepFlight(now) {
-    const t = Math.min(1, (now - flight.start) / flight.duration);
-    const k = easeInOut(t);
-    controls.target.lerpVectors(flight.fromTarget, flight.toTarget, k);
-    camera.position.lerpVectors(flight.fromPosition, flight.toPosition, k);
-    if (t >= 1) {
-      const done = flight.done;
-      flight = null;
-      done();
-    }
-  }
-
-  // 鏡頭飛到 target，保持目前的方位角，距離為 distance。減少動態時直接切過去。
-  function flyTo(target, distance, done = () => {}) {
+  // 鏡頭飛到 target，距離為 distance；沒給 view 時保持目前的方位角與俯角，給了就轉到該視角。
+  // 減少動態時直接切過去。
+  function flyTo(target, distance, done = () => {}, view = null) {
     const offset = camera.position.clone().sub(controls.target);
     const spherical = new THREE.Spherical().setFromVector3(offset);
+    if (view) {
+      spherical.phi = view.polar;
+      spherical.theta = view.azimuth;
+    }
     spherical.radius = THREE.MathUtils.clamp(distance, controls.minDistance, controls.maxDistance);
     spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
     const toPosition = target.clone().add(new THREE.Vector3().setFromSpherical(spherical));
     focus = { x: target.x, z: target.z };
     touched = true;
     controls.enableDamping = !reducedMotion();
-    const { durationMs } = flightPlan({ reducedMotion: reducedMotion() });
-    if (durationMs === 0) {
-      flight = null;
-      controls.target.copy(target);
-      camera.position.copy(toPosition);
-      requestRender();
-      done();
-      return;
+    // 飛行途中又選了別的議題區：新的飛行取代前一段，前一段抵達後的動作不再執行。
+    flight.start({
+      from: { target: controls.target.clone(), position: camera.position.clone() },
+      to: { target: target.clone(), position: toPosition },
+      now: performance.now(),
+      durationMs: flightPlan({ reducedMotion: reducedMotion() }).durationMs,
+      onArrive: done,
+    });
+    // 減少動態時飛行時間為 0：立刻落在目的地。
+    if (reducedMotion()) {
+      const pose = flight.step(performance.now());
+      controls.target.copy(pose.target);
+      camera.position.copy(pose.position);
     }
-    flight = {
-      start: performance.now(),
-      duration: durationMs,
-      fromTarget: controls.target.clone(),
-      toTarget: target.clone(),
-      fromPosition: camera.position.clone(),
-      toPosition,
-      done,
-    };
     requestRender();
   }
 
@@ -262,10 +278,14 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     const tile = tiles.get(id);
     const color = id === selectedId ? PALETTE.landSelected : dimmed.has(id) ? PALETTE.landDimmed : PALETTE.landTop;
     tile.top.material.color.setHex(color);
-    tile.group.position.y = id === selectedId ? 0.12 : 0;
+    tile.group.position.y = id === selectedId ? SELECTED_LIFT : 0;
     kit.setOwnerOffset(id, tile.group.position.y);
     tile.label.classList.toggle('is-selected', id === selectedId);
     tile.label.classList.toggle('is-dimmed', dimmed.has(id));
+  };
+  const tileCenter = (id) => {
+    const { position } = tiles.get(id).group;
+    return { x: position.x, z: position.z };
   };
 
   function select(areaId) {
@@ -273,13 +293,59 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     selectedId = tiles.has(areaId) ? areaId : null;
     if (previous) paintTile(previous);
     if (selectedId) paintTile(selectedId);
+    selection.select(selectedId && tileCenter(selectedId));
+    selection.hover(hoveredId && tileCenter(hoveredId));
     requestRender();
   }
 
-  // 點選：射線打到的第一個議題區格子。
+  // 射線打到的第一個議題區格子：合批的零件從實例查回議題區，其餘往上找格子群組。
+  // 裝飾格與路燈的零件沒有議題區，射線穿過去。
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
+  const areaOf = (hit) => {
+    if (hit.object.isInstancedMesh) return kit.ownerOf(hit);
+    let node = hit.object;
+    while (node && !node.userData.areaId) node = node.parent;
+    return node?.userData.areaId ?? null;
+  };
+  function areaAt(clientX, clientY) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    return raycaster.intersectObjects(pickable, true).map(areaOf).find(Boolean) ?? null;
+  }
+
+  // 滑過格子（桌面滑鼠）：淡色外框，游標旁顯示議題區編號與名稱。每幀最多查一次射線。
+  const hoverTip = el('p', { class: 'island-hover', 'aria-hidden': 'true' });
+  hoverTip.hidden = true;
+  stage.append(hoverTip);
+  let hoveredId = null;
+  let hoverAt = null;
+  let hoverPending = false;
+  const setHover = (areaId) => {
+    if (areaId === hoveredId) return;
+    hoveredId = areaId;
+    selection.hover(areaId && tileCenter(areaId));
+    renderer.domElement.classList.toggle('is-hovering', Boolean(areaId));
+    hoverTip.hidden = !areaId;
+    if (areaId) {
+      const label = tiles.get(areaId).label;
+      hoverTip.replaceChildren(...[...label.childNodes].map((node) => node.cloneNode(true)));
+    }
+    requestRender();
+  };
+  const updateHover = () => {
+    hoverPending = false;
+    if (!hoverAt) return setHover(null);
+    setHover(areaAt(hoverAt.x, hoverAt.y));
+    if (!hoveredId) return;
+    const rect = stage.getBoundingClientRect();
+    hoverTip.style.left = `${hoverAt.x - rect.left}px`;
+    hoverTip.style.top = `${hoverAt.y - rect.top}px`;
+  };
+
   // 依 pointerId 記每根手指按下的位置；同時有兩指以上（雙指縮放）就整次不算點選。
+  // 按下後移動超過門檻（拖曳旋轉）、雙指縮放或滾輪縮放都會取消鏡頭飛行。
   const downs = new Map();
   let multiTouch = false;
   const release = (event) => {
@@ -288,26 +354,33 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
   };
   renderer.domElement.addEventListener('pointerdown', (event) => {
     downs.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (downs.size > 1) multiTouch = true;
+    if (downs.size > 1) {
+      multiTouch = true;
+      flight.cancel();
+    }
   });
+  renderer.domElement.addEventListener('pointermove', (event) => {
+    if (isDrag(downs.get(event.pointerId), { x: event.clientX, y: event.clientY })) flight.cancel();
+    if (event.pointerType !== 'mouse') return;
+    // 拖曳中不顯示滑過。
+    hoverAt = event.buttons === 0 ? { x: event.clientX, y: event.clientY } : null;
+    if (!hoverPending) {
+      hoverPending = true;
+      requestAnimationFrame(updateHover);
+    }
+  });
+  renderer.domElement.addEventListener('pointerleave', () => {
+    hoverAt = null;
+    setHover(null);
+  });
+  renderer.domElement.addEventListener('wheel', () => flight.cancel(), { passive: true });
   renderer.domElement.addEventListener('pointercancel', release);
   renderer.domElement.addEventListener('pointerup', (event) => {
     const down = downs.get(event.pointerId);
-    const isClick = down && !multiTouch && Math.hypot(event.clientX - down.x, event.clientY - down.y) <= CLICK_SLOP;
+    const isClick = down && !multiTouch && !isDrag(down, { x: event.clientX, y: event.clientY });
     release(event);
     if (!isClick) return;
-    const rect = renderer.domElement.getBoundingClientRect();
-    pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
-    raycaster.setFromCamera(pointer, camera);
-    // 第一個屬於議題區的命中：合批的零件從實例查回議題區，其餘往上找格子群組。
-    // 裝飾格與路燈的零件沒有議題區，射線穿過去。
-    const areaOf = (hit) => {
-      if (hit.object.isInstancedMesh) return kit.ownerOf(hit);
-      let node = hit.object;
-      while (node && !node.userData.areaId) node = node.parent;
-      return node?.userData.areaId ?? null;
-    };
-    const areaId = raycaster.intersectObjects(pickable, true).map(areaOf).find(Boolean);
+    const areaId = areaAt(event.clientX, event.clientY);
     if (areaId) onSelectArea(areaId);
   });
 
@@ -377,9 +450,19 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
       flyTo(target, Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE), done);
       return true;
     },
-    // 回到看得到整座島的距離，選中的議題區不變。
+    // 回到全景視角，選中的議題區不變。
     showAll() {
-      if (home) flyTo(home.target, home.distance);
+      if (home) flyTo(home.target, home.distance, undefined, home);
+    },
+    // 政見卡片遮住的範圍（getBoundingClientRect，卡片關閉時傳 null）。畫面偏移把投影中心移到其餘可見區正中，
+    // 選中的議題區落在可見區中央；鏡頭不動，偏移平滑跟上，減少動態時直接到位。
+    setCover(rect) {
+      const box = stage.getBoundingClientRect();
+      const local = rect
+        ? { left: rect.left - box.left, top: rect.top - box.top, right: rect.right - box.left, bottom: rect.bottom - box.top }
+        : { left: 0, top: 0, right: 0, bottom: 0 };
+      cover = coverInsets(local, { width: box.width, height: box.height });
+      requestRender();
     },
     resize,
   };

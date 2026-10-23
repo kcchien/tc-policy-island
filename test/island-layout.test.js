@@ -239,13 +239,19 @@ test('開啟減少動態時鏡頭不飛行，直接切到目的地', () => {
 });
 
 test('浮動元件遮住畫布邊緣時，投影中心移到沒被遮住的區域正中，構圖用該區域的長寬比', () => {
-  const desktop = viewOffset({ width: 1440, height: 900, insets: { top: 0, right: 360, bottom: 0, left: 0 } });
-  const phone = viewOffset({ width: 390, height: 844, insets: { top: 0, right: 0, bottom: 80, left: 0 } });
-  const none = viewOffset({ width: 800, height: 600, insets: { top: 0, right: 0, bottom: 0, left: 0 } });
+  // 視角 90 度：半角正切是 1，正切值與像素高度成正比，好驗算。
+  const canvasFov = 90;
+  const desktop = viewOffset({ width: 1440, height: 900, insets: { top: 0, right: 360, bottom: 0, left: 0 }, canvasFov });
+  const phone = viewOffset({ width: 390, height: 844, insets: { top: 0, right: 0, bottom: 80, left: 0 }, canvasFov });
+  const none = viewOffset({ width: 800, height: 600, insets: { top: 0, right: 0, bottom: 0, left: 0 }, canvasFov });
+  const degrees = (tan) => (360 / Math.PI) * Math.atan(tan);
+  const right = 90;
 
   // 桌面：虛擬畫布寬 1800，從 x=360 開始取 1440 寬，虛擬中心 900 落在畫布的 540，也就是未遮住的 0~1080 正中。
-  // 鏡頭的垂直視角涵蓋整個虛擬畫布高度，未遮住區域只占其中 visibleHeight / fullHeight（fovScale，以正切值計）。
-  assert.deepEqual(desktop, { fullWidth: 1800, fullHeight: 900, x: 360, y: 0, visibleAspect: 1.2, fovScale: 1 });
-  assert.deepEqual(phone, { fullWidth: 390, fullHeight: 924, x: 0, y: 80, visibleAspect: 390 / 764, fovScale: 764 / 924 });
-  assert.deepEqual(none, { fullWidth: 800, fullHeight: 600, x: 0, y: 0, visibleAspect: 800 / 600, fovScale: 1 });
+  assert.deepEqual(desktop, { fullWidth: 1800, fullHeight: 900, x: 360, y: 0, fov: right, visibleAspect: 1.2, visibleFov: right });
+  // 手機：下方遮 80，虛擬畫布高 924。畫布 844 像素仍是 90 度，虛擬畫布與未遮住區域的視角依像素高度等比換算。
+  assert.deepEqual(phone, {
+    fullWidth: 390, fullHeight: 924, x: 0, y: 80, fov: degrees(924 / 844), visibleAspect: 390 / 764, visibleFov: degrees(764 / 844),
+  });
+  assert.deepEqual(none, { fullWidth: 800, fullHeight: 600, x: 0, y: 0, fov: right, visibleAspect: 800 / 600, visibleFov: right });
 });
