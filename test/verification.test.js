@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import {
   buildLayer2Request,
   checkLayer1,
+  checkProfileLayer1,
   loadVerificationRules,
   parseLayer2Output,
   recordVerification,
@@ -82,6 +83,37 @@ test('第一層：出處快照缺失時不通過', () => {
 
 test('第一層：空白或只有標點的引述不通過', () => {
   assert.equal(layer1('，。 ').status, 'fail');
+});
+
+const BULLETIN = '學歷\n•範例大學國際關係\n博士\n•範例高中\n經歷\n•範例協會理事長\n•第 8 、 9 屆範例市議員\n';
+const bulletinProfile = (fields = {}) => ({
+  education: ['範例大學國際關係博士', '範例高中'],
+  experience: ['範例協會理事長', '第8、9屆範例市議員'],
+  sourceId: 'src-bulletin',
+  ...fields,
+});
+
+test('候選人資料第一層：學歷與經歷每一項都逐字出現在出處快照中才通過，跨行與項目符號不影響', () => {
+  const result = checkProfileLayer1(bulletinProfile(), new Map([['src-bulletin', BULLETIN]]));
+
+  assert.deepEqual(result, { status: 'pass', problems: [] });
+});
+
+test('候選人資料第一層：改寫或不在快照中的經歷不通過，並指出是哪一項', () => {
+  const profile = bulletinProfile({ experience: ['範例協會理事長', '第8、9、10屆範例市議員'] });
+
+  const result = checkProfileLayer1(profile, new Map([['src-bulletin', BULLETIN]]));
+
+  assert.equal(result.status, 'fail');
+  assert.deepEqual(result.problems, ['experience[1] 未逐字出現在出處 src-bulletin 的快照中']);
+});
+
+test('候選人資料第一層：快照缺失、學歷或經歷是空的都不通過', () => {
+  assert.equal(checkProfileLayer1(bulletinProfile(), new Map([['src-bulletin', null]])).status, 'fail');
+  assert.deepEqual(
+    checkProfileLayer1(bulletinProfile({ education: [] }), new Map([['src-bulletin', BULLETIN]])).problems,
+    ['education 沒有任何項目'],
+  );
 });
 
 // claude -p --output-format json 的輸出外框，只保留解析會用到的欄位。

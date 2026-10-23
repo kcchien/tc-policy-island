@@ -6,7 +6,8 @@
     "ballotNumber": null,
     "nameStrokes": 6,
     "rawPolicyItems": { "total": 117, "sourceIds": ["chiang-main"] },
-    "dataStatus": null
+    "dataStatus": null,
+    "profile": null
   },
   {
     "id": "ho-hsin-chun",
@@ -15,7 +16,8 @@
     "ballotNumber": null,
     "nameStrokes": 7,
     "rawPolicyItems": { "total": 153, "sourceIds": ["ho-main"] },
-    "dataStatus": null
+    "dataStatus": null,
+    "profile": null
   },
   {
     "id": "hung-li-hua",
@@ -24,6 +26,7 @@
     "ballotNumber": null,
     "nameStrokes": 9,
     "rawPolicyItems": { "total": null, "sourceIds": [] },
-    "dataStatus": "尚無一手來源"
+    "dataStatus": "尚無一手來源",
+    "profile": null
   }
 ]

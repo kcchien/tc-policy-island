@@ -33,6 +33,24 @@ export function checkLayer1(policy, snapshots) {
   return { status: problems.length === 0 ? 'pass' : 'fail', problems };
 }
 
+// 候選人資料的第一層：學歷與經歷每一項都須逐字出現在 profile.sourceId 的出處快照中。
+// 比對規則與政見的原文引述相同（normalizeForMatch）。回傳格式同 checkLayer1。
+export function checkProfileLayer1(profile, snapshots) {
+  const snapshot = snapshots.get(profile.sourceId) ?? null;
+  if (snapshot === null) return { status: 'fail', problems: [`出處 ${profile.sourceId} 沒有可用的快照`] };
+  const normalized = normalizeForMatch(snapshot);
+  const problems = [];
+  for (const field of ['education', 'experience']) {
+    if (profile[field].length === 0) problems.push(`${field} 沒有任何項目`);
+    profile[field].forEach((item, index) => {
+      const text = normalizeForMatch(item);
+      if (text === '') problems.push(`${field}[${index}] 正規化後沒有任何文字`);
+      else if (!normalized.includes(text)) problems.push(`${field}[${index}] 未逐字出現在出處 ${profile.sourceId} 的快照中`);
+    });
+  }
+  return { status: problems.length === 0 ? 'pass' : 'fail', problems };
+}
+
 // 提示詞檔第一行是「版本：X」，其後以「## 系統提示」「## 判定提示」分段。
 function parsePromptFile(text, path) {
   const version = text.match(/^版本：(\S+)/)?.[1];
