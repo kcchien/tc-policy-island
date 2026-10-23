@@ -3,22 +3,24 @@
 // 只讀格子位置，不讀政見資料（ADR 0001）；色碼都在 island-terrain.js 的 TERRAIN_PALETTE。
 
 import * as THREE from 'three';
-import { ambientAt, OUTSKIRTS_DETAIL, planOutskirts, TERRAIN_PALETTE } from './island-terrain.js';
+import { ambientAt, planOutskirts, TERRAIN_PALETTE } from './island-terrain.js';
 
 // 夜間係數超過這個值，鳥回巢不畫。
 const BIRDS_UNTIL_NIGHT = 0.75;
-// 雲影最多幾朵（著色器的陣列長度），等於各畫質雲的數量上限。
-const MAX_CLOUD_SHADOWS = Math.max(...Object.values(OUTSKIRTS_DETAIL).map((d) => d.clouds));
 
 // 地形網格：平面依高度抬起，每個三角面取面心的地面色（田塊、浪花線的邊界才清楚），flatShading 呈現低多邊形的面。
 function terrainMesh(plan, material) {
   const size = plan.extent * 2;
   const segments = plan.detail.segments;
-  const geometry = new THREE.PlaneGeometry(size, size, segments, segments).toNonIndexed();
-  geometry.rotateX(-Math.PI / 2);
-  geometry.translate(plan.center.x, 0, plan.center.z);
+  const grid = new THREE.PlaneGeometry(size, size, segments, segments);
+  grid.rotateX(-Math.PI / 2);
+  grid.translate(plan.center.x, 0, plan.center.z);
+  // 先在共用頂點的網格上算高度（每個格點算一次），再展開成每面獨立的頂點。
+  const shared = grid.attributes.position;
+  for (let i = 0; i < shared.count; i++) shared.setY(i, plan.heightAt(shared.getX(i), shared.getZ(i)));
+  const geometry = grid.toNonIndexed();
+  grid.dispose();
   const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i++) position.setY(i, plan.heightAt(position.getX(i), position.getZ(i)));
   const colors = new Float32Array(position.count * 3);
   const color = new THREE.Color();
   for (let i = 0; i < position.count; i += 3) {
@@ -35,23 +37,25 @@ function terrainMesh(plan, material) {
 }
 
 // 雲影：在地形與水面的材質加一段著色器，雲正下方的地面依距離變暗。uniform 每幀由 update 更新。
+// 陣列長度就是雲的數量（依畫質），低畫質每個像素少算幾朵。
 function addCloudShadows(material, uniforms) {
+  const count = uniforms.cloudShadows.value.length;
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec2 vCloudGround;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCloudGround = (modelMatrix * vec4(transformed, 1.0)).xz;');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\nvarying vec2 vCloudGround;\nuniform vec4 cloudShadows[${MAX_CLOUD_SHADOWS}];`)
+      .replace('#include <common>', `#include <common>\nvarying vec2 vCloudGround;\nuniform vec4 cloudShadows[${count}];`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         float cloudShade = 0.0;
-        for (int i = 0; i < ${MAX_CLOUD_SHADOWS}; i++) {
+        for (int i = 0; i < ${count}; i++) {
           vec4 c = cloudShadows[i];
           cloudShade = max(cloudShade, c.w * (1.0 - smoothstep(c.z * 0.4, c.z, distance(vCloudGround, c.xy))));
         }
         diffuseColor.rgb *= 1.0 - cloudShade;`);
   };
-  material.customProgramCacheKey = () => 'cloud-shadows';
+  material.customProgramCacheKey = () => `cloud-shadows-${count}`;
   material.needsUpdate = true;
 }
 
@@ -84,7 +88,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   const group = new THREE.Group();
   group.name = 'outskirts';
 
-  const shadows = { cloudShadows: { value: Array.from({ length: MAX_CLOUD_SHADOWS }, () => new THREE.Vector4()) } };
+  const shadows = { cloudShadows: { value: Array.from({ length: Math.max(1, plan.clouds.length) }, () => new THREE.Vector4()) } };
   const groundMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.95, metalness: 0 });
   addCloudShadows(groundMaterial, shadows);
   addCloudShadows(environment.waterMaterial, shadows);
@@ -93,8 +97,9 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   // 樹群：樹冠與樹幹各一個 InstancedMesh，每棵樹各自的位置、大小與樹冠色。
   const canopyGeometry = new THREE.ConeGeometry(1, 1, 6).translate(0, 0.5, 0);
   const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.6, 1, 5).translate(0, 0.5, 0);
-  const canopy = new THREE.InstancedMesh(canopyGeometry, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9 }), plan.trees.length);
-  const trunk = new THREE.InstancedMesh(trunkGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.trunk, flatShading: true, roughness: 0.9 }), plan.trees.length);
+  const canopy = new THREE.InstancedMesh(canopyGeometry, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9 }), Math.max(1, plan.trees.length));
+  const trunk = new THREE.InstancedMesh(trunkGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.trunk, flatShading: true, roughness: 0.9 }), Math.max(1, plan.trees.length));
+  canopy.count = trunk.count = plan.trees.length;
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const s = new THREE.Vector3();
@@ -128,10 +133,12 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   }
 
   // 霧團：貼地的扁平圓，顏色跟著時段的霧色。
-  const fogMaterial = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, alphaMap: softDisc(), color: TERRAIN_PALETTE.cloud });
+  // 每團各自一份材質（透明度不同），共用透明度貼圖與幾何。
+  const fogAlpha = softDisc();
   const fogDisc = new THREE.CircleGeometry(1, 24).rotateX(-Math.PI / 2);
   const fogMeshes = plan.fogBanks.map((bank) => {
-    const mesh = new THREE.Mesh(fogDisc, fogMaterial.clone());
+    const material = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, alphaMap: fogAlpha, color: TERRAIN_PALETTE.cloud });
+    const mesh = new THREE.Mesh(fogDisc, material);
     mesh.scale.set(bank.size, 1, bank.size * 0.7);
     mesh.renderOrder = 1;
     group.add(mesh);

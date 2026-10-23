@@ -171,7 +171,8 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
   };
 
   // 兩條河從東側山裡往西流進海，一條在島北、一條在島南（大甲溪與大肚溪的方向），越往下游越寬。
-  const rivers = [-1, 1].map((side, i) => ({ side, base: side * (halfDepth + 5 + rand() * 2), phase: rand() * 10 + i }));
+  // 兩條河離島的距離不同，不對稱地夾住島。
+  const rivers = [[-1, 5], [1, 12]].map(([side, gap], i) => ({ side, base: side * (halfDepth + gap + rand() * 2), phase: rand() * 10 + i }));
   const riverAt = (u, v, coast) => {
     let wet = 0;
     for (const river of rivers) {
@@ -197,11 +198,14 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
     for (const p of peaks) peak = Math.max(peak, Math.exp(-(((u - p.u) ** 2 + (v - p.v) ** 2) / (p.r * p.r))));
     const relief = 0.4 + 0.35 * ridged(x * 0.05, z * 0.028, seed + 9) + 0.3 * peak;
     const mountains = east ** 0.9 * slopeLimit(x, z) * relief;
-    let h = shore + inland * (plain + mountains);
+    // 網格最外圈往下收進海裡，從遠處看不到地形邊緣的斷崖。
+    const rim = 1 - smoothstep(extent - 12, extent - 1, Math.max(Math.abs(u), Math.abs(v)));
+    let h = -1.6 + (shore + 1.6 + inland * (plain + mountains)) * rim;
     // 河道：下切到水面下，水面就從河道露出來。
     const wet = riverAt(u, v, coast) * smoothstep(-1, 2, d);
     h += (SEA_LEVEL - 0.2 - h) * wet;
-    return { h, coast: d, east, wet };
+    // fromCoast 是往內陸離海岸線的距離（海上為負）。
+    return { h, fromCoast: d, east, wet };
   };
   // 高度：原始地形壓在高度上限下方。
   const heightAt = (x, z) => Math.min(shape(x, z).h, clearanceAt(x, z));
@@ -211,10 +215,10 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
   const [fc, fs] = [Math.cos(FIELD_ANGLE), Math.sin(FIELD_ANGLE)];
   const colorAt = (x, z) => {
     const s = shape(x, z);
-    const { coast, east, wet } = s;
+    const { fromCoast, east, wet } = s;
     const h = Math.min(s.h, clearanceAt(x, z));
     if (h < SEA_LEVEL - 0.2) return TERRAIN_PALETTE.seabed;
-    if (h < SEA_LEVEL + 0.06 && coast < 3 && wet < 0.5) return TERRAIN_PALETTE.foam;
+    if (h < SEA_LEVEL + 0.06 && fromCoast < 3 && wet < 0.5) return TERRAIN_PALETTE.foam;
     if (h < SEA_LEVEL + 0.2 || wet > 0.3) return TERRAIN_PALETTE.sand;
     // 東側山腳以東是丘陵，不畫田塊，用草坡到岩的高度色。
     if (east > 0.08) return terrainColor(Math.max(h, PLAIN_TOP * 0.8));
@@ -236,7 +240,7 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
   };
   const onLand = (x, z) => {
     const s = shape(x, z);
-    return s.wet < 0.1 && s.coast > 1.5;
+    return s.wet < 0.1 && s.fromCoast > 1.5;
   };
 
   // 樹群：先撒群心，再在群心附近撒樹。種在沙灘以上、樹線以下、樹頂不超過高度上限的地方。
@@ -323,7 +327,8 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
         const x = cx + Math.cos(angle) * (R * 0.5 + d);
         const z = cz + Math.sin(angle) * (R * 0.5 + d);
         const lowest = slopeLimit(x, z, radius + 0.3);
-        if (lowest >= 1.4) return { x, z, radius, y: Math.min(lowest - 0.3, 3), speed: 0.35 };
+        // 每隻鳥的高低差（lift ±0.2）加上上下擺動（±0.15），最高比群高 0.35。
+        if (lowest >= 1.4) return { x, z, radius, y: Math.min(lowest - 0.4, 3), speed: 0.35 };
       }
     }
     return null;
