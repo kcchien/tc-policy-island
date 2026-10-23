@@ -186,6 +186,30 @@ test('議題區指向不存在的元素、兩區共用同一元素、元素缺�
   ]);
 });
 
+test('裝飾格不屬於任何議題區，座標不得與議題區重疊，元素不得與議題區共用', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-a'), localElement('el-b')];
+  raw.issueAreas[0].localElementId = 'el-a';
+  raw.decorativeTiles = [
+    { id: 'tile-1', axial: [5, 5], localElementId: 'el-b' },
+    { id: 'tile-2', axial: [1, 0], localElementId: null },
+    { id: 'tile-3', axial: [6, 6], localElementId: 'el-a' },
+  ];
+
+  assert.deepEqual(validationErrors(raw), [
+    '裝飾格 tile-2：軸向座標 [1,0] 與 area-b 重複',
+    '裝飾格 tile-3：在地感元素 el-a 已配給議題區 area-a，每個元素只配一區',
+  ]);
+});
+
+test('合法的裝飾格隨公開資料集公開', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-b')];
+  raw.decorativeTiles = [{ id: 'tile-1', axial: [5, 5], localElementId: 'el-b' }];
+
+  assert.deepEqual(buildPublicDataset(raw).decorativeTiles, raw.decorativeTiles);
+});
+
 test('公開資料集保留出處說法不一標註、適用行政區與建置時間', () => {
   const raw = makeRaw();
   raw.policies[0].districts = ['大里區', '霧峰區'];

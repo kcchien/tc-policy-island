@@ -23,11 +23,18 @@ function readDirOfArrays(dir) {
     });
 }
 
+// 元素清單與裝飾格是島嶼檢視用的資料，夾具可以省略，省略時視為空陣列。
+function readOptionalArray(path) {
+  return existsSync(path) ? readJson(path) : [];
+}
+
 export function loadRawData(rawDir) {
   return {
     meta: readJson(join(rawDir, 'meta.json')),
     candidates: readJson(join(rawDir, 'candidates.json')),
     issueAreas: readJson(join(rawDir, 'issue-areas.json')),
+    localElements: readOptionalArray(join(rawDir, 'local-elements.json')),
+    decorativeTiles: readOptionalArray(join(rawDir, 'decorative-tiles.json')),
     sources: readDirOfArrays(join(rawDir, 'sources')),
     policies: readDirOfArrays(join(rawDir, 'policies')),
   };

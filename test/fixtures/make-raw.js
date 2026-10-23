@@ -74,6 +74,7 @@ export function makeRaw() {
       },
     ],
     localElements: [],
+    decorativeTiles: [],
     sources: ['cand-a', 'cand-b', 'cand-c'].map((candidateId) => ({
       id: `src-${candidateId}`,
       candidateId,

@@ -93,6 +93,12 @@ const SCHEMAS = {
     place: 'string',
     reason: 'string',
   },
+  // 島上沒有議題區的格子，只為了讓島排出台中市輪廓。
+  decorativeTile: {
+    id: 'string',
+    axial: 'axial',
+    localElementId: 'string?',
+  },
   source: {
     id: 'string',
     candidateId: 'string',
@@ -130,7 +136,7 @@ const SCHEMAS = {
   },
 };
 
-const LABELS = { meta: '中繼資料', candidate: '候選人', issueArea: '議題區', localElement: '元素', source: '出處', policy: '政見' };
+const LABELS = { meta: '中繼資料', candidate: '候選人', issueArea: '議題區', localElement: '元素', decorativeTile: '裝飾格', source: '出處', policy: '政見' };
 
 function lookup(record, path) {
   let value = record;
@@ -207,18 +213,20 @@ function checkCandidates(candidates, sourcesById, errors) {
   }
 }
 
-function checkIssueAreas(issueAreas, elementIds, errors) {
+// 議題區與裝飾格共用島上的格子：座標不得重複，每個在地感元素只放一格。
+function checkTiles(tiles, elementIds, errors) {
   const seen = new Map();
   const elementOwner = new Map();
-  for (const area of issueAreas) {
-    const key = area.axial.join(',');
-    if (seen.has(key)) errors.push(`議題區 ${area.id}：軸向座標 [${key}] 與 ${seen.get(key)} 重複`);
-    seen.set(key, area.id);
-    const elementId = area.localElementId;
+  for (const { tile, label } of tiles) {
+    const where = `${label} ${tile.id}`;
+    const key = tile.axial.join(',');
+    if (seen.has(key)) errors.push(`${where}：軸向座標 [${key}] 與 ${seen.get(key)} 重複`);
+    seen.set(key, tile.id);
+    const elementId = tile.localElementId;
     if (elementId === null) continue;
-    if (!elementIds.has(elementId)) errors.push(`議題區 ${area.id}：localElementId 指向不存在的元素 ${elementId}`);
-    else if (elementOwner.has(elementId)) errors.push(`議題區 ${area.id}：在地感元素 ${elementId} 已配給議題區 ${elementOwner.get(elementId)}，每個元素只配一區`);
-    else elementOwner.set(elementId, area.id);
+    if (!elementIds.has(elementId)) errors.push(`${where}：localElementId 指向不存在的元素 ${elementId}`);
+    else if (elementOwner.has(elementId)) errors.push(`${where}：在地感元素 ${elementId} 已配給${elementOwner.get(elementId)}，每個元素只配一區`);
+    else elementOwner.set(elementId, where);
   }
 }
 
@@ -265,6 +273,7 @@ export function validateRawData(raw) {
   const candidates = checkList(raw, 'candidates', 'candidate', errors);
   const issueAreas = checkList(raw, 'issueAreas', 'issueArea', errors);
   const localElements = checkList(raw, 'localElements', 'localElement', errors);
+  const decorativeTiles = checkList(raw, 'decorativeTiles', 'decorativeTile', errors);
   const sources = checkList(raw, 'sources', 'source', errors);
   const policies = checkList(raw, 'policies', 'policy', errors);
 
@@ -278,7 +287,10 @@ export function validateRawData(raw) {
   }
   if (Array.isArray(raw?.candidates) && raw.candidates.length === 0) errors.push('候選人：至少要有一位候選人');
   checkCandidates(candidates.valid, refs.sourcesById, errors);
-  checkIssueAreas(issueAreas.valid, new Set(localElements.byId.keys()), errors);
+  checkTiles([
+    ...issueAreas.valid.map((tile) => ({ tile, label: LABELS.issueArea })),
+    ...decorativeTiles.valid.map((tile) => ({ tile, label: LABELS.decorativeTile })),
+  ], new Set(localElements.byId.keys()), errors);
   for (const policy of policies.valid) checkPolicy(policy, refs, errors);
   return errors;
 }
@@ -319,6 +331,7 @@ export function buildPublicDataset(raw, { builtAt = null } = {}) {
     candidates,
     issueAreas: copy.issueAreas,
     localElements: copy.localElements,
+    decorativeTiles: copy.decorativeTiles,
     sources: copy.sources.filter((s) => sourceIds.has(s.id)),
     policies,
   };
