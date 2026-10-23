@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
-import { decorPlan, decorSignature, TREE_SPECIES } from '../site/js/island-decor.js';
+import { DECOR_KINDS, decorPlan, decorSignature, TREE_SPECIES } from '../site/js/island-decor.js';
+import { DECOR_COLORS, decorModel } from '../site/js/island-decor-models.js';
+import { HERO_SHAPES, partBounds } from '../site/js/island-heroes.js';
+import { forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
 import { WALKWAY } from '../site/js/island-body.js';
 import { LOOP_CORE, LOOP_SPOTS } from '../site/js/island-motion.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
@@ -99,6 +102,37 @@ test('裝飾格沒有主題場景，候選人廣場只有路燈', () => {
   assert.deepEqual(plaza.items.map((i) => i.kind), Array(6).fill('lamp'));
   assert.equal(other.hero, null);
   assert.equal(countOf(other, 'lamp'), 6);
+});
+
+test('每種裝飾模型（含每個樹種）都在宣告的高度與寬度內、站在島面上，形體都認得', () => {
+  const models = Object.keys(DECOR_KINDS).flatMap((kind) => (kind === 'tree'
+    ? TREE_SPECIES.map((species) => ({ kind, species, parts: decorModel(kind, species) }))
+    : [{ kind, parts: decorModel(kind) }]));
+  for (const { kind, species, parts } of models) {
+    const name = species ? `${kind}／${species}` : kind;
+    const { height, reach } = DECOR_KINDS[kind];
+    for (const p of parts) {
+      assert.ok(HERO_SHAPES.includes(p.shape), `${name} 用了不認得的形體 ${p.shape}`);
+      assert.ok(p.color in DECOR_COLORS, `${name} 用了不認得的顏色 ${p.color}`);
+      const { min, max } = partBounds(p);
+      assert.ok(min[1] >= -1e-9, `${name} 沉到島面下 ${min[1]}`);
+      assert.ok(max[1] <= height + 1e-9, `${name} 高 ${max[1].toFixed(3)}，宣告 ${height}`);
+      // 外框的四個底角離中心的最大距離；圓形零件以外框算只會偏大。
+      for (const x of [min[0], max[0]]) for (const z of [min[2], max[2]]) {
+        assert.ok(Math.hypot(x, z) <= reach * Math.SQRT2 + 1e-9 && Math.max(Math.abs(x), Math.abs(z)) <= reach + 1e-9, `${name} 寬到 (${x.toFixed(3)}, ${z.toFixed(3)})，宣告 ${reach}`);
+      }
+    }
+  }
+});
+
+test('裝飾的色碼都不落在禁用色範圍', () => {
+  const { ranges } = loadForbiddenColors();
+  for (const [name, value] of Object.entries(DECOR_COLORS)) {
+    const hex = value.toString(16).padStart(6, '0');
+    const [r, g, b] = hex.match(/../g).map((d) => parseInt(d, 16));
+    const hit = forbiddenRangesOf({ ...rgbToHsl({ r, g, b }), alpha: 1 }, ranges);
+    assert.deepEqual(hit.map((h) => h.name), [], `${name} #${hex}`);
+  }
 });
 
 test('裝飾配置與政見資料無關：換一份政見資料，配置完全相同', () => {

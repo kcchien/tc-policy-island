@@ -24,6 +24,15 @@ test('同種形體、同種材質的零件收進同一桶（一個 InstancedMesh
   ]);
 });
 
+test('遠距離隱藏的小物件另外分桶：同形體同材質也不和一般零件同桶，桶上標明 lod', () => {
+  const [a, b] = parts(2);
+  const buckets = partBuckets([a, { ...a, lod: 'small' }, b, { ...a, lod: 'small' }]);
+
+  assert.deepEqual(buckets.map((x) => [x.shape, x.material, x.lod, x.items.length]), [
+    ['box', 'standard', null, 1], ['box', 'standard', 'small', 2], ['cone6', 'standard', null, 1],
+  ]);
+});
+
 test('繪製呼叫數不隨零件數線性增加：零件從 60 個加到 6000 個，桶數不變', () => {
   const counts = [60, 600, 6000].map((n) => partBuckets(parts(n)).length);
   assert.deepEqual(counts, [6, 6, 6]);

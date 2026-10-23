@@ -26,6 +26,9 @@ export const DECOR_KINDS = {
   stone: { radius: 0.03, height: 0.006, reach: 0.03, small: true },
 };
 
+// 小物件（small）在鏡頭離旋轉中心超過這個距離時隱藏。桌面預設視角約 29 還看得到，手機直式的預設視角（約 44 以上）隱藏。
+export const LOD_DISTANCE = 30;
+
 // 步道環內緣（市民走在步道內側，身寬約 0.03）：裝飾的占地要在這條線內側。值是格心到邊的距離。
 export const DECOR_LIMIT = WALKWAY_APOTHEM - WALKWAY.width / 2 - 0.015;
 
