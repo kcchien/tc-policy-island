@@ -27,8 +27,8 @@ export function formatSearch({ view, area, policy, query, district }) {
   return text === '' ? '' : `?${text}`;
 }
 
-// 不支援 WebGL 或島嶼檢視尚未提供時一律用表格檢視；否則依網址，預設島嶼檢視。
-export function chooseView({ requested, webgl, islandAvailable }) {
-  if (!webgl || !islandAvailable) return 'table';
+// 不支援 WebGL 時一律用表格檢視；否則依網址，預設島嶼檢視。
+export function chooseView({ requested, webgl }) {
+  if (!webgl) return 'table';
   return requested ?? 'island';
 }

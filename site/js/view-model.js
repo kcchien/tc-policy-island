@@ -29,8 +29,11 @@ export function buildViewModel(dataset) {
     ...policy,
     quotes: policy.quotes.map((quote) => ({ ...quote, source: sources.get(quote.sourceId) })),
   });
+  const elements = new Map(dataset.localElements.map((e) => [e.id, e]));
+  const elementOf = (tile) => elements.get(tile.localElementId) ?? null;
   const rows = dataset.issueAreas.map((issueArea) => ({
     issueArea,
+    localElement: elementOf(issueArea),
     cells: dataset.candidates.map((candidate) => {
       const policies = dataset.policies
         .filter((p) => p.issueAreaId === issueArea.id && p.candidateId === candidate.id)
@@ -52,5 +55,7 @@ export function buildViewModel(dataset) {
     candidateOrderNote: CANDIDATE_ORDER_RULES[dataset.meta.candidateOrder].note,
     candidates,
     rows,
+    // 島上沒有議題區的格子，只有島嶼檢視使用。
+    decorativeTiles: dataset.decorativeTiles.map((tile) => ({ ...tile, localElement: elementOf(tile) })),
   };
 }

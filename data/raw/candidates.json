@@ -5,7 +5,7 @@
     "party": "中國國民黨",
     "ballotNumber": null,
     "nameStrokes": 6,
-    "rawPolicyItems": { "total": null, "sourceIds": [] },
+    "rawPolicyItems": { "total": 117, "sourceIds": ["chiang-main"] },
     "dataStatus": null
   },
   {

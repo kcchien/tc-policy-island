@@ -6,11 +6,11 @@
     <title>台中政見島</title>
     <meta name="description" content="由 AI 依公開資料整理的 2026 台中市長候選人政見對照，與任何候選人或政黨無關。" />
     <link rel="stylesheet" href="./css/main.css" />
-    <!-- three.js r160 由島嶼檢視的票放進 site/vendor/three/，在那之前不會被載入 -->
+    <!-- three.js r160 放在 site/vendor/three/，只在進入島嶼檢視時載入 -->
     <script type="importmap">
       {
         "imports": {
-          "three": "./vendor/three/build/three.module.js",
+          "three": "./vendor/three/build/three.module.min.js",
           "three/addons/": "./vendor/three/examples/jsm/"
         }
       }
@@ -24,7 +24,7 @@
         <p class="site-subtitle" lang="en">Taichung Policy Island</p>
       </div>
       <div class="view-switch" role="group" aria-label="檢視方式">
-        <button type="button" class="view-button" data-view="island" aria-pressed="false" disabled>島嶼檢視</button>
+        <button type="button" class="view-button" data-view="island" aria-pressed="false">島嶼檢視</button>
         <button type="button" class="view-button" data-view="table" aria-pressed="true">表格檢視</button>
       </div>
       <nav class="site-nav" aria-label="網站">
@@ -37,8 +37,9 @@
       <section class="intro" id="intro" aria-labelledby="intro-title" hidden>
         <h2 class="intro-title" id="intro-title">怎麼看這個網站</h2>
         <ul class="intro-list">
-          <li>每一列是一個議題區，每一欄是一位候選人，三人欄寬與字級相同。</li>
-          <li>點政見摘要或「看政見卡片」，可讀原文引述、出處與核對紀錄。</li>
+          <li>島嶼檢視：拖曳旋轉、滾輪或雙指縮放。每一格是一個議題區，格上三個同尺寸標記 ○ △ □ 依排序代表三位候選人，亮起表示有政見，灰色表示沒有。</li>
+          <li>點島上的議題區或議題區清單，鏡頭會移到該區並開啟政見卡片，可讀原文引述、出處與核對紀錄。</li>
+          <li>表格檢視：每一列是一個議題區，每一欄是一位候選人，三人欄寬與字級相同。</li>
           <li>用關鍵字或適用行政區找出和你有關的政見，網址可直接分享。</li>
         </ul>
         <button type="button" class="intro-dismiss" id="intro-dismiss">知道了</button>
@@ -59,6 +60,23 @@
       </form>
       <p class="result-status" id="result-status" role="status"></p>
       <p class="order-note" id="candidate-order-note"></p>
+
+      <section class="island-view" id="island-root" aria-label="島嶼檢視">
+        <div class="island-stage" id="island-stage">
+          <p class="status island-status" id="island-status">載入島嶼中⋯</p>
+          <button type="button" class="island-reset" id="island-reset">看整座島</button>
+        </div>
+        <aside class="island-panel" id="island-panel" aria-labelledby="island-panel-title">
+          <button type="button" class="island-panel-toggle" id="island-panel-toggle" aria-expanded="false" aria-controls="island-panel-body">
+            議題區清單
+          </button>
+          <div class="island-panel-body" id="island-panel-body">
+            <h2 class="island-panel-title" id="island-panel-title">議題區</h2>
+            <ul class="legend" id="island-legend" aria-label="標記圖例"></ul>
+            <ul class="island-list" id="island-list"></ul>
+          </div>
+        </aside>
+      </section>
 
       <div id="table-root" class="table-root">
         <p class="status">載入政見資料中⋯</p>
