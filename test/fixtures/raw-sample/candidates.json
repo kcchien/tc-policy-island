@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sample-bing",
+    "name": "範例丙",
+    "party": "範例丙黨",
+    "ballotNumber": null,
+    "nameStrokes": 8,
+    "rawPolicyItems": { "total": 0, "sourceIds": [] },
+    "dataStatus": "尚無一手來源（範例）"
+  },
+  {
+    "id": "sample-jia",
+    "name": "範例甲",
+    "party": "範例甲黨",
+    "ballotNumber": null,
+    "nameStrokes": 3,
+    "rawPolicyItems": { "total": 2, "sourceIds": ["sample-src-jia"] },
+    "dataStatus": null
+  },
+  {
+    "id": "sample-yi",
+    "name": "範例乙",
+    "party": "範例乙黨",
+    "ballotNumber": null,
+    "nameStrokes": 5,
+    "rawPolicyItems": { "total": 1, "sourceIds": ["sample-src-yi"] },
+    "dataStatus": null
+  }
+]
