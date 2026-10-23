@@ -882,5 +882,18 @@
     "sourceType": "official-website",
     "title": "何欣純爭取會展中心二期60億中央全額負擔 賴清德盛讚「三句話不離台中」 | 何欣純官方網站｜2026 台中市長候選人",
     "retrievedAt": "2026-10-23"
+  },
+  {
+    "id": "ho-bulletin-2024",
+    "candidateId": "ho-hsin-chun",
+    "url": "https://bulletin.cec.gov.tw/01%E9%81%B8%E8%88%89%E5%85%AC%E5%A0%B1/02%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/113%E5%B9%B4%E7%AC%AC11%E5%B1%86/02%E5%8D%80%E5%9F%9F%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/05%E8%87%BA%E4%B8%AD%E5%B8%82/%E7%AC%AC7%E9%81%B8%E8%88%89%E5%8D%80/%E8%87%BA%E4%B8%AD%E5%B8%82%E7%AB%8B%E5%A7%94%E7%AC%AC7%E9%81%B8%E8%88%89%E5%8D%80.pdf",
+    "archiveUrl": "https://web.archive.org/web/20261016053717/https://bulletin.cec.gov.tw/01%E9%81%B8%E8%88%89%E5%85%AC%E5%A0%B1/02%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/113%E5%B9%B4%E7%AC%AC11%E5%B1%86/02%E5%8D%80%E5%9F%9F%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/05%E8%87%BA%E4%B8%AD%E5%B8%82/%E7%AC%AC7%E9%81%B8%E8%88%89%E5%8D%80/%E8%87%BA%E4%B8%AD%E5%B8%82%E7%AB%8B%E5%A7%94%E7%AC%AC7%E9%81%B8%E8%88%89%E5%8D%80.pdf",
+    "archiveError": null,
+    "snapshotPath": "data/snapshots/ho-bulletin-2024.txt",
+    "snapshotSha256": "9be026b1c60c00773d325a9bdccf4bd91d1b3c2c08ddd873ed39f8ae876fccc2",
+    "snapshotNote": "PDF 第 1 頁以 pdftotext 轉成文字",
+    "sourceType": "election-bulletin",
+    "title": "第11屆立法委員選舉選舉公報（臺中市第7選舉區）",
+    "retrievedAt": "2026-10-23"
   }
 ]

@@ -986,5 +986,18 @@
     "sourceType": "official-website",
     "title": "掃街晚接早！江啟臣鐵人行程搏感情 跨年齡層搶合照｜臺中市長候選人江啟臣",
     "retrievedAt": "2026-10-23"
+  },
+  {
+    "id": "chiang-bulletin-2024",
+    "candidateId": "chiang-chi-chen",
+    "url": "https://bulletin.cec.gov.tw/01%E9%81%B8%E8%88%89%E5%85%AC%E5%A0%B1/02%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/113%E5%B9%B4%E7%AC%AC11%E5%B1%86/02%E5%8D%80%E5%9F%9F%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/05%E8%87%BA%E4%B8%AD%E5%B8%82/%E7%AC%AC8%E9%81%B8%E8%88%89%E5%8D%80/%E8%87%BA%E4%B8%AD%E5%B8%82%E7%AB%8B%E5%A7%94%E7%AC%AC8%E9%81%B8%E8%88%89%E5%8D%80.pdf",
+    "archiveUrl": "https://web.archive.org/web/20260514152736/https://bulletin.cec.gov.tw/01%E9%81%B8%E8%88%89%E5%85%AC%E5%A0%B1/02%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/113%E5%B9%B4%E7%AC%AC11%E5%B1%86/02%E5%8D%80%E5%9F%9F%E7%AB%8B%E6%B3%95%E5%A7%94%E5%93%A1/05%E8%87%BA%E4%B8%AD%E5%B8%82/%E7%AC%AC8%E9%81%B8%E8%88%89%E5%8D%80/%E8%87%BA%E4%B8%AD%E5%B8%82%E7%AB%8B%E5%A7%94%E7%AC%AC8%E9%81%B8%E8%88%89%E5%8D%80.pdf",
+    "archiveError": null,
+    "snapshotPath": "data/snapshots/chiang-bulletin-2024.txt",
+    "snapshotSha256": "93d7926b1ebe84d238f1fa32eb0b28320d2449ede5274005b3d547dece1fb895",
+    "snapshotNote": "PDF 第 1 頁以 pdftotext 轉成文字",
+    "sourceType": "election-bulletin",
+    "title": "第11屆立法委員選舉選舉公報（臺中市第8選舉區）",
+    "retrievedAt": "2026-10-23"
   }
 ]
