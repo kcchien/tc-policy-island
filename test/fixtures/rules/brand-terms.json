@@ -1,0 +1,10 @@
+{
+  "version": "fixture-1",
+  "brand": [
+    { "term": "範例口號", "candidate": "sample-jia", "note": "測試夾具，虛構的品牌用語" },
+    { "term": "七星市政", "candidate": "sample-yi", "note": "測試夾具，虛構的品牌用語" }
+  ],
+  "frequent": [
+    { "term": "超級", "candidate": "sample-jia", "note": "測試夾具，虛構的陣營高頻詞" }
+  ]
+}
