@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
-import { figurePose, plazaLayout } from '../site/js/island-plaza.js';
+import { figureLook, figurePose, plazaLayout } from '../site/js/island-plaza.js';
 import { makeRaw } from './fixtures/make-raw.js';
 
 const layoutOf = (raw) => islandLayout(buildViewModel(buildPublicDataset(raw)));
@@ -46,6 +46,11 @@ test('三個人物依排序規則由西到東並排在廣場南半，配 ○ △
   assert.ok(Math.abs((b.x - a.x) - (c.x - b.x)) < 1e-9);
   assert.equal(b.x, center.x);
   assert.ok(a.z === b.z && b.z === c.z && a.z > center.z, '同一列、在格心南側');
+  // 間距與議題區格子上的標記相同，底座與標記同尺寸。
+  const layout = layoutOf(withDecorativeTiles());
+  const markers = layout.tiles.find((t) => t.kind === 'area').markers;
+  assert.ok(Math.abs((b.x - a.x) - (markers[1].offset.x - markers[0].offset.x)) < 1e-9);
+  assert.deepEqual(plaza.figures.map((f) => f.padRadius), markers.map((m) => m.radius));
 });
 
 test('抽籤後依號次排：號次改變人物順序跟著變', () => {
@@ -61,8 +66,11 @@ test('抽籤後依號次排：號次改變人物順序跟著變', () => {
 test('三個人物的幾何、尺寸、材質與待機動畫參數完全相同，只有身分與位置不同', () => {
   const plaza = plazaLayout(layoutOf(withDecorativeTiles()));
 
-  const looks = plaza.figures.map(({ candidateId, name, symbol, shape, sides, start, padRadius, position, ...look }) => look);
+  const looks = plaza.figures.map(figureLook);
   assert.deepEqual(looks[1], looks[0]);
+  // 外觀不含身分與位置，但含底座面積。
+  assert.deepEqual(Object.keys(looks[0]).filter((key) => ['candidateId', 'name', 'symbol', 'position'].includes(key)), []);
+  assert.equal(looks[0].pad.size, plaza.figures[2].pad.size);
   assert.deepEqual(looks[2], looks[0]);
   assert.equal(looks[0].color, 'figure');
   assert.ok(looks[0].parts.length > 0);

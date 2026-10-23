@@ -504,7 +504,8 @@ export function setMarkerLit(marker, lit) {
   marker.material = lit ? litMaterial() : offMaterial();
 }
 
-// 候選人人物：figure 是 plazaLayout 的人物配置，模型完全由配置產生（零件、尺寸、顏色），
+// 候選人人物：figure 是 plazaLayout 的人物配置，模型完全由配置產生（零件、細分、尺寸、顏色、底座、點選範圍），
+// 這裡不另寫依人物而異的數值；
 // 三人配置相同，模型就相同；上線關卡「人物一致」檢查配置。
 // 回傳 { model, body, hit }：body 是待機動畫伸縮擺動的部分，hit 是點選用的隱形圓柱（比人物略大，手機好點）。
 // 人物會動，不用零件庫的共用幾何，instancify 不會合批。
@@ -513,8 +514,8 @@ export function figureModel(figure) {
   const body = new THREE.Group();
   for (const part of figure.parts) {
     const geometry = part.shape === 'sphere'
-      ? new THREE.IcosahedronGeometry(part.radius, 1)
-      : new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, 8);
+      ? new THREE.IcosahedronGeometry(part.radius, figure.sphereDetail)
+      : new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, figure.segments);
     const m = new THREE.Mesh(geometry, material(color));
     m.position.set(...part.at);
     m.castShadow = true;
@@ -524,10 +525,10 @@ export function figureModel(figure) {
   body.rotation.y = figure.facing;
   // 底座是同尺寸的 ○△□，與格子上的標記同一套形狀與面積。
   const pad = markerModel({ sides: figure.sides, start: figure.start, radius: figure.padRadius });
-  pad.material = material(PALETTE.figurePad);
-  pad.scale.y = 0.5;
+  pad.material = material(PALETTE[figure.pad.color]);
+  pad.scale.y = figure.pad.thickness;
   const hit = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.19, 0.19, figure.labelHeight, 8),
+    new THREE.CylinderGeometry(figure.hitRadius, figure.hitRadius, figure.labelHeight, figure.segments),
     new THREE.MeshBasicMaterial({ visible: false }),
   );
   hit.position.y = figure.labelHeight / 2;

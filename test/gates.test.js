@@ -420,6 +420,8 @@ const FIGURE_CHANGES = [
   ['材質', (plaza) => { plaza.figures[1].color = 'markerLit'; }],
   ['動畫參數', (plaza) => { plaza.figures[1].idle.sway *= 2; }],
   ['動畫相位', (plaza) => { plaza.figures[1].idle.phase = 0.5; }],
+  ['底座', (plaza) => { plaza.figures[1].pad.size *= 1.2; }],
+  ['點選範圍', (plaza) => { plaza.figures[1].hitRadius = 0.3; }],
 ];
 for (const [what, change] of FIGURE_CHANGES) {
   test(`某位候選人人物的${what}與其他人不同時，人物一致關卡不通過並指出候選人`, () => {
@@ -432,6 +434,17 @@ for (const [what, change] of FIGURE_CHANGES) {
     assert.match(output, /cand-b/);
   });
 }
+
+test('網站上的人物配置模組改寫「外觀相同」的定義時，人物一致關卡照樣擋下不同的人物', () => {
+  const tampered = plazaModule((plaza) => { plaza.figures[1].scale = 1.1; })
+    .replace('export function figureLook(', 'export function figureLook() { return {}; }\nfunction originalFigureLook(');
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'js/island-plaza.js': tampered });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /cand-b/);
+});
 
 test('人物順序不依排序規則或沒有等距並排時，人物一致關卡不通過', () => {
   const swapped = makeSite(() => {}, {

@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { orderCandidates } from '../../site/js/dataset.js';
 import { buildViewModel } from '../../site/js/view-model.js';
 import { islandLayout } from '../../site/js/island-layout.js';
+// 什麼算「外觀相同」由 repo 的定義決定，不由受檢的網站模組自己決定。
+import { figureLook } from '../../site/js/island-plaza.js';
 
 // 網站上的人物配置模組。關卡直接載入網站目錄裡的這一份，檢查的就是要上線的程式。
 export const PLAZA_MODULE = 'js/island-plaza.js';
@@ -15,10 +17,11 @@ export default {
     const path = join(site.dir, PLAZA_MODULE);
     if (!existsSync(path)) return [`找不到人物配置模組 ${PLAZA_MODULE}`];
     // Node 24 可以同步 require ES 模組；關卡介面是同步的。
-    const { plazaLayout, figureLook } = createRequire(import.meta.url)(path);
+    const { plazaLayout } = createRequire(import.meta.url)(path);
     const dataset = site.dataset();
     const plaza = plazaLayout(islandLayout(buildViewModel(dataset)));
     if (!plaza.tile) return ['島上沒有候選人廣場（需要至少一個裝飾格）'];
+    if (plaza.figures.length === 0) return ['候選人廣場上沒有候選人人物'];
 
     const failures = [];
     const { figures } = plaza;

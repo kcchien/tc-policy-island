@@ -47,12 +47,18 @@ export function plazaLayout(layout) {
     shape: entry.shape,
     sides: entry.sides,
     start: entry.start,
+    // 底座的外接圓半徑依形狀不同；面積由 pad.size 決定，三人相同。
     padRadius: entry.radius,
+    pad: { size: entry.size, color: 'figurePad', thickness: 0.5 },
     position: { x: tile.position.x + (index - offset) * FIGURE_SPACING, z: tile.position.z + FIGURE_ROW_Z },
     facing: 0,
     scale: FIGURE_SCALE,
     color: 'figure',
     labelHeight: FIGURE_HEIGHT * FIGURE_SCALE + LABEL_GAP,
+    // 零件的多邊形細分（圓柱邊數、球體細分層數）與點選範圍的半徑。
+    segments: 8,
+    sphereDetail: 1,
+    hitRadius: 0.19,
     // 每個人物各自一份，關卡才抓得到單一人物被改動。
     parts: structuredClone(FIGURE_PARTS),
     idle: { ...FIGURE_IDLE },

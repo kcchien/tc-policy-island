@@ -64,7 +64,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   vendor/three/        three.js r160（three@0.160.0 的 three.module.min.js、OrbitControls、CSS2DRenderer 與授權）
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
-  local-elements.json  decorative-tiles.json   元素清單與裝飾格（可省略，視為空陣列）
+  local-elements.json  decorative-tiles.json   元素清單與裝飾格（可省略，視為空陣列；但上線關卡「人物一致」要求至少一個裝飾格當候選人廣場）
   sources/<candidateId>.json   每位候選人一檔，陣列
   policies/<candidateId>.json  每位候選人一檔，陣列
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
