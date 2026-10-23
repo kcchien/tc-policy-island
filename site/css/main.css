@@ -628,8 +628,7 @@ body[data-view="island"] .view-note {
   font-size: 0.75rem;
 }
 
-.island-list,
-.candidate-index {
+.island-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -666,21 +665,6 @@ body[data-view="island"] .view-note {
   display: inline-flex;
   flex: none;
   gap: 4px;
-}
-
-/* 候選人分頁：三人同尺寸 */
-.candidate-index-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 0 10px;
-  padding: 10px 12px;
-  background: var(--rice);
-  border-radius: var(--radius-small);
-}
-
-.candidate-index-item .marker-badge {
-  grid-row: 1 / span 2;
 }
 
 /* 標記徽章：三人同色同尺寸，亮起是實心，沒有政見是淡灰。 */
@@ -851,9 +835,9 @@ body[data-view="island"] .view-note {
   border-radius: var(--radius);
 }
 
-/* 政見卡片：三欄等寬並排 */
+/* 政見卡片與候選人資料卡的對話框：三欄等寬並排 */
 
-.policy-card {
+.sheet-dialog {
   width: min(var(--card-width), calc(100vw - 32px));
   max-width: none;
   max-height: calc(100dvh - 48px);
@@ -865,7 +849,7 @@ body[data-view="island"] .view-note {
   box-shadow: var(--shadow);
 }
 
-.policy-card::backdrop {
+.sheet-dialog::backdrop {
   background: color-mix(in srgb, var(--charcoal) 45%, transparent);
 }
 
@@ -1020,6 +1004,122 @@ body[data-view="island"] .view-note {
 
 .policy-link {
   font-size: 0.75rem;
+}
+
+/* 候選人資料卡：三張同尺寸、同字級。格線本身不設高度（捲動放在外層），1fr 的列或欄才會撐成最高那張的大小。 */
+
+.profile-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 12px;
+}
+
+.candidate-dialog .profile-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--gap) 20px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--rice-deep);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+}
+
+.profile-card.is-focused {
+  border-color: var(--laterite);
+  outline: 2px solid var(--laterite-soft);
+}
+
+.profile-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--candidate);
+}
+
+.profile-head .marker-badge {
+  grid-row: 1 / span 2;
+}
+
+.profile-fields {
+  display: grid;
+  grid-template-columns: 3.5em minmax(0, 1fr);
+  gap: 6px 8px;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.profile-fields dt {
+  color: var(--charcoal-soft);
+}
+
+.profile-fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-list {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.profile-source {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--laterite-soft);
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.profile-source p {
+  margin: 2px 0;
+}
+
+.snapshot-note {
+  padding: 4px 8px;
+  border-left: 3px solid var(--water);
+  background: var(--rice);
+  border-radius: 4px;
+}
+
+.candidate-open {
+  margin-top: 8px;
+}
+
+/* 表格上方的「看候選人資料」按鈕列：只在手機單欄時顯示（桌面在欄標題） */
+.candidate-strip {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: var(--gap);
+  font-size: 0.875rem;
+}
+
+.candidate-strip-buttons {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 8px;
+}
+
+.candidate-strip .candidate-open {
+  flex: 1 1 0;
+  margin-top: 0;
 }
 
 /* 頁首的頁面連結（整理方法、回到政見對照） */
@@ -1527,8 +1627,8 @@ body[data-view="island"] .view-note {
     box-shadow: none;
   }
 
-  /* 政見卡片：底部抽屜，拖曳把手在約一半與全螢幕兩段之間吸附，往下拖到底關閉（sheet.js） */
-  .policy-card {
+  /* 政見卡片與候選人資料卡：底部抽屜，拖曳把手在約一半與全螢幕兩段之間吸附，往下拖到底關閉（sheet.js） */
+  .sheet-dialog {
     width: 100vw;
     height: 50dvh;
     max-height: 100dvh;
@@ -1537,16 +1637,16 @@ body[data-view="island"] .view-note {
     transition: height 0.25s ease;
   }
 
-  .policy-card[data-snap="full"] {
+  .sheet-dialog[data-snap="full"] {
     height: 100dvh;
     border-radius: 0;
   }
 
-  .policy-card.is-dragging {
+  .sheet-dialog.is-dragging {
     transition: none;
   }
 
-  .policy-card::backdrop {
+  .sheet-dialog::backdrop {
     background: color-mix(in srgb, var(--charcoal) 20%, transparent);
   }
 
@@ -1587,6 +1687,19 @@ body[data-view="island"] .view-note {
     grid-auto-flow: row;
     grid-auto-columns: auto;
     padding: 12px var(--gap) calc(var(--gap) + env(safe-area-inset-bottom));
+  }
+
+  .card-body {
+    padding: 12px var(--gap) calc(var(--gap) + env(safe-area-inset-bottom));
+  }
+
+  /* 手機的候選人資料卡對話框改為單欄堆疊，三張仍同高 */
+  .candidate-dialog .profile-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .candidate-strip {
+    display: flex;
   }
 }
 

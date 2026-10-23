@@ -1,4 +1,4 @@
-// 島嶼檢視的索引面板：議題區清單、標記圖例與候選人分頁。桌面在畫面右側，800px 以下由 CSS 改為底部抽屜。
+// 島嶼檢視的索引面板：議題區清單與標記圖例（候選人分頁的候選人資料卡在 candidate-card.js）。桌面在畫面右側，800px 以下由 CSS 改為底部抽屜。
 // 清單的編號與標記狀態與島上的名牌、標記同樣來自 island-layout.js，不呈現政見數量。
 
 import { el } from './dom.js';
@@ -22,22 +22,6 @@ export function renderLegend(container, vm) {
       el('li', { class: 'legend-item' }, el('span', { class: 'marker-badge is-lit', 'aria-hidden': 'true' }, entry.symbol), entry.name),
     ),
     el('li', { class: 'legend-item legend-note' }, '亮起表示有政見，灰色表示沒有；標記不表示政見多寡。'),
-  );
-}
-
-// 候選人分頁：三人同尺寸，依排序列出形狀、姓名與政黨。候選人資料卡加入後由資料卡取代。
-export function renderCandidateIndex(container, vm) {
-  container.replaceChildren(
-    ...markerLegend(vm).map((entry) => {
-      const candidate = vm.candidates.find((c) => c.id === entry.candidateId);
-      return el(
-        'li',
-        { class: 'candidate-index-item', 'data-candidate': candidate.id },
-        el('span', { class: 'marker-badge is-lit', 'aria-hidden': 'true' }, entry.symbol),
-        el('span', { class: 'candidate-name' }, candidate.name),
-        el('span', { class: 'candidate-meta' }, candidate.party),
-      );
-    }),
   );
 }
 

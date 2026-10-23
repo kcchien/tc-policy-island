@@ -201,6 +201,22 @@ test('原文引述、出處標題與網址含品牌用語時不擋，摘要用�
   assert.equal(code, 0, output);
 });
 
+test('候選人資料的學歷與經歷照原文含品牌用語時不擋，比照原文引述；選舉別與出處快照說明照掃', () => {
+  const verbatim = makeSite((dataset) => {
+    dataset.candidates[0].profile.education = ['六星大學學士'];
+    dataset.candidates[0].profile.experience = ['Taichung Way 推動委員'];
+  });
+  const written = makeSite((dataset) => {
+    dataset.candidates[0].profile.electionName = '六星選舉';
+  });
+
+  const verbatimResult = runGates(verbatim);
+  const writtenResult = runGates(written);
+
+  assert.doesNotMatch(verbatimResult.output, /品牌用語「/);
+  assert.match(writtenResult.output, /profile\.electionName：含品牌用語「六星」/);
+});
+
 test('網站文案含陣營高頻詞時不通過', () => {
   const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'index.html': '<p>打造更幸福的查詢體驗</p>' });
 

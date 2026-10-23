@@ -2,7 +2,7 @@
 // 桌面為置中對話框，800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js）。
 
 import { el } from './dom.js';
-import { bindSheetDrag, snapSheet } from './sheet.js';
+import { bindSheetDialog } from './sheet.js';
 
 const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
 
@@ -96,7 +96,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': '切換卡片高度' });
   const dialog = el(
     'dialog',
-    { class: 'policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },
+    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half' },
     el(
       'div',
       { class: 'card-inner' },
@@ -105,21 +105,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       body,
     ),
   );
-  const snapTo = (snap) => {
-    if (snap === 'closed') dialog.close();
-    else dialog.dataset.snap = snap;
-  };
-  bindSheetDrag(handle, dialog, { onSnap: snapTo });
-  // 觸控與滑鼠由 bindSheetDrag 處理；鍵盤操作的 click（detail 為 0）在這裡切換。
-  handle.addEventListener('click', (event) => {
-    if (event.detail === 0) snapTo(snapSheet({ from: dialog.dataset.snap, fraction: 0, moved: false }));
-  });
-  closeButton.addEventListener('click', () => dialog.close());
-  // 點對話框外的遮罩關閉。
-  dialog.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
-  });
-  dialog.addEventListener('close', () => onClose());
+  bindSheetDialog(dialog, { handle, closeButton, onClose });
 
   return {
     element: dialog,
