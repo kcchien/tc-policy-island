@@ -50,6 +50,17 @@ test('專案不存在時先建立專案，正式環境分支為 main，再部署
   ]);
 });
 
+test('專案清單不是 JSON 時中止，不建立專案也不部署', () => {
+  const { run, calls } = fakeRunner({ 'wrangler pages project list': { status: 0, stdout: '有新版 wrangler 可更新\n[]' } });
+  const logs = [];
+
+  const result = deploy({ run, log: (line) => logs.push(line) });
+
+  assert.equal(result.ok, false);
+  assert.deepEqual(calls.slice(3), ['wrangler pages project list --json']);
+  assert.ok(logs.some((line) => line.includes('不部署')));
+});
+
 test('建立專案失敗時不部署', () => {
   const { run, calls } = fakeRunner({
     'wrangler pages project list': { status: 0, stdout: '[]' },

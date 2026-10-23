@@ -19,7 +19,7 @@
 | `node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--brand-terms data/rules/brand-terms.json] [--model claude-opus-5-5] [--claude claude] [--date YYYY-MM-DD]` | 兩層核對（ADR 0002），結果寫回 `policies/*.json`；第一層不過不送第二層，`--skip-passed` 只跑未核對、已退回或以舊版檢核表通過的政見。第二層每筆開一個全新 `claude -p` session，會花費用；提示詞中的候選人姓名與政黨以「○○」遮蔽 |
 | `node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型> [--title <標題>] [--html <本機 HTML 檔>] [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]` | 擷取一個出處：頁面可見文字存成 `data/snapshots/<sourceId>.txt`、送 Wayback Machine 存檔（失敗只記原因）、出處紀錄寫進 `sources/<candidateId>.json`（同識別碼取代）。要登入或瀏覽器渲染的頁面先另存 HTML 再用 `--html` |
 | `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
-| `node scripts/deploy.js [--dry-run] [--wrangler wrangler]`（`npm run deploy`） | 測試 → 建置 → 關卡 → `wrangler pages deploy site` 到 Cloudflare Pages 專案 `tc-policy-island` 的正式環境（`--branch main`），專案不存在時先建立；任一步失敗結束碼 1、不部署。`--dry-run` 跑完檢查與唯讀的專案查詢，只列出建立與部署指令。真的部署只由維護者執行；驗證流程用 `--dry-run` 或 `--wrangler` 指向假指令 |
+| `node scripts/deploy.js [--dry-run] [--wrangler wrangler]`（`npm run deploy`） | 測試 → 建置 → 關卡 → `wrangler pages deploy site` 到 Cloudflare Pages 專案 `tc-policy-island` 的正式環境（`--branch main`），專案不存在時先建立；任一步失敗結束碼 1、不部署。`--dry-run` 跑完檢查與唯讀的專案查詢，只列出建立與部署指令。真的部署只由維護者執行；試部署流程用 `--dry-run` 或 `--wrangler` 指向假指令 |
 
 看夾具資料的畫面：`node scripts/build.js --raw test/fixtures/raw-sample` 後開預覽；看完再跑一次 `node scripts/build.js` 換回正式資料。CI（`.github/workflows/check.yml`）每次 push 跑測試、建置、關卡，不部署。
 

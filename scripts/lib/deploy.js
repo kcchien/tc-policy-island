@@ -29,7 +29,14 @@ export function deploy({ run, log, dryRun = false }) {
     log('✗ 無法列出 Cloudflare Pages 專案（wrangler 是否已登入？），不部署');
     return { ok: false };
   }
-  const exists = JSON.parse(list.stdout).some((p) => p['Project Name'] === PROJECT_NAME);
+  let projects;
+  try {
+    projects = JSON.parse(list.stdout);
+  } catch {
+    log('✗ Cloudflare Pages 專案清單不是 JSON，無法判斷專案是否存在，不部署');
+    return { ok: false };
+  }
+  const exists = projects.some((p) => p['Project Name'] === PROJECT_NAME);
 
   const writes = [
     ...(exists ? [] : [{ name: `建立 Cloudflare Pages 專案 ${PROJECT_NAME}`, args: CREATE_ARGS }]),

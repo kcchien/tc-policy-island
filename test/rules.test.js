@@ -10,6 +10,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { createScanner, loadBrandTerms } from '../scripts/lib/brand-terms.js';
 import { openSite } from '../scripts/gates/site.js';
+import { PROJECT_NAME } from '../scripts/lib/deploy.js';
 import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
 import { extractColors, forbiddenRangesOf, loadForbiddenColors } from '../scripts/lib/colors.js';
@@ -92,6 +93,7 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
   const names = [pkg.name, ...execFileSync('git', ['ls-files'], { cwd: repoPath(''), encoding: 'utf8' }).split('\n').filter(Boolean)];
 
   assert.equal(pkg.name, 'tc-policy-island');
+  assert.equal(PROJECT_NAME, pkg.name);
   assert.deepEqual(names.filter((name) => scan(name).length > 0), []);
 });
 

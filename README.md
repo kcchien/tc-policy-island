@@ -27,7 +27,7 @@ node scripts/preview.js    # 本機預覽 http://localhost:8000/
 
 ## 部署
 
-由維護者在本機執行，CI 只做檢查、不部署。需要先以 `wrangler login` 登入 Cloudflare。
+由維護者在本機執行，CI 只做檢查、不部署。本專案不裝 npm 套件，wrangler 要另外全域安裝（`npm install -g wrangler`），並先以 `wrangler login` 登入 Cloudflare。
 
 ```sh
 npm run deploy               # 測試 → 建置 → 上線關卡 → 部署到 Cloudflare Pages 專案 tc-policy-island 的正式環境（main）
