@@ -171,6 +171,19 @@ function startApp(vm, state, initialView) {
     return { top: bar.bottom, right: Math.max(0, width - panel.getBoundingClientRect().left), bottom: 0, left: 0 };
   };
 
+  // 名牌要避開的浮動元件：標題卡、工具列（桌面是各組按鈕，手機是整條膠囊列）、索引面板、說明文字與開著的卡片。
+  const stageObstacles = () => {
+    const nodes = [
+      titleCard,
+      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
+      panel,
+      document.getElementById('view-note'),
+      card.element.open && card.element,
+      candidateDialog.element.open && candidateDialog.element,
+    ];
+    return nodes.filter(Boolean).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+  };
+
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
   const withIsland = (fn) => island?.then((controller) => controller && fn(controller));
   const applyTime = () => {
@@ -191,6 +204,7 @@ function startApp(vm, state, initialView) {
   const applyLabels = () => {
     document.getElementById('tool-labels').setAttribute('aria-pressed', String(hud.labels));
     stage.classList.toggle('labels-off', !hud.labels);
+    withIsland((controller) => controller.refreshLabels());
   };
   for (const button of document.querySelectorAll('[data-time]')) {
     button.addEventListener('click', () => {
@@ -227,6 +241,7 @@ function startApp(vm, state, initialView) {
           onSelectArea: (areaId) => openCard(areaId, null),
           onSelectCandidate: openCandidateCard,
           insets: stageInsets,
+          obstacles: stageObstacles,
         });
         controller.update(filtered);
         // 卡片開關、手機抽屜換段或拖曳時，畫面偏移跟著卡片遮住的範圍走。
@@ -278,7 +293,7 @@ function startApp(vm, state, initialView) {
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const show = () => card.open(row, vm, { focusPolicyId: policyId });
+    const show = () => card.open(row, vm, { focusPolicyId: policyId, filter: { query: state.query, district: state.district } });
     if (view === 'island') {
       setPanelOpen(false);
       renderIslandPanel();

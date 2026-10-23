@@ -34,7 +34,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/view-model.js     檢視模型：議題區 × 候選人矩陣
   js/table-view.js     表格檢視
   js/filter.js         搜尋與行政區篩選（filterViewModel）
-  js/policy-card.js    政見卡片（兩種檢視共用）
+  js/policy-card.js    政見卡片（兩種檢視共用）：三欄各自捲動、欄頭固定，政見預設只顯示摘要與行政區、點開看原文與核對紀錄，欄內篩選（filter.js 的 policyMatcher），手機改候選人分頁，桌面島嶼檢視可放大成全高
   js/candidate-card.js 候選人資料卡：內容純函式 profileCardContent（Node 可測）、三張同尺寸卡片、對話框（索引候選人分頁、表格欄頭、網址共用）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
@@ -46,6 +46,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
   js/island-clock.js   動畫迴圈時間：統一推進、暫停、減少動態停在固定畫格；後續動畫一律用它註冊（Node 可測）
   js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、預設視角（直式畫面較低俯角並轉方位角）
+  js/island-labels.js  名牌避讓（Node 可測，不 import 其他模組）：placeLabels 依畫面位置決定名牌完整、只留編號或隱藏，8px 遲滯，三位候選人人物名牌同組同進退；island-view.js 在鏡頭或介面變動後呼叫，避開 main.js 給的浮動元件矩形
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
   js/island-parts.js   零件分桶規則（Node 可測）

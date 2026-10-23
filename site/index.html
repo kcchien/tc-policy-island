@@ -20,7 +20,11 @@
   <body data-view="table">
     <!-- 島嶼檢視的 3D 畫布填滿視窗，其餘元件浮在畫布上。 -->
     <section class="island-stage" id="island-stage" aria-label="島嶼檢視">
-      <p class="status island-status" id="island-status">載入島嶼中⋯</p>
+      <div class="status island-status" id="island-status" role="status">
+        <p class="loading-eyebrow" lang="en">Taichung Policy Island</p>
+        <p class="loading-title">正在組合政策城市⋯</p>
+        <p class="loading-note">第一次載入需要幾秒鐘</p>
+      </div>
     </section>
 
     <header class="title-card">
