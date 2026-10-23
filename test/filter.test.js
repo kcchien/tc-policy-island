@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
-import { filterViewModel } from '../site/js/filter.js';
+import { filterViewModel, policyMatcher } from '../site/js/filter.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
 // area-a：甲「增設公車路線」（大里區）、乙「捷運延伸」（原文提到太平）
@@ -111,4 +111,17 @@ test('未知的行政區名稱不當成篩選條件', () => {
 
   assert.equal(filtered.filter.active, false);
   assert.deepEqual(shape(filtered), shape(vm));
+});
+
+test('政見卡片的欄內篩選與全站篩選用同一套比對：關鍵字比對摘要、原文與行政區，行政區須完全相符', () => {
+  const vm = sampleViewModel();
+  const policies = vm.rows.flatMap((row) => row.cells.flatMap((cell) => cell.policies));
+  const ids = (filter) => {
+    const matcher = policyMatcher(filter);
+    return { active: matcher.active, ids: policies.filter(matcher.matches).map((p) => p.id) };
+  };
+  assert.deepEqual(ids({ query: '太平' }), { active: true, ids: ['p-b1'] });
+  assert.deepEqual(ids({ query: '托育 霧峰' }), { active: true, ids: ['p-a2'] });
+  assert.deepEqual(ids({ district: '大里區' }), { active: true, ids: ['p-a1', 'p-a2'] });
+  assert.deepEqual(ids({ query: '  ', district: '不存在區' }).active, false);
 });

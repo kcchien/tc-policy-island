@@ -23,6 +23,7 @@ import {
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
+import { placeLabels } from './island-labels.js';
 import { heroPlan } from './island-heroes.js';
 import { buildHeroScene } from './island-hero-view.js';
 import { el } from './dom.js';
@@ -43,8 +44,14 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫；onSelectCandidate(candidateId) 在點選候選人人物時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 // insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
+// obstacles() 回傳浮動元件與卡片的視窗矩形（getBoundingClientRect），名牌會避開。
 // timeOfDay 是一開始的時段（不補間，直接是這個時段），省略時是白天。
-export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }), timeOfDay }) {
+export function createIslandView(stage, {
+  vm, reducedMotion, onSelectArea, onSelectCandidate,
+  insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+  obstacles = () => [],
+  timeOfDay,
+}) {
   const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -92,6 +99,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   const groups = new Map();
   const pickable = [];
   const labelAnchors = [];
+  // 參與避讓的名牌：{ id, node, group?, compact, pinned? }。compact 表示可以縮成只留編號；
+  // pinned 的名牌（人物名牌與廣場名牌）先放，議題區名牌讓它們。
+  const labelEntries = [];
   for (const tileInfo of layout.tiles) {
     const g = new THREE.Group();
     g.position.set(tileInfo.position.x, 0, tileInfo.position.z);
@@ -128,6 +138,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       );
       const label = new CSS2DObject(el('span', { class: 'island-label-anchor' }, name));
       labelAnchors.push(label);
+      labelEntries.push({ id: tileInfo.id, node: name, compact: true });
       g.add(label);
       g.userData.areaId = tileInfo.id;
       pickable.push(g);
@@ -142,9 +153,11 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     const { model, body, hit } = figureModel(info);
     model.position.set(info.position.x, TILE_SURFACE, info.position.z);
     hit.userData.candidateId = info.candidateId;
-    const label = new CSS2DObject(el('span', { class: 'island-label-anchor' },
-      el('span', { class: 'island-label island-figure-label' }, el('b', { class: 'island-label-number' }, info.symbol))));
+    const node = el('span', { class: 'island-label island-figure-label' }, el('b', { class: 'island-label-number' }, info.symbol));
+    const label = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     label.position.y = info.labelHeight;
+    // 三人的頭上名牌同一組：一起顯示或一起隱藏。
+    labelEntries.push({ id: `figure:${info.candidateId}`, node, group: 'figures', compact: false, pinned: true });
     model.add(label);
     scene.add(model);
     return { info, body, hit };
@@ -157,9 +170,10 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       button.addEventListener('click', () => onSelectCandidate?.(info.candidateId));
       return button;
     });
-    const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' },
-      el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, ISLAND_TEXT.plaza), ...entries)));
+    const node = el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, ISLAND_TEXT.plaza), ...entries);
+    const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     sign.position.set(plaza.sign.x, TILE_SURFACE, plaza.sign.z);
+    labelEntries.push({ id: 'plaza-sign', node, compact: false, pinned: true });
     scene.add(sign);
   }
   const figureHits = figures.map((f) => f.hit);
@@ -240,6 +254,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     renderer.shadowMap.needsUpdate = !animating || frame % shadowEvery === 0;
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
+    layoutLabels();
     // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
     const continuous = moving || flight.active || shifting || !settled || animating;
     if (continuous) {
@@ -251,6 +266,66 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       lastFrame = null;
     }
   };
+  // 名牌避讓（island-labels.js）：鏡頭、畫面偏移、選取或介面變動後，重新決定每個名牌完整顯示、只留編號或隱藏。
+  // 名牌以中心定位，縮成編號時中心不變，所以直接讀目前的位置；兩種尺寸量一次記著，畫布尺寸改變時重量。
+  let labelModes = new Map();
+  let labelKey = '';
+  let labelsDirty = true;
+  // 名牌的字級或內容可能變了（斷點、網頁字型載入）：尺寸重量並重排。
+  const remeasureLabels = () => {
+    for (const entry of labelEntries) entry.sizes = null;
+    labelsDirty = true;
+  };
+  const setMode = (node, mode) => {
+    node.classList.toggle('is-compact', mode === 'number');
+    node.classList.toggle('is-hidden', mode === 'hidden');
+  };
+  const measureLabel = (entry) => {
+    const mode = labelModes.get(entry.id) ?? 'full';
+    setMode(entry.node, 'full');
+    const full = { width: entry.node.offsetWidth, height: entry.node.offsetHeight };
+    let number = null;
+    if (entry.compact) {
+      setMode(entry.node, 'number');
+      number = { width: entry.node.offsetWidth, height: entry.node.offsetHeight };
+    }
+    setMode(entry.node, mode);
+    return { full, number };
+  };
+  function layoutLabels() {
+    // 名牌關閉時不排；重新打開時鏡頭可能已經動過，要重排。
+    if (stage.classList.contains('labels-off')) {
+      labelsDirty = true;
+      return;
+    }
+    const key = [...camera.matrixWorld.elements, ...camera.projectionMatrix.elements, stageSize.width, stageSize.height].join();
+    if (!labelsDirty && key === labelKey) return;
+    labelsDirty = false;
+    labelKey = key;
+    const items = [];
+    for (const entry of labelEntries) {
+      const rect = entry.node.getBoundingClientRect();
+      // 在鏡頭後方或視野外的名牌（CSS2DRenderer 設成不顯示）不參與。
+      if (rect.width === 0 && rect.height === 0) continue;
+      if (!entry.sizes || entry.sizes.full.width === 0) entry.sizes = measureLabel(entry);
+      items.push({
+        id: entry.id,
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        full: entry.sizes.full,
+        number: entry.sizes.number,
+        group: entry.group,
+        pinned: Boolean(entry.pinned),
+      });
+    }
+    // 人物名牌與廣場名牌先放；議題區名牌由畫面下方（離鏡頭近）往上放。
+    items.sort((a, b) => b.pinned - a.pinned || (a.pinned ? 0 : b.y - a.y));
+    labelModes = placeLabels(items, { obstacles: obstacles(), selectedId, previous: labelModes });
+    for (const entry of labelEntries) {
+      if (labelModes.has(entry.id)) setMode(entry.node, labelModes.get(entry.id));
+    }
+  }
+
   // 執行中降級：降像素比、關毛玻璃（.lowfx）、降低陰影更新頻率。
   const applyQuality = (next) => {
     renderer.setPixelRatio(next.pixelRatio);
@@ -287,6 +362,8 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     applyOffset();
     const narrow = width <= NARROW_WIDTH;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
+    // 斷點換了名牌的字級與內容。
+    remeasureLabels();
     // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
     const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
@@ -360,6 +437,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     if (selectedId) paintTile(selectedId);
     selection.select(selectedId && tileCenter(selectedId));
     selection.hover(hoveredId && tileCenter(hoveredId));
+    // 有選中的議題區時，其他名牌變淡。
+    labelRenderer.domElement.classList.toggle('has-selection', Boolean(selectedId));
+    labelsDirty = true;
     requestRender();
   }
 
@@ -463,6 +543,10 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   const observer = new ResizeObserver(resize);
   observer.observe(stage);
   resize();
+  document.fonts?.ready.then(() => {
+    remeasureLabels();
+    requestRender();
+  });
   // 使用者中途切換系統的減少動態設定，重畫一次讓動畫停住或開始走。
   window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', requestRender);
 
@@ -533,6 +617,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     // 政見卡片遮住的範圍（getBoundingClientRect，卡片關閉時傳 null）。畫面偏移把投影中心移到其餘可見區正中，
     // 選中的議題區落在可見區中央；鏡頭不動，偏移平滑跟上，減少動態時直接到位。
     setCover(rect) {
+      labelsDirty = true;
       const box = stage.getBoundingClientRect();
       // 表格檢視時畫布隱藏、量不到大小，不更新；卡片關閉時一律清掉偏移。
       if (rect && (box.width === 0 || box.height === 0)) return;
@@ -543,5 +628,10 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       requestRender();
     },
     resize,
+    // 浮動元件變了（例如名牌開關、索引抽屜或候選人資料卡開關）時重排名牌。
+    refreshLabels() {
+      labelsDirty = true;
+      requestRender();
+    },
   };
 }
