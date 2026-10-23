@@ -39,8 +39,10 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
-  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
-  js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）
+  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主建物位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
+  js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
+  js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、主建物基座、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
+  js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）；placeHero 把單位空間的主題場景放進 heroSlot
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
@@ -53,8 +55,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈）、地面色、各畫質的樹、霧、聚落數量、樹群、聚落、霧團、雲、飛鳥與依動畫時間的位置；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
-  js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民、路網、環線與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查
-  js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車、路面與環線堤，會動的零件每種一個 InstancedMesh
+  js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民（走自己島的步道環）、環線（沿步道環與橋的外圈）與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查（關卡也要載入它 import 的 island-body.js）
+  js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車，會動的零件每種一個 InstancedMesh
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例（候選人分頁的卡片在 candidate-card.js）
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
@@ -100,6 +102,8 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 
 開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
+
+放主題場景：`createIslandView` 的選項 `heroScene(areaId)` 回傳單位空間的模型（底面 x、z 在 ±0.5、高 0~1.5）或 `null`，island-view.js 用 `placeHero` 放進每個議題區島的 `heroSlot`（每島相同，見 `island-body.js` 的 `TILE_SLOTS.hero`）。只依議題區識別碼決定，不讀政見。
 
 ### 資料與夾具
 

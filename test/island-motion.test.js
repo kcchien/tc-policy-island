@@ -8,7 +8,7 @@ import {
   CITIZEN_HEIGHT, CITIZEN_RADIUS, CITIZEN_SCALE, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
   LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
 } from '../site/js/island-motion.js';
-import { islandBody } from '../site/js/island-body.js';
+import { islandBody, TILE_SLOTS } from '../site/js/island-body.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
@@ -166,9 +166,10 @@ test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺�
 });
 
 // 標記離鏡頭的視線有沒有被擋：從標記頂面中心往鏡頭取樣，碰到直立圓柱（離格子頂面 bottom 到 height）就算擋住。
-// 以下兩個值抄自 island-models.js（該模組載入 three.js，Node 不載）：TILE_SURFACE 與議題區 ELEMENT_AREA 的 maxZ。
+// TILE_SURFACE 抄自 island-models.js（該模組載入 three.js，Node 不載）。
 const SURFACE = 0.44;
-const ELEMENT_MAX_Z = 0.24;
+// 北側的主建物與在地感元素最南到哪裡。
+const ELEMENT_MAX_Z = Math.max(TILE_SLOTS.hero.z + TILE_SLOTS.hero.size / 2, TILE_SLOTS.element.area.maxZ);
 const RAW_DIR = fileURLToPath(new URL('../data/raw', import.meta.url));
 const MARKER_TOP = SURFACE + 0.08;
 function blocked(from, camera, { x, z, radius, bottom = 0, height }) {
@@ -181,7 +182,7 @@ function blocked(from, camera, { x, z, radius, bottom = 0, height }) {
   return false;
 }
 
-test('放大後的道具與市民不擋住正式資料任何標記：桌面與手機的預設視角', () => {
+test('放大後的道具、市民、放滿的主建物位置與在地感元素都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
   const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
   const plan = motionPlan(layout);
   const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
@@ -195,6 +196,16 @@ test('放大後的道具與市民不擋住正式資料任何標記：桌面與�
       .filter(() => tile.citizens.length > 0)
       .map(({ x, z }) => ({ x, z, radius: CITIZEN_RADIUS, height: CITIZEN_HEIGHT })),
   ]);
+  // 主建物位置：放滿到高度上限，以外接底面的圓柱近似，主題場景接上後也不得擋到鄰島的標記。
+  const { hero } = TILE_SLOTS;
+  for (const tile of layout.tiles.filter((t) => t.heroSlot)) {
+    obstacles.push({ x: tile.position.x + hero.x, z: tile.position.z + hero.z, radius: (hero.size / 2) * Math.SQRT2, height: hero.maxHeight * hero.size });
+    const e = tile.elementSlot;
+    obstacles.push({
+      x: tile.position.x + (e.minX + e.maxX) / 2, z: tile.position.z + (e.minZ + e.maxZ) / 2,
+      radius: Math.hypot(e.maxX - e.minX, e.maxZ - e.minZ) / 2, height: e.maxY,
+    });
+  }
 
   // 橫式桌面與直式手機（扣掉浮動元件後的可見範圍長寬比）。
   for (const aspect of [1.6, 1.2, 0.6, 0.5, 0.46]) {

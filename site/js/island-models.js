@@ -91,19 +91,11 @@ const group = (...children) => {
   return g;
 };
 
-// 格子：深色土層加淺色頂面，尖頂六角形（CylinderGeometry 六邊時頂點朝南北）。
-export const TILE_HEIGHT = 0.36;
-const TILE_TOP = 0.08;
-export function hexTile(size) {
-  const base = mesh(cyl(size * 0.98, size * 1.02, TILE_HEIGHT, 6), PALETTE.landSide, { y: TILE_HEIGHT / 2 });
-  const top = mesh(new THREE.CylinderGeometry(size * 0.96, size * 0.98, TILE_TOP, 6), PALETTE.landTop, { y: TILE_HEIGHT + TILE_TOP / 2 });
-  top.material = top.material.clone();
-  return { tile: group(base, top), top };
-}
-export const TILE_SURFACE = TILE_HEIGHT + TILE_TOP;
+// 島頂面的高度（島體見 island-body-view.js）。
+export const TILE_SURFACE = 0.44;
 
-// 路燈：每個格子頂點一盞（相鄰格共用的頂點只放一盞），燈柱加燈泡，夜裡燈泡亮起。
-// 每盞都一樣，與議題區內容無關。corners 是 tileCorners 的 [x, z]。
+// 路燈：燈柱加燈泡，夜裡燈泡亮起。每盞都一樣，與議題區內容無關。
+// corners 是 [x, z]，相對傳回群組的原點（island-body.js 的路燈位置每島六盞）。
 export function streetLamps(corners) {
   const lamps = corners.flatMap(([x, z]) => [
     mesh(cyl(0.012, 0.018, 0.3, 5), PALETTE.lampPost, { x, y: TILE_SURFACE + 0.15, z }),
@@ -443,15 +435,6 @@ const BY_CATEGORY = {
   老建築: () => courtyardHouse(),
 };
 
-// 元素區：有標記的議題區格子留出南側的標記帶，元素放在北側；裝飾格沒有標記，元素可以放大置中。
-// 範圍是相對格心的 x、z 與最高高度。格子頂面半徑 0.96，標記帶從 z = 0.32 開始。
-// 鏡頭在南方，本格北半部就在西北、東北鄰格標記帶的正前方，所以北緣收在 -0.66、高度上限 1，
-// 北面也不做整面的高牆；以預設視角從鏡頭對每個標記打射線檢查過不會被遮住。
-const ELEMENT_AREA = {
-  area: { minX: -0.76, maxX: 0.76, minZ: -0.66, maxZ: 0.24, maxY: 1 },
-  decorative: { minX: -0.8, maxX: 0.8, minZ: -0.7, maxZ: 0.7, maxY: 1.35 },
-};
-
 // 把模型等比例縮放到元素區內，水平置中、底部貼齊格子頂面（y = 0）。
 function fitInto(model, area) {
   model.updateMatrixWorld(true);
@@ -470,10 +453,24 @@ function fitInto(model, area) {
   return wrapper;
 }
 
-// kind 是 'area'（議題區，留標記帶）或 'decorative'（裝飾格）。
-export function localElementModel(element, kind = 'area') {
+// slot 是元素區 { minX, maxX, minZ, maxZ, maxY }（相對格心），見 island-body.js 的 TILE_SLOTS.element。
+export function localElementModel(element, slot) {
   const build = BUILDERS[element.id] ?? BY_CATEGORY[element.category];
-  return build ? fitInto(build(), ELEMENT_AREA[kind]) : null;
+  return build ? fitInto(build(), slot) : null;
+}
+
+// 主建物（主題場景）放進 heroSlot：模型在單位空間設計（底面 x、z 在 ±0.5、高 0~slot.maxHeight），
+// 放大 slot.size 倍，底面中心放在 (slot.x, slot.z)，面向 slot.facing。比 maxHeight 高的模型整體等比縮小，
+// 不擋到鄰島的標記。回傳包好的群組，加進格子群組即可。
+export function placeHero(model, slot) {
+  model.updateMatrixWorld(true);
+  const height = new THREE.Box3().setFromObject(model).max.y;
+  const wrapper = new THREE.Group();
+  wrapper.position.set(slot.x, 0, slot.z);
+  wrapper.rotation.y = slot.facing;
+  wrapper.scale.setScalar(slot.size * Math.min(1, slot.maxHeight / Math.max(height, 1e-6)));
+  wrapper.add(model);
+  return wrapper;
 }
 
 // 候選人標記：同尺寸、同色，只以形狀區分。size 是外接圓半徑。
