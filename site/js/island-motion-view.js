@@ -192,8 +192,8 @@ const CITIZEN_GEOMETRY = {
   arm: swingPart,
   body: (p) => new THREE.CapsuleGeometry(p.radius, p.length, 3, 8).translate(...p.at),
   head: (p) => new THREE.SphereGeometry(p.radius, 10, 8).translate(...p.at),
-  // 髮殼往後腦傾斜，露出額頭與眼睛。
-  hair: (p) => new THREE.SphereGeometry(p.radius, 10, 5, 0, Math.PI * 2, 0, Math.PI * 0.56).rotateZ(0.35).translate(...p.at),
+  // 髮殼往後腦傾斜，露出額頭與眼睛（鏡頭多半從斜上方看）。
+  hair: (p) => new THREE.SphereGeometry(p.radius, 10, 5, 0, Math.PI * 2, 0, Math.PI * 0.5).rotateZ(0.95).translate(...p.at),
   eye: (p) => new THREE.SphereGeometry(p.radius, 5, 4).translate(...p.at),
 };
 // 零件的顏色：衣服、頭髮依市民的順序輪替，與格子內容無關。

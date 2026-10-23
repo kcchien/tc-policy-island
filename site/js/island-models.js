@@ -49,8 +49,8 @@ export const PALETTE = {
   // 候選人廣場：人物腳下的形狀底座、人物（身體、頭、髮殼、眼睛）。三位候選人人物同一組中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
-  figureHead: 0xd3c4b0,
-  figureHair: 0x5b524b,
+  figureHead: 0xdccdb8,
+  figureHair: 0x62564c,
   figureEye: 0x3a332e,
 };
 
@@ -534,8 +534,8 @@ export function figureModel(figure) {
     const geometry = {
       sphere: () => new THREE.SphereGeometry(part.radius, n * 2, n),
       capsule: () => new THREE.CapsuleGeometry(part.radius, part.length, n / 2, n * 2),
-      // 半球殼略多蓋一點到頭的側面，像短髮。
-      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * 0.56),
+      // 半球殼往後腦傾斜，蓋住頭頂與後腦、露出額頭與眼睛，像短髮。
+      dome: () => new THREE.SphereGeometry(part.radius, n * 2, n, 0, Math.PI * 2, 0, Math.PI * 0.5).rotateX(-0.95),
       cylinder: () => new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, n),
     }[part.shape]();
     // Q 版人物用平滑著色，圓頭才不會一面一面。
