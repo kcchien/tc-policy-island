@@ -33,6 +33,21 @@ export const LOOP_SPOTS = [{ x: -0.7, z: 0.34 }, { x: 0.7, z: 0.34 }];
 // 市民走的路線：沿格子的六條邊，比格線往格內縮一點，避開路燈與標記。值是格心到邊的距離。
 export const CITIZEN_APOTHEM = 0.845;
 
+// 道具與市民的放大倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率，讓全景第一眼就看得到動態。
+// 倍率是動態強度的一部分，每格相同（motionSignature 會比對）。
+// 市民沿格子南緣走過外側標記前方，再高就會在手機的預設視角擋住標記，所以只放大 1.3 倍。
+export const LOOP_SCALE = 2;
+export const CITIZEN_SCALE = 1.3;
+// 放大後的外形（場景單位），測試用來確認不擋住標記。道具：半徑 LOOP_CORE 的柱子高到 LOOP_HEIGHT，
+// 會動零件（風車葉、旗、吊臂）只在 LOOP_REACH_FROM 以上，掃過半徑 LOOP_REACH。
+// 市民身高 CITIZEN_HEIGHT、身寬半徑 CITIZEN_RADIUS。原尺寸見 island-motion-view.js 的 LOOP_PROPS 與 CITIZEN，改形狀時要守住這些範圍。
+export const LOOP_HEIGHT = 0.45 * LOOP_SCALE;
+export const LOOP_CORE = 0.065 * LOOP_SCALE;
+export const LOOP_REACH = 0.15 * LOOP_SCALE;
+export const LOOP_REACH_FROM = 0.18 * LOOP_SCALE;
+export const CITIZEN_HEIGHT = 0.16 * CITIZEN_SCALE;
+export const CITIZEN_RADIUS = 0.025 * CITIZEN_SCALE;
+
 // 環線（公車與火車）：繞島外緣一圈，在格子外側、貼著水面的堤上，不壓到標記與路燈。
 // 值是環線中心離格線的距離；兩條車道各往內外偏 RING_LANE。
 export const RING_OFFSET = 0.17;
@@ -61,12 +76,13 @@ export function motionPlan(layout, { level = 'high' } = {}) {
       kind,
       center: { x: position.x, z: position.z },
       theme,
-      loops: LOOP_SPOTS.map((spot, i) => ({ ...spot, mirror: i === 1, periodSeconds: LOOP_SECONDS })),
+      loops: LOOP_SPOTS.map((spot, i) => ({ ...spot, mirror: i === 1, periodSeconds: LOOP_SECONDS, scale: LOOP_SCALE })),
       // 市民平均分散在路線上，同速同向。
       citizens: Array.from({ length: counts.citizensPerTile }, (_, i) => ({
         phase: i / counts.citizensPerTile,
         speed: CITIZEN_SPEED,
         stepSeconds: STEP_SECONDS,
+        scale: CITIZEN_SCALE,
       })),
       path,
       pathLength: pathLength(path),
@@ -185,7 +201,7 @@ export function loopPose(theme, t) {
     case 'crane':
       return { swing: 0.6 * Math.sin(TAU * k), hook: 0.04 * (1 - Math.cos(TAU * 2 * k)) };
     case 'boat':
-      return { drift: 0.05 * Math.sin(TAU * k), bob: 0.012 * Math.sin(TAU * 3 * k), roll: 0.12 * Math.sin(TAU * 2 * k) };
+      return { drift: 0.025 * Math.sin(TAU * k), bob: 0.012 * Math.sin(TAU * 3 * k), roll: 0.12 * Math.sin(TAU * 2 * k) };
     default:
       return {};
   }
@@ -194,8 +210,8 @@ export function loopPose(theme, t) {
 // 一格動態的數量與強度，不含格子識別碼、位置與題材。議題區格子之間必須完全相同。
 export function motionSignature(tile) {
   return JSON.stringify({
-    loops: tile.loops.map(({ x, z, mirror, periodSeconds }) => ({ x, z, mirror, periodSeconds })),
-    citizens: tile.citizens.map(({ phase, speed, stepSeconds }) => ({ phase, speed, stepSeconds })),
+    loops: tile.loops.map(({ x, z, mirror, periodSeconds, scale }) => ({ x, z, mirror, periodSeconds, scale })),
+    citizens: tile.citizens.map(({ phase, speed, stepSeconds, scale }) => ({ phase, speed, stepSeconds, scale })),
     path: tile.path.map(([x, z]) => [Math.round((x - tile.center.x) * 1e4), Math.round((z - tile.center.z) * 1e4)]),
   });
 }
