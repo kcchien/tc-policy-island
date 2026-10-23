@@ -17,14 +17,49 @@
     </script>
     <script type="module" src="./js/main.js"></script>
   </head>
-  <body>
+  <body data-view="table">
     <header class="site-header">
-      <h1 class="site-title">台中政見島</h1>
-      <p class="site-subtitle" lang="en">Taichung Policy Island</p>
+      <div class="site-brand">
+        <h1 class="site-title">台中政見島</h1>
+        <p class="site-subtitle" lang="en">Taichung Policy Island</p>
+      </div>
+      <div class="view-switch" role="group" aria-label="檢視方式">
+        <button type="button" class="view-button" data-view="island" aria-pressed="false" disabled>島嶼檢視</button>
+        <button type="button" class="view-button" data-view="table" aria-pressed="true">表格檢視</button>
+      </div>
+      <p class="view-note" id="view-note" hidden></p>
     </header>
 
-    <main id="app" class="site-main" aria-live="polite">
-      <p class="status">載入政見資料中⋯</p>
+    <main class="site-main">
+      <section class="intro" id="intro" aria-labelledby="intro-title" hidden>
+        <h2 class="intro-title" id="intro-title">怎麼看這個網站</h2>
+        <ul class="intro-list">
+          <li>每一列是一個議題區，每一欄是一位候選人，三人欄寬與字級相同。</li>
+          <li>點政見摘要或「看政見卡片」，可讀原文引述、出處與核對紀錄。</li>
+          <li>用關鍵字或適用行政區找出和你有關的政見，網址可直接分享。</li>
+        </ul>
+        <button type="button" class="intro-dismiss" id="intro-dismiss">知道了</button>
+      </section>
+
+      <form class="toolbar" id="filters" role="search" aria-label="搜尋與篩選政見">
+        <div class="field field-search">
+          <label for="search">關鍵字</label>
+          <input id="search" name="q" type="search" placeholder="例如：托育、捷運、大里" autocomplete="off" />
+        </div>
+        <div class="field field-district">
+          <label for="district">適用行政區</label>
+          <select id="district" name="district">
+            <option value="">全部行政區</option>
+          </select>
+        </div>
+        <button type="reset" class="filter-reset">清除</button>
+      </form>
+      <p class="result-status" id="result-status" role="status"></p>
+      <p class="order-note" id="candidate-order-note"></p>
+
+      <div id="table-root" class="table-root">
+        <p class="status">載入政見資料中⋯</p>
+      </div>
     </main>
 
     <footer class="site-footer">

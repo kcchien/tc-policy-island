@@ -29,7 +29,12 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/dataset.js        政見資料集：欄位表、驗證、排除未核對、候選人排序
   js/view-model.js     檢視模型：議題區 × 候選人矩陣
   js/table-view.js     表格檢視
+  js/filter.js         搜尋與行政區篩選（filterViewModel）
+  js/policy-card.js    政見卡片（兩種檢視共用）
+  js/app-state.js      網址參數與檢視選擇
+  js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片
   data/dataset.json    建置產物，不進版控
+  data/snapshots/      建置時複製的公開出處快照，不進版控
   vendor/three/        three.js r160（島嶼檢視的票加入）
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
@@ -52,7 +57,9 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、或列在 `rawPolicyItems.sourceIds` 的那些。
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。
 
-檢視模型（`buildViewModel`）輸出 `rows[].cells[]`，每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount` 與 `rawPolicyItems`，另有 `noPolicyText` 與 `candidateOrderNote`。島嶼檢視與表格檢視都只讀檢視模型。
+檢視模型（`buildViewModel`）輸出 `rows[].cells[]`，每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount` 與 `rawPolicyItems`，另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
+
+網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 
 ### 資料與夾具
 

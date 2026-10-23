@@ -1,6 +1,6 @@
 /* 配色依 ADR 0001：大肚山紅土赭色為主色，米白、炭灰為底，水面用偏灰的青色。
    不用政黨色（藍、綠、白、橘）與候選人識別色（海洋藍、粉紅、桃紅、紫）。
-   三位候選人共用同一個中性色 --candidate。 */
+   三位候選人共用同一個中性色 --candidate。色碼只定義在 :root，其他地方一律用變數。 */
 :root {
   --laterite: #8e4b32;
   --laterite-soft: #c99a83;
@@ -14,7 +14,11 @@
   --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
   --radius: 10px;
+  --radius-small: 8px;
   --gap: 16px;
+  --shadow: 0 1px 2px color-mix(in srgb, var(--charcoal) 12%, transparent),
+    0 6px 18px color-mix(in srgb, var(--charcoal) 8%, transparent);
+  --page-width: 1180px;
 }
 
 * {
@@ -30,15 +34,46 @@ body {
   line-height: 1.6;
 }
 
+a {
+  color: var(--laterite);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--laterite);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* 頁首 */
+
 .site-header,
 .site-main,
 .site-footer {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: var(--gap);
 }
 
 .site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px var(--gap);
   border-bottom: 3px solid var(--laterite);
 }
 
@@ -46,6 +81,7 @@ body {
   margin: 0;
   color: var(--laterite);
   font-size: 1.75rem;
+  line-height: 1.2;
 }
 
 .site-subtitle {
@@ -55,63 +91,460 @@ body {
   font-size: 0.875rem;
 }
 
+.view-switch {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  background: var(--rice-deep);
+  border-radius: 999px;
+}
+
+.view-button {
+  min-height: 40px;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.view-button[aria-pressed="true"] {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+.view-button:disabled {
+  color: var(--charcoal-soft);
+  cursor: not-allowed;
+}
+
+.view-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+  text-align: right;
+}
+
+/* 首次進站說明 */
+
+.intro {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 8px var(--gap);
+  margin-bottom: var(--gap);
+  padding: var(--gap);
+  background: var(--rice-deep);
+  border-left: 4px solid var(--water);
+  border-radius: var(--radius);
+}
+
+.intro[hidden] {
+  display: none;
+}
+
+.intro-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.intro-list {
+  grid-column: 1;
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 0.9375rem;
+}
+
+.intro-dismiss {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.intro-dismiss,
+.filter-reset,
+.area-open,
+.card-close {
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--laterite);
+  border-radius: var(--radius-small);
+  background: var(--rice);
+  color: var(--laterite);
+  cursor: pointer;
+}
+
+.intro-dismiss:hover,
+.filter-reset:hover,
+.area-open:hover,
+.card-close:hover {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+/* 搜尋與篩選 */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  padding: 12px var(--gap);
+  background: var(--rice-deep);
+  border-radius: var(--radius);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+}
+
+.field-search {
+  flex: 1 1 18rem;
+}
+
+.field-district {
+  flex: 0 1 12rem;
+}
+
+/* 16px 避免 iOS 聚焦時自動放大 */
+.toolbar input,
+.toolbar select {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--laterite-soft);
+  border-radius: var(--radius-small);
+  background: var(--rice);
+  font-size: 16px;
+}
+
+.result-status:empty {
+  display: none;
+}
+
+.result-status,
 .order-note {
+  margin: 12px 0 0;
   color: var(--charcoal-soft);
   font-size: 0.875rem;
 }
 
-.table-scroll {
-  overflow-x: auto;
+.table-root {
+  margin-top: 8px;
 }
 
+/* 表格檢視：候選人欄等寬（table-layout: fixed），字級相同 */
+
 .policy-table {
-  width: 100%;
-  min-width: 40rem;
-  border-collapse: collapse;
   table-layout: fixed;
-  background: var(--rice-deep);
-  border-radius: var(--radius);
+  border-collapse: separate;
+  border-spacing: 8px;
+  margin: 0 -8px;
+  width: calc(100% + 16px);
+}
+
+.policy-table .area-col {
+  width: 10rem;
 }
 
 .policy-table th,
 .policy-table td {
   padding: 12px;
-  border: 1px solid var(--rice);
   vertical-align: top;
   text-align: left;
+  border-radius: var(--radius);
 }
 
 .policy-table thead th {
-  border-bottom: 2px solid var(--candidate);
-}
-
-.policy-table .area-col {
-  width: 9rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--rice);
+  border-bottom: 3px solid var(--candidate);
+  border-radius: 0;
+  font-weight: normal;
 }
 
 .candidate-name {
   display: block;
+  margin: 0;
   font-size: 1.125rem;
+  font-weight: bold;
 }
 
 .candidate-meta {
   display: block;
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+}
+
+.data-status {
+  display: block;
+  margin: 6px 0 0;
+  padding: 4px 8px;
+  background: var(--rice-deep);
+  border-left: 3px solid var(--water);
+  border-radius: 4px;
+  font-size: 0.8125rem;
+}
+
+.area-cell {
+  background: var(--rice-deep);
+  border-left: 4px solid var(--laterite);
+}
+
+.area-name {
+  display: block;
+  font-size: 1.0625rem;
+}
+
+.area-departments {
+  display: block;
+  margin-bottom: 8px;
   color: var(--charcoal-soft);
   font-size: 0.8125rem;
   font-weight: normal;
 }
 
-.policy-list {
-  margin: 0;
-  padding-left: 1.2em;
+.area-open {
+  min-height: 36px;
+  padding: 4px 10px;
+  font-size: 0.8125rem;
+  font-weight: normal;
 }
 
-.no-policy {
+.policy-cell {
+  background: var(--rice-deep);
+}
+
+.cell-candidate {
+  display: none;
+}
+
+.policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.policy-chip {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  background: var(--rice);
+  box-shadow: var(--shadow);
+  text-align: left;
+  cursor: pointer;
+}
+
+.policy-chip:hover {
+  border-color: var(--laterite-soft);
+}
+
+.chip-summary {
+  display: block;
+  font-size: 0.9375rem;
+}
+
+.chip-districts {
+  display: block;
+  margin-top: 4px;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.no-policy,
+.empty-result {
+  margin: 0;
   color: var(--charcoal-soft);
   font-size: 0.875rem;
 }
 
+.empty-result {
+  padding: var(--gap);
+  background: var(--rice-deep);
+  border-radius: var(--radius);
+}
+
+/* 政見卡片：三欄等寬並排 */
+
+.policy-card {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rice);
+  color: var(--charcoal);
+  box-shadow: var(--shadow);
+}
+
+.policy-card::backdrop {
+  background: color-mix(in srgb, var(--charcoal) 45%, transparent);
+}
+
+.card-inner {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 48px);
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: var(--gap) 20px;
+  border-bottom: 3px solid var(--laterite);
+}
+
+.card-title {
+  margin: 0;
+  color: var(--laterite);
+  font-size: 1.375rem;
+}
+
+.card-description {
+  margin: 2px 0;
+  color: var(--charcoal-soft);
+  font-size: 0.875rem;
+}
+
+.card-share {
+  font-size: 0.8125rem;
+}
+
+.card-columns {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: var(--gap) 20px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.card-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--rice-deep);
+  border-radius: var(--radius);
+}
+
+.card-column-head {
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--candidate);
+}
+
+.policy {
+  padding: 12px;
+  background: var(--rice);
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  box-shadow: var(--shadow);
+}
+
+.policy.is-focused {
+  border-color: var(--laterite);
+  outline: 2px solid var(--laterite-soft);
+}
+
+.policy-summary {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.conflict-note {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--laterite);
+  background: var(--rice-deep);
+  font-size: 0.8125rem;
+}
+
+.quote {
+  margin: 0 0 8px;
+}
+
+.quote-text {
+  margin: 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--water);
+  color: var(--charcoal-soft);
+  font-size: 0.875rem;
+}
+
+.quote-text::before {
+  content: "原文：";
+  color: var(--charcoal);
+  font-weight: bold;
+}
+
+.quote-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-top: 4px;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.source-type {
+  padding: 0 6px;
+  border: 1px solid var(--candidate);
+  border-radius: 999px;
+}
+
+.source-links {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.policy-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+}
+
+.policy-facts dt {
+  color: var(--charcoal-soft);
+}
+
+.policy-facts dd {
+  margin: 0;
+}
+
+.verification-line {
+  display: block;
+}
+
+.policy-link {
+  font-size: 0.75rem;
+}
+
+/* 頁尾 */
+
 .site-footer {
+  margin-top: 24px;
   color: var(--charcoal-soft);
   font-size: 0.8125rem;
   border-top: 1px solid var(--laterite-soft);
@@ -119,4 +552,128 @@ body {
 
 .status-error {
   color: var(--laterite);
+}
+
+/* 手機：800px 以下表格改單欄，卡片改底部抽屜 */
+@media (max-width: 800px) {
+  .site-header {
+    padding-bottom: 12px;
+  }
+
+  .site-title {
+    font-size: 1.5rem;
+  }
+
+  .view-note {
+    text-align: left;
+  }
+
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-dismiss {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .field-search,
+  .field-district {
+    flex: 1 1 100%;
+  }
+
+  .policy-table,
+  .policy-table tbody,
+  .policy-table tr,
+  .policy-table th,
+  .policy-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .policy-table {
+    margin: 0;
+  }
+
+  .policy-table colgroup {
+    display: none;
+  }
+
+  .policy-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .area-row {
+    margin-bottom: var(--gap);
+    padding: 4px;
+    background: var(--rice-deep);
+    border-radius: var(--radius);
+  }
+
+  .policy-table .area-cell {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+
+  .area-departments {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+  }
+
+  .policy-table .policy-cell {
+    margin-top: 4px;
+    background: var(--rice);
+  }
+
+  .cell-candidate {
+    display: block;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--candidate);
+    font-weight: bold;
+  }
+
+  .cell-candidate .data-status {
+    font-weight: normal;
+  }
+
+  .policy-chip {
+    background: var(--rice-deep);
+    box-shadow: none;
+  }
+
+  .policy-card {
+    width: 100vw;
+    max-height: 85dvh;
+    margin: auto 0 0;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .card-inner {
+    max-height: 85dvh;
+  }
+
+  .card-head {
+    padding: 12px var(--gap);
+  }
+
+  .card-columns {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    padding: 12px var(--gap) var(--gap);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
 }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const BUILD_SCRIPT = fileURLToPath(new URL('../scripts/build.js', import.meta.url));
@@ -29,6 +29,29 @@ test('建置指令從原始資料目錄產出公開資料集，未核對政見�
     ['sample-jia', 'sample-yi', 'sample-bing'],
   );
   assert.match(dataset.meta.builtAt, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('建置指令把公開出處的出處快照複製到公開資料集旁的 snapshots/，讓卡片的快照連結可用', () => {
+  const { code, output, out } = build(SAMPLE_RAW);
+
+  assert.equal(code, 0, output);
+  const copied = readFileSync(join(dirname(out), 'snapshots', 'sample-src-jia.txt'), 'utf8');
+  const original = readFileSync(new URL('./fixtures/snapshots/sample-src-jia.txt', import.meta.url), 'utf8');
+  assert.equal(copied, original);
+});
+
+test('公開出處的出處快照檔不存在時，建置失敗並指出是哪個出處', () => {
+  const rawDir = mkdtempSync(join(tmpdir(), 'build-raw-'));
+  cpSync(SAMPLE_RAW, rawDir, { recursive: true });
+  const file = join(rawDir, 'sources', 'sample-yi.json');
+  const sources = JSON.parse(readFileSync(file, 'utf8'));
+  sources[0].snapshotPath = 'test/fixtures/snapshots/missing.txt';
+  writeFileSync(file, JSON.stringify(sources));
+
+  const { code, output } = build(rawDir);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /出處 sample-src-yi 的出處快照 test\/fixtures\/snapshots\/missing\.txt 不存在/);
 });
 
 test('原始資料結構錯誤時，建置指令以非零結束碼退出並列出錯誤', () => {
