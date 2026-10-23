@@ -4,9 +4,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter } from './island-layout.js';
-import { initialQuality } from './island-quality.js';
-import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, TILE_SURFACE } from './island-models.js';
+import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter, tileCorners } from './island-layout.js';
+import { createFpsGovernor, initialQuality } from './island-quality.js';
+import { createDaylight } from './island-daylight.js';
+import { createAnimator } from './island-clock.js';
+import { createEnvironment } from './island-environment.js';
+import { instancify } from './island-kit.js';
+import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE } from './island-models.js';
 import { el } from './dom.js';
 
 const FOV = 32;
@@ -38,7 +42,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
   const renderer = new THREE.WebGLRenderer({ antialias: quality.antialias, powerPreference: 'low-power' });
   renderer.setPixelRatio(quality.pixelRatio);
   renderer.shadowMap.enabled = quality.shadows;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = quality.level === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+  // 陰影由迴圈決定何時更新（低畫質或卡頓時每幾幀一次）。
+  renderer.shadowMap.autoUpdate = false;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.domElement.classList.add('island-canvas');
   renderer.domElement.setAttribute('aria-hidden', 'true');
@@ -49,28 +55,21 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
   stage.append(renderer.domElement, labelRenderer.domElement);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(PALETTE.background);
-  scene.fog = new THREE.Fog(PALETTE.background, 60, 140);
 
   const layout = islandLayout(vm);
   const { bounds } = layout;
   const outline = islandPoints(layout, { surface: TILE_SURFACE, top: MODEL_TOP });
   const center = new THREE.Vector3(bounds.center.x, 0, bounds.center.z);
 
-  scene.add(new THREE.HemisphereLight(PALETTE.hemiSky, PALETTE.hemiGround, 1.6));
-  const sun = new THREE.DirectionalLight(PALETTE.sun, 2.2);
-  sun.position.set(center.x - 10, 22, center.z + 12);
-  sun.target.position.copy(center);
-  sun.castShadow = quality.shadows;
-  sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { left: -bounds.radius, right: bounds.radius, top: bounds.radius, bottom: -bounds.radius, near: 1, far: 60 });
-  scene.add(sun, sun.target);
-
-  const water = new THREE.Mesh(new THREE.CircleGeometry(bounds.radius * 6, 48), new THREE.MeshStandardMaterial({ color: PALETTE.water, roughness: 0.75 }));
-  water.rotation.x = -Math.PI / 2;
-  water.position.copy(center).setY(0.12);
-  water.receiveShadow = true;
-  scene.add(water);
+  // 晝夜（預設白天）、天空、光照與發光材質。
+  const daylight = createDaylight();
+  const environment = createEnvironment(scene, { center, radius: bounds.radius, quality });
+  // 裝飾動畫的時間；後續的動畫用 animator.add 註冊（見 island-clock.js）。
+  const animator = createAnimator({ reducedMotion });
+  const governor = createFpsGovernor(quality);
+  let shadowEvery = quality.shadowEvery;
+  let frame = 0;
+  let lastNight = 0;
 
   // 每格一個群組：格子、在地感元素、三個標記、議題區名牌。
   const tiles = new Map();
@@ -106,6 +105,10 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     }
     scene.add(g);
   }
+  scene.add(streetLamps(tileCorners(layout)));
+  // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
+  const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
+  pickable.push(...kit.meshes);
 
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 400);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -135,9 +138,29 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     if (flight) stepFlight(now);
     else recenter();
     const moving = controls.update();
+    const { lighting, settled } = daylight.at(now);
+    lastNight = lighting.night;
+    environment.apply(lighting, renderer);
+    animator.tick(now, { night: lighting.night });
+    // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
+    const animating = animator.running;
+    frame += 1;
+    renderer.shadowMap.needsUpdate = !animating || frame % shadowEvery === 0;
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
-    if (moving || flight) requestRender();
+    if (animating) {
+      const next = governor.frame(now);
+      if (next) applyQuality(next);
+    } else {
+      governor.pause();
+    }
+    if (moving || flight || !settled || animating) requestRender();
+  };
+  // 執行中降級：降像素比、關毛玻璃（.lowfx）、降低陰影更新頻率。
+  const applyQuality = (next) => {
+    renderer.setPixelRatio(next.pixelRatio);
+    shadowEvery = next.shadowEvery;
+    document.documentElement.classList.toggle('lowfx', next.lowFx);
   };
   const requestRender = () => {
     if (renderPending) return;
@@ -227,6 +250,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     const color = id === selectedId ? PALETTE.landSelected : dimmed.has(id) ? PALETTE.landDimmed : PALETTE.landTop;
     tile.top.material.color.setHex(color);
     tile.group.position.y = id === selectedId ? 0.12 : 0;
+    kit.setOwnerOffset(id, tile.group.position.y);
     tile.label.classList.toggle('is-selected', id === selectedId);
     tile.label.classList.toggle('is-dimmed', dimmed.has(id));
   };
@@ -262,17 +286,63 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(pickable, true)[0];
-    let node = hit?.object;
-    while (node && !node.userData.areaId) node = node.parent;
-    if (node) onSelectArea(node.userData.areaId);
+    // 第一個屬於議題區的命中：合批的零件從實例查回議題區，其餘往上找格子群組。
+    // 裝飾格與路燈的零件沒有議題區，射線穿過去。
+    const areaOf = (hit) => {
+      if (hit.object.isInstancedMesh) return kit.ownerOf(hit);
+      let node = hit.object;
+      while (node && !node.userData.areaId) node = node.parent;
+      return node?.userData.areaId ?? null;
+    };
+    const areaId = raycaster.intersectObjects(pickable, true).map(areaOf).find(Boolean);
+    if (areaId) onSelectArea(areaId);
   });
 
   const observer = new ResizeObserver(resize);
   observer.observe(stage);
   resize();
+  // 使用者中途切換系統的減少動態設定，重畫一次讓動畫停住或開始走。
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', requestRender);
 
   return {
+    // 切換時段：'dawn'、'day'、'dusk'、'night'（island-daylight.js 的 TIMES_OF_DAY），約 1.4 秒補間；
+    // 減少動態時直接切過去。不認得的時段回傳 false。
+    setTimeOfDay(id) {
+      const changed = daylight.set(id, performance.now(), { instant: reducedMotion() });
+      if (changed) requestRender();
+      return changed;
+    },
+    timeOfDay() {
+      return daylight.current;
+    },
+    // 暫停按鈕：true 時所有裝飾動畫停在目前畫格。
+    setPaused(paused) {
+      animator.setPaused(paused);
+      requestRender();
+    },
+    paused() {
+      return animator.paused;
+    },
+    // 給後續的場景模組註冊裝飾動畫 fn(t, dt, env)，回傳取消函式。見 island-clock.js。
+    addAnimation(fn) {
+      const remove = animator.add(fn);
+      requestRender();
+      return remove;
+    },
+    // 上一幀的繪製呼叫數與畫質，給量測與除錯用。
+    stats() {
+      return {
+        drawCalls: renderer.info.render.calls,
+        triangles: renderer.info.render.triangles,
+        // 合批的零件數與 InstancedMesh 數（每個一次繪製呼叫）。
+        parts: kit.meshes.reduce((sum, mesh) => sum + mesh.count, 0),
+        partMeshes: kit.meshes.length,
+        pixelRatio: renderer.getPixelRatio(),
+        quality: quality.level,
+        // 上一幀的夜間係數（補間途中介於兩個時段之間）。
+        night: lastNight,
+      };
+    },
     // 套用篩選結果：只改標記亮暗與議題區淡化，島的形狀不變。
     update(filtered) {
       const next = islandLayout(vm, { filtered });

@@ -1256,3 +1256,9 @@ body[data-view="table"] .island-view {
     scroll-behavior: auto !important;
   }
 }
+
+/* 島嶼檢視卡頓時（island-view.js 執行中降級）關掉毛玻璃 */
+.lowfx * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

@@ -3,9 +3,9 @@
 
 import * as THREE from 'three';
 import { markerOutline } from './island-layout.js';
+import { glowSourceMaterial, sharedGeometry } from './island-kit.js';
 
 export const PALETTE = {
-  background: 0xe8e0d2,
   water: 0x7d9a98,
   shallow: 0x98aeaa,
   landTop: 0xc99a83,
@@ -45,9 +45,9 @@ export const PALETTE = {
   markerLit: 0xf1e4c8,
   markerGlow: 0x8a6f4a,
   markerOff: 0x6b6560,
-  hemiSky: 0xf4efe6,
-  hemiGround: 0x8e4b32,
-  sun: 0xf2e6d4,
+  windowGlow: 0xf2e2a0,
+  lampGlow: 0xf4e8b8,
+  lampPost: 0x4f4a45,
 };
 
 const materials = new Map();
@@ -60,12 +60,23 @@ export function material(color, options = {}) {
   return materials.get(key);
 }
 
-function mesh(geometry, color, { x = 0, y = 0, z = 0, rotX = 0, rotY = 0, rotZ = 0, side } = {}) {
+// form 是一般幾何，或零件形體 { geometry, scale }（共用的單位幾何，之後由 instancify 合批）。
+function mesh(form, color, { x = 0, y = 0, z = 0, rotX = 0, rotY = 0, rotZ = 0, side } = {}) {
+  const geometry = form.isBufferGeometry ? form : form.geometry;
   const m = new THREE.Mesh(geometry, side ? material(color, { side }) : material(color));
+  if (!form.isBufferGeometry) m.scale.set(...form.scale);
   m.position.set(x, y, z);
   m.rotation.set(rotX, rotY, rotZ);
   m.castShadow = true;
   m.receiveShadow = true;
+  return m;
+}
+
+// 發光零件（窗、燈泡）：instancify 會換成共用的發光材質，亮度隨夜間係數變化。
+function glowMesh(shape, color, { x = 0, y = 0, z = 0 } = {}) {
+  const m = new THREE.Mesh(shape.geometry, glowSourceMaterial(color));
+  m.scale.set(...shape.scale);
+  m.position.set(x, y, z);
   return m;
 }
 
@@ -79,18 +90,38 @@ const group = (...children) => {
 export const TILE_HEIGHT = 0.36;
 const TILE_TOP = 0.08;
 export function hexTile(size) {
-  const base = mesh(new THREE.CylinderGeometry(size * 0.98, size * 1.02, TILE_HEIGHT, 6), PALETTE.landSide, { y: TILE_HEIGHT / 2 });
+  const base = mesh(cyl(size * 0.98, size * 1.02, TILE_HEIGHT, 6), PALETTE.landSide, { y: TILE_HEIGHT / 2 });
   const top = mesh(new THREE.CylinderGeometry(size * 0.96, size * 0.98, TILE_TOP, 6), PALETTE.landTop, { y: TILE_HEIGHT + TILE_TOP / 2 });
   top.material = top.material.clone();
   return { tile: group(base, top), top };
 }
 export const TILE_SURFACE = TILE_HEIGHT + TILE_TOP;
 
-// 常用形體。每個元素先在約 1.5 × 1.05 的範圍內組好，再由 fitInto 縮放到格子的元素區。
-const cone = (r, h, segments = 6) => new THREE.ConeGeometry(r, h, segments);
-const cyl = (rt, rb, h, segments = 10) => new THREE.CylinderGeometry(rt, rb, h, segments);
-const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
-const rockGeo = (r, detail = 0) => new THREE.DodecahedronGeometry(r, detail);
+// 路燈：每個格子頂點一盞（相鄰格共用的頂點只放一盞），燈柱加燈泡，夜裡燈泡亮起。
+// 每盞都一樣，與議題區內容無關。corners 是 tileCorners 的 [x, z]。
+export function streetLamps(corners) {
+  const lamps = corners.flatMap(([x, z]) => [
+    mesh(cyl(0.012, 0.018, 0.3, 5), PALETTE.lampPost, { x, y: TILE_SURFACE + 0.15, z }),
+    glowMesh(sphere(0.035, 6, 4), PALETTE.lampGlow, { x, y: TILE_SURFACE + 0.32, z }),
+  ]);
+  return group(lamps);
+}
+
+// 常用形體：零件庫的共用單位幾何加縮放，同種形體全島只建一份幾何。
+// 每個元素先在約 1.5 × 1.05 的範圍內組好，再由 fitInto 縮放到格子的元素區。
+const form = (key, make, scale) => ({ geometry: sharedGeometry(key, make), scale });
+const cone = (r, h, segments = 6) => form(`cone${segments}`, () => new THREE.ConeGeometry(1, 1, segments), [r, h, r]);
+// 圓柱的上下半徑比四捨五入到兩位，比例相同的圓柱共用幾何。
+function cyl(rt, rb, h, segments = 10) {
+  const r = Math.max(rt, rb);
+  const [top, bottom] = [rt / r, rb / r].map((v) => Math.round(v * 100) / 100);
+  return form(`cyl${segments}:${top}:${bottom}`, () => new THREE.CylinderGeometry(top, bottom, 1, segments), [r, h, r]);
+}
+const box = (w, h, d) => form('box', () => new THREE.BoxGeometry(1, 1, 1), [w, h, d]);
+const rockGeo = (r) => form('dodeca', () => new THREE.DodecahedronGeometry(1, 0), [r, r, r]);
+const ico = (r) => form('ico', () => new THREE.IcosahedronGeometry(1, 0), [r, r, r]);
+const sphere = (r, widthSegments, heightSegments) =>
+  form(`sphere${widthSegments}x${heightSegments}`, () => new THREE.SphereGeometry(1, widthSegments, heightSegments), [r, r, r]);
 
 function conifer(x, z, h = 0.42) {
   return [
@@ -103,15 +134,15 @@ function conifer(x, z, h = 0.42) {
 function roundTree(x, z, h = 0.36) {
   return [
     mesh(cyl(0.025, 0.035, h * 0.45, 5), PALETTE.timber, { x, y: h * 0.22, z }),
-    mesh(new THREE.IcosahedronGeometry(h * 0.33, 0), PALETTE.foliage, { x, y: h * 0.68, z }),
+    mesh(ico(h * 0.33), PALETTE.foliage, { x, y: h * 0.68, z }),
   ];
 }
 
 // 平頂台地：八邊形截錐，南北向壓扁成 depthScale 倍。
 function mesa(top, bottom, height, depthScale) {
-  const geometry = cyl(top, bottom, height, 8);
-  geometry.scale(1, 1, depthScale);
-  return geometry;
+  const shape = cyl(top, bottom, height, 8);
+  shape.scale[2] *= depthScale;
+  return shape;
 }
 
 // 以拉伸剖面做的山脊或台地：剖面在 x-y 平面，沿 z 拉伸 depth。
@@ -149,6 +180,8 @@ function hall({ w, d, h, roofH = 0.22, wallColor = PALETTE.brick, roofColor = PA
   const parts = [mesh(box(w, h, d), wallColor), mesh(roofGeo, roofColor)];
   parts[0].position.y = h / 2;
   parts[1].position.y = h;
+  // 正面一排窗，夜裡亮起。
+  parts.push(glowMesh(box(w * 0.55, h * 0.28, 0.012), PALETTE.windowGlow, { y: h * 0.52, z: d / 2 + 0.006 }));
   if (swallowtail) {
     parts.push(mesh(box(w + 0.1, 0.04, 0.05), roofColor, { y: h + roofH + 0.01 }));
     for (const side of [-1, 1]) {
@@ -193,9 +226,9 @@ function wetland({ birds = 3, channel = false } = {}) {
   // 白鷺：身體、長頸、頭。
   [[0.05, -0.05], [0.3, 0.2], [-0.2, 0.25]].slice(0, birds).forEach(([x, z], i) => {
     parts.push(
-      mesh(new THREE.SphereGeometry(0.07, 6, 4), PALETTE.porcelain, { x, y: 0.16, z }),
+      mesh(sphere(0.07, 6, 4), PALETTE.porcelain, { x, y: 0.16, z }),
       mesh(cyl(0.015, 0.02, 0.14, 4), PALETTE.porcelain, { x: x + 0.05, y: 0.25, z, rotZ: -0.4 }),
-      mesh(new THREE.SphereGeometry(0.03, 5, 3), PALETTE.porcelain, { x: x + 0.08, y: 0.32, z }),
+      mesh(sphere(0.03, 5, 3), PALETTE.porcelain, { x: x + 0.08, y: 0.32, z }),
       mesh(cyl(0.008, 0.008, 0.14, 3), PALETTE.timber, { x, y: 0.07, z }),
     );
     if (i === 0) parts.push(mesh(cone(0.01, 0.08, 3), PALETTE.syrup, { x: x + 0.13, y: 0.32, z, rotZ: -Math.PI / 2 }));
@@ -295,7 +328,7 @@ const BUILDERS = {
     mesh(cyl(0.245, 0.24, 0.14, 14), PALETTE.pearl, { y: 0.11 }),
     mesh(cyl(0.31, 0.31, 0.04, 14), PALETTE.porcelain, { y: 0.88 }),
     mesh(cyl(0.035, 0.035, 0.6, 6), PALETTE.porcelain, { x: 0.06, y: 1.05, rotZ: 0.15 }),
-    ...[[-0.45, 0.25], [0.5, 0.2], [0.42, -0.3], [-0.5, -0.2], [0.55, 0.38]].map(([x, z]) => mesh(new THREE.IcosahedronGeometry(0.05, 0), PALETTE.pearl, { x, y: 0.08, z })),
+    ...[[-0.45, 0.25], [0.5, 0.2], [0.42, -0.3], [-0.5, -0.2], [0.55, 0.38]].map(([x, z]) => mesh(ico(0.05), PALETTE.pearl, { x, y: 0.08, z })),
   ),
   // 大麵羹：大碗裡粗黃的鹼麵與筷子。
   'da-mian-geng': () => group(
@@ -314,9 +347,9 @@ const BUILDERS = {
   // 蜜豆冰：碗上堆成小山的剉冰，淋糖水、放蜜豆與水果。
   'mitou-ice': () => group(
     ...bowl({ r: 0.55, fill: PALETTE.shavedIce, extras: [
-      (y) => mesh(new THREE.IcosahedronGeometry(0.45, 0), PALETTE.shavedIce, { y: y + 0.22 }),
+      (y) => mesh(ico(0.45), PALETTE.shavedIce, { y: y + 0.22 }),
       (y) => mesh(cone(0.36, 0.2, 7), PALETTE.syrup, { y: y + 0.6 }),
-      (y) => [[-0.18, 0.15], [0.15, 0.2], [0.05, -0.2], [-0.22, -0.12], [0.25, -0.05]].map(([x, z], i) => mesh(new THREE.IcosahedronGeometry(0.055, 0), i % 2 ? PALETTE.fruit : PALETTE.bean, { x, y: y + 0.42, z })),
+      (y) => [[-0.18, 0.15], [0.15, 0.2], [0.05, -0.2], [-0.22, -0.12], [0.25, -0.05]].map(([x, z], i) => mesh(ico(0.055), i % 2 ? PALETTE.fruit : PALETTE.bean, { x, y: y + 0.42, z })),
     ] }),
   ),
   // 粄條：盤上寬扁的米白麵條，配筷子與一小碟。
@@ -448,10 +481,16 @@ const litMaterial = () => material(PALETTE.markerLit, { emissive: PALETTE.marker
 const offMaterial = () => material(PALETTE.markerOff, { transparent: true, opacity: 0.55 });
 
 // 標記平躺在格子上、略為墊高，從斜上方看得到形狀。marker 是 islandLayout 的標記資料。
+// 標記的亮暗會隨篩選切換材質，不合批；同形狀的標記共用一份幾何。
+const markerGeometries = new Map();
 export function markerModel(marker) {
-  const geometry = new THREE.ExtrudeGeometry(markerShape(marker), { depth: MARKER_DEPTH, bevelEnabled: false, curveSegments: 16 });
-  geometry.rotateX(-Math.PI / 2);
-  const m = new THREE.Mesh(geometry, offMaterial());
+  const key = `${marker.sides}:${marker.start}:${marker.radius}`;
+  if (!markerGeometries.has(key)) {
+    const geometry = new THREE.ExtrudeGeometry(markerShape(marker), { depth: MARKER_DEPTH, bevelEnabled: false, curveSegments: 16 });
+    geometry.rotateX(-Math.PI / 2);
+    markerGeometries.set(key, geometry);
+  }
+  const m = new THREE.Mesh(markerGeometries.get(key), offMaterial());
   m.castShadow = true;
   return m;
 }

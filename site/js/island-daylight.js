@@ -19,8 +19,8 @@ export const KEYFRAMES = {
   dawn: {
     skyTop: 0xb9b7c2, skyHorizon: 0xe2cdb6, fog: 0xd9cbbb, fogNear: 55, fogFar: 145,
     sunColor: 0xeedcc8, sunIntensity: 1.4, sunDirection: [14, 7, 6],
-    hemiSky: 0xd8cfc8, hemiGround: 0x7a5040, hemiIntensity: 1.1,
-    water: 0x7f8f92, night: 0.25, exposure: 1,
+    hemiSky: 0xd8cfc8, hemiGround: 0x7a5040, hemiIntensity: 1.4,
+    water: 0x9aa6a4, night: 0.25, exposure: 1,
   },
   day: {
     skyTop: 0xc3cbca, skyHorizon: 0xeee6d8, fog: 0xe8e0d2, fogNear: 60, fogFar: 140,
@@ -31,14 +31,14 @@ export const KEYFRAMES = {
   dusk: {
     skyTop: 0xa9a0a8, skyHorizon: 0xdcb9a0, fog: 0xcdb4a2, fogNear: 55, fogFar: 140,
     sunColor: 0xe6cdb8, sunIntensity: 1.3, sunDirection: [-16, 6, 4],
-    hemiSky: 0xcdb9b0, hemiGround: 0x6e4434, hemiIntensity: 0.9,
-    water: 0x6f7c80, night: 0.55, exposure: 1.05,
+    hemiSky: 0xcdb9b0, hemiGround: 0x6e4434, hemiIntensity: 1.2,
+    water: 0x9a9894, night: 0.55, exposure: 1.05,
   },
   night: {
     skyTop: 0x1d1f27, skyHorizon: 0x3b3c46, fog: 0x34353e, fogNear: 45, fogFar: 125,
-    sunColor: 0xb4b8c4, sunIntensity: 0.5, sunDirection: [-6, 18, -8],
-    hemiSky: 0x5a5d68, hemiGround: 0x2e2622, hemiIntensity: 0.55,
-    water: 0x2f3a3c, night: 1, exposure: 1.15,
+    sunColor: 0xb4b8c4, sunIntensity: 0.9, sunDirection: [-6, 18, -8],
+    hemiSky: 0x70737e, hemiGround: 0x3a302a, hemiIntensity: 1,
+    water: 0x46524f, night: 1, exposure: 1.2,
   },
 };
 
