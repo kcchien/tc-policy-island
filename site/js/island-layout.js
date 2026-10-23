@@ -34,6 +34,12 @@ export function markerOutline({ sides, start, radius }) {
 // 三個標記排在格子南側（靠近鏡頭的一側），由西到東依候選人排序。
 const MARKER_SPACING = 0.42;
 const MARKER_ROW_Z = 0.52;
+// 標記列占用的範圍（相對格心）：三個標記的中心與最大外接圓半徑。裝飾（island-decor.js）避開這裡，不讀標記本身。
+// 畫成立牌（island-models.js 的 markerSign，底座半徑 0.07、牌寬 0.2）後比這個範圍小，避讓只會偏寬。
+export const MARKER_ROW = {
+  centers: [-1, 0, 1].map((i) => ({ x: i * MARKER_SPACING, z: MARKER_ROW_Z })),
+  reach: Math.max(...MARKER_SHAPES.map((shape) => circumradius(shape.sides, MARKER_SIZE))),
+};
 
 // 尖頂六角格的軸向座標換成平面座標：q 往東（+x），r 往南（+z）。格距比島大，相鄰島之間留出水道。
 export function axialToPosition([q, r], size = GRID_SPACING) {

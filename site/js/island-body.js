@@ -22,15 +22,15 @@ export const WALKWAY_APOTHEM = apothemOf(WALKWAY.radius);
 const LAMP_RADIUS = 1.24;
 
 // 島上的位置（相對格心，場景單位）。每個議題區島都相同，與政見無關（ADR 0001）。
-// hero：主題場景（island-heroes.js）。模型在單位空間設計（底面 x、z 在 ±0.5、高 0~maxHeight），放大 size 倍後底面中心放在 (x, z)。
-//   放在北側（離預設鏡頭較遠），不擋南側的標記。單位空間高過 maxHeight 會擋到東南、西南鄰島的標記
-//   （預設視角的視線測試），island-heroes.js 的 heroSlotTransform 會把超高的場景等比縮小。
+// hero：主題場景（island-heroes.js）。模型在單位空間設計（底面 x、z 在 ±0.5、高 0~1.5），每座都放大 size 倍，
+//   底面中心放在 (x, z)。放在北側（離預設鏡頭較遠），南緣離標記列留一道窄縫，北角剛好在步道環內側。
+//   放大後不擋任何標記，由預設視角的視線測試以每個零件的外框檢查（test/island-motion.test.js）。
 // element：在地感元素的範圍 { minX, maxX, minZ, maxZ, maxY }，議題區島放在主題場景西側當次要元素；
 //   裝飾格沒有標記與主題場景，元素放大置中。
 export const TILE_SLOTS = {
-  hero: { x: 0, z: -0.4, size: 0.72, maxHeight: 1.2, facing: 0 },
+  hero: { x: 0, z: -0.27, size: 0.92, facing: 0 },
   element: {
-    area: { minX: -0.84, maxX: -0.44, minZ: -0.37, maxZ: 0.03, maxY: 0.55 },
+    area: { minX: -0.84, maxX: -0.5, minZ: -0.4, maxZ: 0, maxY: 0.55 },
     decorative: { minX: -0.7, maxX: 0.7, minZ: -0.55, maxZ: 0.55, maxY: 1.35 },
     // 候選人廣場（island-plaza.js）：南半站三個候選人人物，元素放在北半。
     plaza: { minX: -0.7, maxX: 0.7, minZ: -0.6, maxZ: 0.12, maxY: 1 },

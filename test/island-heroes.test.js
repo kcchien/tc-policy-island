@@ -67,7 +67,7 @@ test('換政見資料，主題場景的選擇與位置都不變', () => {
   assert.deepEqual(crowded, none);
 });
 
-test('主題場景放進每島的主題場景位置：外框在位置範圍內，放大後不高過高度上限', () => {
+test('主題場景放進每島的主題場景位置：外框在位置範圍內，每座放大倍率相同', () => {
   // 每個有專屬場景的議題區各一格，連同通用場景都檢查。
   const raw = makeRaw();
   const ids = [...Object.keys(HERO_SCENES), 'area-x'];
@@ -80,11 +80,10 @@ test('主題場景放進每島的主題場景位置：外框在位置範圍內�
     const slot = tile.heroSlot;
     const { min, max } = sceneBounds(heroSceneFor(hero.areaId));
     const s = hero.transform.scale;
-    assert.ok(s <= slot.size + 1e-9, `${hero.areaId} 放大 ${s} 超過位置大小`);
+    assert.equal(s, slot.size, `${hero.areaId} 放大 ${s}，與位置大小不同`);
     // 外框（單位空間 ±0.5 內）放大後在位置的底面範圍內。
     for (const x of [min[0], max[0]]) assert.ok(Math.abs(hero.transform.x - tile.position.x - slot.x + x * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 東西超出`);
     for (const z of [min[2], max[2]]) assert.ok(Math.abs(hero.transform.z - tile.position.z - slot.z + z * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 南北超出`);
-    assert.ok(max[1] * s <= slot.maxHeight * slot.size + 1e-9, `${hero.areaId} 高 ${(max[1] * s).toFixed(2)}，會擋到鄰島的標記`);
   }
 });
 

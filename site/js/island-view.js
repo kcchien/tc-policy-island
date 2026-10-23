@@ -18,14 +18,14 @@ import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
 import { createMotion } from './island-motion-view.js';
 import {
-  figureModel, localElementModel, markerModel, setMarkerLit, TILE_SURFACE,
+  figureModel, localElementModel, markerSign, setMarkerLit, TILE_SURFACE,
 } from './island-models.js';
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
 import { placeLabels } from './island-labels.js';
-import { heroPlan } from './island-heroes.js';
-import { buildHeroScene } from './island-hero-view.js';
+import { LOD_DISTANCE } from './island-decor.js';
+import { createDecor } from './island-decor-view.js';
 import { el } from './dom.js';
 import { ISLAND_TEXT } from './ui-text.js';
 
@@ -92,9 +92,8 @@ export function createIslandView(stage, {
   let frame = 0;
   let lastNight = 0;
 
-  // 每格一個群組：島體（island-body-view.js）、主題場景、在地感元素、三個標記、議題區名牌。
-  // 主題場景放在每島的主題場景位置（heroSlot），只依議題區決定（island-heroes.js）。
-  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
+  // 每格一個群組：島體（island-body-view.js）、靜態裝飾（主題場景、路燈、大樹、家具與植栽，island-decor-view.js）、
+  // 在地感元素、三個標記、議題區名牌。
   const tiles = new Map();
   const groups = new Map();
   const pickable = [];
@@ -114,15 +113,9 @@ export function createIslandView(stage, {
       model.position.y = TILE_SURFACE;
       g.add(model);
     }
-    // 議題區的主題場景（只依識別碼，見 island-heroes.js）；heroes 的位置是世界座標，換成格子群組內的座標。
-    const hero = heroes.get(tileInfo.id);
-    if (hero) {
-      const { x, z, scale, yaw } = hero.transform;
-      g.add(buildHeroScene(tileInfo.id, { x: x - tileInfo.position.x, y: TILE_SURFACE, z: z - tileInfo.position.z, scale, yaw }));
-    }
     const markers = tileInfo.markers.map((info) => {
-      const marker = markerModel(info);
-      marker.position.set(info.offset.x, TILE_SURFACE + 0.01, info.offset.z);
+      const marker = markerSign(info);
+      marker.position.set(info.offset.x, TILE_SURFACE, info.offset.z);
       setMarkerLit(marker, info.lit);
       g.add(marker);
       return marker;
@@ -184,14 +177,18 @@ export function createIslandView(stage, {
       body.rotation.z = tilt;
     }
   });
-  // 島體：頂面、側壁、圖案帶、步道環、路緣、路燈、淺水與泡沫環、拱橋（island-body-view.js），每格相同、不讀政見。
+  // 島體：頂面、側壁、圖案帶、步道環、路緣、淺水與泡沫環、拱橋（island-body-view.js），每格相同、不讀政見。
   const islandBody = createIslandBody(scene, layout, { groupOf: (id) => groups.get(id), waterMaterial: environment.waterMaterial, plazaId: plaza.tile?.id });
+  // 靜態裝飾：主題場景只依議題區識別碼，其餘每個議題區格子數量相同，不讀政見（island-decor.js）。
+  const decor = createDecor(scene, layout, { groupOf: (id) => groups.get(id), surface: TILE_SURFACE });
   // 每格的循環道具、市民、環線車輛（island-motion-view.js），配置不讀政見。
   const motion = createMotion(scene, layout, { level: quality.level, groupOf: (id) => tiles.get(id)?.group, glowMaterial: environment.glowMaterial });
   animator.add(motion.update);
   // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
   const kit = instancify(scene, { glowMaterial: environment.glowMaterial });
   pickable.push(...kit.meshes);
+  // 鏡頭拉遠時隱藏的小物件（長椅、盆栽、踏石等），合批後是幾個獨立的 InstancedMesh。
+  const smallDecor = kit.meshes.filter((mesh) => mesh.userData.lod === 'small');
   // 外圍地形與環境（不可點選）；雲、霧、鳥隨動畫時間移動。
   const outskirts = createOutskirts(scene, { layout, quality, environment });
   animator.add(outskirts.update);
@@ -247,6 +244,9 @@ export function createIslandView(stage, {
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
+    decor.setNight(lighting.night);
+    const showSmall = camera.position.distanceTo(controls.target) < LOD_DISTANCE;
+    for (const mesh of smallDecor) mesh.visible = showSmall;
     animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon, lighting });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
@@ -422,6 +422,7 @@ export function createIslandView(stage, {
     tile.group.position.y = id === selectedId ? SELECTED_LIFT : 0;
     kit.setOwnerOffset(id, tile.group.position.y);
     islandBody.setLift(id, tile.group.position.y);
+    decor.setLift(id, tile.group.position.y);
     tile.label.classList.toggle('is-selected', id === selectedId);
     tile.label.classList.toggle('is-dimmed', dimmed.has(id));
   };

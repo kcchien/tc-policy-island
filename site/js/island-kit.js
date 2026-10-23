@@ -73,6 +73,29 @@ export function glowSourceMaterial(color) {
   return m;
 }
 
+const clayMaterials = new Map();
+// 同色共用材質；instancify 只讀顏色，合批後換成黏土材質。
+function clay(color) {
+  if (!clayMaterials.has(color)) clayMaterials.set(color, new THREE.MeshStandardMaterial({ color }));
+  return clayMaterials.get(color);
+}
+
+// 零件資料（island-heroes.js 的格式 { shape, color, size, at, rot?, yaw? }）→ Mesh，color 依 colors 色表換成色碼。
+// 變換是「平移 at · 繞 y 轉 yaw · rot · 縮放 size」（與 island-heroes.js 的 partBounds 相同）。主題場景與靜態裝飾共用。
+export function kitPartMesh(part, colors) {
+  const { geometry, glow } = kitShape(part.shape);
+  const color = colors[part.color];
+  const mesh = new THREE.Mesh(geometry, glow ? glowSourceMaterial(color) : clay(color));
+  const [rx = 0, ry = 0, rz = 0] = part.rot ?? [];
+  const rotation = new THREE.Matrix4().makeRotationY(part.yaw ?? 0)
+    .multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rx, ry, rz)));
+  mesh.matrix.makeTranslation(...part.at).multiply(rotation).scale(new THREE.Vector3(...part.size));
+  mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
+  mesh.castShadow = !glow;
+  mesh.receiveShadow = !glow;
+  return mesh;
+}
+
 // 主題場景零件庫的形體（kitShape 建的幾何）：用黏土材質並加縮放微抖動。
 // 其他零件（格子、在地感元素、路燈、路面）維持原本的低多邊形 flatShading，不受影響。
 const isClayShape = (shape) => shape.startsWith('kit:');
@@ -91,8 +114,15 @@ function ownerOf(object) {
   return null;
 }
 
+// 往上找第一個 userData.lod（遠距離隱藏的分組，例如裝飾的小物件），合批時另外分桶。
+function lodOf(object) {
+  for (let node = object; node; node = node.parent) if (node.userData.lod) return node.userData.lod;
+  return null;
+}
+
 // 把 root 底下用共用幾何、材質可合批的靜態零件換成 InstancedMesh，加到 root。
-// glowMaterial 是所有發光件共用的材質（顏色每幀乘夜間係數）。
+// glowMaterial 是所有發光件共用的材質（顏色每幀乘夜間係數）。祖先設了 userData.lod 的零件另外分桶，
+// 那幾個 InstancedMesh 的 userData.lod 標明分組，呼叫端依鏡頭距離整個隱藏。
 // 回傳 { meshes, ownerOf(hit), setOwnerOffset(owner, y) }。
 export function instancify(root, { glowMaterial }) {
   root.updateMatrixWorld(true);
@@ -111,6 +141,7 @@ export function instancify(root, { glowMaterial }) {
       geometry: object.geometry,
       castShadow: object.castShadow,
       owner: ownerOf(object),
+      lod: lodOf(object),
       object,
     });
   });
@@ -144,6 +175,7 @@ export function instancify(root, { glowMaterial }) {
     mesh.castShadow = bucket.material !== 'glow' && bucket.items.some((p) => p.castShadow);
     mesh.receiveShadow = bucket.material !== 'glow';
     mesh.userData.items = bucket.items.map((p) => ({ owner: p.owner, transform: p.transform }));
+    if (bucket.lod) mesh.userData.lod = bucket.lod;
     mesh.computeBoundingSphere();
     root.add(mesh);
     return mesh;

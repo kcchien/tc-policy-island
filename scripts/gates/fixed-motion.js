@@ -3,20 +3,11 @@ import { join } from 'node:path';
 import { buildViewModel } from '../../site/js/view-model.js';
 import { islandLayout } from '../../site/js/island-layout.js';
 import { motionSignature } from '../../site/js/island-motion.js';
+import { policyVariants } from '../lib/policy-variants.js';
 
 // 網站上的動態配置模組。關卡直接載入網站目錄裡的這一份，檢查的就是要上線的程式。
 export const MOTION_MODULE = 'js/island-motion.js';
 
-// 同一份公開資料集換幾種政見內容：沒有政見、政見全部集中在第一個議題區、每條政見重複三次。
-// 動態配置只依格子決定，換哪一種都必須得到同樣的結果（ADR 0001）。
-function policyVariants(dataset) {
-  const firstArea = dataset.issueAreas[0]?.id;
-  return [
-    { name: '沒有任何政見', policies: [] },
-    { name: '政見全部集中在第一個議題區', policies: dataset.policies.map((p) => ({ ...p, issueAreaId: firstArea })) },
-    { name: '每條政見重複三次', policies: dataset.policies.flatMap((p) => [0, 1, 2].map((i) => ({ ...p, id: `${p.id}-${i}` }))) },
-  ];
-}
 
 export default {
   id: 'fixed-motion',

@@ -13,13 +13,15 @@ export function scaleJitter(index) {
   return 1 + SCALE_JITTER * (unit * 2 - 1);
 }
 
-// part：{ shape, material, transform, color }。shape 是共用幾何的代號（例如 'box'、'cone6'），
-// material 是材質種類（例如 'standard'、'glow'）。回傳的桶依第一次出現的順序排列。
+// part：{ shape, material, transform, color, lod? }。shape 是共用幾何的代號（例如 'box'、'cone6'），
+// material 是材質種類（例如 'standard'、'glow'），lod 是遠距離隱藏的分組（例如 'small'，整桶一起隱藏），沒有就是 null。
+// 回傳的桶依第一次出現的順序排列。
 export function partBuckets(parts) {
   const buckets = new Map();
   for (const part of parts) {
-    const key = `${part.shape}|${part.material}`;
-    if (!buckets.has(key)) buckets.set(key, { key, shape: part.shape, material: part.material, items: [] });
+    const lod = part.lod ?? null;
+    const key = `${part.shape}|${part.material}|${lod ?? ''}`;
+    if (!buckets.has(key)) buckets.set(key, { key, shape: part.shape, material: part.material, lod, items: [] });
     buckets.get(key).items.push(part);
   }
   return [...buckets.values()];
