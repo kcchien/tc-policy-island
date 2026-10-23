@@ -1,0 +1,122 @@
+/* 配色依 ADR 0001：大肚山紅土赭色為主色，米白、炭灰為底，水面用偏灰的青色。
+   不用政黨色（藍、綠、白、橘）與候選人識別色（海洋藍、粉紅、桃紅、紫）。
+   三位候選人共用同一個中性色 --candidate。 */
+:root {
+  --laterite: #8e4b32;
+  --laterite-soft: #c99a83;
+  --rice: #f4efe6;
+  --rice-deep: #e8e0d2;
+  --charcoal: #2f2c29;
+  --charcoal-soft: #5e5852;
+  --water: #7d9a98;
+  --candidate: #6b6560;
+
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --radius: 10px;
+  --gap: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow-wrap: anywhere;
+  background: var(--rice);
+  color: var(--charcoal);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+.site-header,
+.site-main,
+.site-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--gap);
+}
+
+.site-header {
+  border-bottom: 3px solid var(--laterite);
+}
+
+.site-title {
+  margin: 0;
+  color: var(--laterite);
+  font-size: 1.75rem;
+}
+
+.site-subtitle {
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.order-note {
+  color: var(--charcoal-soft);
+  font-size: 0.875rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.policy-table {
+  width: 100%;
+  min-width: 40rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: var(--rice-deep);
+  border-radius: var(--radius);
+}
+
+.policy-table th,
+.policy-table td {
+  padding: 12px;
+  border: 1px solid var(--rice);
+  vertical-align: top;
+  text-align: left;
+}
+
+.policy-table thead th {
+  border-bottom: 2px solid var(--candidate);
+}
+
+.policy-table .area-col {
+  width: 9rem;
+}
+
+.candidate-name {
+  display: block;
+  font-size: 1.125rem;
+}
+
+.candidate-meta {
+  display: block;
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+  font-weight: normal;
+}
+
+.policy-list {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.no-policy {
+  color: var(--charcoal-soft);
+  font-size: 0.875rem;
+}
+
+.site-footer {
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+  border-top: 1px solid var(--laterite-soft);
+}
+
+.status-error {
+  color: var(--laterite);
+}
