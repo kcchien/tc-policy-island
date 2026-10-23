@@ -39,8 +39,10 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）
-  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
-  js/island-models.js  格子、在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
+  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主題場景位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
+  js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
+  js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
+  js/island-models.js  在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、太陽光暈、光照與補光、霧、淺水與深水、夜間係數）、著色器混色比例、1.4 秒補間、自動時段 timeOfDayAt（台灣時間 05–08 清晨、08–16 白天、16–19 黃昏、其餘夜晚）（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
@@ -55,8 +57,13 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-environment.js 天空著色器（漸層、太陽光暈、夜晚星星）、太陽、半球光與補光、霧、水面著色器（深淺漂移、遠處加深、閃光，waterMaterial 可給其他物件共用）、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈並做梯田）、地面色、各畫質的背景樹（針葉與闊葉，數千棵）、霧、聚落、雲、海上小島與帆船數量、樹群、聚落、霧團、雲、飛鳥、三圈遠山剪影與其顏色、小島燈塔帆船，與依動畫時間的位置與水面時間；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、背景樹（不投影）與聚落 InstancedMesh、霧團、雲與雲影、飛鳥、遠山剪影、小島燈塔帆船；用 addAnimation 的時間移動，水面時間也從這裡交給環境
-  js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民、路網、環線與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查
-  js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車、路面與環線堤，會動的零件每種一個 InstancedMesh
+  js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民（走自己島的步道環）、環線（沿步道環與橋的外圈）與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查（關卡也要載入它 import 的 island-body.js）
+  js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車，會動的零件每種一個 InstancedMesh
+  js/bgm-score.js      背景音樂的樂曲（Node 可測）：固定種子產生的 32 小節循環，G 宮五聲音階，鼓組、貝斯、和弦、撥弦與拉弦旋律都是純資料
+  js/bgm-schedule.js   背景音樂的前瞻排程（每格時間由起點與格數算出，不漂移，Node 可測）
+  js/bgm-synth.js      背景音樂的音色：Web Audio 即時合成，不用音檔（關卡「不載入音檔」）
+  js/bgm-player.js     背景音樂的播放：第一次開啟才建立 AudioContext；renderBars 用離線音訊環境渲染前幾小節供試聽
+  js/bgm-control.js    工具列的音樂開關與音量滑桿（文字在 ui-text.js 的 MUSIC_TEXT）：預設靜音，只有按開關才播放（進站一律不出聲，減少動態時亦同），分頁隱藏暫停，音量記在 localStorage
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例（候選人分頁的卡片在 candidate-card.js）
   js/ui-text.js        畫面文案：程式產生、給市民看的文字一律放這裡（其他畫面模組不寫中文字串，test/ui-text.test.js 檢查），受上線關卡「受眾文案」掃描
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
@@ -103,6 +110,8 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 
 開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
+
+放主題場景：`island-heroes.js` 的 `heroPlan(layout)` 預設用 `heroSlotTransform` 把每座場景放進該議題區島的 `heroSlot`（每島相同，見 `island-body.js` 的 `TILE_SLOTS.hero`），場景高過 `maxHeight` 時整座等比縮小，不擋鄰島標記。只依議題區識別碼決定，不讀政見。
 
 ### 資料與夾具
 

@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
+import { cameraLimits, islandLayout, islandPoints, orbitCenter, viewOffset } from './island-layout.js';
 import {
   approachInsets, combineInsets, coverInsets, createCameraFlight, flightDuration, homeView, isDrag, sameInsets,
 } from './island-camera.js';
@@ -18,8 +18,10 @@ import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
 import { createMotion } from './island-motion-view.js';
 import {
-  figureModel, hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE,
+  figureModel, localElementModel, markerModel, setMarkerLit, TILE_SURFACE,
 } from './island-models.js';
+import { TILE_SLOTS } from './island-body.js';
+import { createIslandBody } from './island-body-view.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
 import { heroPlan } from './island-heroes.js';
 import { buildHeroScene } from './island-hero-view.js';
@@ -83,21 +85,21 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   let frame = 0;
   let lastNight = 0;
 
-  // 每格一個群組：格子、主題場景、在地感元素、三個標記、議題區名牌。
+  // 每格一個群組：島體（island-body-view.js）、主題場景、在地感元素、三個標記、議題區名牌。
+  // 主題場景放在每島的主題場景位置（heroSlot），只依議題區決定（island-heroes.js）。
   const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
   const tiles = new Map();
+  const groups = new Map();
   const pickable = [];
   const labelAnchors = [];
   for (const tileInfo of layout.tiles) {
     const g = new THREE.Group();
     g.position.set(tileInfo.position.x, 0, tileInfo.position.z);
-    const { tile, top } = hexTile(layout.hexSize);
-    // 候選人廣場是鋪面的裝飾格，在地感元素照議題區格子的位置放在北半，南半站候選人人物。
+    groups.set(tileInfo.id, g);
+    // 候選人廣場是鋪面的裝飾格，在地感元素放在北半，南半站候選人人物。
     const isPlaza = tileInfo.id === plaza.tile?.id;
-    if (tileInfo.kind === 'decorative') top.material.color.setHex(isPlaza ? PALETTE.plazaTop : PALETTE.decorativeTop);
-    g.add(tile);
-    const elementKind = isPlaza ? 'area' : tileInfo.kind === 'area' ? 'secondary' : 'decorative';
-    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, elementKind);
+    const slot = isPlaza ? TILE_SLOTS.element.plaza : tileInfo.elementSlot;
+    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, slot);
     if (model) {
       model.position.y = TILE_SURFACE;
       g.add(model);
@@ -129,7 +131,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       g.add(label);
       g.userData.areaId = tileInfo.id;
       pickable.push(g);
-      tiles.set(tileInfo.id, { group: g, top, markers, label: name });
+      tiles.set(tileInfo.id, { group: g, markers, label: name });
     }
     scene.add(g);
   }
@@ -168,8 +170,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       body.rotation.z = tilt;
     }
   });
-  scene.add(streetLamps(tileCorners(layout)));
-  // 每格的循環道具、市民、環線車輛與路網（island-motion-view.js），配置不讀政見。
+  // 島體：頂面、側壁、圖案帶、步道環、路緣、路燈、淺水與泡沫環、拱橋（island-body-view.js），每格相同、不讀政見。
+  const islandBody = createIslandBody(scene, layout, { groupOf: (id) => groups.get(id), waterMaterial: environment.waterMaterial, plazaId: plaza.tile?.id });
+  // 每格的循環道具、市民、環線車輛（island-motion-view.js），配置不讀政見。
   const motion = createMotion(scene, layout, { level: quality.level, groupOf: (id) => tiles.get(id)?.group, glowMaterial: environment.glowMaterial });
   animator.add(motion.update);
   // 靜態零件合批成 InstancedMesh，繪製呼叫數只看零件種類，不看零件數。
@@ -338,10 +341,10 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   let dimmed = new Set();
   const paintTile = (id) => {
     const tile = tiles.get(id);
-    const color = id === selectedId ? PALETTE.landSelected : dimmed.has(id) ? PALETTE.landDimmed : PALETTE.landTop;
-    tile.top.material.color.setHex(color);
+    islandBody.paint(id, { selected: id === selectedId, dimmed: dimmed.has(id) });
     tile.group.position.y = id === selectedId ? SELECTED_LIFT : 0;
     kit.setOwnerOffset(id, tile.group.position.y);
+    islandBody.setLift(id, tile.group.position.y);
     tile.label.classList.toggle('is-selected', id === selectedId);
     tile.label.classList.toggle('is-dimmed', dimmed.has(id));
   };

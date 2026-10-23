@@ -1,16 +1,16 @@
-// 島嶼的動態：每格的循環道具、市民、環線上的公車與火車、格子間的路網。
+// 島嶼的動態：每格的循環道具、市民、沿步道環與橋繞行的公車與火車。步道與橋本身是島體（island-body-view.js）。
 // 配置一律來自 island-motion.js 的 motionPlan（只讀格子，不讀政見）；這裡只把配置畫成 3D。
-// 靜態零件（道具底座、路、環線堤）用零件庫的共用幾何，之後由 instancify 合批；
+// 靜態零件（道具底座）用零件庫的共用幾何，之後由 instancify 合批；
 // 會動的零件每種一個 InstancedMesh，每幀由動畫迴圈更新矩陣，繪製呼叫數不隨格子數增加。
 
 import * as THREE from 'three';
-import { citizenPose, loopPose, motionPlan, vehiclePose } from './island-motion.js';
+import { citizenPose, loopPose, motionPlan, VEHICLE_HALF_WIDTH, vehiclePose } from './island-motion.js';
+import { tileAt } from './island-body.js';
 import { material, PALETTE, PARTS, TILE_SURFACE } from './island-models.js';
 
 // 3D 材質色碼，受禁用色檢查（ADR 0001）。衣服只用低飽和的大地色，不用任何政黨或候選人的識別色。
 export const MOTION_PALETTE = {
   road: 0x8c847b,
-  dike: 0x8f8476,
   skin: 0xc49a7c,
   trousers: 0x4f4a45,
   clothes: [0x8a5a44, 0x9a7b55, 0x6f6a58, 0xa86f5a, 0x7c6f66, 0xb59a74],
@@ -25,13 +25,8 @@ export const MOTION_PALETTE = {
   stone: 0xa59a8c,
 };
 
-// 環線的堤：堤頂高度在水面（y = 0.12）之上、格子頂面之下；轉角放圓墩補滿接縫。
-const RING_Y = 0.18;
-const DIKE_HEIGHT = 0.08;
-const DIKE_WIDTH = 0.17;
-// 路面：寬度跨過格子間的縫，每段多鋪一點蓋住轉角。
-const ROAD_WIDTH = 0.08;
-const ROAD_THICKNESS = 0.006;
+// 車輛底部離步道面的高度（步道略高出島頂面）。
+const VEHICLE_LIFT = 0.008;
 
 // 零件庫的共用單位幾何（零件代號與 island-models.js 相同，同種形體合進同一桶）。
 const unitBox = () => PARTS.box(1, 1, 1).geometry;
@@ -185,8 +180,8 @@ const CITIZEN = {
 
 // 車輛：車身、車頂、兩側窗帶（夜裡發光）、車燈（夜裡發光）。長度方向沿 +x。
 const VEHICLES = {
-  train: { length: 0.32, width: 0.07, height: 0.07, color: MOTION_PALETTE.train, roof: MOTION_PALETTE.trainRoof },
-  bus: { length: 0.22, width: 0.065, height: 0.075, color: MOTION_PALETTE.bus, roof: MOTION_PALETTE.busRoof },
+  train: { length: 0.32, width: 2 * VEHICLE_HALF_WIDTH.train, height: 0.07, color: MOTION_PALETTE.train, roof: MOTION_PALETTE.trainRoof },
+  bus: { length: 0.22, width: 2 * VEHICLE_HALF_WIDTH.bus, height: 0.075, color: MOTION_PALETTE.bus, roof: MOTION_PALETTE.busRoof },
 };
 
 // scene 是島嶼場景；layout 是 islandLayout 的結果；groupOf(areaId) 回傳該格的群組（靜態零件放進去，選取抬高時跟著動）。
@@ -195,27 +190,6 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   const plan = motionPlan(layout, { level });
   const areas = plan.tiles.filter((t) => t.kind === 'area');
   const liftOf = (id) => groupOf(id)?.position.y ?? 0;
-
-  // 路網：每條格子邊一段薄路面，鋪在格子頂面，跨過格子間的縫。
-  const roads = new THREE.Group();
-  for (const { from, to } of plan.roads) {
-    const [dx, dz] = [to[0] - from[0], to[1] - from[1]];
-    roads.add(part(unitBox(), MOTION_PALETTE.road, {
-      scale: [Math.hypot(dx, dz) + ROAD_WIDTH * 0.6, ROAD_THICKNESS, ROAD_WIDTH],
-      x: (from[0] + to[0]) / 2, y: TILE_SURFACE + ROAD_THICKNESS / 2, z: (from[1] + to[1]) / 2,
-      rotY: -Math.atan2(dz, dx),
-    }));
-  }
-  // 環線：貼著水面的堤，火車與公車分走內外兩條車道。
-  const dikeY = RING_Y - DIKE_HEIGHT / 2;
-  plan.ring.forEach((from, i) => {
-    const to = plan.ring[(i + 1) % plan.ring.length];
-    const [dx, dz] = [to[0] - from[0], to[1] - from[1]];
-    const at = { x: (from[0] + to[0]) / 2, y: dikeY, z: (from[1] + to[1]) / 2, rotY: -Math.atan2(dz, dx) };
-    roads.add(part(unitBox(), MOTION_PALETTE.dike, { ...at, scale: [Math.hypot(dx, dz), DIKE_HEIGHT, DIKE_WIDTH] }));
-    roads.add(part(unitCyl(8), MOTION_PALETTE.dike, { scale: [DIKE_WIDTH / 2, DIKE_HEIGHT, DIKE_WIDTH / 2], x: from[0], y: dikeY, z: from[1] }));
-  });
-  scene.add(roads);
 
   // 循環道具的底座放進格子群組（相對格心），零件庫合批時記得是哪一格。
   for (const tile of areas) {
@@ -313,7 +287,8 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     for (const vehicle of plan.vehicles) vehiclePoses.set(vehicle, vehiclePose(plan.ring, vehicle, t, plan.ringLength));
     cars.forEach(({ vehicle, index, spec }, i) => {
       const pose = vehiclePoses.get(vehicle)[index];
-      placeAt(pose.x, RING_Y, pose.z, pose.heading);
+      // 車輛走在步道環上，過橋時跟著拱起（pose.y）；在選中的島上跟著抬高，在橋面中段不屬於任何島。
+      placeAt(pose.x, TILE_SURFACE + VEHICLE_LIFT + pose.y + liftOf(tileAt(layout, pose)), pose.z, pose.heading);
       carBody.setMatrixAt(i, m.multiplyMatrices(place, local.makeScale(spec.length, spec.height * 0.85, spec.width)));
       local.makeScale(spec.length * 0.96, spec.height * 0.15, spec.width * 0.9).setPosition(0, spec.height * 0.85, 0);
       carRoof.setMatrixAt(i, m.multiplyMatrices(place, local));

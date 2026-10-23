@@ -9,10 +9,12 @@ import repoDocuments from './repo-documents.js';
 import fixedMotion from './fixed-motion.js';
 import figureConsistency from './figure-consistency.js';
 import audienceText from './audience-text.js';
+import noAudioFiles from './no-audio-files.js';
 
 // 上線關卡清單。新增關卡：在本目錄寫一個 { id, name, check(site) → 失敗訊息陣列 } 模組，加進這裡。
 export const GATES = [
   datasetStructure, verifiedPolicies, candidateColumns, candidateProfiles, brandTerms, forbiddenColors, repoDocuments, fixedMotion, figureConsistency, audienceText,
+  noAudioFiles,
 ];
 
 export function runGates(siteDir) {
