@@ -8,6 +8,7 @@ import { renderIslandList, renderLegend } from './island-list.js';
 import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
+import { setupMusicToggle } from './bgm-control.js';
 
 const DATASET_URL = './data/dataset.json';
 const INTRO_SEEN_KEY = 'policy-island:intro-seen';
@@ -219,6 +220,10 @@ function startApp(vm, state, initialView) {
     applyLabels();
   });
   document.getElementById('tool-overview').addEventListener('click', () => withIsland((controller) => controller.showAll()));
+  setupMusicToggle({
+    button: document.getElementById('tool-music'),
+    volumeInput: document.getElementById('tool-music-volume'),
+  });
 
   const renderIslandPanel = () => {
     renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null) });

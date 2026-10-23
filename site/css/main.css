@@ -265,6 +265,33 @@ select {
   color: var(--laterite);
 }
 
+/* 背景音樂：關閉時音符畫一道斜線。開啟後音量滑桿浮在開關正下方，
+   不佔工具列寬度，開關也不會因此移位（避免第二下點到滑桿） */
+.music-group {
+  position: relative;
+}
+
+#tool-music[aria-pressed="true"] .icon-muted,
+.music-volume {
+  display: none;
+}
+
+.music-group.is-on .music-volume {
+  display: block;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  width: 96px;
+  margin: 0;
+  padding: 6px 10px;
+  transform: translateX(-50%);
+  background: var(--glass);
+  border-radius: 999px;
+  box-shadow: var(--float-shadow);
+  accent-color: var(--laterite);
+  pointer-events: auto;
+}
+
 .view-note {
   margin: 0;
   color: var(--charcoal-soft);
@@ -1910,8 +1937,10 @@ body[data-view="island"] .card-height {
     padding: 4px 2px;
   }
 
+  /* 膠囊列放不下音量滑桿，手機用裝置的音量鍵調整 */
   body[data-view="island"] .time-group,
-  body[data-view="island"] .view-button[aria-pressed="true"] {
+  body[data-view="island"] .view-button[aria-pressed="true"],
+  body[data-view="island"] .music-group .music-volume {
     display: none;
   }
 

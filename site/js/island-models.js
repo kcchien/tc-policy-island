@@ -8,11 +8,8 @@ import { glowSourceMaterial, sharedGeometry } from './island-kit.js';
 export const PALETTE = {
   water: 0x7d9a98,
   shallow: 0x98aeaa,
-  landTop: 0xc99a83,
+  // 選取外框的深赭色（島頂面的顏色在 island-body-view.js 的 BODY_PALETTE）。
   landSide: 0x8e4b32,
-  landSelected: 0xd9b59c,
-  landDimmed: 0xb3aba2,
-  decorativeTop: 0xbba893,
   mud: 0x8f7a64,
   rock: 0x8a7f74,
   rockDark: 0x6e655d,
@@ -49,8 +46,7 @@ export const PALETTE = {
   // 夜間發光倍率約 1.8，太淡的燈色乘上去會變成近白（禁用色），燈色要夠飽和。
   lampGlow: 0xe8d488,
   lampPost: 0x4f4a45,
-  // 候選人廣場：鋪面、人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
-  plazaTop: 0xcfc4b2,
+  // 候選人廣場：人物腳下的形狀底座、人物。三位候選人人物同一個中性色。
   figurePad: 0xe6dccb,
   figure: 0x9c948a,
 };
@@ -91,21 +87,13 @@ const group = (...children) => {
   return g;
 };
 
-// 格子：深色土層加淺色頂面，尖頂六角形（CylinderGeometry 六邊時頂點朝南北）。
-export const TILE_HEIGHT = 0.36;
-const TILE_TOP = 0.08;
-export function hexTile(size) {
-  const base = mesh(cyl(size * 0.98, size * 1.02, TILE_HEIGHT, 6), PALETTE.landSide, { y: TILE_HEIGHT / 2 });
-  const top = mesh(new THREE.CylinderGeometry(size * 0.96, size * 0.98, TILE_TOP, 6), PALETTE.landTop, { y: TILE_HEIGHT + TILE_TOP / 2 });
-  top.material = top.material.clone();
-  return { tile: group(base, top), top };
-}
-export const TILE_SURFACE = TILE_HEIGHT + TILE_TOP;
+// 島頂面的高度（島體見 island-body-view.js）。
+export const TILE_SURFACE = 0.44;
 
-// 路燈：每個格子頂點一盞（相鄰格共用的頂點只放一盞），燈柱加燈泡，夜裡燈泡亮起。
-// 每盞都一樣，與議題區內容無關。corners 是 tileCorners 的 [x, z]。
-export function streetLamps(corners) {
-  const lamps = corners.flatMap(([x, z]) => [
+// 路燈：燈柱加燈泡，夜裡燈泡亮起。每盞都一樣，與議題區內容無關。
+// positions 是 [x, z]，相對傳回群組的原點（island-body.js 的路燈位置每島六盞）。
+export function streetLamps(positions) {
+  const lamps = positions.flatMap(([x, z]) => [
     mesh(cyl(0.012, 0.018, 0.3, 5), PALETTE.lampPost, { x, y: TILE_SURFACE + 0.15, z }),
     glowMesh(sphere(0.035, 6, 4), PALETTE.lampGlow, { x, y: TILE_SURFACE + 0.32, z }),
   ]);
@@ -471,17 +459,6 @@ const BY_CATEGORY = {
   老建築: () => courtyardHouse(),
 };
 
-// 元素區：有標記的議題區格子留出南側的標記帶，元素放在北側；裝飾格沒有標記，元素可以放大置中。
-// 範圍是相對格心的 x、z 與最高高度。格子頂面半徑 0.96，標記帶從 z = 0.32 開始。
-// 鏡頭在南方，本格北半部就在西北、東北鄰格標記帶的正前方，所以北緣收在 -0.66、高度上限 1，
-// 北面也不做整面的高牆；以預設視角從鏡頭對每個標記打射線檢查過不會被遮住。
-// secondary：議題區格子的元素區西半放主題場景（island-heroes.js 的 temporarySlot），在地感元素縮到東半當次要元素。
-const ELEMENT_AREA = {
-  area: { minX: -0.76, maxX: 0.76, minZ: -0.66, maxZ: 0.24, maxY: 1 },
-  secondary: { minX: 0.14, maxX: 0.76, minZ: -0.46, maxZ: 0.22, maxY: 0.6 },
-  decorative: { minX: -0.8, maxX: 0.8, minZ: -0.7, maxZ: 0.7, maxY: 1.35 },
-};
-
 // 把模型等比例縮放到元素區內，水平置中、底部貼齊格子頂面（y = 0）。
 function fitInto(model, area) {
   model.updateMatrixWorld(true);
@@ -500,10 +477,11 @@ function fitInto(model, area) {
   return wrapper;
 }
 
-// kind 是 'area'（留標記帶，候選人廣場用）、'secondary'（議題區格子，主題場景旁的次要元素）或 'decorative'（裝飾格）。
-export function localElementModel(element, kind = 'area') {
+// slot 是元素區 { minX, maxX, minZ, maxZ, maxY }（相對格心），見 island-body.js 的 TILE_SLOTS.element。
+// 議題區島的元素是主題場景（island-heroes.js）旁的次要元素。
+export function localElementModel(element, slot) {
   const build = BUILDERS[element.id] ?? BY_CATEGORY[element.category];
-  return build ? fitInto(build(), ELEMENT_AREA[kind]) : null;
+  return build ? fitInto(build(), slot) : null;
 }
 
 // 候選人標記：同尺寸、同色，只以形狀區分。size 是外接圓半徑。

@@ -67,26 +67,24 @@ test('換政見資料，主題場景的選擇與位置都不變', () => {
   assert.deepEqual(crowded, none);
 });
 
-test('暫放位置：主題場景放大後仍在格子的元素區內，不擋標記帶', () => {
-  const layout = layoutOf(rawWith([]));
+test('主題場景放進每島的主題場景位置：外框在位置範圍內，放大後不高過高度上限', () => {
+  // 每個有專屬場景的議題區各一格，連同通用場景都檢查。
+  const raw = makeRaw();
+  const ids = [...Object.keys(HERO_SCENES), 'area-x'];
+  raw.issueAreas = ids.map((id, i) => ({ id, name: `議題區${id}`, departments: ['測試局'], description: '測試用議題區', axial: [i, 0], localElementId: null }));
+  raw.decorativeTiles = [];
+  raw.policies = [];
+  const layout = layoutOf(raw);
   for (const hero of heroPlan(layout)) {
     const tile = layout.tiles.find((t) => t.id === hero.areaId);
+    const slot = tile.heroSlot;
     const { min, max } = sceneBounds(heroSceneFor(hero.areaId));
     const s = hero.transform.scale;
-    assert.ok(hero.transform.z - tile.position.z + max[2] * s <= 0.24 + 1e-9, '主題場景伸進標記帶');
-    // 外框四角都在格子頂面（尖頂六角形，外接半徑 0.96）內。
-    const r = 0.96 * layout.hexSize;
-    for (const x of [min[0], max[0]]) for (const z of [min[2], max[2]]) {
-      const dx = Math.abs(hero.transform.x - tile.position.x + x * s);
-      const dz = Math.abs(hero.transform.z - tile.position.z + z * s);
-      assert.ok(dx <= (r * Math.sqrt(3)) / 2 && dz <= r - dx / Math.sqrt(3), `${hero.areaId} 的角 (${x}, ${z}) 超出格子頂面`);
-    }
-  }
-  // 每座場景用暫放的縮放都不超過元素區的高度上限 1。
-  const s = heroPlan(layout)[0].transform.scale;
-  for (const scene of Object.values(HERO_SCENES)) {
-    const height = sceneBounds(scene).max[1] * s;
-    assert.ok(height <= 1 + 1e-9, `${scene.id} 暫放後高 ${height.toFixed(2)}，會擋到北鄰格的標記`);
+    assert.ok(s <= slot.size + 1e-9, `${hero.areaId} 放大 ${s} 超過位置大小`);
+    // 外框（單位空間 ±0.5 內）放大後在位置的底面範圍內。
+    for (const x of [min[0], max[0]]) assert.ok(Math.abs(hero.transform.x - tile.position.x - slot.x + x * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 東西超出`);
+    for (const z of [min[2], max[2]]) assert.ok(Math.abs(hero.transform.z - tile.position.z - slot.z + z * s) <= slot.size / 2 + 1e-9, `${hero.areaId} 南北超出`);
+    assert.ok(max[1] * s <= slot.maxHeight * slot.size + 1e-9, `${hero.areaId} 高 ${(max[1] * s).toFixed(2)}，會擋到鄰島的標記`);
   }
 });
 

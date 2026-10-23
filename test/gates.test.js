@@ -44,6 +44,7 @@ const COMPLIANT_FILES = {
   'css/main.css': ':root { --laterite: #8e4b32; --rice: #f4efe6; --water: #7d9a98; }\nbody { color: rgb(47, 44, 41); background: var(--rice); }',
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
   'js/island-motion.js': repoFile('site/js/island-motion.js'),
+  'js/island-body.js': repoFile('site/js/island-body.js'),
   'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
   'js/ui-text.js': repoFile('site/js/ui-text.js'),
   ...REPO_FILES,
@@ -653,4 +654,29 @@ test('網站目錄缺少動態配置模組時，動態數量固定關卡不通�
 
   assert.notEqual(code, 0);
   assert.match(output, /js\/island-motion\.js/);
+});
+
+test('網站目錄放了音檔或程式引用音檔時，不載入音檔關卡不通過並指出檔案', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'audio/loop.mp3': 'ID3',
+    'js/music.js': "const track = new Audio('./audio/theme.ogg');",
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /audio\/loop\.mp3/);
+  assert.match(output, /js\/music\.js/);
+});
+
+test('即時合成的背景音樂程式、叫做 midi 的欄位與文案提到「音檔」兩字不擋', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/bgm-synth.js': "const osc = context.createOscillator(); // 不使用音檔\nconst noise = context.createBuffer(1, 4410, 44100);\nif (slot.midi !== null) play(slot.midi);",
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.equal(code, 0, output);
 });

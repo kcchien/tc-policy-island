@@ -936,17 +936,23 @@ export function heroSceneFor(areaId) {
   return HERO_SCENES[areaId] ?? GENERIC_SCENE;
 }
 
-// 暫放位置：島體改版提供每島的主題場景位置（heroSlot）之前，主題場景放在現有格子元素區的西半，
-// 在地感元素縮到東半（island-models.js 的 ELEMENT_AREA.secondary）。
-// 縮放 0.76 讓最高的場景（約 1.31）放大後不超過 1，不擋北鄰格的標記；南緣不進標記帶（z ≤ 0.24）。
-export const TEMPORARY_SLOT = { dx: -0.3, dz: -0.2, scale: 0.76 };
-export function temporarySlot(tile) {
-  return { x: tile.position.x + TEMPORARY_SLOT.dx, z: tile.position.z + TEMPORARY_SLOT.dz, scale: TEMPORARY_SLOT.scale, yaw: 0 };
+// 主題場景位置（island-layout.js 每個議題區格子的 heroSlot，數值在 island-body.js 的 TILE_SLOTS.hero）：
+// 放大 slot.size 倍，底面中心放在格心加 (slot.x, slot.z)。場景比 slot.maxHeight 高時整座等比縮小，
+// 放大後不擋到鄰島的標記（預設視角的視線測試在 test/island-motion.test.js）。縮放只看場景本身，與政見無關。
+export function heroSlotTransform(tile) {
+  const slot = tile.heroSlot;
+  const height = sceneBounds(heroSceneFor(tile.id)).max[1];
+  return {
+    x: tile.position.x + slot.x,
+    z: tile.position.z + slot.z,
+    scale: slot.size * Math.min(1, slot.maxHeight / height),
+    yaw: slot.facing,
+  };
 }
 
 // 每個議題區格子的主題場景與擺放：{ areaId, sceneId, transform: { x, z, scale, yaw } }。
-// 只讀格子的識別碼、種類與位置，不讀標記亮暗與政見。slotOf(tile) 決定擺放（島體提供主題場景位置後傳入，取代暫放位置）。
-export function heroPlan(layout, { slotOf = temporarySlot } = {}) {
+// 只讀格子的識別碼、種類、位置與主題場景位置，不讀標記亮暗與政見。slotOf(tile) 決定擺放。
+export function heroPlan(layout, { slotOf = heroSlotTransform } = {}) {
   return layout.tiles
     .filter((tile) => tile.kind === 'area')
     .map((tile) => ({ areaId: tile.id, sceneId: heroSceneFor(tile.id).id, transform: slotOf(tile) }));
