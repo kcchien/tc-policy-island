@@ -29,15 +29,11 @@ test('狀態寫回網址時省略空欄，讀回後與原狀態相同', () => {
 });
 
 test('不支援 WebGL 時一律進入表格檢視，即使網址指定島嶼檢視', () => {
-  assert.equal(chooseView({ requested: 'island', webgl: false, islandAvailable: true }), 'table');
-  assert.equal(chooseView({ requested: null, webgl: false, islandAvailable: true }), 'table');
+  assert.equal(chooseView({ requested: 'island', webgl: false }), 'table');
+  assert.equal(chooseView({ requested: null, webgl: false }), 'table');
 });
 
-test('島嶼檢視尚未提供時進入表格檢視', () => {
-  assert.equal(chooseView({ requested: 'island', webgl: true, islandAvailable: false }), 'table');
-});
-
-test('支援 WebGL 且島嶼檢視可用時，預設島嶼檢視，網址可指定表格檢視', () => {
-  assert.equal(chooseView({ requested: null, webgl: true, islandAvailable: true }), 'island');
-  assert.equal(chooseView({ requested: 'table', webgl: true, islandAvailable: true }), 'table');
+test('支援 WebGL 時預設島嶼檢視，網址可指定表格檢視', () => {
+  assert.equal(chooseView({ requested: null, webgl: true }), 'island');
+  assert.equal(chooseView({ requested: 'table', webgl: true }), 'table');
 });

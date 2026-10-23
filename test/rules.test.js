@@ -12,6 +12,7 @@ import { createScanner, loadBrandTerms } from '../scripts/lib/brand-terms.js';
 import { openSite } from '../scripts/gates/site.js';
 import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
+import { extractColors, forbiddenRangesOf, loadForbiddenColors } from '../scripts/lib/colors.js';
 
 const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 const raw = loadRawData(repoPath('data/raw'));
@@ -92,6 +93,21 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
 
   assert.equal(pkg.name, 'tc-policy-island');
   assert.deepEqual(names.filter((name) => scan(name).length > 0), []);
+});
+
+test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
+  const { ranges } = loadForbiddenColors();
+  const files = ['site/js/island-models.js', 'site/js/island-view.js'];
+  let scanned = 0;
+  for (const file of files) {
+    const text = readFileSync(repoPath(file), 'utf8');
+    const colors = extractColors(text, 'js');
+    // three.js 的色碼寫法是 0xrrggbb；每一個都要被抽到，沒有漏網的寫法。
+    assert.equal(colors.length, (text.match(/0x[0-9a-f]{6}\b/gi) ?? []).length, file);
+    for (const color of colors) assert.deepEqual(forbiddenRangesOf(color, ranges), [], `${file} 的 ${color.raw}`);
+    scanned += colors.length;
+  }
+  assert.ok(scanned >= 40, `只掃到 ${scanned} 個色碼`);
 });
 
 test('本 repo 的網站文案與配色，以正式原始資料建置後通過品牌用語掃描與禁用色檢查', () => {

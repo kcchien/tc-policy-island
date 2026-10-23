@@ -4,12 +4,12 @@ import { filterViewModel } from './filter.js';
 import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
 import { renderTable } from './table-view.js';
+import { renderIslandList, renderLegend } from './island-list.js';
 import { el } from './dom.js';
 
 const DATASET_URL = './data/dataset.json';
-// 島嶼檢視完成後由島嶼檢視的票改為 true。
-const ISLAND_AVAILABLE = false;
 const INTRO_SEEN_KEY = 'policy-island:intro-seen';
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 function supportsWebGL() {
   try {
@@ -47,15 +47,16 @@ function setupIntro() {
   });
 }
 
-function setupViewSwitch(view, webgl) {
-  document.body.dataset.view = view;
-  document.body.dataset.webgl = webgl ? 'yes' : 'no';
-  for (const button of document.querySelectorAll('.view-button')) {
-    button.setAttribute('aria-pressed', String(button.dataset.view === view));
-  }
+function showViewNote(text) {
   const note = document.getElementById('view-note');
-  note.textContent = webgl ? '島嶼檢視準備中，目前提供表格檢視。' : '此裝置無法顯示島嶼檢視，已改用表格檢視。';
+  note.textContent = text;
   note.hidden = false;
+}
+
+// 島嶼檢視無法使用時停用切換按鈕，只留表格檢視。
+function disableIsland(reason) {
+  document.querySelector('.view-button[data-view="island"]').disabled = true;
+  showViewNote(reason);
 }
 
 function setupDistricts(select, selected) {
@@ -70,12 +71,22 @@ function resultStatusText(filtered) {
   return `符合篩選條件的政見共 ${matchCount} 筆，分布在 ${filtered.rows.length} 個議題區。`;
 }
 
-function startApp(vm, state) {
+function startApp(vm, state, initialView) {
   const tableRoot = document.getElementById('table-root');
   const form = document.getElementById('filters');
   const search = document.getElementById('search');
   const district = document.getElementById('district');
   const status = document.getElementById('result-status');
+  const stage = document.getElementById('island-stage');
+  const panel = document.getElementById('island-panel');
+  const panelToggle = document.getElementById('island-panel-toggle');
+  const islandList = document.getElementById('island-list');
+
+  let view = initialView;
+  let filtered = vm;
+  // 目前選中的議題區。關閉卡片後仍保留，切換檢視時沿用。
+  let selectedArea = null;
+  let island = null;
 
   const updateUrl = () => history.replaceState(null, '', formatSearch(state) || location.pathname);
 
@@ -88,19 +99,105 @@ function startApp(vm, state) {
   });
   document.body.append(card.element);
 
+  const setPanelOpen = (open) => {
+    panel.classList.toggle('is-open', open);
+    panelToggle.setAttribute('aria-expanded', String(open));
+  };
+  panelToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
+  document.getElementById('island-reset').addEventListener('click', () => {
+    island?.then((controller) => controller?.showAll());
+  });
+
+  const renderIslandPanel = () => {
+    renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null) });
+  };
+
+  // 第一次進入島嶼檢視時才載入 three.js。載入或建立場景失敗就改用表格檢視。
+  const ensureIsland = () => {
+    island ??= import('./island-view.js')
+      .then(({ createIslandView }) => {
+        const controller = createIslandView(stage, {
+          vm,
+          reducedMotion: () => reducedMotionQuery.matches,
+          onSelectArea: (areaId) => openCard(areaId, null),
+        });
+        controller.update(filtered);
+        document.getElementById('island-status').remove();
+        return controller;
+      })
+      .catch((error) => {
+        console.error(error);
+        disableIsland('島嶼檢視載入失敗，已改用表格檢視。');
+        setView('table');
+        return null;
+      });
+    return island;
+  };
+
+  const scrollToTableRow = (areaId) => document.getElementById(`area-${areaId}`)?.scrollIntoView({ block: 'start' });
+
+  const highlightTableRow = () => {
+    for (const row of tableRoot.querySelectorAll('.area-row')) {
+      row.classList.toggle('is-selected', row.id === `area-${selectedArea}`);
+    }
+  };
+
   const openCard = (areaId, policyId) => {
     const row = vm.rows.find((r) => r.issueArea.id === areaId);
     if (!row) return false;
+    selectedArea = areaId;
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    card.open(row, vm, { focusPolicyId: policyId });
+    const show = () => card.open(row, vm, { focusPolicyId: policyId });
+    if (view === 'island') {
+      setPanelOpen(false);
+      renderIslandPanel();
+      // 鏡頭飛到該區後才開卡片；減少動態時沒有飛行，立即開啟。
+      ensureIsland().then((controller) => {
+        if (!controller || !controller.focusArea(areaId, show)) show();
+      });
+    } else {
+      highlightTableRow();
+      show();
+    }
     return true;
   };
 
+  function setView(next) {
+    view = next;
+    document.body.dataset.view = next;
+    for (const button of document.querySelectorAll('.view-button')) {
+      button.setAttribute('aria-pressed', String(button.dataset.view === next));
+    }
+    if (next === 'island') {
+      renderIslandPanel();
+      ensureIsland().then((controller) => {
+        if (!controller) return;
+        controller.resize();
+        if (selectedArea) controller.focusArea(selectedArea);
+      });
+    } else {
+      highlightTableRow();
+      if (selectedArea) scrollToTableRow(selectedArea);
+    }
+  }
+
+  for (const button of document.querySelectorAll('.view-button')) {
+    button.addEventListener('click', () => {
+      if (button.disabled || button.dataset.view === view) return;
+      state.view = button.dataset.view;
+      updateUrl();
+      setView(button.dataset.view);
+    });
+  }
+
   const render = () => {
-    const filtered = filterViewModel(vm, { query: state.query, district: state.district });
+    filtered = filterViewModel(vm, { query: state.query, district: state.district });
     renderTable(tableRoot, filtered, { onOpenCard: openCard });
+    highlightTableRow();
+    renderIslandPanel();
+    island?.then((controller) => controller?.update(filtered));
     status.textContent = resultStatusText(filtered);
   };
 
@@ -121,15 +218,17 @@ function startApp(vm, state) {
   });
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
+  renderLegend(document.getElementById('island-legend'), vm);
   updateUrl();
   render();
+  setView(view);
 
-  // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時捲到該列並開卡片。
+  // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時開該區卡片（表格檢視先捲到該列）。
   const policyRow = state.policy && vm.rows.find((r) => r.cells.some((c) => c.policies.some((p) => p.id === state.policy)));
   if (policyRow) {
     openCard(policyRow.issueArea.id, state.policy);
   } else if (state.area && vm.rows.some((r) => r.issueArea.id === state.area)) {
-    document.getElementById(`area-${state.area}`)?.scrollIntoView({ block: 'start' });
+    if (view === 'table') scrollToTableRow(state.area);
     openCard(state.area, null);
   }
 }
@@ -137,20 +236,23 @@ function startApp(vm, state) {
 async function start() {
   const state = parseSearch(location.search);
   const webgl = supportsWebGL();
-  const view = chooseView({ requested: state.view, webgl, islandAvailable: ISLAND_AVAILABLE });
+  const view = chooseView({ requested: state.view, webgl });
   // 網址指定的檢視無法使用時，不把它留在網址上。
   if (state.view !== view) state.view = null;
-  setupViewSwitch(view, webgl);
+  document.body.dataset.view = view;
+  document.body.dataset.webgl = webgl ? 'yes' : 'no';
+  if (!webgl) disableIsland('此裝置無法顯示島嶼檢視，已改用表格檢視。');
   setupIntro();
   try {
     const response = await fetch(DATASET_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const vm = buildViewModel(await response.json());
     document.getElementById('data-cutoff-date').textContent = vm.meta.dataCutoffDate;
-    startApp(vm, state);
+    startApp(vm, state, view);
   } catch (error) {
-    const message = el('p', { class: 'status status-error' }, `政見資料載入失敗（${error.message}），請稍後重新整理。`);
-    document.getElementById('table-root').replaceChildren(message);
+    const message = `政見資料載入失敗（${error.message}），請稍後重新整理。`;
+    document.getElementById('table-root').replaceChildren(el('p', { class: 'status status-error' }, message));
+    document.getElementById('island-status').textContent = message;
   }
 }
 
