@@ -7,15 +7,15 @@
     "quotes": [
       {
         "text": "捷運多線齊發，力拚藍線完工",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣宣示將力拚捷運藍線早日完工、橘線及延伸線加速動工",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       },
       {
         "text": "江啟臣主張加速推動捷運藍線，強化與臺鐵海線的轉乘串聯",
-        "sourceId": "chiang-pr-wuqi-briefing-sea-air-ports"
+        "sourceId": "chiang-pr-43"
       }
     ],
     "districts": [],
@@ -42,11 +42,11 @@
     "quotes": [
       {
         "text": "加速機場捷運橘線後續規劃建設",
-        "sourceId": "chiang-pr-taichung-airport-expansion"
+        "sourceId": "chiang-pr-38"
       },
       {
         "text": "讓橘線延伸至清水並與藍線相連",
-        "sourceId": "chiang-pr-haixian-zhang-qing-zhao"
+        "sourceId": "chiang-pr-19"
       }
     ],
     "districts": [
@@ -75,7 +75,7 @@
     "quotes": [
       {
         "text": "全力推動捷運紅線加速審議、串聯一中至豐原等重要商圈",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       }
     ],
     "districts": [
@@ -104,7 +104,7 @@
     "quotes": [
       {
         "text": "將加速推動捷運紅線及綠線延伸大坑，持續爭取中央支持",
-        "sourceId": "chiang-pr-beitun-shen-youlian-joint-briefing"
+        "sourceId": "chiang-pr-07"
       }
     ],
     "districts": [
@@ -133,11 +133,11 @@
     "quotes": [
       {
         "text": "將全力推動屯區環狀紫線，與捷運綠線串聯",
-        "sourceId": "chiang-pr-tunqu-transport-blueprint"
+        "sourceId": "chiang-pr-41"
       },
       {
         "text": "並推動藍線延伸太平、橘線通往大里及霧峰",
-        "sourceId": "chiang-pr-tunqu-transport-blueprint"
+        "sourceId": "chiang-pr-41"
       }
     ],
     "districts": [
@@ -168,11 +168,11 @@
     "quotes": [
       {
         "text": "四環一線，完善交通幹線",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣主張整合臺74線、國道與生活圈路網形成「四環一線」",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -199,15 +199,15 @@
     "quotes": [
       {
         "text": "他承諾未來將全力推動「生活圈四號」打通，串聯龍井至烏日段",
-        "sourceId": "chiang-pr-dadu-longjing-canvass"
+        "sourceId": "chiang-pr-12"
       },
       {
         "text": "將優先推動生活圈四號道路，補齊大肚、龍井等地外環路網，並改善港區交通安全",
-        "sourceId": "chiang-pr-longjing-senior-card-briefings"
+        "sourceId": "chiang-pr-26"
       },
       {
         "text": "推動國道四號清水端延伸及港區道路立體化，加速生活圈四號線延伸段，串聯烏日、大肚、龍井，補足「四環一線」路網",
-        "sourceId": "chiang-pr-wuqi-briefing-sea-air-ports"
+        "sourceId": "chiang-pr-43"
       }
     ],
     "districts": [
@@ -233,16 +233,16 @@
   {
     "id": "chiang-chi-chen-008",
     "candidateId": "chiang-chi-chen",
-    "issueAreaId": "transportation",
+    "issueAreaId": "city-governance",
     "summary": "要求中央將國道四號高架延伸進台中港區，並推動台中港聯外道路立體化。",
     "quotes": [
       {
         "text": "同時要求中央比照高雄港，將國道四號直接高架延伸進港區、優化聯外幹道",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       },
       {
         "text": "江啟臣提出臺中港聯外道路立體化訴求",
-        "sourceId": "chiang-pr-shalu-coastal-transport"
+        "sourceId": "chiang-pr-35"
       }
     ],
     "districts": [],
@@ -269,7 +269,7 @@
     "quotes": [
       {
         "text": "推動國道一號后里至大雅段拓寬",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       }
     ],
     "districts": [
@@ -299,7 +299,7 @@
     "quotes": [
       {
         "text": "他將推動「甲埔大道延伸案」",
-        "sourceId": "chiang-pr-jiaanpu-20-minute-city"
+        "sourceId": "chiang-pr-22"
       }
     ],
     "districts": [
@@ -330,11 +330,11 @@
     "quotes": [
       {
         "text": "東豐快速道路（豐原至東勢段）也力拚118年全線通車",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       },
       {
         "text": "未來更將推動延伸至新社，讓山城交通效益最大化",
-        "sourceId": "chiang-pr-dongfeng-expressway-third-section"
+        "sourceId": "chiang-pr-14"
       }
     ],
     "districts": [
@@ -365,31 +365,31 @@
     "quotes": [
       {
         "text": "推動「臺中進臺中出」國門升級計畫",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市府將全力向中央爭取擴大臺中國際機場航廈與既有設施的實質擴建，同時大幅「提升大運量通關與國際航線停泊量能」。爭取更多直飛航班",
-        "sourceId": "chiang-central-taiwan-airport-gateway"
+        "sourceId": "chiang-page-01"
       },
       {
         "text": "由市府主導周邊土地的系統化整合與多元活化使用，透過都市計畫變更全面翻轉機場周邊市容。",
-        "sourceId": "chiang-central-taiwan-airport-gateway"
+        "sourceId": "chiang-page-01"
       },
       {
         "text": "以年旅運量千萬人次為目標，升級臺中國際機場",
-        "sourceId": "chiang-pr-taichung-airport-expansion"
+        "sourceId": "chiang-pr-38"
       },
       {
         "text": "他主張加速臺中國際機場第三航廈規劃建設，並整體評估跑道設施擴充與航空城發展",
-        "sourceId": "chiang-pr-taichung-airport-expansion"
+        "sourceId": "chiang-pr-38"
       },
       {
         "text": "江啟臣提出推動高速公路直通機場的交通規劃",
-        "sourceId": "chiang-pr-taichung-airport-expansion"
+        "sourceId": "chiang-pr-38"
       },
       {
         "text": "並提出清泉崗機場擴建目標應直接上看1,000萬人次",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -416,11 +416,11 @@
     "quotes": [
       {
         "text": "加速推動鐵路高架雙軌化",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "並推進鐵路海線雙軌與高架化",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -447,11 +447,11 @@
     "quotes": [
       {
         "text": "增闢高鐵站區聯外道路",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對高鐵特區也將規劃聯外專用匝道與拓寬平面道路",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -478,15 +478,15 @@
     "quotes": [
       {
         "text": "打造全齡友善人本道路",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "鎖定學校、醫院與大眾運輸樞紐周邊，展開人行道鋪面翻新與無障礙坡道優化，檢討行人庇護島",
-        "sourceId": "chiang-smart-transport-walkable-streets"
+        "sourceId": "chiang-page-30"
       },
       {
         "text": "他也承諾推動人行道全面翻新、擴大假日行人徒步區",
-        "sourceId": "chiang-pr-central-west-district-briefing"
+        "sourceId": "chiang-pr-09"
       }
     ],
     "districts": [],
@@ -513,15 +513,15 @@
     "quotes": [
       {
         "text": "市民公車免費，培養公共運輸習慣",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將雙十公車升級為「臺中市民搭乘公車運輸全程免費」（含幹線、市區與捷運接駁）。",
-        "sourceId": "chiang-smart-transport-public-transit"
+        "sourceId": "chiang-page-28"
       },
       {
         "text": "並承諾在捷運路網完工前推動市民公車免費",
-        "sourceId": "chiang-pr-20-minute-city-gis-policy"
+        "sourceId": "chiang-pr-01"
       }
     ],
     "districts": [],
@@ -548,15 +548,15 @@
     "quotes": [
       {
         "text": "建立重大節點的高效快捷公車",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "結合豐原、水湳、臺中車站、烏日高鐵等四大轉運站，建立「四大節點高效快捷公車」，讓日常交通在 20 分鐘車程內搞定。",
-        "sourceId": "chiang-smart-transport-public-transit"
+        "sourceId": "chiang-page-28"
       },
       {
         "text": "完善臺中機場往返高鐵及中部各大轉運中心的快速公車聯營",
-        "sourceId": "chiang-pr-taichung-airport-expansion"
+        "sourceId": "chiang-pr-38"
       }
     ],
     "districts": [],
@@ -583,7 +583,7 @@
     "quotes": [
       {
         "text": "增設海線轉運站",
-        "sourceId": "chiang-pr-beitun-waipu-briefings"
+        "sourceId": "chiang-pr-08"
       }
     ],
     "districts": [
@@ -620,19 +620,19 @@
     "quotes": [
       {
         "text": "完善公車路網，補足駕駛人力",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "由市府帶頭編列預算補貼，實質補足公車駕駛的薪資缺口，透過加薪解決駕駛荒",
-        "sourceId": "chiang-smart-transport-public-transit"
+        "sourceId": "chiang-page-28"
       },
       {
         "text": "規劃以各大生活圈轉運中心為樞紐，區內以高頻次循環公車串聯住宅、醫療與學校，跨區則由高快速公路公車快速對接",
-        "sourceId": "chiang-pr-20-minute-city-gis-policy"
+        "sourceId": "chiang-pr-01"
       },
       {
         "text": "未來將重新盤點公車路線與班次，導入AI提高準點率",
-        "sourceId": "chiang-pr-south-nantun-briefings"
+        "sourceId": "chiang-pr-37"
       }
     ],
     "districts": [],
@@ -659,11 +659,11 @@
     "quotes": [
       {
         "text": "打造「四線兩環一城」單車路網",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將編列30億元打通單車路網斷點，串起「四線兩環一城」",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -690,11 +690,11 @@
     "quotes": [
       {
         "text": "增設「袋鼠車」，擴充Youbike E電輔車",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "加速擴充 iBike 2.0 E 電輔車數量，並率先全國試辦推動附設兒童安全座椅的「袋鼠車」（親子共享腳踏車）",
-        "sourceId": "chiang-smart-transport-walkable-streets"
+        "sourceId": "chiang-page-30"
       }
     ],
     "districts": [],
@@ -721,11 +721,11 @@
     "quotes": [
       {
         "text": "試辦無人公車與偏鄉無人計程車（Robotaxi）",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "試辦無人化公車並針對偏鄉導入無人計程車（Robotaxi）預約服務",
-        "sourceId": "chiang-smart-transport-public-transit"
+        "sourceId": "chiang-page-28"
       }
     ],
     "districts": [],
@@ -752,15 +752,15 @@
     "quotes": [
       {
         "text": "務實增加停車空間，科技協助好停車",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對主要商圈與捷運樞紐，加速將低效率的平面停車場改建為高容納率的立體停車場，全面導入全自動智慧化停車服務",
-        "sourceId": "chiang-smart-transport-smart-roads"
+        "sourceId": "chiang-page-29"
       },
       {
         "text": "並盤點公有土地、結合民間資源，增加立體、共享等多元停車空間",
-        "sourceId": "chiang-pr-beitun-shen-youlian-joint-briefing"
+        "sourceId": "chiang-pr-07"
       }
     ],
     "districts": [],
@@ -787,15 +787,15 @@
     "quotes": [
       {
         "text": "升級道路燙平計畫",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對各區展開覆蓋率更廣的「道路燙平計畫」。",
-        "sourceId": "chiang-smart-transport-smart-roads"
+        "sourceId": "chiang-page-29"
       },
       {
         "text": "並強化道路燙平計畫，導入AI預警及循環材料",
-        "sourceId": "chiang-pr-traffic-smart-era-policy-launch"
+        "sourceId": "chiang-pr-39"
       }
     ],
     "districts": [],
@@ -822,7 +822,7 @@
     "quotes": [
       {
         "text": "打通道路瓶頸，用路安全又順暢",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -849,19 +849,19 @@
     "quotes": [
       {
         "text": "毒駕酒駕零容忍，建構科技稽查網",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "導入更高精準度的「毒品快篩」與夜間科技執法儀器，提升攔查效率與員警安全。",
-        "sourceId": "chiang-city-safety-tech-enforcement"
+        "sourceId": "chiang-page-04"
       },
       {
         "text": "建立由警政、衛生、社會局共同編織的防治通報網，針對高風險個案進行源頭列管",
-        "sourceId": "chiang-city-safety-tech-enforcement"
+        "sourceId": "chiang-page-04"
       },
       {
         "text": "利用大數據分析出易肇事與毒酒駕熱點，展開常態性的跨局處聯合稽查",
-        "sourceId": "chiang-city-safety-tech-enforcement"
+        "sourceId": "chiang-page-04"
       }
     ],
     "districts": [],
@@ -888,7 +888,7 @@
     "quotes": [
       {
         "text": "詐騙追到底，公私協力強化聯防",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -915,27 +915,27 @@
     "quotes": [
       {
         "text": "強化警消執勤安全，提高福利待遇",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "放寬並提高健康檢查補助，40 歲以上每年補助 4,500 元，未滿 40 歲提高至每年 3,500 元。",
-        "sourceId": "chiang-city-safety-first-responders"
+        "sourceId": "chiang-page-02"
       },
       {
         "text": "成立專責的消防「職業安全衛生室」，編制專人推動風險評估與心理輔導",
-        "sourceId": "chiang-city-safety-first-responders"
+        "sourceId": "chiang-page-02"
       },
       {
         "text": "加速汰換並購置符合第一線需求的「輕量化高防護消防衣」；並增購高防護科技執勤裝備，例如為出勤警消配戴「生命體徵監控手錶」",
-        "sourceId": "chiang-city-safety-first-responders"
+        "sourceId": "chiang-page-02"
       },
       {
         "text": "未來將全面導入AI、無人機及無人載具等科技，協助第一線救災人員在進入現場前，即時掌握火勢、地形及受困者位置",
-        "sourceId": "chiang-pr-fire-phoenix-tech-rescue"
+        "sourceId": "chiang-pr-17"
       },
       {
         "text": "他主張將AI導入公衛、防災及救護，升級救護車設備",
-        "sourceId": "chiang-pr-medical-longterm-care-support-launch"
+        "sourceId": "chiang-pr-27"
       }
     ],
     "districts": [],
@@ -962,15 +962,15 @@
     "quotes": [
       {
         "text": "擴大老屋健檢與延壽計畫",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市府將鎖定老舊住宅與人口密集社區，擴大推動老屋健檢",
-        "sourceId": "chiang-senior-care-age-friendly-housing"
+        "sourceId": "chiang-page-22"
       },
       {
         "text": "針對高齡長輩進行屋內「機能延壽」的診斷與補助，從無障礙空間改善做起",
-        "sourceId": "chiang-senior-care-age-friendly-housing"
+        "sourceId": "chiang-page-22"
       }
     ],
     "districts": [],
@@ -997,7 +997,7 @@
     "quotes": [
       {
         "text": "試辦老屋通用設計專案",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1024,7 +1024,7 @@
     "quotes": [
       {
         "text": "補助升級住宅安全防護",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1051,11 +1051,11 @@
     "quotes": [
       {
         "text": "鼓勵取得銀髮住宅標章",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "全面鼓勵並輔導民間住宅、公辦都更與社宅取得符合國內外標準的「銀髮住宅標章」",
-        "sourceId": "chiang-senior-care-age-friendly-housing"
+        "sourceId": "chiang-page-22"
       }
     ],
     "districts": [],
@@ -1082,39 +1082,39 @@
     "quotes": [
       {
         "text": "打造TRMC臺灣機器人製造城市",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "攜手「臺灣 AI 機器人產業大聯盟」，建立國際級戰略平台",
-        "sourceId": "chiang-robot-manufacturing-city-ai-industry"
+        "sourceId": "chiang-page-18"
       },
       {
         "text": "深化美國喬治亞理工學院與東海大學等校合作，在臺中打造專屬的機器人實驗示範園區。",
-        "sourceId": "chiang-robot-manufacturing-city-ai-industry"
+        "sourceId": "chiang-page-18"
       },
       {
         "text": "攜手 AIT 整合臺灣廠商與美國市場，吸引外商研發總部進駐",
-        "sourceId": "chiang-robot-manufacturing-city-ai-industry"
+        "sourceId": "chiang-page-18"
       },
       {
         "text": "市政府要把精密機械、半導體、AI、光學與資通訊廠商串起來，建立軟硬體整合平台，幫中小企業跨過升級門檻",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       },
       {
         "text": "同時推動「AI機器人智慧製造園區」，盤點中科、精密機械園區及潭雅神等產業聚落，協助既有園區升級與必要的新開發",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       },
       {
         "text": "市府就提供單一窗口，協助從研發、測試走到量產",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       },
       {
         "text": "未來將建立國際級戰略合作平台，幫廠商找到國際品牌、研發團隊與市場",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       },
       {
         "text": "有條件透過TRMC機器人製造園區，讓AI從大腦走向身體，並加速檢測驗證與國際標準接軌",
-        "sourceId": "chiang-pr-amcham-taichung-dinner"
+        "sourceId": "chiang-pr-04"
       }
     ],
     "districts": [],
@@ -1141,15 +1141,15 @@
     "quotes": [
       {
         "text": "未來應該整合產學研資源與國際合作，打造「臺中無人載具及實體AI產業生態系」，推動傳統精密機械升級智慧製造",
-        "sourceId": "chiang-pr-aidc-trainer-aircraft-ai"
+        "sourceId": "chiang-pr-03"
       },
       {
         "text": "擴大測試驗證能量，打造無人載具系統整合與高階製造中心",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       },
       {
         "text": "並推動「低空經濟」示範區",
-        "sourceId": "chiang-pr-robot-policy-launch"
+        "sourceId": "chiang-pr-34"
       }
     ],
     "districts": [],
@@ -1176,27 +1176,27 @@
     "quotes": [
       {
         "text": "創造臺中會展經濟168，發揮「前店後廠」優勢",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "成立跨局處一站式的「臺中市會展經濟推動辦公室」，專責推廣城市品牌並協助會展籌辦。",
-        "sourceId": "chiang-exhibition-economy-taichung-hub"
+        "sourceId": "chiang-page-08"
       },
       {
         "text": "系統性建置會展活動招商、供應鏈媒合、城市接待配套、成效追蹤、會展城市交流、產學合作等六大平台。",
-        "sourceId": "chiang-exhibition-economy-taichung-hub"
+        "sourceId": "chiang-page-08"
       },
       {
         "text": "推出誘因提供機制、公協會與會議大使計畫、建置全場館與供應鏈資料庫、城市接待方案等八項具體工具",
-        "sourceId": "chiang-exhibition-economy-taichung-hub"
+        "sourceId": "chiang-page-08"
       },
       {
         "text": "提出由市長親自領導的會展專案辦公室，串聯六大平臺、推動八項具體政策",
-        "sourceId": "chiang-pr-mice-economy"
+        "sourceId": "chiang-pr-28"
       },
       {
         "text": "將依臺中優勢產業爭取並舉辦特色展會，包括國際自行車展、國際工具機展、自動化工業大展及運動器材展",
-        "sourceId": "chiang-pr-mice-economy"
+        "sourceId": "chiang-pr-28"
       }
     ],
     "districts": [],
@@ -1223,23 +1223,23 @@
     "quotes": [
       {
         "text": "組織「臺中館」協助產業海外參展",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "捨棄過去個別企業單打獨鬥的定額補助模式，轉為「報隊組團」的國際競爭戰略。",
-        "sourceId": "chiang-exhibition-economy-city-pavilion"
+        "sourceId": "chiang-page-05"
       },
       {
         "text": "由市府單位主導，在國際指標型大展中組織專屬的「臺中館」或「Taichung IMPACT（臺灣影響力）主題館」。",
-        "sourceId": "chiang-exhibition-economy-city-pavilion"
+        "sourceId": "chiang-page-05"
       },
       {
         "text": "透過統一的城市美學包裝進行整合招商，倍增參展能見度並分攤基層中小企業的行銷成本",
-        "sourceId": "chiang-exhibition-economy-city-pavilion"
+        "sourceId": "chiang-page-05"
       },
       {
         "text": "與米蘭、斯圖加特、鳳凰城等產業城市建立展會互惠、企業媒合及市場合作",
-        "sourceId": "chiang-pr-amcham-taichung-dinner"
+        "sourceId": "chiang-pr-04"
       }
     ],
     "districts": [],
@@ -1266,19 +1266,19 @@
     "quotes": [
       {
         "text": "公私串聯，推廣會展旅遊路線",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "整合觀旅局資源，串聯在地觀光旅宿、旅行社與商圈，將商務客的停留時間轉化為觀光消費。",
-        "sourceId": "chiang-exhibition-economy-mice-tourism"
+        "sourceId": "chiang-page-06"
       },
       {
         "text": "專為國際買家量身打造「臺中味商圈散策與城市走讀」套裝路線",
-        "sourceId": "chiang-exhibition-economy-mice-tourism"
+        "sourceId": "chiang-page-06"
       },
       {
         "text": "透過與既有的國內外旅遊平台合作，主動推送臺中會展旅遊方案給適合的商務消費者。",
-        "sourceId": "chiang-exhibition-economy-mice-tourism"
+        "sourceId": "chiang-page-06"
       }
     ],
     "districts": [],
@@ -1305,7 +1305,7 @@
     "quotes": [
       {
         "text": "推動主題式觀光接駁專車",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1332,7 +1332,7 @@
     "quotes": [
       {
         "text": "協助觀旅業者取得「國際永續認證」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1359,7 +1359,7 @@
     "quotes": [
       {
         "text": "成立「勞工諮詢委員會」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1386,7 +1386,7 @@
     "quotes": [
       {
         "text": "擴大挹注勞工權益基金",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1413,23 +1413,23 @@
     "quotes": [
       {
         "text": "成立AI賦能學院，加值勞工競爭力",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣主張成立「AI賦能學院」，由政府結合企業、大專院校及研究機構，提供在職員工AI應用與智慧製造訓練，建立技能認證及企業加薪輔導機制",
-        "sourceId": "chiang-pr-aidc-trainer-aircraft-ai"
+        "sourceId": "chiang-pr-03"
       },
       {
         "text": "成立勞工「AI學院」提供免費培訓",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       },
       {
         "text": "未來將成立「AI賦能學院」，協助婦女提升職場技能、增加薪資",
-        "sourceId": "chiang-pr-women-support-association-launch"
+        "sourceId": "chiang-pr-42"
       },
       {
         "text": "成立「AI賦能學院」協助農民掌握數位工具",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       }
     ],
     "districts": [],
@@ -1456,7 +1456,7 @@
     "quotes": [
       {
         "text": "強化銀髮職場續航力",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1483,19 +1483,19 @@
     "quotes": [
       {
         "text": "引入國際資源，升級青創、新創加速器",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市府將主動協助，引進具備全球市場能力的指標性加速器進駐臺中。",
-        "sourceId": "chiang-exhibition-economy-startup-accelerator"
+        "sourceId": "chiang-page-07"
       },
       {
         "text": "辦理青創、新創嘉年華，由國際導師一對一帶路，實質媒合海外資金。",
-        "sourceId": "chiang-exhibition-economy-startup-accelerator"
+        "sourceId": "chiang-page-07"
       },
       {
         "text": "他也規劃盤點閒置公有空間改建為青年創業孵化器與加速器，積極引進國際創投資源與產業導師",
-        "sourceId": "chiang-pr-20-minute-city-gis-policy"
+        "sourceId": "chiang-pr-01"
       }
     ],
     "districts": [],
@@ -1522,15 +1522,15 @@
     "quotes": [
       {
         "text": "舊縣議會變身新創基地",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將「舊臺中縣議會」改造成新創孵化基地",
-        "sourceId": "chiang-exhibition-economy-startup-accelerator"
+        "sourceId": "chiang-page-07"
       },
       {
         "text": "舊縣議會則轉型為青年創新創業育成基地與加速器，接軌國際導師與產業資源",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       }
     ],
     "districts": [
@@ -1559,7 +1559,7 @@
     "quotes": [
       {
         "text": "擴大市政空間導入AI智慧沙盒",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1586,15 +1586,15 @@
     "quotes": [
       {
         "text": "啟動「新住民二代國際領航計劃」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對高中與大專院校的新二代青年開設培力活動，讓他們帶著臺灣深入東協、擔任城市親善大使。",
-        "sourceId": "chiang-multicultural-city-new-immigrants"
+        "sourceId": "chiang-page-11"
       },
       {
         "text": "其次啟動「新住民二代國際領航計畫」，針對高中、大專新二代青年提供培力、實務活動與國際交流",
-        "sourceId": "chiang-pr-new-residents-4-policies"
+        "sourceId": "chiang-pr-31"
       }
     ],
     "districts": [],
@@ -1621,11 +1621,11 @@
     "quotes": [
       {
         "text": "新住民微型創業貸款利息補貼",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對設籍臺中並獲中央微型創業鳳凰貸款等的新住民創業者，給予延長利息補貼",
-        "sourceId": "chiang-multicultural-city-new-immigrants"
+        "sourceId": "chiang-page-11"
       }
     ],
     "districts": [],
@@ -1652,19 +1652,19 @@
     "quotes": [
       {
         "text": "未來將檢討並提供合理的規費與租金輔導機制",
-        "sourceId": "chiang-pr-hanxi-nightmarket-3-arrows"
+        "sourceId": "chiang-pr-20"
       },
       {
         "text": "引入微型創業貸款利息補貼，鼓勵更多青年留在臺中打拚",
-        "sourceId": "chiang-pr-hanxi-nightmarket-3-arrows"
+        "sourceId": "chiang-pr-20"
       },
       {
         "text": "江啟臣主張結合數位支付、物流配送與網路行銷，協助攤商拓展客源，同時鼓勵青年進駐創業",
-        "sourceId": "chiang-pr-jianguo-market-10th-anniversary"
+        "sourceId": "chiang-pr-23"
       },
       {
         "text": "則將推動「環保永續夜市」概念，補助環保設備",
-        "sourceId": "chiang-pr-zhongxiao-nantun-market-canvass"
+        "sourceId": "chiang-pr-44"
       }
     ],
     "districts": [],
@@ -1691,11 +1691,11 @@
     "quotes": [
       {
         "text": "升級原住民職業培力與探索",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "升級職業培力，開辦高階精緻製造業培訓與青少年職涯探索。",
-        "sourceId": "chiang-multicultural-city-indigenous-support"
+        "sourceId": "chiang-page-10"
       }
     ],
     "districts": [],
@@ -1722,11 +1722,11 @@
     "quotes": [
       {
         "text": "擴大加碼原住民「微型保險」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對設籍臺中市 15 至 64 歲的原住民族人，市府全額補助微型保險",
-        "sourceId": "chiang-multicultural-city-indigenous-support"
+        "sourceId": "chiang-page-10"
       }
     ],
     "districts": [],
@@ -1753,19 +1753,19 @@
     "quotes": [
       {
         "text": "推動星光計畫，點亮活化舊城區",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "以臺中火車站為中心，串聯「新民街倉庫群」至干城、台糖生態園，打造兼具歷史美感與前瞻性的全新文創聚落與 Live House 展演空間。",
-        "sourceId": "chiang-old-town-revival-night-economy"
+        "sourceId": "chiang-page-14"
       },
       {
         "text": "另推動「星光計劃」，活化新民街倉庫群設置Live House、籌辦「鐵支路開唱」",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       },
       {
         "text": "讓水湳「流行影音中心」成為流行產業鏈孵化基地，並深化與日、韓、泰等國際音樂祭的交流",
-        "sourceId": "chiang-old-town-revival-night-economy"
+        "sourceId": "chiang-page-14"
       }
     ],
     "districts": [],
@@ -1792,15 +1792,15 @@
     "quotes": [
       {
         "text": "公有市場裝冷氣，打造特色市場",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將編列專案預算，針對全市傳統市場的公共衛生、停車空間與動線規劃進行全面改善",
-        "sourceId": "chiang-pr-hanxi-nightmarket-3-arrows"
+        "sourceId": "chiang-pr-20"
       },
       {
         "text": "應持續改善採光、通風、空調及環境衛生，並優化採買動線與周邊停車交通",
-        "sourceId": "chiang-pr-jianguo-market-10th-anniversary"
+        "sourceId": "chiang-pr-23"
       }
     ],
     "districts": [],
@@ -1823,19 +1823,19 @@
     "id": "chiang-chi-chen-054",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "改辦台中購物節，結合會展中心、商圈、零售業、觀光與演藝活動，將參展廠商與國際買家的消費導入商圈。",
+    "summary": "繼續舉辦台中購物節，結合會展中心、商圈、零售業、觀光與演藝活動，將參展廠商與國際買家的消費導入商圈。",
     "quotes": [
       {
         "text": "購物節再升級，商圈文創更在地",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "打造「旗艦級購物節」，結合會展中心、商圈與零售業，將參展廠商及國際買家的消費導入購物節",
-        "sourceId": "chiang-pr-four-hq-openings-xitun-nanqu-dali"
+        "sourceId": "chiang-pr-18"
       },
       {
         "text": "江啟臣提出「會展經濟168 Plus」，串聯臺中購物節、各大商圈、觀光旅遊與演藝活動",
-        "sourceId": "chiang-pr-mice-economy"
+        "sourceId": "chiang-pr-28"
       }
     ],
     "districts": [],
@@ -1862,7 +1862,7 @@
     "quotes": [
       {
         "text": "復興臺中木業",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1889,7 +1889,7 @@
     "quotes": [
       {
         "text": "活化文資老屋",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -1916,27 +1916,27 @@
     "quotes": [
       {
         "text": "臺中領鮮Re Branding",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市府將與在地頂尖設計師和青年創意團隊合作，翻新視覺識別，將大甲芋頭、外埔火龍果、新社香菇等在地驕傲，轉譯為精緻的故事內容。",
-        "sourceId": "chiang-smart-agriculture-brand-upgrade"
+        "sourceId": "chiang-page-25"
       },
       {
         "text": "跨界聯名星級餐廳與風格餐飲，將臺中優質農產推向高端消費通路",
-        "sourceId": "chiang-smart-agriculture-brand-upgrade"
+        "sourceId": "chiang-page-25"
       },
       {
         "text": "運用「臺中影響力主題館」帶著農民參與海內外大小展覽，並由新設立的「農漁牧加值平台」開拓新通路",
-        "sourceId": "chiang-smart-agriculture-brand-upgrade"
+        "sourceId": "chiang-page-25"
       },
       {
         "text": "江啟臣主張再造「臺中領鮮」品牌，結合在地青年及設計團隊，從品牌識別、包裝到故事行銷全面升級，並串聯電商平台、實體零售與星級餐廳",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       },
       {
         "text": "他也將結合「臺中會展168」及海內外展覽，把臺中農產打造為會展限定伴手禮、宴會料理及城市品牌",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       }
     ],
     "districts": [],
@@ -1963,23 +1963,23 @@
     "quotes": [
       {
         "text": "產學合作打造「智慧農業臺中隊」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市府將大幅擴大智慧農業產學合作的專案補助，降低基層農民導入科技設備的財務門檻與風險。",
-        "sourceId": "chiang-smart-agriculture-university-partnership"
+        "sourceId": "chiang-page-27"
       },
       {
         "text": "主動媒合中興大學等臺中在地的相關校系，將學術界的技術能量，直接帶進重要的農產區。",
-        "sourceId": "chiang-smart-agriculture-university-partnership"
+        "sourceId": "chiang-page-27"
       },
       {
         "text": "都由學界與基層農會合作在耕地上實地驗證",
-        "sourceId": "chiang-smart-agriculture-university-partnership"
+        "sourceId": "chiang-page-27"
       },
       {
         "text": "江啟臣將成立「智慧農業臺中隊」，串聯中興大學、農業研究機構、農會與農民，結合臺中的精密機械、AI及機器人產業能量，發展病蟲害預測、智慧溫室環控及自動化採收設備",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       }
     ],
     "districts": [],
@@ -2006,15 +2006,15 @@
     "quotes": [
       {
         "text": "升級「臺中農易通APP」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "升級現有網頁版系統，用最直覺、活潑的 APP 介面，將農民最關心的氣象預警、即時菜價與線上補助申請全面整合",
-        "sourceId": "chiang-smart-agriculture-disaster-alert"
+        "sourceId": "chiang-page-26"
       },
       {
         "text": "在 APP 內建「智慧專家線上診斷」，農民只要拍下作物生病的照片上傳，AI 就能即時辨識並給出建議",
-        "sourceId": "chiang-smart-agriculture-disaster-alert"
+        "sourceId": "chiang-page-26"
       }
     ],
     "districts": [],
@@ -2041,11 +2041,11 @@
     "quotes": [
       {
         "text": "建置精準即時農業災害預警細胞簡訊",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "首創針對特定產區、作物的「細胞簡訊」系統。一旦預測到天災，系統會精準鎖定該區農民手機主動發送指引",
-        "sourceId": "chiang-smart-agriculture-disaster-alert"
+        "sourceId": "chiang-page-26"
       }
     ],
     "districts": [],
@@ -2072,7 +2072,7 @@
     "quotes": [
       {
         "text": "糧食及農產品生產所需的農業用水，必須列為第一優先保障",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       }
     ],
     "districts": [],
@@ -2099,7 +2099,7 @@
     "quotes": [
       {
         "text": "只要代表臺中獲得優秀名次，市府就應提高獎勵、加碼頒發獎勵金",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       }
     ],
     "districts": [],
@@ -2126,7 +2126,7 @@
     "quotes": [
       {
         "text": "補助卵巢AMH 健康檢測",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2153,7 +2153,7 @@
     "quotes": [
       {
         "text": "擴大醫療凍卵補助",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2176,19 +2176,19 @@
     "id": "chiang-chi-chen-065",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "health",
-    "summary": "產後父母心理諮商補助改為父母都可申請，各補助 3 次。",
+    "summary": "產後父母心理諮商補助改為父母都可申請，父母各補助 3 次（另一出處寫各 3 小時）。",
     "quotes": [
       {
         "text": "升級補助產後父母心理諮商",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "升級產後父母心理諮商補助至「父母各 3 次」的額度，打破只有媽媽能申請的限制",
-        "sourceId": "chiang-parenting-friendly-city-parental-leave"
+        "sourceId": "chiang-page-17"
       },
       {
         "text": "提供新手爸媽各3小時心理諮商",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       }
     ],
     "districts": [],
@@ -2215,15 +2215,15 @@
     "quotes": [
       {
         "text": "補助臺中孕婦施打RSV疫苗",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "推出設籍臺中孕婦施打 RSV（呼吸道融合病毒）疫苗補助，在懷孕後期減免自費施打費用",
-        "sourceId": "chiang-parenting-friendly-city-maternal-care"
+        "sourceId": "chiang-page-16"
       },
       {
         "text": "並補助28至36週孕婦施打 RSV 疫苗",
-        "sourceId": "chiang-pr-parenting-13-policies"
+        "sourceId": "chiang-pr-32"
       }
     ],
     "districts": [],
@@ -2250,15 +2250,15 @@
     "quotes": [
       {
         "text": "擴大補助嬰幼兒疫苗接種",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "6 歲以下免費施打幼兒腸病毒疫苗",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       },
       {
         "text": "並擴大補助符合接種條件的嬰幼兒施打腸病毒A71型疫苗",
-        "sourceId": "chiang-pr-wuqi-briefing-sea-air-ports"
+        "sourceId": "chiang-pr-43"
       }
     ],
     "districts": [],
@@ -2285,11 +2285,11 @@
     "quotes": [
       {
         "text": "提高產後到宅月嫂補助",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "提升產後到宅月嫂補助時數至 40 小時",
-        "sourceId": "chiang-parenting-friendly-city-maternal-care"
+        "sourceId": "chiang-page-16"
       }
     ],
     "districts": [],
@@ -2312,31 +2312,31 @@
     "id": "chiang-chi-chen-069",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "敬老愛心卡維持每月 1000 點，點數當年度內不歸零，計程車單趟折抵提高到 200 點，可折抵 YouBike、長青學苑報名費與掛號費，並開放部分點數在農會與特約藥局使用。",
+    "summary": "敬老愛心卡維持每月 1000 點，點數當年度內不歸零，計程車單趟補助提高到 200 點或 200 元（各出處寫法不同），可折抵 YouBike、長青學苑報名費與掛號費，並開放部分點數在農會與特約藥局使用。",
     "quotes": [
       {
         "text": "升級愛心敬老卡，擴大範圍更好用",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "承諾維持每月 1000 點不跳票，並首創點數當年度內不歸零（Card-control），沒用完的直接累積",
-        "sourceId": "chiang-senior-care-community-hubs"
+        "sourceId": "chiang-page-23"
       },
       {
         "text": "計程車單趟扣抵翻倍至 200 點、折抵 YouBike 2.0E 及長青學苑報名費",
-        "sourceId": "chiang-senior-care-community-hubs"
+        "sourceId": "chiang-page-23"
       },
       {
         "text": "每月可用部分點數至農會與特約藥局採買保健品，看病更是不限額折抵掛號費。",
-        "sourceId": "chiang-senior-care-community-hubs"
+        "sourceId": "chiang-page-23"
       },
       {
         "text": "承諾未來將敬老愛心卡計程車單趟補貼由現行100元加碼提高至200元起跳",
-        "sourceId": "chiang-pr-beitun-hq-openings"
+        "sourceId": "chiang-pr-06"
       },
       {
         "text": "推動敬老愛心卡點數每月不歸零、改採年度結算，計程車每趟補助朝200元邁進，擴大就醫、指定藥局等使用範圍，並規劃一定額度可於農漁會消費",
-        "sourceId": "chiang-pr-coastal-daan-dajia-briefings"
+        "sourceId": "chiang-pr-10"
       }
     ],
     "districts": [],
@@ -2363,11 +2363,11 @@
     "quotes": [
       {
         "text": "補助弱勢族群接種帶狀皰疹疫苗",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "針對設籍臺中的重症弱勢族群與 65 歲以上長輩，在接受必要性的公衛檢查後，提供免預約、定額或全額的帶狀皰疹疫苗施打補助",
-        "sourceId": "chiang-senior-care-long-term-care-office"
+        "sourceId": "chiang-page-24"
       }
     ],
     "districts": [],
@@ -2394,7 +2394,7 @@
     "quotes": [
       {
         "text": "增設、升級國民運動中心",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2421,15 +2421,15 @@
     "quotes": [
       {
         "text": "衛生局下新設「長照處」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將衛生局的醫事照護與社會局的社福體系縫合，成立專責的「臺中市長照處」，統一調度全市資源。",
-        "sourceId": "chiang-senior-care-long-term-care-office"
+        "sourceId": "chiang-page-24"
       },
       {
         "text": "未來民眾只要一通電話或臨櫃，就能從失能評估、居家照顧到喘息服務一條龍搞定",
-        "sourceId": "chiang-senior-care-long-term-care-office"
+        "sourceId": "chiang-page-24"
       }
     ],
     "districts": [],
@@ -2456,11 +2456,11 @@
     "quotes": [
       {
         "text": "打造智慧衛生所",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "他提出推動「智慧衛生所」，藉由網路視訊看診",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       }
     ],
     "districts": [],
@@ -2487,15 +2487,15 @@
     "quotes": [
       {
         "text": "打造豐原中興健康園區",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將舊衛生局大樓改建升級為「豐原中興健康園區」。",
-        "sourceId": "chiang-taichung-20-minute-city"
+        "sourceId": "chiang-page-31"
       },
       {
         "text": "未來將活化舊縣府周邊空間，整建為結合健康照護、公共服務、綠地與停車功能的「中興健康園區」",
-        "sourceId": "chiang-pr-lien-chiachen-hq"
+        "sourceId": "chiang-pr-24"
       }
     ],
     "districts": [
@@ -2524,11 +2524,11 @@
     "quotes": [
       {
         "text": "從樹下到樓下，發展社區特色長照C據點",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "依據長輩聚落的真實需求，打造如「銀髮文青沙龍」、「屋頂療癒農場」或「不老電競基地」等具備社區特色的長照 C 據點",
-        "sourceId": "chiang-senior-care-community-hubs"
+        "sourceId": "chiang-page-23"
       }
     ],
     "districts": [],
@@ -2555,7 +2555,7 @@
     "quotes": [
       {
         "text": "推動全齡專班課程，助長輩圓夢",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2582,7 +2582,7 @@
     "quotes": [
       {
         "text": "推動銀髮好肌力計畫，避免肌少症",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2609,11 +2609,11 @@
     "quotes": [
       {
         "text": "推動AI主動遠距監測，居家即醫院",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣提出導入AI居家安全與防跌監測，優先關注獨居高齡女性",
-        "sourceId": "chiang-pr-women-support-association-launch"
+        "sourceId": "chiang-pr-42"
       }
     ],
     "districts": [],
@@ -2640,7 +2640,7 @@
     "quotes": [
       {
         "text": "擴大3K危勞產業勞工健康檢查補助",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -2667,11 +2667,11 @@
     "quotes": [
       {
         "text": "升級新住民母語、法律與心理諮詢",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "設置具備越南語、印尼語、泰語等多語系的專業律師與心理諮商服務",
-        "sourceId": "chiang-multicultural-city-new-immigrants"
+        "sourceId": "chiang-page-11"
       }
     ],
     "districts": [],
@@ -2698,15 +2698,15 @@
     "quotes": [
       {
         "text": "打造原住民族行動長照車與健康站",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "派遣配備行動檢測與物理治療設備的「原民行動長照車」深入山城部落",
-        "sourceId": "chiang-multicultural-city-indigenous-support"
+        "sourceId": "chiang-page-10"
       },
       {
         "text": "重新檢討「文化健康站」的資源配置，把長照據點真正搬進部落裡。",
-        "sourceId": "chiang-multicultural-city-indigenous-support"
+        "sourceId": "chiang-page-10"
       }
     ],
     "districts": [
@@ -2738,7 +2738,7 @@
     "quotes": [
       {
         "text": "「獎勵於原鄉外設置原住民族據點」，提供展演與青年創業交流空間",
-        "sourceId": "chiang-pr-indigenous-5-policies"
+        "sourceId": "chiang-pr-21"
       }
     ],
     "districts": [],
@@ -2765,11 +2765,11 @@
     "quotes": [
       {
         "text": "上任後將延續65歲以上長者免繳健保費政策",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       },
       {
         "text": "65歲以上健保免費絕對續行",
-        "sourceId": "chiang-pr-tucheng-taiping-market-canvass"
+        "sourceId": "chiang-pr-40"
       }
     ],
     "districts": [],
@@ -2796,11 +2796,11 @@
     "quotes": [
       {
         "text": "未來重大健康、公衛、醫療、長照與藥事政策，將讓專業人員實質參與",
-        "sourceId": "chiang-pr-medical-longterm-care-support-launch"
+        "sourceId": "chiang-pr-27"
       },
       {
         "text": "同時邀請藥師代表參與AI智慧城市與健康治理等核心決策",
-        "sourceId": "chiang-pr-pharmacist-support-group"
+        "sourceId": "chiang-pr-33"
       }
     ],
     "districts": [],
@@ -2827,11 +2827,11 @@
     "quotes": [
       {
         "text": "成立「婦幼發展委員會」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "成立「臺中市婦幼發展委員會」，由府級親自召集，將少子化對策、婦女權益、幼兒托育與孕產婦照顧等散落的業務一權統籌",
-        "sourceId": "chiang-parenting-friendly-city-parental-leave"
+        "sourceId": "chiang-page-17"
       }
     ],
     "districts": [],
@@ -2858,11 +2858,11 @@
     "quotes": [
       {
         "text": "加碼好孕專車延長使用至產後一年",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將「健康好孕專車」的使用期限貼心延長至「產後一年」",
-        "sourceId": "chiang-parenting-friendly-city-maternal-care"
+        "sourceId": "chiang-page-16"
       }
     ],
     "districts": [],
@@ -2889,11 +2889,11 @@
     "quotes": [
       {
         "text": "推動親子友善停車措施",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣規劃親子車位免費停車4小時",
-        "sourceId": "chiang-pr-parenting-13-policies"
+        "sourceId": "chiang-pr-32"
       }
     ],
     "districts": [],
@@ -2920,23 +2920,23 @@
     "quotes": [
       {
         "text": "加碼補助準公共托嬰、育兒津貼加碼千元",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "準公共托嬰補助加碼，從每月 1,400 元提高到 3,000 元，並逐步朝向第二胎以上零月費",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       },
       {
         "text": "針對未送托家庭的育兒津貼，每個月再加碼 1,000 元。",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       },
       {
         "text": "提高準公托補助至最高每月1萬6千元",
-        "sourceId": "chiang-pr-fengyuan-policy-briefing"
+        "sourceId": "chiang-pr-16"
       }
     ],
     "districts": [],
-    "conflictNote": null,
+    "conflictNote": "準公共托育補助的金額寫法不同：育兒子頁與育兒政策新聞稿寫市府加碼從每月 1,400 元提高到 3,000 元，豐原政見說明會新聞稿寫「提高準公托補助至最高每月1萬6千元」，沒有說明兩個數字的關係。",
     "verification": {
       "layer1": {
         "status": "pending",
@@ -2959,11 +2959,11 @@
     "quotes": [
       {
         "text": "友善再升級，育嬰留停給付目標100%",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "補足勞保給付餘下的 20% 平均月投保薪資差額，讓勞工在育嬰留停期間領滿 100% 薪資",
-        "sourceId": "chiang-parenting-friendly-city-parental-leave"
+        "sourceId": "chiang-page-17"
       }
     ],
     "districts": [],
@@ -2990,15 +2990,15 @@
     "quotes": [
       {
         "text": "推出臨托預約APP、鼓勵企業辦理共托",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "推出全臺首創的「臨托預約 APP」，讓家長能一鍵預約周邊空閒臨托量能",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       },
       {
         "text": "鼓勵在地企業辦理共托，把托育據點搬到上班的樓下。",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       }
     ],
     "districts": [],
@@ -3025,7 +3025,7 @@
     "quotes": [
       {
         "text": "未來將在南屯及各新興人口移入區擴大公共托育、幼兒教保",
-        "sourceId": "chiang-pr-zhongxiao-nantun-market-canvass"
+        "sourceId": "chiang-pr-44"
       }
     ],
     "districts": [
@@ -3054,15 +3054,15 @@
     "quotes": [
       {
         "text": "全面推行育兒友善廁所",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "於市內全面推行育兒友善廁所，在公廁增設配備安全座椅、尿布台的專屬親子廁間。",
-        "sourceId": "chiang-parenting-friendly-city-childcare-support"
+        "sourceId": "chiang-page-15"
       },
       {
         "text": "並以文心森林公園親子廁所為範本推動「親子小白宮」",
-        "sourceId": "chiang-pr-parenting-13-policies"
+        "sourceId": "chiang-pr-32"
       }
     ],
     "districts": [],
@@ -3089,11 +3089,11 @@
     "quotes": [
       {
         "text": "推行AI減壓教師行政庶務",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "開發校園行政專屬「AI智慧系統」，自動彙整報表與評鑑資料",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3120,11 +3120,11 @@
     "quotes": [
       {
         "text": "國中小導入AI智慧助教系統",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "在學生端則引入AI助教，精準定位學習盲點以實踐因材施教",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3151,19 +3151,19 @@
     "quotes": [
       {
         "text": "成立「科技教育發展中心」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "正式成立專責的「科技教育發展中心」，統一調度全市的數位教育資源。",
-        "sourceId": "chiang-robot-manufacturing-city-tech-education"
+        "sourceId": "chiang-page-20"
       },
       {
         "text": "由專責中心統一編組科技教材與師資",
-        "sourceId": "chiang-robot-manufacturing-city-tech-education"
+        "sourceId": "chiang-page-20"
       },
       {
         "text": "把程式邏輯、微型機器人與生成式 AI 的基礎應用，用好玩、活潑的情境式體驗，深度融入從幼兒園到高中的課程裡",
-        "sourceId": "chiang-robot-manufacturing-city-tech-education"
+        "sourceId": "chiang-page-20"
       }
     ],
     "districts": [],
@@ -3190,11 +3190,11 @@
     "quotes": [
       {
         "text": "增設「職業探索中心」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "大幅增設「職業探索中心」，拉高學子參與職業探索的群科豐富度與頻率。",
-        "sourceId": "chiang-robot-manufacturing-city-vocational-training"
+        "sourceId": "chiang-page-21"
       }
     ],
     "districts": [],
@@ -3221,15 +3221,15 @@
     "quotes": [
       {
         "text": "擴大STEAM示範學校和據點",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將跨學門的 STEAM（科學、科技、工程、藝術、數學）動手做教育，擴大推廣至幼兒到高中的各級示範學校。",
-        "sourceId": "chiang-robot-manufacturing-city-steam-education"
+        "sourceId": "chiang-page-19"
       },
       {
         "text": "於山、海、屯、城及高鐵門戶五大生活圈建置跨學門STEAM示範據點",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3256,11 +3256,11 @@
     "quotes": [
       {
         "text": "校園大翻新，建置有溫度的安全校園",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "承諾市府每年主動編列至少10億元專款，加速老舊校舍、廁所、跑道重建及防墜設施工程",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3287,11 +3287,11 @@
     "quotes": [
       {
         "text": "成立技職教育專責單位",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "在教育局內大刀闊斧成立技職教育專責單位",
-        "sourceId": "chiang-robot-manufacturing-city-vocational-training"
+        "sourceId": "chiang-page-21"
       }
     ],
     "districts": [],
@@ -3318,11 +3318,11 @@
     "quotes": [
       {
         "text": "雙語教學Plus，校校有外師Plus",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "推動「雙語教學Plus」逐步邁向「校校有外師」",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3349,15 +3349,15 @@
     "quotes": [
       {
         "text": "營養午餐免費再升級，吃飽更要吃健康",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "未來將透過農會與農民契作，建立「臺中在地食材優先」機制，把新鮮蔬果送進校園廚房",
-        "sourceId": "chiang-pr-agriculture-5-policies"
+        "sourceId": "chiang-pr-02"
       },
       {
         "text": "結合在地食材推展低碳食農教育",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3384,7 +3384,7 @@
     "quotes": [
       {
         "text": "營養加分，減低校園營養師與學生比",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -3411,7 +3411,7 @@
     "quotes": [
       {
         "text": "充實特教助理員、彈性調降普通生人數",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3438,7 +3438,7 @@
     "quotes": [
       {
         "text": "建立具體管教標準與教師心理諮商機制",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3465,7 +3465,7 @@
     "quotes": [
       {
         "text": "逐年調降生師比、降低代理教師比例並落實全年聘期",
-        "sourceId": "chiang-pr-education-6-priority-policies"
+        "sourceId": "chiang-pr-15"
       }
     ],
     "districts": [],
@@ -3492,11 +3492,11 @@
     "quotes": [
       {
         "text": "教育經費比例將維持最高",
-        "sourceId": "chiang-pr-jiaanpu-20-minute-city"
+        "sourceId": "chiang-pr-22"
       },
       {
         "text": "他承諾若當選，教育經費將維持最高比例",
-        "sourceId": "chiang-pr-beitun-waipu-briefings"
+        "sourceId": "chiang-pr-08"
       }
     ],
     "districts": [],
@@ -3523,7 +3523,7 @@
     "quotes": [
       {
         "text": "釋出國中小正式「客語專任教師」職缺",
-        "sourceId": "chiang-multicultural-city-hakka-heritage"
+        "sourceId": "chiang-page-09"
       }
     ],
     "districts": [],
@@ -3550,11 +3550,11 @@
     "quotes": [
       {
         "text": "爭取臺灣設計展，蛻變「生活美學城市」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "江啟臣承諾爭取臺灣設計展重返臺中",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       }
     ],
     "districts": [],
@@ -3581,11 +3581,11 @@
     "quotes": [
       {
         "text": "轉型臺中文化建設基金會為「臺中設計中心」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "成立臺中設計中心，讓專業設計參與捷運站、公有市場及全齡公園規劃",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       }
     ],
     "districts": [],
@@ -3612,7 +3612,7 @@
     "quotes": [
       {
         "text": "全年藝文不間斷，「週週有主題、月月有節日」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -3639,15 +3639,15 @@
     "quotes": [
       {
         "text": "臺中車站出發啟動「臺中文化門戶計畫」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將以臺中車站為核心啟動「文化門戶計畫」，串聯臺中公園、臺中州廳、市役所、第二市場及臺中文學館等歷史空間",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       },
       {
         "text": "中西區擁有臺中州廳、刑務所演武場、國漫館與第二市場等地標，將透過「臺中文化門戶計畫」串聯周邊古蹟，打造城市博物館群",
-        "sourceId": "chiang-pr-central-west-district-briefing"
+        "sourceId": "chiang-pr-09"
       }
     ],
     "districts": [
@@ -3677,15 +3677,15 @@
     "quotes": [
       {
         "text": "推動巷弄文化小蜜蜂",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "把舞台直接搬到阿公阿嬤熟悉的廟口、社區活動中心與公園樹下",
-        "sourceId": "chiang-old-town-revival-community-arts"
+        "sourceId": "chiang-page-12"
       },
       {
         "text": "擴大「巷弄文化小蜜蜂」，將藝文帶進29個行政區的廟口、公園與社區",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       }
     ],
     "districts": [],
@@ -3712,11 +3712,11 @@
     "quotes": [
       {
         "text": "擴大臺中與國際藝文品牌交流",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "主動與國際指標性藝術節簽署合作，引進全球頂尖藝文展演，並帶著臺中的獨立樂團與新銳藝術家走向國際舞台。",
-        "sourceId": "chiang-old-town-revival-night-economy"
+        "sourceId": "chiang-page-14"
       }
     ],
     "districts": [],
@@ -3743,19 +3743,19 @@
     "quotes": [
       {
         "text": "架構「文化產業投資平台」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "聯合數位局、經發局與民間創投機構，打造全臺首創的文化創投媒合中心。",
-        "sourceId": "chiang-old-town-revival-culture-investment"
+        "sourceId": "chiang-page-13"
       },
       {
         "text": "為文創團隊提供低利融資、版權媒合與海外市場拓銷。",
-        "sourceId": "chiang-old-town-revival-culture-investment"
+        "sourceId": "chiang-page-13"
       },
       {
         "text": "江啟臣將成立「臺中文化產業投資平台」，提供補助、低利資金、版權媒合及市場拓銷",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       }
     ],
     "districts": [],
@@ -3782,11 +3782,11 @@
     "quotes": [
       {
         "text": "鼓勵「企業認養文化場域」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "舉凡企業實質出資認養古蹟或是贊助藝文演出，市府將給予相應獎勵、稅費減免與城市榮譽表揚",
-        "sourceId": "chiang-old-town-revival-culture-investment"
+        "sourceId": "chiang-page-13"
       }
     ],
     "districts": [],
@@ -3813,11 +3813,11 @@
     "quotes": [
       {
         "text": "建構「跨域文化人才庫」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "運用「臺中設計中心」與「舊縣議會新創基地」建立藝文創業孵化器（Arts Incubator），為數位設計、流行音樂等跨域人才提供低障礙的共同工作室與啟動資源。",
-        "sourceId": "chiang-old-town-revival-culture-investment"
+        "sourceId": "chiang-page-13"
       }
     ],
     "districts": [],
@@ -3844,7 +3844,7 @@
     "quotes": [
       {
         "text": "他也將推動文化社會處方箋，結合藝文與醫療照護",
-        "sourceId": "chiang-pr-culture-flagship-15-policies"
+        "sourceId": "chiang-pr-11"
       }
     ],
     "districts": [],
@@ -3871,11 +3871,11 @@
     "quotes": [
       {
         "text": "升級「東勢客家文化園區」，再現山城客家之美",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "啟動「東勢客家文化園區」升級，興建實驗劇場並導入親子沈浸式 DIY 體驗",
-        "sourceId": "chiang-multicultural-city-hakka-heritage"
+        "sourceId": "chiang-page-09"
       }
     ],
     "districts": [
@@ -3904,7 +3904,7 @@
     "quotes": [
       {
         "text": "升級「巧聖仙師文化祭」，打造國際亮點節慶",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -3931,11 +3931,11 @@
     "quotes": [
       {
         "text": "扎根客語教育與「大埔腔」AI 數位保存",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "聯手產學研發起「大埔腔 AI 數位保存計畫」，採集地方耆老的原生語音，建立資料庫與 AI 模型留住文化根基。",
-        "sourceId": "chiang-multicultural-city-hakka-heritage"
+        "sourceId": "chiang-page-09"
       }
     ],
     "districts": [],
@@ -3962,11 +3962,11 @@
     "quotes": [
       {
         "text": "創辦「Hakka Sound音樂祭」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將客家傳統山歌與搖滾、嘻哈、電子等現代流行樂交會共振，推動客語流行音樂（Hakkapop）",
-        "sourceId": "chiang-multicultural-city-hakka-heritage"
+        "sourceId": "chiang-page-09"
       }
     ],
     "districts": [],
@@ -3993,11 +3993,11 @@
     "quotes": [
       {
         "text": "創辦（和平）梨山、谷關「山和谷音樂祭」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "並籌辦串聯梨山、和平、谷關的「山和谷音樂祭」",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       }
     ],
     "districts": [
@@ -4026,7 +4026,7 @@
     "quotes": [
       {
         "text": "未來將結合福壽山、武陵農場與在地原民文化，推廣「步道觀光」",
-        "sourceId": "chiang-pr-lishan-smart-agriculture"
+        "sourceId": "chiang-pr-25"
       }
     ],
     "districts": [
@@ -4055,11 +4055,11 @@
     "quotes": [
       {
         "text": "江啟臣承諾，未來將全面推動大坑風景區的硬體升級，除了爭取預算對現有步道進行總體檢、增設友善長輩與親子的無障礙平緩步道，並導入智慧導覽與生態教育外",
-        "sourceId": "chiang-pr-dakeng-hiking-tourism"
+        "sourceId": "chiang-pr-13"
       },
       {
         "text": "更要結合大坑特有的溫泉資源，發展「白天爬山、晚上泡湯」的旗艦級休閒品牌",
-        "sourceId": "chiang-pr-dakeng-hiking-tourism"
+        "sourceId": "chiang-pr-13"
       }
     ],
     "districts": [
@@ -4088,11 +4088,11 @@
     "quotes": [
       {
         "text": "建構原住民族全適齡語文與祭儀智慧庫",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "建構「大臺中原住民族語與祭儀智慧庫」，採集部落耆老記憶，在都會社區與校園導入「情境式、沉浸式」實作工坊",
-        "sourceId": "chiang-multicultural-city-indigenous-support"
+        "sourceId": "chiang-page-10"
       }
     ],
     "districts": [],
@@ -4119,7 +4119,7 @@
     "quotes": [
       {
         "text": "成立「智慧城市發展委員會」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4146,15 +4146,15 @@
     "quotes": [
       {
         "text": "成立「國際合作發展委員會」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "未來將在市長層級設置「國際合作與發展委員會」，作為企業與國際社群對接市府的單一窗口",
-        "sourceId": "chiang-pr-amcham-taichung-dinner"
+        "sourceId": "chiang-pr-04"
       },
       {
         "text": "首先成立「國際合作發展委員會」，納入新住民及其二代參與",
-        "sourceId": "chiang-pr-new-residents-4-policies"
+        "sourceId": "chiang-pr-31"
       }
     ],
     "districts": [],
@@ -4181,7 +4181,7 @@
     "quotes": [
       {
         "text": "建置「臺中市主權AI與數據中心」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4208,19 +4208,19 @@
     "quotes": [
       {
         "text": "建構「臺中智慧安全網」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "將現行家福、兒少、性平、治安、心衛、長照、食藥、就業等八個獨立的安全通報網資訊進行匯流整合。",
-        "sourceId": "chiang-city-safety-smart-safety-net"
+        "sourceId": "chiang-page-03"
       },
       {
         "text": "在符合個資法的前提下，建置跨局處的智慧預警平台",
-        "sourceId": "chiang-city-safety-smart-safety-net"
+        "sourceId": "chiang-page-03"
       },
       {
         "text": "利用大數據與 AI 交叉比對高風險家庭、校園安全與精神衛生等邊緣信號",
-        "sourceId": "chiang-city-safety-smart-safety-net"
+        "sourceId": "chiang-page-03"
       }
     ],
     "districts": [],
@@ -4247,15 +4247,15 @@
     "quotes": [
       {
         "text": "建立即時AI輔助交通系統、全域智慧巡檢",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "建置「全域智慧巡檢管理系統」，讓巡檢車上的 AI 即時自動辨識道路坑洞與標線磨損",
-        "sourceId": "chiang-smart-transport-smart-roads"
+        "sourceId": "chiang-page-29"
       },
       {
         "text": "逐步升級「全動態 AI 智慧號誌系統」，覆蓋主要交通瓶頸路口，依據即時車流無縫調節紅綠燈",
-        "sourceId": "chiang-smart-transport-smart-roads"
+        "sourceId": "chiang-page-29"
       }
     ],
     "districts": [],
@@ -4282,7 +4282,7 @@
     "quotes": [
       {
         "text": "擴大AI水情治理系統",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4309,7 +4309,7 @@
     "quotes": [
       {
         "text": "構築智慧滅鼠系統",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4336,11 +4336,11 @@
     "quotes": [
       {
         "text": "推動智慧噪音監測系統",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "另推動智慧噪音監測，結合聲音照相與車牌辨識，強化噪音防制",
-        "sourceId": "chiang-pr-smart-city-safety-net-launch"
+        "sourceId": "chiang-pr-36"
       }
     ],
     "districts": [],
@@ -4367,11 +4367,11 @@
     "quotes": [
       {
         "text": "推動「減碳存摺」控污管煤",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "市民搭乘免費公車後可累積綠色里程點數，點數可直接實質折抵 iBike 的騎乘費用",
-        "sourceId": "chiang-smart-transport-walkable-streets"
+        "sourceId": "chiang-page-30"
       }
     ],
     "districts": [],
@@ -4398,11 +4398,11 @@
     "quotes": [
       {
         "text": "應對極端氣候，升級城市災防韌性",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "透過中臺灣區域治理平臺強化防救災合作",
-        "sourceId": "chiang-pr-smart-city-safety-net-launch"
+        "sourceId": "chiang-pr-36"
       }
     ],
     "districts": [],
@@ -4429,7 +4429,7 @@
     "quotes": [
       {
         "text": "推動多元廚餘去化模式",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4456,7 +4456,7 @@
     "quotes": [
       {
         "text": "推動美樂地plus，升級「共融療癒全齡公園」",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4483,7 +4483,7 @@
     "quotes": [
       {
         "text": "設置筏子溪自行車道",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4510,7 +4510,7 @@
     "quotes": [
       {
         "text": "大甲溪高灘地水岸親水公園",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4537,7 +4537,7 @@
     "quotes": [
       {
         "text": "「親海啟航」，建設大安親海自然步道、濱海樂園增設濱海運動區",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [
@@ -4566,7 +4566,7 @@
     "quotes": [
       {
         "text": "規劃將鰲峰山打造成綜合休閒園區",
-        "sourceId": "chiang-pr-haixian-zhang-qing-zhao"
+        "sourceId": "chiang-pr-19"
       }
     ],
     "districts": [
@@ -4595,7 +4595,7 @@
     "quotes": [
       {
         "text": "推動興建符合250公尺國際標準的室內自由車場館",
-        "sourceId": "chiang-pr-haixian-zhang-qing-zhao"
+        "sourceId": "chiang-pr-19"
       }
     ],
     "districts": [],
@@ -4622,11 +4622,11 @@
     "quotes": [
       {
         "text": "落實居住正義，推動臺中多元社會住宅",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "同時持續興建社會住宅",
-        "sourceId": "chiang-pr-tunqu-transport-blueprint"
+        "sourceId": "chiang-pr-41"
       }
     ],
     "districts": [],
@@ -4653,15 +4653,15 @@
     "quotes": [
       {
         "text": "打造「20分鐘生活圈」均衡地方發展",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "讓市民在20分鐘通勤範圍內，滿足就醫、就學與就業等日常需求",
-        "sourceId": "chiang-pr-20-minute-city-gis-policy"
+        "sourceId": "chiang-pr-01"
       },
       {
         "text": "他提出山城、海線、屯區、市區及高鐵門戶特區五大生活圈，以「20分鐘生活圈」為目標",
-        "sourceId": "chiang-pr-nantun-briefing-20-minute-city"
+        "sourceId": "chiang-pr-30"
       }
     ],
     "districts": [],
@@ -4688,11 +4688,11 @@
     "quotes": [
       {
         "text": "未來他將依各區面積、道路現況與實際需求分配預算，加碼基層建設",
-        "sourceId": "chiang-pr-jiaanpu-20-minute-city"
+        "sourceId": "chiang-pr-22"
       },
       {
         "text": "不再僅以人口數作為資源分配依據，而是依各區需求進行檢討與建設",
-        "sourceId": "chiang-pr-beitun-waipu-briefings"
+        "sourceId": "chiang-pr-08"
       }
     ],
     "districts": [],
@@ -4719,7 +4719,7 @@
     "quotes": [
       {
         "text": "江啟臣承諾會全力協助爭取交通部及行政院合理提高補助比例",
-        "sourceId": "chiang-pr-mrt-blue-line-groundbreaking"
+        "sourceId": "chiang-pr-29"
       }
     ],
     "districts": [],
@@ -4746,11 +4746,11 @@
     "quotes": [
       {
         "text": "升級毛小孩公園",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       },
       {
         "text": "他也主張增設寵物公園",
-        "sourceId": "chiang-pr-beiqu-briefing-lu-chen-zheng-xian"
+        "sourceId": "chiang-pr-05"
       }
     ],
     "districts": [],
@@ -4777,7 +4777,7 @@
     "quotes": [
       {
         "text": "動物之家升級，收容教育再回家",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],
@@ -4804,7 +4804,7 @@
     "quotes": [
       {
         "text": "開辦寵物產業認證",
-        "sourceId": "chiang-future"
+        "sourceId": "chiang-main"
       }
     ],
     "districts": [],

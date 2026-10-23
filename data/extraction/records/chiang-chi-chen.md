@@ -4,7 +4,7 @@
 - 抽取指示：`data/extraction/instructions.md` 版本 2
 - 擷取日期：2026-10-23
 - 結果：政見 149 筆（`data/raw/policies/chiang-chi-chen.json`），全部未核對；引用出處 76 個（`data/raw/sources/chiang-chi-chen.json`，快照在 `data/snapshots/`）
-- 原始政見條目總數：117，依據出處 `chiang-future`（官網政見頁「五大面向・百大新政」，01 交通公安 22 項、02 產業就業 25 項、03 健康養護 19 項、04 文教社福 32 項、05 韌性永續 19 項）。十大亮點與新聞稿不計入。
+- 原始政見條目總數：117，依據出處 `chiang-main`（官網政見頁「五大面向・百大新政」，01 交通公安 22 項、02 產業就業 25 項、03 健康養護 19 項、04 文教社福 32 項、05 韌性永續 19 項）。十大亮點與新聞稿不計入。
 
 ## 檢視範圍
 
@@ -28,6 +28,8 @@
 - 地方場次套用全市政見、沒有提出該區專屬具體項目的，視為重述，不加適用行政區。
 - 一個條目內含多件事時，只有跨不同議題區才拆成多筆（江-02-21、江-05-13）。
 - 摘要避開品牌用語；「加速器」是設施名稱，沒有中性的替代說法，照用。
+- 只向中央提出要求的事項（國道四號延伸進港區、提高捷運補助比例）依分類規則第 3 節第 5 點歸市政治理；市府自己也要做的部分（例如機場周邊土地整合）照主要成果歸區。
+- 條目編號「江-面向-序號」是本紀錄為主要政見頁 117 項編的號碼，面向 01 至 05 照官網順序，序號照面向內的列出順序；同一條目跨議題區拆開時加 a、b。
 
 ## 適用行政區
 
@@ -44,7 +46,88 @@
 
 ## 出處存檔
 
-76 個出處中 10 個有 Wayback Machine 存檔網址。其餘在抽取時遇到 Wayback Machine 限流（回應 HTTP 429 或拒絕連線），依管理者決定照實記錄 `archiveError`、不重試，補送存檔另行集中處理。
+76 個出處中 10 個有 Wayback Machine 存檔網址。其餘在抽取時遇到 Wayback Machine 限流（回應 HTTP 429 或拒絕連線），依管理者決定照實記錄 `archiveError`、不重試，補送存檔另行集中處理。其中寫「抽取階段未再送存檔」的出處是限流後沒有送出，不是送了失敗。
+
+出處識別碼用中性編號：主要政見頁 `chiang-main`，政見子頁 `chiang-page-NN`，新聞稿 `chiang-pr-NN`，依網址排序。快照檔名會出現在網站上，所以不沿用官網網址中品牌用語的英譯。
+
+| 出處識別碼 | 網址 | 存檔 |
+|---|---|---|
+| chiang-main | https://taichungway.tw/future | https://web.archive.org/web/20261023095728/https://taichungway.tw/future |
+| chiang-page-01 | https://taichungway.tw/central-taiwan-airport-gateway | https://web.archive.org/web/20261023100741/https://taichungway.tw/central-taiwan-airport-gateway |
+| chiang-page-02 | https://taichungway.tw/city-safety-first-responders | https://web.archive.org/web/20261023100805/https://taichungway.tw/city-safety-first-responders |
+| chiang-page-03 | https://taichungway.tw/city-safety-smart-safety-net | https://web.archive.org/web/20261023100831/https://taichungway.tw/city-safety-smart-safety-net |
+| chiang-page-04 | https://taichungway.tw/city-safety-tech-enforcement | 失敗：Wayback Machine 回應 HTTP 429 |
+| chiang-page-05 | https://taichungway.tw/exhibition-economy-city-pavilion | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-06 | https://taichungway.tw/exhibition-economy-mice-tourism | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-07 | https://taichungway.tw/exhibition-economy-startup-accelerator | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-08 | https://taichungway.tw/exhibition-economy-taichung-hub | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-09 | https://taichungway.tw/multicultural-city-hakka-heritage | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-10 | https://taichungway.tw/multicultural-city-indigenous-support | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-11 | https://taichungway.tw/multicultural-city-new-immigrants | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-12 | https://taichungway.tw/old-town-revival-community-arts | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-13 | https://taichungway.tw/old-town-revival-culture-investment | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-14 | https://taichungway.tw/old-town-revival-night-economy | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-15 | https://taichungway.tw/parenting-friendly-city-childcare-support | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-16 | https://taichungway.tw/parenting-friendly-city-maternal-care | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-17 | https://taichungway.tw/parenting-friendly-city-parental-leave | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-18 | https://taichungway.tw/robot-manufacturing-city-ai-industry | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-19 | https://taichungway.tw/robot-manufacturing-city-steam-education | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-20 | https://taichungway.tw/robot-manufacturing-city-tech-education | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-21 | https://taichungway.tw/robot-manufacturing-city-vocational-training | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-22 | https://taichungway.tw/senior-care-age-friendly-housing | https://web.archive.org/web/20261023101127/https://taichungway.tw/senior-care-age-friendly-housing |
+| chiang-page-23 | https://taichungway.tw/senior-care-community-hubs | https://web.archive.org/web/20261023101151/https://taichungway.tw/senior-care-community-hubs |
+| chiang-page-24 | https://taichungway.tw/senior-care-long-term-care-office | https://web.archive.org/web/20261023101214/https://taichungway.tw/senior-care-long-term-care-office |
+| chiang-page-25 | https://taichungway.tw/smart-agriculture-brand-upgrade | https://web.archive.org/web/20261023101239/https://taichungway.tw/smart-agriculture-brand-upgrade |
+| chiang-page-26 | https://taichungway.tw/smart-agriculture-disaster-alert | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-27 | https://taichungway.tw/smart-agriculture-university-partnership | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-28 | https://taichungway.tw/smart-transport-public-transit | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-29 | https://taichungway.tw/smart-transport-smart-roads | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-30 | https://taichungway.tw/smart-transport-walkable-streets | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-31 | https://taichungway.tw/taichung-20-minute-city | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-01 | https://taichungway.tw/press-release-20-minute-city-gis-policy | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-02 | https://taichungway.tw/press-release-agriculture-5-policies | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-03 | https://taichungway.tw/press-release-aidc-trainer-aircraft-ai | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-04 | https://taichungway.tw/press-release-amcham-taichung-dinner | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-05 | https://taichungway.tw/press-release-beiqu-briefing-lu-chen-zheng-xian | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-06 | https://taichungway.tw/press-release-beitun-hq-openings | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-07 | https://taichungway.tw/press-release-beitun-shen-youlian-joint-briefing | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-pr-08 | https://taichungway.tw/press-release-beitun-waipu-briefings | https://web.archive.org/web/20261023101511/https://taichungway.tw/press-release-beitun-waipu-briefings |
+| chiang-pr-09 | https://taichungway.tw/press-release-central-west-district-briefing | https://web.archive.org/web/20261023101630/https://taichungway.tw/press-release-central-west-district-briefing |
+| chiang-pr-10 | https://taichungway.tw/press-release-coastal-daan-dajia-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-11 | https://taichungway.tw/press-release-culture-flagship-15-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-12 | https://taichungway.tw/press-release-dadu-longjing-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-13 | https://taichungway.tw/press-release-dakeng-hiking-tourism | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-14 | https://taichungway.tw/press-release-dongfeng-expressway-third-section | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-15 | https://taichungway.tw/press-release-education-6-priority-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-16 | https://taichungway.tw/press-release-fengyuan-policy-briefing | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-17 | https://taichungway.tw/press-release-fire-phoenix-tech-rescue | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-18 | https://taichungway.tw/press-release-four-hq-openings-xitun-nanqu-dali | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-19 | https://taichungway.tw/press-release-haixian-zhang-qing-zhao | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-20 | https://taichungway.tw/press-release-hanxi-nightmarket-3-arrows | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-21 | https://taichungway.tw/press-release-indigenous-5-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-22 | https://taichungway.tw/press-release-jiaanpu-20-minute-city | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-23 | https://taichungway.tw/press-release-jianguo-market-10th-anniversary | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-24 | https://taichungway.tw/press-release-lien-chiachen-hq | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-25 | https://taichungway.tw/press-release-lishan-smart-agriculture | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-26 | https://taichungway.tw/press-release-longjing-senior-card-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-27 | https://taichungway.tw/press-release-medical-longterm-care-support-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-28 | https://taichungway.tw/press-release-mice-economy-168 | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-29 | https://taichungway.tw/press-release-mrt-blue-line-groundbreaking | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-30 | https://taichungway.tw/press-release-nantun-briefing-20-minute-city | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-31 | https://taichungway.tw/press-release-new-residents-4-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-32 | https://taichungway.tw/press-release-parenting-13-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-33 | https://taichungway.tw/press-release-pharmacist-support-group | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-34 | https://taichungway.tw/press-release-robot-policy-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-35 | https://taichungway.tw/press-release-shalu-coastal-transport | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-36 | https://taichungway.tw/press-release-smart-city-safety-net-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-37 | https://taichungway.tw/press-release-south-nantun-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-38 | https://taichungway.tw/press-release-taichung-airport-expansion | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-39 | https://taichungway.tw/press-release-traffic-smart-era-policy-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-40 | https://taichungway.tw/press-release-tucheng-taiping-market-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-41 | https://taichungway.tw/press-release-tunqu-transport-blueprint | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-42 | https://taichungway.tw/press-release-women-support-association-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-43 | https://taichungway.tw/press-release-wuqi-briefing-sea-air-ports | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-44 | https://taichungway.tw/press-release-zhongxiao-nantun-market-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
 
 ## 十大亮點
 
@@ -191,7 +274,7 @@
 
 網址：https://taichungway.tw/central-taiwan-airport-gateway
 
-結果：收錄（出處 chiang-central-taiwan-airport-gateway）。
+結果：收錄，出處識別碼 chiang-page-01。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -202,7 +285,7 @@
 
 網址：https://taichungway.tw/city-safety-first-responders
 
-結果：收錄（出處 chiang-city-safety-first-responders）。
+結果：收錄，出處識別碼 chiang-page-02。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -214,7 +297,7 @@
 
 網址：https://taichungway.tw/city-safety-smart-safety-net
 
-結果：收錄（出處 chiang-city-safety-smart-safety-net）。
+結果：收錄，出處識別碼 chiang-page-03。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -226,7 +309,7 @@
 
 網址：https://taichungway.tw/city-safety-tech-enforcement
 
-結果：收錄（出處 chiang-city-safety-tech-enforcement）。
+結果：收錄，出處識別碼 chiang-page-04。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -239,7 +322,7 @@
 
 網址：https://taichungway.tw/exhibition-economy-city-pavilion
 
-結果：收錄（出處 chiang-exhibition-economy-city-pavilion）。
+結果：收錄，出處識別碼 chiang-page-05。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -251,7 +334,7 @@
 
 網址：https://taichungway.tw/exhibition-economy-mice-tourism
 
-結果：收錄（出處 chiang-exhibition-economy-mice-tourism）。
+結果：收錄，出處識別碼 chiang-page-06。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -263,7 +346,7 @@
 
 網址：https://taichungway.tw/exhibition-economy-startup-accelerator
 
-結果：收錄（出處 chiang-exhibition-economy-startup-accelerator）。
+結果：收錄，出處識別碼 chiang-page-07。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -275,7 +358,7 @@
 
 網址：https://taichungway.tw/exhibition-economy-taichung-hub
 
-結果：收錄（出處 chiang-exhibition-economy-taichung-hub）。
+結果：收錄，出處識別碼 chiang-page-08。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -287,7 +370,7 @@
 
 網址：https://taichungway.tw/multicultural-city-hakka-heritage
 
-結果：收錄（出處 chiang-multicultural-city-hakka-heritage）。
+結果：收錄，出處識別碼 chiang-page-09。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -301,7 +384,7 @@
 
 網址：https://taichungway.tw/multicultural-city-indigenous-support
 
-結果：收錄（出處 chiang-multicultural-city-indigenous-support）。
+結果：收錄，出處識別碼 chiang-page-10。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -315,7 +398,7 @@
 
 網址：https://taichungway.tw/multicultural-city-new-immigrants
 
-結果：收錄（出處 chiang-multicultural-city-new-immigrants）。
+結果：收錄，出處識別碼 chiang-page-11。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -327,7 +410,7 @@
 
 網址：https://taichungway.tw/old-town-revival-community-arts
 
-結果：收錄（出處 chiang-old-town-revival-community-arts）。
+結果：收錄，出處識別碼 chiang-page-12。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -339,7 +422,7 @@
 
 網址：https://taichungway.tw/old-town-revival-culture-investment
 
-結果：收錄（出處 chiang-old-town-revival-culture-investment）。
+結果：收錄，出處識別碼 chiang-page-13。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -352,7 +435,7 @@
 
 網址：https://taichungway.tw/old-town-revival-night-economy
 
-結果：收錄（出處 chiang-old-town-revival-night-economy）。
+結果：收錄，出處識別碼 chiang-page-14。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -364,7 +447,7 @@
 
 網址：https://taichungway.tw/parenting-friendly-city-childcare-support
 
-結果：收錄（出處 chiang-parenting-friendly-city-childcare-support）。
+結果：收錄，出處識別碼 chiang-page-15。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -379,7 +462,7 @@
 
 網址：https://taichungway.tw/parenting-friendly-city-maternal-care
 
-結果：收錄（出處 chiang-parenting-friendly-city-maternal-care）。
+結果：收錄，出處識別碼 chiang-page-16。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -391,7 +474,7 @@
 
 網址：https://taichungway.tw/parenting-friendly-city-parental-leave
 
-結果：收錄（出處 chiang-parenting-friendly-city-parental-leave）。
+結果：收錄，出處識別碼 chiang-page-17。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -403,7 +486,7 @@
 
 網址：https://taichungway.tw/press-release-20-minute-city-gis-policy
 
-結果：收錄（出處 chiang-pr-20-minute-city-gis-policy）。
+結果：收錄，出處識別碼 chiang-pr-01。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -422,7 +505,7 @@
 
 網址：https://taichungway.tw/press-release-agriculture-5-policies
 
-結果：收錄（出處 chiang-pr-agriculture-5-policies）。
+結果：收錄，出處識別碼 chiang-pr-02。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -446,7 +529,7 @@
 
 網址：https://taichungway.tw/press-release-aidc-trainer-aircraft-ai
 
-結果：收錄（出處 chiang-pr-aidc-trainer-aircraft-ai）。
+結果：收錄，出處識別碼 chiang-pr-03。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -457,7 +540,7 @@
 
 網址：https://taichungway.tw/press-release-amcham-taichung-dinner
 
-結果：收錄（出處 chiang-pr-amcham-taichung-dinner）。
+結果：收錄，出處識別碼 chiang-pr-04。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -474,7 +557,7 @@
 
 網址：https://taichungway.tw/press-release-beiqu-briefing-lu-chen-zheng-xian
 
-結果：收錄（出處 chiang-pr-beiqu-briefing-lu-chen-zheng-xian）。
+結果：收錄，出處識別碼 chiang-pr-05。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -492,7 +575,7 @@
 
 網址：https://taichungway.tw/press-release-beitun-hq-openings
 
-結果：收錄（出處 chiang-pr-beitun-hq-openings）。
+結果：收錄，出處識別碼 chiang-pr-06。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -522,7 +605,7 @@
 
 網址：https://taichungway.tw/press-release-beitun-shen-youlian-joint-briefing
 
-結果：收錄（出處 chiang-pr-beitun-shen-youlian-joint-briefing）。
+結果：收錄，出處識別碼 chiang-pr-07。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -537,7 +620,7 @@
 
 網址：https://taichungway.tw/press-release-beitun-waipu-briefings
 
-結果：收錄（出處 chiang-pr-beitun-waipu-briefings）。
+結果：收錄，出處識別碼 chiang-pr-08。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -566,7 +649,7 @@
 
 網址：https://taichungway.tw/press-release-central-west-district-briefing
 
-結果：收錄（出處 chiang-pr-central-west-district-briefing）。
+結果：收錄，出處識別碼 chiang-pr-09。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -593,7 +676,7 @@
 
 網址：https://taichungway.tw/press-release-coastal-daan-dajia-briefings
 
-結果：收錄（出處 chiang-pr-coastal-daan-dajia-briefings）。
+結果：收錄，出處識別碼 chiang-pr-10。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -609,7 +692,7 @@
 
 網址：https://taichungway.tw/press-release-culture-flagship-15-policies
 
-結果：收錄（出處 chiang-pr-culture-flagship-15-policies）。
+結果：收錄，出處識別碼 chiang-pr-11。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -629,7 +712,7 @@
 
 網址：https://taichungway.tw/press-release-dadu-longjing-canvass
 
-結果：收錄（出處 chiang-pr-dadu-longjing-canvass）。
+結果：收錄，出處識別碼 chiang-pr-12。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -651,7 +734,7 @@
 
 網址：https://taichungway.tw/press-release-dakeng-hiking-tourism
 
-結果：收錄（出處 chiang-pr-dakeng-hiking-tourism）。
+結果：收錄，出處識別碼 chiang-pr-13。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -671,7 +754,7 @@
 
 網址：https://taichungway.tw/press-release-dongfeng-expressway-third-section
 
-結果：收錄（出處 chiang-pr-dongfeng-expressway-third-section）。
+結果：收錄，出處識別碼 chiang-pr-14。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -705,7 +788,7 @@
 
 網址：https://taichungway.tw/press-release-education-6-priority-policies
 
-結果：收錄（出處 chiang-pr-education-6-priority-policies）。
+結果：收錄，出處識別碼 chiang-pr-15。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -741,7 +824,7 @@
 
 網址：https://taichungway.tw/press-release-fengyuan-policy-briefing
 
-結果：收錄（出處 chiang-pr-fengyuan-policy-briefing）。
+結果：收錄，出處識別碼 chiang-pr-16。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -769,7 +852,7 @@
 
 網址：https://taichungway.tw/press-release-fire-phoenix-tech-rescue
 
-結果：收錄（出處 chiang-pr-fire-phoenix-tech-rescue）。
+結果：收錄，出處識別碼 chiang-pr-17。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -780,7 +863,7 @@
 
 網址：https://taichungway.tw/press-release-four-hq-openings-xitun-nanqu-dali
 
-結果：收錄（出處 chiang-pr-four-hq-openings-xitun-nanqu-dali）。
+結果：收錄，出處識別碼 chiang-pr-18。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -806,7 +889,7 @@
 
 網址：https://taichungway.tw/press-release-haixian-zhang-qing-zhao
 
-結果：收錄（出處 chiang-pr-haixian-zhang-qing-zhao）。
+結果：收錄，出處識別碼 chiang-pr-19。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -821,7 +904,7 @@
 
 網址：https://taichungway.tw/press-release-hanxi-nightmarket-3-arrows
 
-結果：收錄（出處 chiang-pr-hanxi-nightmarket-3-arrows）。
+結果：收錄，出處識別碼 chiang-pr-20。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -850,7 +933,7 @@
 
 網址：https://taichungway.tw/press-release-indigenous-5-policies
 
-結果：收錄（出處 chiang-pr-indigenous-5-policies）。
+結果：收錄，出處識別碼 chiang-pr-21。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -864,7 +947,7 @@
 
 網址：https://taichungway.tw/press-release-jiaanpu-20-minute-city
 
-結果：收錄（出處 chiang-pr-jiaanpu-20-minute-city）。
+結果：收錄，出處識別碼 chiang-pr-22。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -890,7 +973,7 @@
 
 網址：https://taichungway.tw/press-release-jianguo-market-10th-anniversary
 
-結果：收錄（出處 chiang-pr-jianguo-market-10th-anniversary）。
+結果：收錄，出處識別碼 chiang-pr-23。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -958,7 +1041,7 @@
 
 網址：https://taichungway.tw/press-release-lien-chiachen-hq
 
-結果：收錄（出處 chiang-pr-lien-chiachen-hq）。
+結果：收錄，出處識別碼 chiang-pr-24。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -969,7 +1052,7 @@
 
 網址：https://taichungway.tw/press-release-lishan-smart-agriculture
 
-結果：收錄（出處 chiang-pr-lishan-smart-agriculture）。
+結果：收錄，出處識別碼 chiang-pr-25。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -990,7 +1073,7 @@
 
 網址：https://taichungway.tw/press-release-longjing-senior-card-briefings
 
-結果：收錄（出處 chiang-pr-longjing-senior-card-briefings）。
+結果：收錄，出處識別碼 chiang-pr-26。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1016,7 +1099,7 @@
 
 網址：https://taichungway.tw/press-release-medical-longterm-care-support-launch
 
-結果：收錄（出處 chiang-pr-medical-longterm-care-support-launch）。
+結果：收錄，出處識別碼 chiang-pr-27。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1033,7 +1116,7 @@
 
 網址：https://taichungway.tw/press-release-mice-economy-168
 
-結果：收錄（出處 chiang-pr-mice-economy）。
+結果：收錄，出處識別碼 chiang-pr-28。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1046,7 +1129,7 @@
 
 網址：https://taichungway.tw/press-release-mrt-blue-line-groundbreaking
 
-結果：收錄（出處 chiang-pr-mrt-blue-line-groundbreaking）。
+結果：收錄，出處識別碼 chiang-pr-29。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1059,7 +1142,7 @@
 
 網址：https://taichungway.tw/press-release-nantun-briefing-20-minute-city
 
-結果：收錄（出處 chiang-pr-nantun-briefing-20-minute-city）。
+結果：收錄，出處識別碼 chiang-pr-30。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1089,7 +1172,7 @@
 
 網址：https://taichungway.tw/press-release-new-residents-4-policies
 
-結果：收錄（出處 chiang-pr-new-residents-4-policies）。
+結果：收錄，出處識別碼 chiang-pr-31。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1122,7 +1205,7 @@
 
 網址：https://taichungway.tw/press-release-parenting-13-policies
 
-結果：收錄（出處 chiang-pr-parenting-13-policies）。
+結果：收錄，出處識別碼 chiang-pr-32。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1158,7 +1241,7 @@
 
 網址：https://taichungway.tw/press-release-pharmacist-support-group
 
-結果：收錄（出處 chiang-pr-pharmacist-support-group）。
+結果：收錄，出處識別碼 chiang-pr-33。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1207,7 +1290,7 @@
 
 網址：https://taichungway.tw/press-release-robot-policy-launch
 
-結果：收錄（出處 chiang-pr-robot-policy-launch）。
+結果：收錄，出處識別碼 chiang-pr-34。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1238,7 +1321,7 @@
 
 網址：https://taichungway.tw/press-release-shalu-coastal-transport
 
-結果：收錄（出處 chiang-pr-shalu-coastal-transport）。
+結果：收錄，出處識別碼 chiang-pr-35。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1275,7 +1358,7 @@
 
 網址：https://taichungway.tw/press-release-smart-city-safety-net-launch
 
-結果：收錄（出處 chiang-pr-smart-city-safety-net-launch）。
+結果：收錄，出處識別碼 chiang-pr-36。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1293,7 +1376,7 @@
 
 網址：https://taichungway.tw/press-release-south-nantun-briefings
 
-結果：收錄（出處 chiang-pr-south-nantun-briefings）。
+結果：收錄，出處識別碼 chiang-pr-37。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1312,7 +1395,7 @@
 
 網址：https://taichungway.tw/press-release-taichung-airport-expansion
 
-結果：收錄（出處 chiang-pr-taichung-airport-expansion）。
+結果：收錄，出處識別碼 chiang-pr-38。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1369,7 +1452,7 @@
 
 網址：https://taichungway.tw/press-release-traffic-smart-era-policy-launch
 
-結果：收錄（出處 chiang-pr-traffic-smart-era-policy-launch）。
+結果：收錄，出處識別碼 chiang-pr-39。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1392,7 +1475,7 @@
 
 網址：https://taichungway.tw/press-release-tucheng-taiping-market-canvass
 
-結果：收錄（出處 chiang-pr-tucheng-taiping-market-canvass）。
+結果：收錄，出處識別碼 chiang-pr-40。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1409,7 +1492,7 @@
 
 網址：https://taichungway.tw/press-release-tunqu-transport-blueprint
 
-結果：收錄（出處 chiang-pr-tunqu-transport-blueprint）。
+結果：收錄，出處識別碼 chiang-pr-41。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1433,7 +1516,7 @@
 
 網址：https://taichungway.tw/press-release-women-support-association-launch
 
-結果：收錄（出處 chiang-pr-women-support-association-launch）。
+結果：收錄，出處識別碼 chiang-pr-42。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1483,7 +1566,7 @@
 
 網址：https://taichungway.tw/press-release-wuqi-briefing-sea-air-ports
 
-結果：收錄（出處 chiang-pr-wuqi-briefing-sea-air-ports）。
+結果：收錄，出處識別碼 chiang-pr-43。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1602,7 +1685,7 @@
 
 網址：https://taichungway.tw/press-release-zhongxiao-nantun-market-canvass
 
-結果：收錄（出處 chiang-pr-zhongxiao-nantun-market-canvass）。
+結果：收錄，出處識別碼 chiang-pr-44。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1621,7 +1704,7 @@
 
 網址：https://taichungway.tw/robot-manufacturing-city-ai-industry
 
-結果：收錄（出處 chiang-robot-manufacturing-city-ai-industry）。
+結果：收錄，出處識別碼 chiang-page-18。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1633,7 +1716,7 @@
 
 網址：https://taichungway.tw/robot-manufacturing-city-steam-education
 
-結果：收錄（出處 chiang-robot-manufacturing-city-steam-education）。
+結果：收錄，出處識別碼 chiang-page-19。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1645,7 +1728,7 @@
 
 網址：https://taichungway.tw/robot-manufacturing-city-tech-education
 
-結果：收錄（出處 chiang-robot-manufacturing-city-tech-education）。
+結果：收錄，出處識別碼 chiang-page-20。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1657,7 +1740,7 @@
 
 網址：https://taichungway.tw/robot-manufacturing-city-vocational-training
 
-結果：收錄（出處 chiang-robot-manufacturing-city-vocational-training）。
+結果：收錄，出處識別碼 chiang-page-21。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1668,7 +1751,7 @@
 
 網址：https://taichungway.tw/senior-care-age-friendly-housing
 
-結果：收錄（出處 chiang-senior-care-age-friendly-housing）。
+結果：收錄，出處識別碼 chiang-page-22。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1680,7 +1763,7 @@
 
 網址：https://taichungway.tw/senior-care-community-hubs
 
-結果：收錄（出處 chiang-senior-care-community-hubs）。
+結果：收錄，出處識別碼 chiang-page-23。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1693,7 +1776,7 @@
 
 網址：https://taichungway.tw/senior-care-long-term-care-office
 
-結果：收錄（出處 chiang-senior-care-long-term-care-office）。
+結果：收錄，出處識別碼 chiang-page-24。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1705,7 +1788,7 @@
 
 網址：https://taichungway.tw/smart-agriculture-brand-upgrade
 
-結果：收錄（出處 chiang-smart-agriculture-brand-upgrade）。
+結果：收錄，出處識別碼 chiang-page-25。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1717,7 +1800,7 @@
 
 網址：https://taichungway.tw/smart-agriculture-disaster-alert
 
-結果：收錄（出處 chiang-smart-agriculture-disaster-alert）。
+結果：收錄，出處識別碼 chiang-page-26。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1729,7 +1812,7 @@
 
 網址：https://taichungway.tw/smart-agriculture-university-partnership
 
-結果：收錄（出處 chiang-smart-agriculture-university-partnership）。
+結果：收錄，出處識別碼 chiang-page-27。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1741,7 +1824,7 @@
 
 網址：https://taichungway.tw/smart-transport-public-transit
 
-結果：收錄（出處 chiang-smart-transport-public-transit）。
+結果：收錄，出處識別碼 chiang-page-28。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1755,7 +1838,7 @@
 
 網址：https://taichungway.tw/smart-transport-smart-roads
 
-結果：收錄（出處 chiang-smart-transport-smart-roads）。
+結果：收錄，出處識別碼 chiang-page-29。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1768,7 +1851,7 @@
 
 網址：https://taichungway.tw/smart-transport-walkable-streets
 
-結果：收錄（出處 chiang-smart-transport-walkable-streets）。
+結果：收錄，出處識別碼 chiang-page-30。
 
 | 摘錄 | 結果 |
 |---|---|
@@ -1780,7 +1863,7 @@
 
 網址：https://taichungway.tw/taichung-20-minute-city
 
-結果：收錄（出處 chiang-taichung-20-minute-city）。
+結果：收錄，出處識別碼 chiang-page-31。
 
 | 摘錄 | 結果 |
 |---|---|
