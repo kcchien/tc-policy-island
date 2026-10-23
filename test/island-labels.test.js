@@ -17,25 +17,29 @@ test('與先放好的名牌重疊時先縮成只留編號，編號仍重疊就�
   assert.equal(placeLabels([label('a', 100, 100), label('c', 105, 100)]).get('c'), 'hidden');
 });
 
-test('8px 遲滯：重疊不到 8px 時維持上一次的顯示方式，不在兩種之間來回閃', () => {
-  // a 與 b 相距 75px，完整名牌重疊 5px。
-  const pair = [label('a', 100, 100), label('b', 175, 100)];
-  assert.equal(placeLabels(pair, { previous: new Map([['b', 'full']]) }).get('b'), 'full');
-  assert.equal(placeLabels(pair, { previous: new Map([['b', 'number']]) }).get('b'), 'number');
-  // 重疊 10px 超過遲滯範圍，完整名牌也要縮。
-  const closer = [label('a', 100, 100), label('b', 170, 100)];
-  assert.equal(placeLabels(closer, { previous: new Map([['b', 'full']]) }).get('b'), 'number');
-  // 完全分開後才從編號恢復完整。
-  const apart = [label('a', 100, 100), label('b', 180, 100)];
+test('8px 遲滯：縮小後要空出 8px 才恢復完整，空隙在 8px 內時維持上一次的顯示方式，不來回閃', () => {
+  // a 與 b 的完整名牌之間空 5px。
+  const near = [label('a', 100, 100), label('b', 185, 100)];
+  assert.equal(placeLabels(near, { previous: new Map([['b', 'full']]) }).get('b'), 'full');
+  assert.equal(placeLabels(near, { previous: new Map([['b', 'number']]) }).get('b'), 'number');
+  // 空 10px 超過遲滯範圍，從編號恢復完整。
+  const apart = [label('a', 100, 100), label('b', 190, 100)];
   assert.equal(placeLabels(apart, { previous: new Map([['b', 'number']]) }).get('b'), 'full');
 });
 
-test('隱藏的名牌也要離開 8px 遲滯範圍才重新出現', () => {
+test('遲滯不容許重疊：上一次完整顯示的名牌，只要重疊 1px 就縮', () => {
+  const touching = [label('a', 100, 100), label('b', 179, 100)];
+  assert.equal(placeLabels(touching, { previous: new Map([['b', 'full']]) }).get('b'), 'number');
+});
+
+test('隱藏的名牌也要離開面板 8px 才重新出現', () => {
   const panel = { left: 0, top: 0, right: 130, bottom: 200 };
-  // 只留編號時左緣 126，伸進面板 4px：上次顯示中就留著，上次隱藏就繼續隱藏。
-  const near = [label('a', 138, 100, { full: null })];
+  // 只留編號時左緣 133，離面板 3px：上次顯示中就留著，上次隱藏就繼續隱藏。
+  const near = [label('a', 145, 100, { full: null })];
   assert.equal(placeLabels(near, { obstacles: [panel], previous: new Map([['a', 'number']]) }).get('a'), 'number');
   assert.equal(placeLabels(near, { obstacles: [panel], previous: new Map([['a', 'hidden']]) }).get('a'), 'hidden');
+  const clear = [label('a', 152, 100, { full: null })];
+  assert.equal(placeLabels(clear, { obstacles: [panel], previous: new Map([['a', 'hidden']]) }).get('a'), 'number');
 });
 
 test('選中的名牌最先放，其他名牌讓它', () => {

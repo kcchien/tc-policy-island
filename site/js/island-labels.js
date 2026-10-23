@@ -4,8 +4,8 @@
 // 名牌顯示方式，由好到差。
 export const LABEL_MODES = ['full', 'number', 'hidden'];
 
-// 遲滯：維持上一次的顯示方式時，重疊不到這麼多像素都算沒重疊；要換到更好的顯示方式則不能有任何重疊。
-// 名牌在邊界附近時才不會每幀來回切換。
+// 遲滯：換到比上一次更好的顯示方式（第一次出現也算）要與其他矩形空出這麼多像素；維持或變差只要不重疊。
+// 名牌在邊界附近時才不會每幀來回切換，而且畫面上永遠不重疊。
 export const LABEL_HYSTERESIS = 8;
 
 const rectOf = ({ x, y }, { width, height }, inset = 0) => ({
@@ -26,12 +26,16 @@ export function placeLabels(labels, { obstacles = [], selectedId = null, previou
   const placed = [];
   const modes = new Map();
   const blocked = (rect) => obstacles.some((o) => overlaps(rect, o)) || placed.some((p) => overlaps(rect, p));
-  // 單一名牌能用的最好顯示方式。
-  const bestMode = (label) => LABEL_MODES.find((mode) => {
-    if (mode === 'hidden') return true;
-    const size = label[mode];
-    return size && !blocked(rectOf(label, size, previous.get(label.id) === mode ? LABEL_HYSTERESIS : 0));
-  });
+  // 單一名牌能用的最好顯示方式。上一次沒出現過的名牌當作上一次隱藏。
+  const bestMode = (label) => {
+    const before = LABEL_MODES.indexOf(previous.get(label.id) ?? 'hidden');
+    return LABEL_MODES.find((mode, index) => {
+      if (mode === 'hidden') return true;
+      const size = label[mode];
+      const upgrade = index < before;
+      return size && !blocked(rectOf(label, size, upgrade ? -LABEL_HYSTERESIS : 0));
+    });
+  };
   const place = (label, mode) => {
     modes.set(label.id, mode);
     if (mode !== 'hidden') placed.push(rectOf(label, label[mode]));
