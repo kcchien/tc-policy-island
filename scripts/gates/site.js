@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 
 // 網站目錄內公開資料集的位置。建置指令寫到這裡，關卡與瀏覽器從這裡讀。
 export const DATASET_PATH = 'data/dataset.json';
@@ -9,6 +9,16 @@ export function openSite(dir) {
   let dataset;
   return {
     dir,
+    // 網站目錄內全部檔案的相對路徑（以 / 分隔，依字母排序）。
+    files() {
+      return readdirSync(dir, { recursive: true, withFileTypes: true })
+        .filter((entry) => entry.isFile())
+        .map((entry) => relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/'))
+        .sort();
+    },
+    readText(path) {
+      return readFileSync(join(dir, path), 'utf8');
+    },
     dataset() {
       if (dataset === undefined) {
         const path = join(dir, DATASET_PATH);
