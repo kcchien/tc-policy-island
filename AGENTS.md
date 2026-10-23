@@ -40,7 +40,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
-  js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）
+  js/island-models.js  格子、在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、太陽光暈、光照與補光、霧、淺水與深水、夜間係數）、著色器混色比例、1.4 秒補間、自動時段 timeOfDayAt（台灣時間 05–08 清晨、08–16 白天、16–19 黃昏、其餘夜晚）（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
@@ -48,8 +48,10 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、預設視角（直式畫面較低俯角並轉方位角）
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
-  js/island-parts.js   零件分桶規則（Node 可測）
-  js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
+  js/island-parts.js   零件分桶規則與實例縮放微抖動（Node 可測）
+  js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動）
+  js/island-heroes.js  主題場景（Node 可測）：20 個議題區各一座的零件資料（單位空間）、只依識別碼選場景、擺放（heroPlan，島體提供主題場景位置前暫放在元素區西半）、色碼
+  js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
   js/island-environment.js 天空著色器（漸層、太陽光暈、夜晚星星）、太陽、半球光與補光、霧、水面著色器（深淺漂移、遠處加深、閃光，waterMaterial 可給其他物件共用）、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈並做梯田）、地面色、各畫質的背景樹（針葉與闊葉，數千棵）、霧、聚落、雲、海上小島與帆船數量、樹群、聚落、霧團、雲、飛鳥、三圈遠山剪影與其顏色、小島燈塔帆船，與依動畫時間的位置與水面時間；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、背景樹（不投影）與聚落 InstancedMesh、霧團、雲與雲影、飛鳥、遠山剪影、小島燈塔帆船；用 addAnimation 的時間移動，水面時間也從這裡交給環境

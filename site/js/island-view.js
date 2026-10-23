@@ -21,6 +21,8 @@ import {
   figureModel, hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetLamps, TILE_SURFACE,
 } from './island-models.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
+import { heroPlan } from './island-heroes.js';
+import { buildHeroScene } from './island-hero-view.js';
 import { el } from './dom.js';
 
 const FOV = 32;
@@ -80,7 +82,8 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   let frame = 0;
   let lastNight = 0;
 
-  // 每格一個群組：格子、在地感元素、三個標記、議題區名牌。
+  // 每格一個群組：格子、主題場景、在地感元素、三個標記、議題區名牌。
+  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
   const tiles = new Map();
   const pickable = [];
   const labelAnchors = [];
@@ -92,10 +95,17 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     const isPlaza = tileInfo.id === plaza.tile?.id;
     if (tileInfo.kind === 'decorative') top.material.color.setHex(isPlaza ? PALETTE.plazaTop : PALETTE.decorativeTop);
     g.add(tile);
-    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, isPlaza ? 'area' : tileInfo.kind);
+    const elementKind = isPlaza ? 'area' : tileInfo.kind === 'area' ? 'secondary' : 'decorative';
+    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, elementKind);
     if (model) {
       model.position.y = TILE_SURFACE;
       g.add(model);
+    }
+    // 議題區的主題場景（只依識別碼，見 island-heroes.js）；heroes 的位置是世界座標，換成格子群組內的座標。
+    const hero = heroes.get(tileInfo.id);
+    if (hero) {
+      const { x, z, scale, yaw } = hero.transform;
+      g.add(buildHeroScene(tileInfo.id, { x: x - tileInfo.position.x, y: TILE_SURFACE, z: z - tileInfo.position.z, scale, yaw }));
     }
     const markers = tileInfo.markers.map((info) => {
       const marker = markerModel(info);
