@@ -174,6 +174,55 @@ test('第二層提示詞：不含候選人、議題區、出處與抽取資訊',
   }
 });
 
+test('第二層提示詞：品牌用語清單只代入詞本身，不含候選人姓名與政黨名稱（盲測）', () => {
+  // 正式清單每筆的 candidate 與 note 會寫到真實候選人，這裡故意放進去，確認不會漏給核對 AI。
+  const leaked = ['江啟臣', '何欣純', '洪麗華', '中國國民黨', '民主進步黨', '司法正義黨'];
+  const brandTerms = join(mkdtempSync(join(tmpdir(), 'rules-')), 'brand-terms.json');
+  writeFileSync(brandTerms, JSON.stringify({
+    version: 'leak-test',
+    brand: [
+      { term: '範例口號', candidate: '江啟臣', note: '中國國民黨提名的江啟臣使用' },
+      { term: '七星市政', candidate: '何欣純', note: '民主進步黨提名的何欣純使用' },
+    ],
+    frequent: [{ term: '超級', candidate: '洪麗華', note: '司法正義黨洪麗華' }],
+  }));
+
+  const request = buildLayer2Request(loadVerificationRules({ ...RULE_PATHS, brandTerms }), POLICY);
+
+  assert.ok(request.prompt.includes('範例口號'));
+  for (const name of leaked) {
+    assert.ok(!request.prompt.includes(name), name);
+    assert.ok(!request.systemPrompt.includes(name), name);
+  }
+});
+
+test('第二層提示詞：本身含候選人姓名或政黨名稱的品牌用語不代入提示詞', () => {
+  const brandTerms = join(mkdtempSync(join(tmpdir(), 'rules-')), 'brand-terms.json');
+  writeFileSync(brandTerms, JSON.stringify({
+    version: 'leak-test',
+    brand: [
+      { term: '範例口號', candidate: 'sample-jia', note: '' },
+      { term: '台中的市長範例甲', candidate: 'sample-jia', note: '' },
+    ],
+    frequent: [{ term: '範例乙黨加油', candidate: 'sample-yi', note: '' }],
+  }));
+  const rules = loadVerificationRules({ ...RULE_PATHS, brandTerms });
+
+  const policy = {
+    ...POLICY,
+    summary: '範例甲黨主張在範例區增設三條公車路線。',
+    quotes: [{ text: '我範例甲承諾，在範例區增設三條範例公車路線。', sourceId: 'sample-src-jia' }],
+  };
+
+  const request = buildLayer2Request(rules, policy, { hiddenNames: ['範例甲', '範例甲黨', '範例乙', '範例乙黨'] });
+
+  assert.ok(request.prompt.includes('範例口號'));
+  assert.ok(!request.prompt.includes('範例甲'));
+  assert.ok(!request.prompt.includes('範例乙'));
+  assert.ok(request.prompt.includes('○○主張在範例區增設三條公車路線。'));
+  assert.ok(request.prompt.includes('我○○承諾，在範例區增設三條範例公車路線。'));
+});
+
 test('檢核表與提示詞的版本不一致時拒絕載入', () => {
   const dir = mkdtempSync(join(tmpdir(), 'rules-'));
   const prompt = join(dir, 'layer2-prompt.md');

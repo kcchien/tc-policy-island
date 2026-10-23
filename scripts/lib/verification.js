@@ -64,17 +64,24 @@ export function loadVerificationRules(paths) {
   };
 }
 
-const termList = (entries) => entries.map((e) => `- ${e.term}`).join('\n') || '（無）';
+export const HIDDEN_NAME_MASK = '○○';
 
 // 只代入摘要、原文引述、檢核表與品牌用語清單。候選人、議題區、出處等一律不給。
-export function buildLayer2Request(rules, policy) {
+// 盲測：品牌用語只代入 term，不帶 candidate 與 note；hiddenNames（候選人姓名與政黨名稱）
+// 在摘要與原文引述中以 ○○ 遮蔽，本身含這些名稱的品牌用語整筆不代入（由上線關卡的品牌用語掃描處理）。
+export function buildLayer2Request(rules, policy, { hiddenNames = [] } = {}) {
+  const names = [...new Set(hiddenNames.filter(Boolean))].sort((a, b) => b.length - a.length);
+  const mask = (text) => names.reduce((out, name) => out.replaceAll(name, HIDDEN_NAME_MASK), text);
+  const termList = (entries) =>
+    entries.map((e) => e.term).filter((term) => !names.some((name) => term.includes(name)))
+      .map((term) => `- ${term}`).join('\n') || '（無）';
   const values = {
     checklistVersion: rules.checklist.version,
     checklist: rules.checklist.items.map((item, i) => `${i + 1}. ${item.title}：${item.rule}`).join('\n'),
     brandTerms: termList(rules.brandTerms.brand),
     frequentTerms: termList(rules.brandTerms.frequent),
-    quotes: policy.quotes.map((q) => `- 「${q.text}」`).join('\n'),
-    summary: policy.summary,
+    quotes: policy.quotes.map((q) => `- 「${mask(q.text)}」`).join('\n'),
+    summary: mask(policy.summary),
   };
   return {
     systemPrompt: rules.prompt.system,
