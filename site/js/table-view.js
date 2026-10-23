@@ -58,7 +58,7 @@ function areaHeader(row, onOpenCard) {
   return el(
     'th',
     { scope: 'row', role: 'rowheader', class: 'area-cell' },
-    el('span', { class: 'area-name' }, row.issueArea.name),
+    el('span', { class: 'area-name' }, el('span', { class: 'area-number' }, row.number), row.issueArea.name),
     el('span', { class: 'area-departments' }, row.issueArea.departments.join('、')),
     button,
   );

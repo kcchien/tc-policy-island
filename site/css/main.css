@@ -21,6 +21,14 @@
   --shadow: 0 1px 2px color-mix(in srgb, var(--charcoal) 12%, transparent),
     0 6px 18px color-mix(in srgb, var(--charcoal) 8%, transparent);
   --page-width: 1180px;
+
+  /* 島嶼檢視的浮動元件 */
+  --glass: color-mix(in srgb, var(--rice) 92%, transparent);
+  --float-shadow: 0 10px 30px color-mix(in srgb, var(--charcoal) 16%, transparent),
+    0 2px 6px color-mix(in srgb, var(--charcoal) 10%, transparent);
+  --hud-gap: 16px;
+  --title-width: 300px;
+  --panel-width: 340px;
 }
 
 * {
@@ -60,7 +68,11 @@ select {
   clip-path: inset(50%);
 }
 
-/* 頁首 */
+[hidden] {
+  display: none !important;
+}
+
+/* 整理方法頁的頁首 */
 
 .site-header,
 .site-main,
@@ -93,39 +105,134 @@ select {
   font-size: 0.875rem;
 }
 
-.view-switch {
-  display: inline-flex;
-  padding: 4px;
-  gap: 4px;
-  background: var(--rice-deep);
-  border-radius: 999px;
+/* 首頁：標題卡、工具列、索引面板。兩種檢視共用；島嶼檢視時浮在全螢幕畫布上。 */
+
+.title-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  background: var(--glass);
+  border-top: 4px solid var(--laterite);
+  border-radius: var(--radius-large);
+  box-shadow: var(--float-shadow);
 }
 
-.view-button {
-  min-height: 40px;
-  padding: 6px 16px;
+.title-disclosure {
+  margin: 6px 0 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.title-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  margin: 2px 0 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.title-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.hud-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tool-group {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--glass);
+  border-radius: 999px;
+  box-shadow: var(--float-shadow);
+}
+
+.tool-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 52px;
+  min-height: 48px;
+  padding: 4px 8px;
   border: 0;
   border-radius: 999px;
   background: transparent;
+  color: var(--charcoal);
   cursor: pointer;
 }
 
-.view-button[aria-pressed="true"] {
+.tool-button:hover {
+  background: var(--rice-deep);
+}
+
+.tool-button[aria-pressed="true"] {
   background: var(--laterite);
   color: var(--rice);
 }
 
-.view-button:disabled {
+.tool-button:disabled {
   color: var(--charcoal-soft);
   cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tool-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tool-label {
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* 暫停鈕：暫停中顯示播放圖示 */
+#tool-pause .icon-play,
+#tool-pause[aria-pressed="true"] .icon-pause {
+  display: none;
+}
+
+#tool-pause[aria-pressed="true"] .icon-play {
+  display: inline;
+}
+
+/* 時段循環鈕與索引鈕只在手機的膠囊列出現；名牌鈕按下表示名牌顯示中，不用主色底 */
+.time-cycle,
+.index-toggle,
+.index-close {
+  display: none;
+}
+
+#tool-labels[aria-pressed="true"] {
+  background: var(--rice-deep);
+  color: var(--laterite);
 }
 
 .view-note {
-  flex-basis: 100%;
   margin: 0;
   color: var(--charcoal-soft);
   font-size: 0.8125rem;
-  text-align: right;
 }
 
 /* 首次進站說明 */
@@ -135,15 +242,11 @@ select {
   grid-template-columns: 1fr auto;
   align-items: start;
   gap: 8px var(--gap);
-  margin-bottom: var(--gap);
-  padding: var(--gap);
+  margin-bottom: 12px;
+  padding: 12px var(--gap);
   background: var(--rice-deep);
   border-left: 4px solid var(--water);
   border-radius: var(--radius);
-}
-
-.intro[hidden] {
-  display: none;
 }
 
 .intro-title {
@@ -155,7 +258,7 @@ select {
   grid-column: 1;
   margin: 0;
   padding-left: 1.2em;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
 .intro-dismiss {
@@ -167,7 +270,8 @@ select {
 .intro-dismiss,
 .filter-reset,
 .area-open,
-.card-close {
+.card-close,
+.index-close {
   min-height: 40px;
   padding: 6px 14px;
   border: 1px solid var(--laterite);
@@ -180,14 +284,15 @@ select {
 .intro-dismiss:hover,
 .filter-reset:hover,
 .area-open:hover,
-.card-close:hover {
+.card-close:hover,
+.index-close:hover {
   background: var(--laterite);
   color: var(--rice);
 }
 
 /* 搜尋與篩選 */
 
-.toolbar {
+.filters {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
@@ -217,8 +322,8 @@ select {
 }
 
 /* 16px 避免 iOS 聚焦時自動放大 */
-.toolbar input,
-.toolbar select {
+.filters input,
+.filters select {
   min-height: 44px;
   padding: 8px 12px;
   border: 1px solid var(--laterite-soft);
@@ -242,31 +347,100 @@ select {
   margin-top: 8px;
 }
 
-/* 檢視切換：兩種檢視共用頁首、搜尋列與政見卡片 */
+/* 檢視切換 */
 
-body[data-view="island"] .table-root,
-body[data-view="table"] .island-view {
+body[data-view="table"] .island-stage,
+body[data-view="table"] .index-panel,
+body[data-view="table"] [data-island-only],
+body[data-view="island"] .table-main,
+body[data-view="island"] .site-footer {
   display: none;
 }
 
-/* 島嶼檢視：左側 3D 島，右側議題區清單 */
+/* 表格檢視：一般的捲動頁面，標題卡與工具列排在頁首。 */
 
-.island-view {
-  /* 島是東西長的橫長形，畫布太高只會多出上下的空水面。 */
-  --island-height: clamp(420px, calc(100dvh - 240px), 560px);
+body[data-view="table"] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 12px;
-  margin-top: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px var(--gap);
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: var(--gap);
+}
+
+body[data-view="table"] .title-card {
+  box-shadow: none;
+  background: transparent;
+  padding: 0 0 8px;
+  border-top: 0;
+  border-radius: 0;
+}
+
+body[data-view="table"] .hud-toolbar {
+  justify-content: flex-end;
+}
+
+body[data-view="table"] :is(.view-note, .table-main, .site-footer) {
+  grid-column: 1 / -1;
+}
+
+body[data-view="table"] .view-note {
+  text-align: right;
+}
+
+body[data-view="table"] .site-footer {
+  width: 100%;
+  padding-inline: 0;
+}
+
+/* 島嶼檢視：3D 畫布填滿視窗。左上標題卡、上方工具列、右側索引面板浮在畫布上，彼此不重疊。 */
+
+body[data-view="island"] {
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .island-stage {
-  position: relative;
-  height: var(--island-height);
+  position: fixed;
+  inset: 0;
   overflow: hidden;
-  border-radius: var(--radius-large);
   background: var(--rice-deep);
   touch-action: none;
+}
+
+body[data-view="island"] .title-card {
+  position: fixed;
+  top: var(--hud-gap);
+  left: var(--hud-gap);
+  z-index: 2;
+  width: var(--title-width);
+}
+
+body[data-view="island"] .hud-toolbar {
+  position: fixed;
+  top: var(--hud-gap);
+  left: calc(var(--title-width) + 2 * var(--hud-gap));
+  right: calc(var(--panel-width) + 2 * var(--hud-gap));
+  z-index: 2;
+  pointer-events: none;
+}
+
+body[data-view="island"] .tool-group {
+  pointer-events: auto;
+}
+
+body[data-view="island"] .view-note {
+  position: fixed;
+  bottom: var(--hud-gap);
+  left: var(--hud-gap);
+  z-index: 2;
+  max-width: var(--title-width);
+  padding: 6px 12px;
+  background: var(--glass);
+  border-radius: var(--radius);
+  box-shadow: var(--float-shadow);
 }
 
 .island-canvas {
@@ -284,6 +458,10 @@ body[data-view="table"] .island-view {
   pointer-events: none;
 }
 
+.island-stage.labels-off .island-labels {
+  display: none;
+}
+
 .island-status {
   position: absolute;
   inset: 0;
@@ -295,38 +473,33 @@ body[data-view="table"] .island-view {
   text-align: center;
 }
 
-.island-reset {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1;
-  min-height: 36px;
-  padding: 4px 12px;
-  border: 1px solid var(--laterite);
-  border-radius: 999px;
-  background: var(--rice);
-  color: var(--laterite);
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-.island-reset:hover {
-  background: var(--laterite);
-  color: var(--rice);
-}
-
-/* 長名牌每行最多四字，同一列相鄰的名牌才不會互疊。 */
+/* 議題區名牌：編號加名稱。CSS2DRenderer 每幀改 transform，名牌不加 transform 的轉場。
+   長名牌每行最多四字，同一列相鄰的名牌才不會互疊。 */
 .island-label {
-  display: block;
-  max-width: calc(4em + 14px);
-  padding: 2px 7px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--rice) 88%, transparent);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  max-width: calc(6em + 14px);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--glass);
   box-shadow: var(--shadow);
   color: var(--charcoal);
   font-size: 0.8125rem;
   line-height: 1.3;
-  text-align: center;
+}
+
+.island-label-number,
+.area-number {
+  color: var(--laterite);
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.island-label-number {
+  flex: none;
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 .island-label.is-selected {
@@ -334,36 +507,103 @@ body[data-view="table"] .island-view {
   color: var(--rice);
 }
 
+.island-label.is-selected .island-label-number {
+  color: var(--rice);
+}
+
 .island-label.is-dimmed {
   opacity: 0.45;
 }
 
-.island-panel {
+/* 索引面板 */
+
+.index-panel {
+  position: fixed;
+  top: var(--hud-gap);
+  right: var(--hud-gap);
+  bottom: var(--hud-gap);
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  height: var(--island-height);
+  width: var(--panel-width);
   min-height: 0;
-  background: var(--rice-deep);
+  background: var(--glass);
   border-radius: var(--radius-large);
+  box-shadow: var(--float-shadow);
 }
 
-.island-panel-toggle {
-  display: none;
+.index-title {
+  margin: 0;
+  padding: 14px 16px 6px;
+  color: var(--laterite);
+  font-size: 1.125rem;
 }
 
-.island-panel-body {
+.index-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  margin: 0 12px;
+  padding: 4px;
+  background: var(--rice-deep);
+  border-radius: 999px;
+}
+
+.index-tab {
+  flex: 1;
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.index-tab[aria-selected="true"] {
+  background: var(--rice);
+  box-shadow: var(--shadow);
+  color: var(--laterite);
+  font-weight: bold;
+}
+
+.index-body {
+  flex: 1;
   min-height: 0;
   padding: 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.island-panel-title {
-  margin: 0;
-  font-size: 1rem;
+.index-tabpanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.index-panel .intro {
+  grid-template-columns: 1fr;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+}
+
+.index-panel .intro-dismiss {
+  grid-column: 1;
+  grid-row: auto;
+  justify-self: start;
+}
+
+.index-panel .filters {
+  padding: 10px;
+  gap: 8px;
+}
+
+.index-panel .field-search,
+.index-panel .field-district {
+  flex: 1 1 100%;
+}
+
+.index-panel .result-status,
+.index-panel .order-note {
+  margin-top: 8px;
+  font-size: 0.8125rem;
 }
 
 .legend {
@@ -388,7 +628,8 @@ body[data-view="table"] .island-view {
   font-size: 0.75rem;
 }
 
-.island-list {
+.island-list,
+.candidate-index {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -398,12 +639,12 @@ body[data-view="table"] .island-view {
 }
 
 .island-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2em minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   padding: 6px 10px;
   border: 1px solid transparent;
   border-radius: var(--radius-small);
@@ -425,6 +666,21 @@ body[data-view="table"] .island-view {
   display: inline-flex;
   flex: none;
   gap: 4px;
+}
+
+/* 候選人分頁：三人同尺寸 */
+.candidate-index-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0 10px;
+  padding: 10px 12px;
+  background: var(--rice);
+  border-radius: var(--radius-small);
+}
+
+.candidate-index-item .marker-badge {
+  grid-row: 1 / span 2;
 }
 
 /* 標記徽章：三人同色同尺寸，亮起是實心，沒有政見是淡灰。 */
@@ -515,6 +771,11 @@ body[data-view="table"] .island-view {
 .area-name {
   display: block;
   font-size: 1.0625rem;
+}
+
+.area-name .area-number {
+  margin-right: 6px;
+  font-size: 0.875rem;
 }
 
 .area-departments {
@@ -614,6 +875,10 @@ body[data-view="table"] .island-view {
   max-height: calc(100dvh - 48px);
 }
 
+.card-handle {
+  display: none;
+}
+
 .card-head {
   display: flex;
   align-items: flex-start;
@@ -621,6 +886,11 @@ body[data-view="table"] .island-view {
   gap: var(--gap);
   padding: var(--gap) 20px;
   border-bottom: 3px solid var(--laterite);
+}
+
+.card-close {
+  flex: none;
+  white-space: nowrap;
 }
 
 .card-title {
@@ -1002,18 +1272,34 @@ body[data-view="table"] .island-view {
   color: var(--laterite);
 }
 
-/* 手機：800px 以下表格改單欄，卡片改底部抽屜 */
+/* 桌面寬度不夠時縮小標題卡與索引面板，工具列只留圖示列可換行 */
+@media (min-width: 801px) and (max-width: 1180px) {
+  :root {
+    --title-width: 220px;
+    --panel-width: 300px;
+  }
+
+  body[data-view="island"] .title-disclosure {
+    font-size: 0.6875rem;
+  }
+
+  body[data-view="island"] .site-subtitle {
+    font-size: 0.75rem;
+  }
+}
+
+/* 手機：800px 以下表格改單欄；島嶼檢視的工具列改為底部膠囊列，索引與卡片改底部抽屜 */
 @media (max-width: 800px) {
+  :root {
+    --hud-gap: 8px;
+  }
+
   .site-header {
     padding-bottom: 12px;
   }
 
   .site-title {
     font-size: 1.5rem;
-  }
-
-  .view-note {
-    text-align: left;
   }
 
   .intro {
@@ -1031,135 +1317,147 @@ body[data-view="table"] .island-view {
     flex: 1 1 100%;
   }
 
-  /* 島嶼檢視：島占滿螢幕寬度，議題區清單改為底部抽屜。頁首與搜尋列縮小，讓島在第一個畫面就完整出現。 */
-  .island-view {
-    --island-height: clamp(280px, 78vw, 56dvh);
+  /* 表格檢視：頁首直排，工具列只剩檢視切換 */
+  body[data-view="table"] {
     grid-template-columns: minmax(0, 1fr);
-    margin-inline: calc(-1 * var(--gap));
+    padding: 12px;
   }
 
-  .island-stage {
-    border-radius: 0;
+  body[data-view="table"] .hud-toolbar {
+    justify-content: flex-start;
   }
 
-  /* 直書名牌往上長，按鈕放右下角才不會壓到東北角的名牌。 */
-  .island-reset {
-    top: auto;
-    bottom: 10px;
+  body[data-view="table"] .view-note {
+    text-align: left;
   }
 
-  body[data-view="island"] {
-    padding-bottom: 64px;
+  /* 島嶼檢視：標題卡縮小放左上 */
+  body[data-view="island"] .title-card {
+    top: calc(var(--hud-gap) + env(safe-area-inset-top));
+    width: min(260px, calc(100vw - 2 * var(--hud-gap)));
+    padding: 8px 12px;
   }
 
-  body[data-view="island"] .site-header {
-    padding-top: 10px;
+  body[data-view="island"] .site-title {
+    font-size: 1.25rem;
   }
 
-  body[data-view="island"] .view-button {
-    min-height: 36px;
-    padding: 4px 12px;
+  body[data-view="island"] .site-subtitle {
+    font-size: 0.6875rem;
   }
 
-  body[data-view="island"] .toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 6.5rem auto;
-    gap: 6px;
-    padding: 8px;
+  body[data-view="island"] .title-disclosure {
+    margin-top: 2px;
+    font-size: 0.6875rem;
+    line-height: 1.4;
   }
 
-  body[data-view="island"] .toolbar .field label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
-  body[data-view="island"] .toolbar input,
-  body[data-view="island"] .toolbar select {
-    padding: 8px;
-  }
-
-  body[data-view="island"] .filter-reset {
-    min-height: 44px;
-    padding: 4px 8px;
-  }
-
-  body[data-view="island"] .order-note {
-    margin-top: 8px;
+  body[data-view="island"] .title-links a {
+    min-height: 28px;
     font-size: 0.8125rem;
   }
 
-  /* 每格只有約 35px 寬，橫書名牌必然互相重疊，改為直書。
-     錨點高度為 0，名牌往上長，底端對齊格子，不蓋住格子南側的標記。 */
-  .island-label-anchor {
-    display: block;
-    height: 0;
+  body[data-view="island"] .view-note {
+    top: calc(var(--hud-gap) + env(safe-area-inset-top));
+    right: var(--hud-gap);
+    bottom: auto;
+    left: auto;
+    max-width: calc(100vw - 260px - 3 * var(--hud-gap));
+    font-size: 0.75rem;
   }
 
-  .island-label {
-    display: block;
-    max-width: none;
-    padding: 3px 1px;
-    /* 錨點高度為 0，直書的行長會被算成 0，不禁止換行就會一字一行。 */
-    white-space: nowrap;
-    border-radius: 5px;
-    font-size: 0.6875rem;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    transform: translateY(-100%);
-    writing-mode: vertical-rl;
-    text-orientation: upright;
+  /* 底部膠囊列：全部按鈕排成一列，時段改成一顆循環鈕，檢視切換只留另一種檢視 */
+  body[data-view="island"] .hud-toolbar {
+    top: auto;
+    right: var(--hud-gap);
+    bottom: calc(var(--hud-gap) + env(safe-area-inset-bottom));
+    left: var(--hud-gap);
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 4px;
+    background: var(--glass);
+    border-radius: 999px;
+    box-shadow: var(--float-shadow);
+    pointer-events: auto;
   }
 
-  .island-panel {
-    position: fixed;
+  body[data-view="island"] .tool-group {
+    flex: 1 1 auto;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body[data-view="island"] .tool-group:has(.time-cycle) {
+    flex: 5 1 auto;
+  }
+
+  body[data-view="island"] .tool-button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 4px 2px;
+  }
+
+  body[data-view="island"] .time-group,
+  body[data-view="island"] .view-button[aria-pressed="true"] {
+    display: none;
+  }
+
+  body[data-view="island"] .time-cycle,
+  body[data-view="island"] .index-toggle {
+    display: inline-flex;
+  }
+
+  .index-toggle[aria-expanded="true"] {
+    background: var(--rice-deep);
+    color: var(--laterite);
+  }
+
+  /* 索引抽屜：從底部升起，蓋住膠囊列，用「關閉索引」收起 */
+  .index-panel {
+    top: auto;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 5;
-    height: auto;
-    max-height: 70dvh;
-    border-radius: var(--radius-large) var(--radius-large) 0 0;
-    box-shadow: var(--shadow);
-  }
-
-  .island-panel-toggle {
-    display: block;
-    width: 100%;
-    min-height: 52px;
-    border: 0;
-    background: transparent;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .island-panel-toggle::before {
-    content: "";
-    display: block;
-    width: 40px;
-    height: 4px;
-    margin: 0 auto 6px;
-    border-radius: 2px;
-    background: var(--laterite-soft);
-  }
-
-  .island-panel-body {
+    z-index: 4;
     display: none;
-    padding-top: 0;
+    width: auto;
+    max-height: 80dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--rice);
+    border-radius: var(--radius-large) var(--radius-large) 0 0;
   }
 
-  .island-panel.is-open .island-panel-body {
+  .index-panel.is-open {
     display: flex;
   }
 
-  .island-panel-title {
+  .index-close {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+    top: 8px;
+    right: 12px;
+    display: block;
+    min-height: 36px;
+    padding: 4px 12px;
+    font-size: 0.875rem;
+  }
+
+  .index-title {
+    padding-right: 120px;
+  }
+
+  /* 名牌只顯示編號，名稱看索引；每格只有約 35px 寬，放名稱必然互疊 */
+  .island-label {
+    padding: 1px 6px;
+    font-size: 0.6875rem;
+  }
+
+  .island-label-name {
+    display: none;
+  }
+
+  .island-label-number {
+    font-size: 0.6875rem;
   }
 
   .policy-table,
@@ -1229,31 +1527,73 @@ body[data-view="table"] .island-view {
     box-shadow: none;
   }
 
+  /* 政見卡片：底部抽屜，拖曳把手在約一半與全螢幕兩段之間吸附，往下拖到底關閉（sheet.js） */
   .policy-card {
     width: 100vw;
-    max-height: 85dvh;
+    height: 50dvh;
+    max-height: 100dvh;
     margin: auto 0 0;
     border-radius: var(--radius-large) var(--radius-large) 0 0;
+    transition: height 0.25s ease;
+  }
+
+  .policy-card[data-snap="full"] {
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .policy-card.is-dragging {
+    transition: none;
+  }
+
+  .policy-card::backdrop {
+    background: color-mix(in srgb, var(--charcoal) 20%, transparent);
   }
 
   .card-inner {
-    max-height: 85dvh;
+    height: 100%;
+    max-height: none;
+  }
+
+  .card-handle {
+    display: block;
+    flex: none;
+    width: 100%;
+    min-height: 28px;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .card-handle::before {
+    content: "";
+    display: block;
+    width: 44px;
+    height: 5px;
+    margin: 0 auto;
+    border-radius: 3px;
+    background: var(--laterite-soft);
   }
 
   .card-head {
-    padding: 12px var(--gap);
+    padding: 0 var(--gap) 12px;
   }
 
   .card-columns {
+    flex: 1;
+    min-height: 0;
     grid-auto-flow: row;
     grid-auto-columns: auto;
-    padding: 12px var(--gap) var(--gap);
+    padding: 12px var(--gap) calc(var(--gap) + env(safe-area-inset-bottom));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;
+    transition: none !important;
   }
 }
 

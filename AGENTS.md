@@ -35,6 +35,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/table-view.js     表格檢視
   js/filter.js         搜尋與行政區篩選（filterViewModel）
   js/policy-card.js    政見卡片（兩種檢視共用）
+  js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、候選人標記、構圖、鏡頭限制、畫質、飛行
@@ -46,7 +47,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-parts.js   零件分桶規則（Node 可測）
   js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
-  js/island-list.js    島嶼檢視的議題區清單與標記圖例
+  js/island-list.js    索引面板：議題區清單（含編號）、標記圖例、候選人分頁
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
   js/markdown.js       repo 文件的 Markdown 解析（只支援 repo 用到的寫法）
@@ -84,7 +85,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、或列在 `rawPolicyItems.sourceIds` 的那些。
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。
 
-檢視模型（`buildViewModel`）輸出 `rows[].cells[]`，每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount` 與 `rawPolicyItems`，另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
+檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount` 與 `rawPolicyItems`，另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
 
 網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 

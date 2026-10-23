@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter, tileCorners } from './island-layout.js';
+import { cameraLimits, easeInOut, flightPlan, frameIsland, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
 import { createDaylight } from './island-daylight.js';
 import { createAnimator } from './island-clock.js';
@@ -31,7 +31,8 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
-export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
+// insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
+export function createIslandView(stage, { vm, reducedMotion, onSelectArea, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
   const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -95,7 +96,13 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     });
     if (tileInfo.kind === 'area') {
       // 外層是 CSS2DRenderer 定位的錨點；名牌本身的對齊方式由 CSS 決定（手機改直書）。
-      const name = el('span', { class: 'island-label' }, tileInfo.name);
+      // 名牌的編號與索引面板相同（檢視模型的議題區編號）。
+      const name = el(
+        'span',
+        { class: 'island-label' },
+        el('b', { class: 'island-label-number' }, tileInfo.number),
+        el('span', { class: 'island-label-name' }, tileInfo.name),
+      );
       const label = new CSS2DObject(el('span', { class: 'island-label-anchor' }, name));
       labelAnchors.push(label);
       g.add(label);
@@ -176,13 +183,17 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     if (width === 0 || height === 0) return;
     renderer.setSize(width, height);
     labelRenderer.setSize(width, height);
-    const aspect = width / height;
-    camera.aspect = aspect;
+    // 浮動元件遮住的邊緣不算進構圖：投影中心移到沒被遮住的區域正中。
+    const offset = viewOffset({ width, height, insets: insets() });
+    const aspect = offset.visibleAspect;
+    camera.aspect = offset.fullWidth / offset.fullHeight;
+    camera.setViewOffset(offset.fullWidth, offset.fullHeight, offset.x, offset.y, width, height);
     camera.updateProjectionMatrix();
     const narrow = width <= NARROW_WIDTH;
     const polar = narrow ? POLAR_NARROW : POLAR_WIDE;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
-    const frame = frameIsland(outline, { fov: FOV, aspect, polar, fill: 0.8 });
+    const visibleFov = (360 / Math.PI) * Math.atan(Math.tan((FOV * Math.PI) / 360) * offset.fovScale);
+    const frame = frameIsland(outline, { fov: visibleFov, aspect, polar, fill: 0.8 });
     Object.assign(controls, cameraLimits(bounds, frame.distance));
     home = { polar, distance: frame.distance, target: new THREE.Vector3(frame.target.x, 0, frame.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。

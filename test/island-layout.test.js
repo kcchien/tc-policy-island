@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, tileCorners,
+  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, tileCorners, viewOffset,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -27,6 +27,22 @@ test('每個議題區一格，每格三個同尺寸標記，依候選人排序�
   );
   const sizes = new Set(layout.tiles.flatMap((tile) => tile.markers.map((m) => m.size)));
   assert.equal(sizes.size, 1);
+});
+
+test('議題區格子帶檢視模型的編號，篩選淡化的格子也保留原編號；裝飾格沒有編號', () => {
+  const raw = makeRaw();
+  raw.decorativeTiles = [{ id: 'tile-east', axial: [2, 0], localElementId: null }];
+  const second = policy('p-a2', 'cand-a', undefined, 'area-b');
+  second.summary = '只在第二區的關鍵字';
+  raw.policies.push(second);
+  const vm = viewModelOf(raw);
+
+  const layout = islandLayout(vm, { filtered: filterViewModel(vm, { query: '只在第二區' }) });
+
+  assert.deepEqual(
+    layout.tiles.map((tile) => [tile.id, tile.number, tile.dimmed]),
+    [['area-a', '01', true], ['area-b', '02', false], ['tile-east', null, false]],
+  );
 });
 
 test('三種形狀的標記面積相同，同一列相鄰標記不重疊，也不伸進北側的元素區', () => {
@@ -220,4 +236,16 @@ test('飛到議題區後再縮遠，旋轉中心逐步回到島中心，島不�
 test('開啟減少動態時鏡頭不飛行，直接切到目的地', () => {
   assert.equal(flightPlan({ reducedMotion: true }).durationMs, 0);
   assert.ok(flightPlan({ reducedMotion: false }).durationMs > 0);
+});
+
+test('浮動元件遮住畫布邊緣時，投影中心移到沒被遮住的區域正中，構圖用該區域的長寬比', () => {
+  const desktop = viewOffset({ width: 1440, height: 900, insets: { top: 0, right: 360, bottom: 0, left: 0 } });
+  const phone = viewOffset({ width: 390, height: 844, insets: { top: 0, right: 0, bottom: 80, left: 0 } });
+  const none = viewOffset({ width: 800, height: 600, insets: { top: 0, right: 0, bottom: 0, left: 0 } });
+
+  // 桌面：虛擬畫布寬 1800，從 x=360 開始取 1440 寬，虛擬中心 900 落在畫布的 540，也就是未遮住的 0~1080 正中。
+  // 鏡頭的垂直視角涵蓋整個虛擬畫布高度，未遮住區域只占其中 visibleHeight / fullHeight（fovScale，以正切值計）。
+  assert.deepEqual(desktop, { fullWidth: 1800, fullHeight: 900, x: 360, y: 0, visibleAspect: 1.2, fovScale: 1 });
+  assert.deepEqual(phone, { fullWidth: 390, fullHeight: 924, x: 0, y: 80, visibleAspect: 390 / 764, fovScale: 764 / 924 });
+  assert.deepEqual(none, { fullWidth: 800, fullHeight: 600, x: 0, y: 0, visibleAspect: 800 / 600, fovScale: 1 });
 });

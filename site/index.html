@@ -2,7 +2,7 @@
 <html lang="zh-Hant-TW">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>台中政見島</title>
     <meta name="description" content="由 AI 依公開資料整理的 2026 台中市長候選人政見對照，與任何候選人或政黨無關。" />
     <link rel="stylesheet" href="./css/main.css" />
@@ -18,34 +18,89 @@
     <script type="module" src="./js/main.js"></script>
   </head>
   <body data-view="table">
-    <header class="site-header">
-      <div class="site-brand">
-        <h1 class="site-title">台中政見島</h1>
-        <p class="site-subtitle" lang="en">Taichung Policy Island</p>
-      </div>
-      <div class="view-switch" role="group" aria-label="檢視方式">
-        <button type="button" class="view-button" data-view="island" aria-pressed="false">島嶼檢視</button>
-        <button type="button" class="view-button" data-view="table" aria-pressed="true">表格檢視</button>
-      </div>
-      <nav class="site-nav" aria-label="網站">
+    <!-- 島嶼檢視的 3D 畫布填滿視窗，其餘元件浮在畫布上。 -->
+    <section class="island-stage" id="island-stage" aria-label="島嶼檢視">
+      <p class="status island-status" id="island-status">載入島嶼中⋯</p>
+    </section>
+
+    <header class="title-card">
+      <h1 class="site-title">台中政見島</h1>
+      <p class="site-subtitle" lang="en">Taichung Policy Island</p>
+      <p class="title-disclosure">本站由 AI 依公開資料自動整理，與任何候選人或政黨無關，未經人工逐筆審查。</p>
+      <p class="title-links">
         <a href="./method.html">整理方法</a>
-      </nav>
-      <p class="view-note" id="view-note" hidden></p>
+        <span>資料截止日 <span data-cutoff-date>載入中</span></span>
+      </p>
     </header>
 
-    <main class="site-main">
+    <nav class="hud-toolbar" id="hud-toolbar" aria-label="檢視操作">
+      <div class="tool-group time-group" role="group" aria-label="時段" data-island-only>
+        <button type="button" class="tool-button" data-time="dawn" aria-pressed="false">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 7V4M5.6 11.6 3.5 9.5M18.4 11.6l2.1-2.1" /></svg>
+          <span class="tool-label">清晨</span>
+        </button>
+        <button type="button" class="tool-button" data-time="day" aria-pressed="true">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" /></svg>
+          <span class="tool-label">白天</span>
+        </button>
+        <button type="button" class="tool-button" data-time="dusk" aria-pressed="false">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16h16M7 20h10M8 16a4 4 0 0 1 8 0M12 5v3M6 9.5l1.5 1.5M18 9.5 16.5 11" /></svg>
+          <span class="tool-label">黃昏</span>
+        </button>
+        <button type="button" class="tool-button" data-time="night" aria-pressed="false">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5Z" /></svg>
+          <span class="tool-label">夜晚</span>
+        </button>
+      </div>
+      <div class="tool-group" role="group" aria-label="島嶼" data-island-only>
+        <button type="button" class="tool-button time-cycle" id="tool-time-cycle" aria-label="切換時段，目前白天">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2" /></svg>
+          <span class="tool-label" id="tool-time-cycle-label">白天</span>
+        </button>
+        <button type="button" class="tool-button" id="tool-pause" aria-pressed="false">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-pause" d="M9 6v12M15 6v12" /><path class="icon-play" d="M8 5.5v13l10-6.5Z" /></svg>
+          <span class="tool-label" id="tool-pause-label">暫停</span>
+        </button>
+        <button type="button" class="tool-button" id="tool-labels" aria-pressed="true">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="9" rx="3" /><path d="M12 16v4" /></svg>
+          <span class="tool-label">名牌</span>
+        </button>
+        <button type="button" class="tool-button" id="tool-overview">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+          <span class="tool-label">全景</span>
+        </button>
+        <button type="button" class="tool-button index-toggle" id="tool-index" aria-expanded="false" aria-controls="index-panel">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1" /></svg>
+          <span class="tool-label">索引</span>
+        </button>
+      </div>
+      <div class="tool-group view-switch" role="group" aria-label="檢視方式">
+        <button type="button" class="tool-button view-button" data-view="island" aria-pressed="false">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5Z" /></svg>
+          <span class="tool-label">島嶼檢視</span>
+        </button>
+        <button type="button" class="tool-button view-button" data-view="table" aria-pressed="true">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M4 10h16M10 10v9" /></svg>
+          <span class="tool-label">表格檢視</span>
+        </button>
+      </div>
+    </nav>
+    <p class="view-note" id="view-note" hidden></p>
+
+    <!-- 共用控制區：島嶼檢視時放在索引面板的議題區分頁，表格檢視時放在表格上方（main.js 搬移）。 -->
+    <div class="controls" id="controls">
       <section class="intro" id="intro" aria-labelledby="intro-title" hidden>
         <h2 class="intro-title" id="intro-title">怎麼看這個網站</h2>
         <ul class="intro-list">
-          <li>島嶼檢視：拖曳旋轉、滾輪或雙指縮放。每一格是一個議題區，格上三個同尺寸標記 ○ △ □ 依排序代表三位候選人，亮起表示有政見，灰色表示沒有。</li>
-          <li>點島上的議題區或議題區清單，鏡頭會移到該區並開啟政見卡片，可讀原文引述、出處與核對紀錄。</li>
+          <li>島嶼檢視：拖曳旋轉、滾輪或雙指縮放。每一格是一個議題區，格上的編號與索引相同；三個同尺寸標記 ○ △ □ 依排序代表三位候選人，亮起表示有政見，灰色表示沒有。</li>
+          <li>點島上的議題區或索引裡的議題區，鏡頭會移到該區並開啟政見卡片，可讀原文引述、出處與核對紀錄。</li>
           <li>表格檢視：每一列是一個議題區，每一欄是一位候選人，三人欄寬與字級相同。</li>
           <li>用關鍵字或適用行政區找出和你有關的政見，網址可直接分享。</li>
         </ul>
         <button type="button" class="intro-dismiss" id="intro-dismiss">知道了</button>
       </section>
 
-      <form class="toolbar" id="filters" role="search" aria-label="搜尋與篩選政見">
+      <form class="filters" id="filters" role="search" aria-label="搜尋與篩選政見">
         <div class="field field-search">
           <label for="search">關鍵字</label>
           <input id="search" name="q" type="search" placeholder="例如：托育、捷運、大里" autocomplete="off" />
@@ -59,25 +114,32 @@
         <button type="reset" class="filter-reset">清除</button>
       </form>
       <p class="result-status" id="result-status" role="status"></p>
+    </div>
+
+    <aside class="index-panel" id="index-panel" aria-labelledby="index-panel-title">
+      <button type="button" class="index-close" id="index-close">關閉索引</button>
+      <h2 class="index-title" id="index-panel-title">政見索引</h2>
+      <div class="index-tabs" role="tablist" aria-label="索引分頁">
+        <button type="button" class="index-tab" role="tab" id="index-tab-areas" aria-selected="true" aria-controls="index-areas">議題區</button>
+        <button type="button" class="index-tab" role="tab" id="index-tab-candidates" aria-selected="false" aria-controls="index-candidates" tabindex="-1">候選人</button>
+      </div>
+      <div class="index-body">
+        <section class="index-tabpanel" id="index-areas" role="tabpanel" aria-labelledby="index-tab-areas">
+          <div class="controls-slot" id="panel-controls-slot"></div>
+          <ul class="legend" id="island-legend" aria-label="標記圖例"></ul>
+          <ol class="island-list" id="island-list" aria-label="議題區"></ol>
+        </section>
+        <!-- 候選人分頁：候選人資料卡加入前，先放排序規則與標記對照。 -->
+        <section class="index-tabpanel" id="index-candidates" role="tabpanel" aria-labelledby="index-tab-candidates" hidden>
+          <p class="order-note" id="panel-order-note"></p>
+          <ul class="candidate-index" id="candidate-index"></ul>
+        </section>
+      </div>
+    </aside>
+
+    <main class="table-main">
+      <div class="controls-slot" id="table-controls-slot"></div>
       <p class="order-note" id="candidate-order-note"></p>
-
-      <section class="island-view" id="island-root" aria-label="島嶼檢視">
-        <div class="island-stage" id="island-stage">
-          <p class="status island-status" id="island-status">載入島嶼中⋯</p>
-          <button type="button" class="island-reset" id="island-reset">看整座島</button>
-        </div>
-        <aside class="island-panel" id="island-panel" aria-labelledby="island-panel-title">
-          <button type="button" class="island-panel-toggle" id="island-panel-toggle" aria-expanded="false" aria-controls="island-panel-body">
-            議題區清單
-          </button>
-          <div class="island-panel-body" id="island-panel-body">
-            <h2 class="island-panel-title" id="island-panel-title">議題區</h2>
-            <ul class="legend" id="island-legend" aria-label="標記圖例"></ul>
-            <ul class="island-list" id="island-list"></ul>
-          </div>
-        </aside>
-      </section>
-
       <div id="table-root" class="table-root">
         <p class="status">載入政見資料中⋯</p>
       </div>
@@ -85,7 +147,7 @@
 
     <footer class="site-footer">
       <p>本站由 AI 依公開資料自動整理，與任何候選人或政黨無關，未經人工逐筆審查。<a href="./method.html">看完整整理方法</a></p>
-      <p>資料截止日：<span id="data-cutoff-date">載入中</span></p>
+      <p>資料截止日：<span data-cutoff-date>載入中</span></p>
     </footer>
   </body>
 </html>

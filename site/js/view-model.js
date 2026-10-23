@@ -23,6 +23,10 @@ function sourceView(source) {
   };
 }
 
+// 議題區編號：依議題區清單的資料順序（分類規則的順序）從 01 起算，與政見數量和候選人無關。
+// 篩選只移除列、不重編，島上名牌與索引用同一個編號。
+export const areaNumber = (index) => String(index + 1).padStart(2, '0');
+
 export function buildViewModel(dataset) {
   const sources = new Map(dataset.sources.map((s) => [s.id, sourceView(s)]));
   const policyView = (policy) => ({
@@ -31,8 +35,9 @@ export function buildViewModel(dataset) {
   });
   const elements = new Map(dataset.localElements.map((e) => [e.id, e]));
   const elementOf = (tile) => elements.get(tile.localElementId) ?? null;
-  const rows = dataset.issueAreas.map((issueArea) => ({
+  const rows = dataset.issueAreas.map((issueArea, index) => ({
     issueArea,
+    number: areaNumber(index),
     localElement: elementOf(issueArea),
     cells: dataset.candidates.map((candidate) => {
       const policies = dataset.policies
