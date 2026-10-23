@@ -72,7 +72,7 @@
 
 規則：同一筆政見被第二層退回三次就刪除並記錄原因。本次沒有政見退回達三次，刪除 0 筆。
 
-累計退回 2 次的政見（江啟臣兩個版本合計）：
+累計退回 2 次的政見（江啟臣為版本 1 與版本 2 合計）：
 
 - 江啟臣：chiang-chi-chen-006、chiang-chi-chen-045、chiang-chi-chen-077
 - 何欣純：ho-hsin-chun-052、ho-hsin-chun-056、ho-hsin-chun-147、ho-hsin-chun-178

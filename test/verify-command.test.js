@@ -29,12 +29,12 @@ function editPolicy(rawDir, candidateId, id, change) {
   writeFileSync(join(rawDir, 'policies', `${candidateId}.json`), JSON.stringify(policies));
 }
 
-function verify(rawDir, args = [], { verdict = '通過', barrier = 0 } = {}) {
+function verify(rawDir, args = [], { verdict = '通過', barrier = 0, stderrBytes = 0 } = {}) {
   const log = join(mkdtempSync(join(tmpdir(), 'verify-log-')), 'calls.jsonl');
   const result = spawnSync(
     process.execPath,
     [VERIFY_SCRIPT, '--raw', rawDir, '--claude', FAKE_CLAUDE, '--brand-terms', BRAND_TERMS, '--date', '2026-10-24', ...args],
-    { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_LOG: log, FAKE_CLAUDE_VERDICT: verdict, FAKE_CLAUDE_BARRIER: String(barrier) } },
+    { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_LOG: log, FAKE_CLAUDE_VERDICT: verdict, FAKE_CLAUDE_BARRIER: String(barrier), FAKE_CLAUDE_STDERR_BYTES: String(stderrBytes) }, timeout: 30_000 },
   );
   const calls = existsSync(log)
     ? readFileSync(log, 'utf8').trim().split('\n').map((line) => JSON.parse(line))
@@ -93,6 +93,23 @@ test('--jobs 讓第二層同時跑多筆，每筆仍是各自的全新 session �
   for (const id of ['sample-jia-001', 'sample-jia-002']) {
     assert.equal(policyById(rawDir, 'sample-jia', id).verification.layer2.status, 'pass', id);
   }
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.status, 'pass');
+});
+
+test('--jobs 不是正整數時以非零結束碼退出，不送第二層', () => {
+  const { code, output, calls } = verify(copySample(), ['--jobs', '0']);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /--jobs/);
+  assert.equal(calls.length, 0);
+});
+
+test('claude 在 stderr 輸出大量訊息時，核對不會卡住', () => {
+  const rawDir = copySample();
+
+  const { code, output } = verify(rawDir, ['--candidate', 'sample-yi'], { stderrBytes: 1024 * 1024 });
+
+  assert.equal(code, 0, output);
   assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.status, 'pass');
 });
 

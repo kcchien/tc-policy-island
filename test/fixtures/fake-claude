@@ -6,6 +6,9 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 
 const prompt = readFileSync(0, 'utf8');
+// 設了 FAKE_CLAUDE_STDERR_BYTES 時先往 stderr 寫這麼多位元組，模擬大量診斷輸出。
+const stderrBytes = Number(process.env.FAKE_CLAUDE_STDERR_BYTES ?? 0);
+if (stderrBytes > 0) await new Promise((resolve) => process.stderr.write('x'.repeat(stderrBytes), resolve));
 const barrier = Number(process.env.FAKE_CLAUDE_BARRIER ?? 0);
 if (barrier > 0) {
   const starts = `${process.env.FAKE_CLAUDE_LOG}.starts`;

@@ -66,10 +66,11 @@ function readSnapshots(sources) {
 }
 
 // 非同步版的 spawnSync：回傳 { stdout, error }，執行檔不存在或逾時時 error 有值。
-function run(command, args, { cwd, input, timeout }) {
-  return new Promise((done) => {
+function spawnAsync(command, args, { cwd, input, timeout }) {
+  return new Promise((settle) => {
     // 不用 spawn 的 timeout 選項：執行檔不存在時它的計時器不會清掉，流程會卡到逾時。
-    const child = spawn(command, args, { cwd });
+    // stderr 不讀，接成管線而沒人讀時，子程序寫滿緩衝區就會卡住。
+    const child = spawn(command, args, { cwd, stdio: ['pipe', 'pipe', 'ignore'] });
     let stdout = '';
     let error = null;
     const timer = setTimeout(() => {
@@ -81,7 +82,7 @@ function run(command, args, { cwd, input, timeout }) {
     child.on('error', (e) => { error ??= e; });
     child.on('close', () => {
       clearTimeout(timer);
-      done({ stdout, error });
+      settle({ stdout, error });
     });
     child.stdin.end(input);
   });
@@ -92,7 +93,7 @@ function run(command, args, { cwd, input, timeout }) {
 async function runLayer2(request) {
   const cwd = mkdtempSync(join(tmpdir(), 'tc-verify-'));
   try {
-    const result = await run(
+    const result = await spawnAsync(
       values.claude,
       [
         '-p',
