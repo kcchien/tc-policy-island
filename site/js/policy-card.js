@@ -1,47 +1,26 @@
 // 政見卡片：一個議題區內三位候選人的政見並排。表格檢視與島嶼檢視共用，只讀檢視模型的一列（row）。
-// 桌面島嶼檢視停靠在畫布下方、可一鍵展開成全高；800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js），
-// 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，點開才顯示原文與核對紀錄。
+// 桌面島嶼檢視停靠在畫布下方、可一鍵放大成全高；800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js），
+// 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，
+// 點開才顯示原文引述、出處與核對紀錄。畫面文字取自 ui-text.js。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
-import { NO_MATCH_TEXT, policyMatcher } from './filter.js';
+import { policyMatcher } from './filter.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
-
-const STATUS_TEXT = { pending: '未核對', pass: '通過', fail: '不通過' };
-
-// 第一層（逐字比對）的結果與日期，政見卡片與候選人資料卡共用。
-export const layer1StatusText = ({ status, checkedAt }) => `${STATUS_TEXT[status]}${checkedAt ? `（${checkedAt}）` : ''}`;
-
-export function verificationText({ layer1, layer2 }) {
-  return [
-    `第一層 逐字比對：${layer1StatusText(layer1)}`,
-    `第二層 檢核表${layer2.checklistVersion ? `（版本 ${layer2.checklistVersion}）` : ''}：${STATUS_TEXT[layer2.status]}` +
-      (layer2.checkedAt ? `（${layer2.model}，${layer2.checkedAt}）` : ''),
-  ];
-}
-
-export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
-
-export function candidateCountText(areaPolicyCount, rawPolicyItems) {
-  return `此議題區 ${areaPolicyCount} 筆政見，${rawPolicyItemsText(rawPolicyItems)}`;
-}
-
-// 卡片內篩選時欄頭的第二行，三欄同一句型。
-export const columnMatchText = (matchCount) => `符合篩選條件 ${matchCount} 筆`;
-
-export function cardFilterStatusText({ active, matchCount }) {
-  if (!active) return '';
-  if (matchCount === 0) return '這個議題區沒有符合篩選條件的政見。';
-  return `這個議題區符合篩選條件的政見共 ${matchCount} 筆。`;
-}
+import {
+  candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
+} from './ui-text.js';
 
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
 export const policyHref = (policyId) => `?policy=${encodeURIComponent(policyId)}`;
 export const areaHref = (areaId) => `?area=${encodeURIComponent(areaId)}`;
 
-const EXPAND_TEXT = { false: '全部展開', true: '全部收合' };
-// 桌面島嶼檢視的卡片高度：停靠在下方（上方留給島）或放大成全高。
-const HEIGHT_TEXT = { false: '放大卡片', true: '縮小卡片' };
+// 出處、原文存檔、網頁備份三個連結，政見卡片與候選人資料卡共用。
+export const sourceLinks = (source) => [
+  el('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.link),
+  el('a', { href: source.snapshotUrl, target: '_blank' }, SOURCE_TEXT.snapshot),
+  source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.archive),
+];
 
 function quoteBlock(quote) {
   const { source } = quote;
@@ -53,21 +32,15 @@ function quoteBlock(quote) {
       'figcaption',
       { class: 'quote-source' },
       el('span', { class: 'source-type' }, source.sourceTypeName),
-      el('span', {}, `${source.title}（${source.retrievedAt} 擷取）`),
-      el(
-        'span',
-        { class: 'source-links' },
-        el('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, '出處'),
-        el('a', { href: source.snapshotUrl, target: '_blank' }, '出處快照'),
-        source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, '存檔網址'),
-      ),
+      el('span', {}, SOURCE_TEXT.titleWithDate(source.title, source.retrievedAt)),
+      el('span', { class: 'source-links' }, sourceLinks(source)),
     ),
   );
 }
 
 // 一筆政見：摘要列（摘要、適用行政區、出處說法不一的提示）可點開，展開後才是原文引述、出處與核對紀錄。
 function policyArticle(policy, { focused, open }) {
-  const districts = policy.districts.length > 0 ? policy.districts.join('、') : '未指定';
+  const districts = policy.districts.length > 0 ? policy.districts.join('、') : T.noDistricts;
   return el(
     'article',
     { class: `policy${focused ? ' is-focused' : ''}`, id: `card-policy-${policy.id}`, 'aria-current': focused ? 'true' : null },
@@ -81,22 +54,22 @@ function policyArticle(policy, { focused, open }) {
         el(
           'span',
           { class: 'policy-tags' },
-          el('span', { class: 'policy-districts' }, `適用行政區：${districts}`),
-          policy.conflictNote && el('span', { class: 'policy-flag' }, '出處說法不一'),
+          el('span', { class: 'policy-districts' }, T.districtsLine(districts)),
+          policy.conflictNote && el('span', { class: 'policy-flag' }, T.conflictFlag),
         ),
       ),
       el(
         'div',
         { class: 'policy-more' },
-        policy.conflictNote && el('p', { class: 'conflict-note' }, el('strong', {}, '出處說法不一：'), policy.conflictNote),
+        policy.conflictNote && el('p', { class: 'conflict-note' }, el('strong', {}, T.conflict), policy.conflictNote),
         ...policy.quotes.map(quoteBlock),
         el(
           'dl',
           { class: 'policy-facts' },
-          el('dt', {}, '核對紀錄'),
-          el('dd', {}, ...verificationText(policy.verification).map((line) => el('span', { class: 'verification-line' }, line))),
+          el('dt', {}, T.verification),
+          el('dd', {}, el('span', { class: 'verification-line' }, verificationText(policy.verification))),
         ),
-        el('a', { class: 'policy-link', href: policyHref(policy.id) }, '這筆政見的連結'),
+        el('a', { class: 'policy-link', href: policyHref(policy.id) }, T.policyLink),
       ),
     ),
   );
@@ -121,7 +94,7 @@ function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId
       el('h3', { class: 'candidate-name' }, candidate.name),
       el('p', { class: 'candidate-meta' }, candidate.party),
       el('p', { class: 'candidate-meta' }, candidateCountText(cell.policies.length, candidate.rawPolicyItems)),
-      matcher.active && el('p', { class: 'candidate-meta candidate-match' }, columnMatchText(policies.length)),
+      matcher.active && el('p', { class: 'candidate-meta candidate-match' }, T.columnMatch(policies.length)),
     ),
     // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。
     candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
@@ -136,31 +109,31 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const number = el('span', { class: 'card-number' });
   const title = el('h2', { class: 'card-title', id: 'policy-card-title' });
   const description = el('p', { class: 'card-description' });
-  const tabs = el('div', { class: 'card-tabs', role: 'tablist', 'aria-label': '候選人' });
+  const tabs = el('div', { class: 'card-tabs', role: 'tablist', 'aria-label': T.tabsLabel });
   const body = el('div', { class: 'card-columns' });
   // 開卡片時焦點放在關閉鈕，Tab 往後是篩選與各欄政見。
-  const closeButton = el('button', { type: 'button', class: 'card-close', autofocus: true }, '關閉');
-  const heightButton = el('button', { type: 'button', class: 'card-height', 'aria-pressed': 'false' }, HEIGHT_TEXT.false);
-  const expandButton = el('button', { type: 'button', class: 'card-expand', 'aria-pressed': 'false' }, EXPAND_TEXT.false);
-  const shareLink = el('a', { class: 'card-share' }, '這個議題區的連結');
-  const search = el('input', { id: 'card-search', type: 'search', autocomplete: 'off', placeholder: '在這個議題區找關鍵字' });
+  const closeButton = el('button', { type: 'button', class: 'card-close', autofocus: true }, DIALOG_TEXT.close);
+  const heightButton = el('button', { type: 'button', class: 'card-height', 'aria-pressed': 'false' }, T.enlarge);
+  const expandButton = el('button', { type: 'button', class: 'card-expand', 'aria-pressed': 'false' }, T.expandAll);
+  const shareLink = el('a', { class: 'card-share' }, T.areaLink);
+  const search = el('input', { id: 'card-search', type: 'search', autocomplete: 'off', placeholder: T.searchPlaceholder });
   const district = el(
     'select',
     { id: 'card-district' },
-    el('option', { value: '' }, '全部行政區'),
+    el('option', { value: '' }, T.allDistricts),
     TAICHUNG_DISTRICTS.map((name) => el('option', { value: name }, name)),
   );
   const filterStatus = el('p', { class: 'card-filter-status', role: 'status' });
   const filters = el(
     'form',
-    { class: 'card-filters', role: 'search', 'aria-label': '在這個議題區篩選政見' },
+    { class: 'card-filters', role: 'search', 'aria-label': T.filtersLabel },
     // 欄位名稱只給輔助科技讀，畫面上用提示文字與預設選項說明，省下卡片高度。
-    el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, '在這個議題區找政見的關鍵字'), search),
-    el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, '適用行政區'), district),
+    el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, T.searchLabel), search),
+    el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, T.districts), district),
     expandButton,
   );
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
-  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': '切換卡片高度' });
+  const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'docked' },
@@ -175,7 +148,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
           'div',
           { class: 'card-heading' },
           number,
-          el('div', { class: 'card-heading-text' }, el('p', { class: 'card-eyebrow' }, '議題區'), title),
+          el('div', { class: 'card-heading-text' }, el('p', { class: 'card-eyebrow' }, T.eyebrow), title),
           description,
         ),
         el('div', { class: 'card-actions' }, shareLink, heightButton, closeButton),
@@ -231,7 +204,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
         candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, active: index === active, index })),
     );
     selectTab(active);
-    filterStatus.textContent = cardFilterStatusText({
+    filterStatus.textContent = T.filterStatus({
       active: matcher.active,
       matchCount: columns.reduce((sum, column) => sum + column.policies.length, 0),
     });
@@ -240,15 +213,16 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const setExpanded = (next) => {
     expanded = next;
     expandButton.setAttribute('aria-pressed', String(next));
-    expandButton.textContent = EXPAND_TEXT[next];
+    expandButton.textContent = next ? T.collapseAll : T.expandAll;
     for (const details of body.querySelectorAll('.policy-details')) details.open = next;
   };
   expandButton.addEventListener('click', () => setExpanded(!expanded));
 
+  // 桌面島嶼檢視的卡片高度：停靠在下方（上方留給島）或放大成全高。
   const setTall = (tall) => {
     dialog.dataset.height = tall ? 'tall' : 'docked';
     heightButton.setAttribute('aria-pressed', String(tall));
-    heightButton.textContent = HEIGHT_TEXT[tall];
+    heightButton.textContent = tall ? T.shrink : T.enlarge;
   };
   heightButton.addEventListener('click', () => setTall(dialog.dataset.height !== 'tall'));
 
@@ -266,7 +240,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       current = { row, vm };
       number.textContent = row.number;
       title.textContent = issueArea.name;
-      description.textContent = `${issueArea.description}（對應局處：${issueArea.departments.join('、')}）`;
+      description.textContent = T.areaDescription(issueArea.description, issueArea.departments);
       shareLink.setAttribute('href', areaHref(issueArea.id));
       if (!sameArea) {
         search.value = focusPolicyId ? '' : filter.query ?? '';

@@ -40,7 +40,7 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
   js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置、格子頂點、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
-  js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）
+  js/island-models.js  格子、在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
@@ -49,14 +49,17 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-labels.js  名牌避讓（Node 可測，不 import 其他模組）：placeLabels 依畫面位置決定名牌完整、只留編號或隱藏，8px 遲滯，三位候選人人物名牌同組同進退；island-view.js 在鏡頭或介面變動後呼叫，避開 main.js 給的浮動元件矩形
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
-  js/island-parts.js   零件分桶規則（Node 可測）
-  js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
+  js/island-parts.js   零件分桶規則與實例縮放微抖動（Node 可測）
+  js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動）
+  js/island-heroes.js  主題場景（Node 可測）：20 個議題區各一座的零件資料（單位空間）、只依識別碼選場景、擺放（heroPlan，島體提供主題場景位置前暫放在元素區西半）、色碼
+  js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈）、地面色、各畫質的樹、霧、聚落數量、樹群、聚落、霧團、雲、飛鳥與依動畫時間的位置；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
   js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民、路網、環線與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查
   js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車、路面與環線堤，會動的零件每種一個 InstancedMesh
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例（候選人分頁的卡片在 candidate-card.js）
+  js/ui-text.js        畫面文案：程式產生、給市民看的文字一律放這裡（其他畫面模組不寫中文字串，test/ui-text.test.js 檢查），受上線關卡「受眾文案」掃描
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
   js/markdown.js       repo 文件的 Markdown 解析（只支援 repo 用到的寫法）
@@ -90,7 +93,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - **議題區**：`id`、`name`、`departments[]`、`description`、`axial [q, r]`、`localElementId?`。清單依 `docs/rules/classification-rules.md` 劃分，數量與島的格數無關。
 - **元素**：`id`、`name`、`category`（`LOCAL_ELEMENT_CATEGORIES`：自然景觀、小吃、老建築）、`place`、`reason`（與任何市長任期的政績無關的理由）。
 - **裝飾格**：`id`、`axial [q, r]`、`localElementId?`。島上沒有議題區的格子。議題區與裝飾格的座標不得重複，每個元素只放一格。公開資料集另含 `localElements` 與 `decorativeTiles`。
-- **出處**：`id`、`candidateId`、`url`、`archiveUrl?`、`archiveError?`（存檔失敗原因）、`snapshotPath`（相對 repo 根目錄）、`snapshotSha256`、`snapshotNote?`（快照的產生方式，例如 PDF 轉文字與字型對照還原；取自網頁可見文字時為 `null`）、`sourceType`（`official-website`、`official-facebook`、`policy-presentation`、`election-bulletin`，中文名見 `SOURCE_TYPES`）、`title`、`retrievedAt`。
+- **出處**：`id`、`candidateId`、`url`、`archiveUrl?`、`archiveError?`（存檔失敗原因）、`snapshotPath`（相對 repo 根目錄）、`snapshotSha256`、`snapshotNote?`（快照的產生方式，例如 PDF 轉文字與字型對照還原；取自網頁可見文字時為 `null`；給維護者看，畫面只在有字形還原時以 `snapshotNoteText` 改寫成白話）、`sourceType`（`official-website`、`official-facebook`、`policy-presentation`、`election-bulletin`，中文名見 `SOURCE_TYPES`）、`title`、`retrievedAt`。
 - **政見**：`id`、`candidateId`、`issueAreaId`（恰好一個）、`summary`、`quotes[] { text, sourceId }`（至少一則，出處須屬同一位候選人）、`districts[]`（`TAICHUNG_DISTRICTS` 的 29 區正式名稱，可空）、`conflictNote?`（出處說法不一標註）、`verification`。
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、列在 `rawPolicyItems.sourceIds`、或是公開候選人資料出處的那些。
 - **候選人資料** `profile`：`birthYear`、`education[]`、`experience[]`（學歷與經歷逐字照出處）、`sourceId`（出處須屬同一位候選人）、`electionYear`、`electionName`（資料取自哪一場選舉，例如「第11屆立法委員選舉（臺中市第8選舉區）」）、`verification { layer1 { status, checkedAt? } }`。只有第一層（逐字比對），`pass` 才公開，否則公開資料集的 `profile` 為 `null`。姓名與政黨沿用候選人的欄位。抽取方法見 `data/extraction/candidate-profiles.md`。
@@ -107,7 +110,8 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 - `data/raw/` 只放從一手來源抽取的真實資料。示範或測試用的政見一律放 `test/fixtures/`，候選人用虛構的「範例甲乙丙」「候選人甲乙丙」，不掛真實候選人的名字。
 - 新增上線關卡：在 `scripts/gates/` 寫一個 `{ id, name, check(site) }` 模組（`check` 回傳失敗訊息陣列，`site.dataset()` 讀公開資料集），加進 `scripts/gates/index.js` 的 `GATES`，並在 `test/gates.test.js` 用夾具網站目錄驗證擋下違規、放行合規。
 - 品牌用語掃描與禁用色檢查讀 `data/rules/` 的正式清單；`site.files()` 列出網站目錄全部檔案，`site.readText(path)` 讀檔。改清單或新增網站文案後跑 `node --test test/rules.test.js`，它會用正式資料檢查本站文案、檔名與專案名。
-- 整理方法頁要照原文公開的 repo 檔案加進 `site/js/repo-documents.js` 的 `REPO_DOCUMENTS`，並在 `site/method.html` 放一個 `data-repo-file="<repo 路徑>"` 容器。逐字副本不受品牌用語掃描，由關卡 `repo-documents` 驗證逐字相同，見 `docs/rules/brand-terms.md`「例外：引用 repo 文件」。頁面文案不要寫進這些檔案。
+- 給市民看的文字（頁面 HTML、`site/js/ui-text.js`、公開資料集中整理者撰寫的欄位）不得外漏內部細節：檔案路徑、副檔名、工具名、字型名、模型代號、程式欄位名、版本識別碼、雜湊值與「出處快照」「存檔網址」這類內部術語，由上線關卡「受眾文案」（`scripts/lib/audience-text.js`）擋下。畫面用白話：出處快照寫「原文存檔」、存檔網址寫「網頁備份」、核對兩層寫「原文逐字比對」「AI 依公開檢核表檢查」。原文引述、候選人資料原文與逐字公開的 repo 文件不掃。
+- 整理方法頁要照原文公開的 repo 檔案加進 `site/js/repo-documents.js` 的 `REPO_DOCUMENTS`、在 `site/js/ui-text.js` 的 `REPO_DOCUMENT_TEXT` 寫白話標題與說明（頁面不顯示檔案路徑），並在 `site/method.html` 放一個 `data-repo-file="<repo 路徑>"` 容器。逐字副本不受品牌用語掃描，由關卡 `repo-documents` 驗證逐字相同，見 `docs/rules/brand-terms.md`「例外：引用 repo 文件」。頁面文案不要寫進這些檔案。
 - `test/` 底下的 `.js` 都會被 `node --test` 當成測試檔執行，夾具模組不要有副作用。
 - 無頭 Chrome 的 `--window-size` 有最小寬度，390px 截圖會被裁切，手機版改用可模擬裝置寬度的瀏覽器驗證。
 

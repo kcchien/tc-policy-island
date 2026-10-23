@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { partBuckets } from '../site/js/island-parts.js';
+import { partBuckets, SCALE_JITTER, scaleJitter } from '../site/js/island-parts.js';
 
 const SHAPES = ['box', 'cone6', 'cyl8:0.5'];
 const MATERIALS = ['standard', 'glow'];
@@ -27,6 +27,15 @@ test('同種形體、同種材質的零件收進同一桶（一個 InstancedMesh
 test('繪製呼叫數不隨零件數線性增加：零件從 60 個加到 6000 個，桶數不變', () => {
   const counts = [60, 600, 6000].map((n) => partBuckets(parts(n)).length);
   assert.deepEqual(counts, [6, 6, 6]);
+});
+
+test('實例縮放微抖動：在 1 ± 0.0072 之內、每次載入相同、相鄰實例不同（共面的零件不會 z-fighting）', () => {
+  assert.equal(SCALE_JITTER, 0.0072);
+  const values = Array.from({ length: 200 }, (_, i) => scaleJitter(i));
+  assert.ok(values.every((v) => v >= 1 - 0.0072 && v <= 1 + 0.0072));
+  assert.deepEqual(values, Array.from({ length: 200 }, (_, i) => scaleJitter(i)));
+  assert.ok(values.slice(1).every((v, i) => v !== values[i]));
+  assert.ok(Math.max(...values) - Math.min(...values) > 0.01, '抖動幅度太小');
 });
 
 test('每個實例保留自己的顏色與變換', () => {

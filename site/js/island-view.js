@@ -22,7 +22,10 @@ import {
 } from './island-models.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
 import { placeLabels } from './island-labels.js';
+import { heroPlan } from './island-heroes.js';
+import { buildHeroScene } from './island-hero-view.js';
 import { el } from './dom.js';
+import { ISLAND_TEXT } from './ui-text.js';
 
 const FOV = 32;
 // 窄畫面的名牌改成直書（見 LABEL_NARROW）。預設視角的俯角與方位角由 island-camera.js 的 homeView 依長寬比決定。
@@ -85,7 +88,8 @@ export function createIslandView(stage, {
   let frame = 0;
   let lastNight = 0;
 
-  // 每格一個群組：格子、在地感元素、三個標記、議題區名牌。
+  // 每格一個群組：格子、主題場景、在地感元素、三個標記、議題區名牌。
+  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
   const tiles = new Map();
   const pickable = [];
   const labelAnchors = [];
@@ -99,10 +103,17 @@ export function createIslandView(stage, {
     const isPlaza = tileInfo.id === plaza.tile?.id;
     if (tileInfo.kind === 'decorative') top.material.color.setHex(isPlaza ? PALETTE.plazaTop : PALETTE.decorativeTop);
     g.add(tile);
-    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, isPlaza ? 'area' : tileInfo.kind);
+    const elementKind = isPlaza ? 'area' : tileInfo.kind === 'area' ? 'secondary' : 'decorative';
+    const model = tileInfo.localElement && localElementModel(tileInfo.localElement, elementKind);
     if (model) {
       model.position.y = TILE_SURFACE;
       g.add(model);
+    }
+    // 議題區的主題場景（只依識別碼，見 island-heroes.js）；heroes 的位置是世界座標，換成格子群組內的座標。
+    const hero = heroes.get(tileInfo.id);
+    if (hero) {
+      const { x, z, scale, yaw } = hero.transform;
+      g.add(buildHeroScene(tileInfo.id, { x: x - tileInfo.position.x, y: TILE_SURFACE, z: z - tileInfo.position.z, scale, yaw }));
     }
     const markers = tileInfo.markers.map((info) => {
       const marker = markerModel(info);
@@ -154,7 +165,7 @@ export function createIslandView(stage, {
       button.addEventListener('click', () => onSelectCandidate?.(info.candidateId));
       return button;
     });
-    const node = el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, '候選人廣場'), ...entries);
+    const node = el('span', { class: 'island-label island-plaza-sign' }, el('span', { class: 'island-plaza-title' }, ISLAND_TEXT.plaza), ...entries);
     const sign = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     sign.position.set(plaza.sign.x, TILE_SURFACE, plaza.sign.z);
     // 廣場名牌排在人物名牌前面，議題區名牌讓它。

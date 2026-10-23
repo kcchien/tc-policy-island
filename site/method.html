@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>整理方法｜台中政見島</title>
-    <meta name="description" content="台中政見島的整理方法：揭露聲明、排序規則、分類規則、檢核表、提示詞、抽取指示、元素清單、資料下載、授權與更正管道。" />
+    <meta name="description" content="台中政見島的整理方法：揭露聲明、排序規則、分類規則、檢核表、AI 核對指示、政見整理指示、元素清單、資料下載、授權與更正管道。" />
     <link rel="stylesheet" href="./css/main.css" />
     <script type="module" src="./js/method.js"></script>
   </head>
@@ -26,12 +26,12 @@
       <nav class="method-toc" aria-label="本頁內容">
         <ol>
           <li><a href="#disclosure">揭露聲明</a></li>
-          <li><a href="#repo-documents">引用 repo 文件</a></li>
+          <li><a href="#repo-documents">原文公開的文件</a></li>
           <li><a href="#sources">只收一手來源</a></li>
           <li><a href="#profiles">候選人資料</a></li>
           <li><a href="#order">候選人排序規則</a></li>
           <li><a href="#classification">議題區與分類規則</a></li>
-          <li><a href="#verification">抽取與核對</a></li>
+          <li><a href="#verification">整理與核對</a></li>
           <li><a href="#elements">元素清單</a></li>
           <li><a href="#neutrality">中立規則</a></li>
           <li><a href="#download">資料下載</a></li>
@@ -45,15 +45,15 @@
         <ul>
           <li>本站由 AI 依公開資料自動整理，未經人工逐筆審查。</li>
           <li>本站與任何候選人或政黨無關。</li>
-          <li>整理者不具名。內容可不可信，不靠整理者的身分，而靠本頁公開的流程，以及每條政見附的原文引述、出處與出處快照，任何人都能自行查證。</li>
+          <li>內容可不可信，不靠整理者的身分，而靠本頁公開的流程，以及每條政見附的原文引述、出處與原文存檔，任何人都能自行查證。</li>
         </ul>
       </section>
 
       <section class="method-section" id="repo-documents" aria-labelledby="repo-documents-title">
-        <h2 id="repo-documents-title">引用 repo 文件</h2>
-        <p>本頁標示「引用 repo 文件」的區塊，是本站 repo 內實際使用的文件原文，建置網站時逐字複製，不改寫、不遮字。讀者看到的就是抽取、核對與上線關卡實際讀取的內容。每個區塊都附原檔連結，可以直接對照。</p>
-        <p>Markdown 文件依原檔的標題、清單與表格排版；檢核表與品牌用語清單是 JSON 檔，排成清單與表格呈現，欄位值照原檔，不增刪、不換字。核對第二層提示詞照原檔逐行呈現。</p>
-        <p>這些文件為了說明規則，會寫出候選人的品牌用語作為例子。品牌用語掃描因此比照原文引述，不掃這些區塊。為了不讓這個例外被拿來夾帶整理者自己寫的文字，上線關卡會逐字比對每個區塊與它標註的 repo 檔案，不一致就不部署。本頁其他說明文字照常受品牌用語掃描。</p>
+        <h2 id="repo-documents-title">原文公開的文件</h2>
+        <p>本頁標示「公開原文」的區塊，是本站整理與核對政見時實際使用的規則、清單與指示，照原文公開，不改寫、不遮字。讀者看到的，就是整理與核對時實際讀取的內容。每個區塊都附「在 GitHub 查看」連結，可以對照原始檔案與修改紀錄。</p>
+        <p>規則文件依原文的標題、清單與表格排版；檢核表與品牌用語清單排成清單與表格，內容照原文，不增刪、不換字。AI 核對指示照原文逐行呈現。這些文件是寫給整理流程與 AI 讀的，會出現檔案位置、指令與欄位名稱等技術細節，照原文保留。</p>
+        <p>這些文件為了說明規則，會寫出候選人的品牌用語作為例子。本站文字的品牌用語檢查因此比照原文引述，不檢查這些區塊。為了不讓這個例外被拿來夾帶整理者自己寫的文字，每次上線前都會自動比對每個區塊與原始檔案逐字相同，不一致就不上線。本頁其他說明文字照常檢查。</p>
       </section>
 
       <section class="method-section" id="sources" aria-labelledby="sources-title">
@@ -64,7 +64,7 @@
         <ul id="data-status-list">
           <li>載入中⋯</li>
         </ul>
-        <p>候選人還沒有一手來源時，本站不從媒體報導補資料，而是在表格與政見卡片上標示資料狀態。中選會選舉公報公布後，會依同一份抽取指示與核對流程補上。</p>
+        <p>候選人還沒有一手來源時，本站不從媒體報導補資料，而是在表格與政見卡片上標示資料狀態。中選會選舉公報公布後，會依同一份政見整理指示與核對流程補上。</p>
       </section>
 
       <section class="method-section" id="profiles" aria-labelledby="profiles-title">
@@ -74,8 +74,8 @@
           <li>來源只用中選會：學歷與經歷取自中選會選舉公報，出生年取自同一份公報，並與中選會選舉資料庫比對。2026 年選舉公報公布前，用三位候選人最近一次都有公報的 2024 年第11屆立法委員選舉（區域）臺中市各選舉區公報。每張卡片註明選舉年份與選舉別。</li>
           <li>逐字呈現：學歷與經歷照公報原文，公報上一個項目符號列成一項；公報上沒有分項的整段文字照原樣呈現，不自行斷句。不改寫、不摘要，也不加整理者撰寫的介紹或評語。</li>
           <li>不收政績、爭議、財產、媒體報導與候選人自我介紹。</li>
-          <li>每張卡片附出處連結、出處快照、存檔網址與擷取日期。公報 PDF 轉文字時有字形抽不出來、改用 PDF 字型對照還原的，卡片上的「出處快照說明」會寫明還原方法與對照檔。</li>
-          <li>核對：學歷與經歷須逐字出現在出處快照中（核對第一層的逐字比對），通過才公開。候選人資料沒有摘要，所以不做第二層。上線關卡另外檢查三人欄位相同、出處是中選會網站上的選舉公報。</li>
+          <li>每張卡片附出處連結、原文存檔（本站存下的公報文字）、網頁備份與擷取日期。公報有部分文字因字型無法直接轉成文字、需要比對公報影像還原的，卡片上的「原文存檔說明」會註明，還原方法見下方的候選人資料整理方法。</li>
+          <li>核對：學歷與經歷須逐字出現在原文存檔中（原文逐字比對），通過才公開。候選人資料沒有摘要，所以不做 AI 檢查。每次上線前另外自動檢查三人欄位相同、出處是中選會網站上的選舉公報。</li>
           <li>學歷與經歷是候選人本人的文字，比照原文引述，不受品牌用語掃描。</li>
         </ul>
         <div data-repo-file="data/extraction/candidate-profiles.md"></div>
@@ -107,19 +107,19 @@
       </section>
 
       <section class="method-section" id="verification" aria-labelledby="verification-title">
-        <h2 id="verification-title">抽取與核對</h2>
+        <h2 id="verification-title">整理與核對</h2>
         <ol>
-          <li><strong>抽取</strong>：AI 依「政見抽取指示」讀取一手來源，整理出政見、原文引述與摘要，並存下出處快照與存檔網址。三位候選人共用同一份抽取指示。</li>
-          <li><strong>核對第一層</strong>：程式比對。原文引述在統一全形半形、去掉空白與換行、統一標點之後，必須逐字出現在出處快照中。字詞不同就不通過。</li>
-          <li><strong>核對第二層</strong>：每條政見另開一個全新的 AI session，看不到抽取過程，只拿到檢核表、品牌用語清單、摘要與原文引述，候選人姓名與政黨以「○○」遮蔽。它依檢核表判定通過或退回，並寫下理由。三位候選人共用同一份檢核表與提示詞。</li>
-          <li><strong>公開</strong>：兩層都通過的政見才會進入公開資料集，其餘在建置時由程式排除。每條政見在政見卡片上附核對紀錄：結果、檢核表版本與日期。</li>
+          <li><strong>整理</strong>：AI 依「政見整理指示」讀取一手來源，整理出政見、原文引述與摘要，並存下原文存檔（出處頁面當下的文字）與網頁備份（送交第三方網頁存檔服務保存的副本）。三位候選人共用同一份整理指示。</li>
+          <li><strong>第一道核對：原文逐字比對</strong>。由程式比對：原文引述在統一全形半形、去掉空白與換行、統一標點之後，必須逐字出現在原文存檔中。字詞不同就不通過。</li>
+          <li><strong>第二道核對：AI 依公開檢核表檢查</strong>。每條政見另開一次全新的 AI 對話，看不到整理過程，只拿到檢核表、品牌用語清單、摘要與原文引述，候選人姓名與政黨以「○○」遮蔽。AI 依檢核表判定通過或退回，並寫下理由。三位候選人共用同一份檢核表與核對指示。</li>
+          <li><strong>公開</strong>：兩道核對都通過的政見才會公開，其餘由程式排除。每條政見在政見卡片上附核對紀錄：結果與日期。</li>
         </ol>
-        <p>檢核表與提示詞改內容就升版。已通過的政見遇到新版檢核表，要依新版重新核對。</p>
+        <p>檢核表與核對指示改了內容就換新版本。已通過的政見遇到新版檢核表，要依新版重新核對。</p>
         <div data-repo-file="data/extraction/instructions.md"></div>
         <div data-repo-file="data/verification/checklist.json" data-open></div>
         <div data-repo-file="data/verification/layer2-prompt.md"></div>
         <h3>核對報告</h3>
-        <p>核對報告記錄各候選人第二層的通過率、退回次數與刪除筆數，對全部政見執行核對後產生，放在 repo 的 <code>data/verification/report.md</code>。</p>
+        <p>核對報告記錄各候選人在第二道核對的通過率、退回次數與刪除筆數，對全部政見執行核對後產生，公開在下方。</p>
         <div data-repo-file="data/verification/report.md" data-open></div>
       </section>
 
@@ -151,9 +151,9 @@
           <li>只收一手來源，不收媒體報導。</li>
           <li>網站名稱、文案與網址不用任何候選人的品牌用語或其諧音。</li>
           <li>不放民調、捐款或催票連結，也不放任何陣營的標誌或照片。</li>
-          <li>每條政見附出處連結與出處快照，通過兩層核對才公開。</li>
-          <li>分類規則、檢核表、提示詞、抽取指示與完整流程都公開在本頁。</li>
-          <li>上線不靠人工放行，改由自動化上線關卡把關：品牌用語掃描、禁用色檢查、公開資料全數通過核對、三位候選人版面一致、引用 repo 文件與原檔逐字相同。任一項沒過就不部署。</li>
+          <li>每條政見附出處連結與原文存檔，通過兩道核對才公開。</li>
+          <li>分類規則、檢核表、AI 核對指示、政見整理指示與完整流程都公開在本頁。</li>
+          <li>上線不靠人工放行，改由每次上線前的自動檢查把關：不含品牌用語、不用禁用色、公開資料全數通過核對、三位候選人版面一致、島上人物與動態不隨政見改變、公開原文與原始檔案逐字相同、畫面文字不外漏技術細節。任一項沒過就不上線。</li>
         </ul>
         <div data-repo-file="docs/adr/0001-neutrality-rules.md"></div>
         <div data-repo-file="docs/adr/0002-ai-verification-instead-of-human-review.md"></div>
@@ -167,9 +167,9 @@
         <p><a class="download-link" href="./data/dataset.json" download="tc-policy-island-dataset.json">下載公開資料集（JSON）</a></p>
         <ul>
           <li>公開資料集只含兩層核對都通過的政見，內容包括候選人、議題區、元素清單、出處，以及每條政見的原文引述與核對紀錄。</li>
-          <li>出處的 <code>archiveUrl</code> 是存檔網址；<code>snapshotPath</code> 是出處快照在 repo 中的位置，網站上的出處快照放在本站 <code>data/snapshots/</code> 底下的同名檔案。</li>
-          <li>每個「引用 repo 文件」區塊都附原檔連結。</li>
-          <li>程式碼與原始資料在 <a href="https://github.com/kcchien/tc-policy-island">GitHub repo</a>。</li>
+          <li>每個出處都附網頁備份的網址與原文存檔的位置；各欄位的說明見 GitHub 專案的說明文件。</li>
+          <li>每個「公開原文」區塊都附 GitHub 連結。</li>
+          <li>程式碼與原始資料在 <a href="https://github.com/kcchien/tc-policy-island">GitHub 專案</a>。</li>
         </ul>
       </section>
 
@@ -177,8 +177,8 @@
         <h2 id="license-title">授權</h2>
         <ul>
           <li>整理內容（摘要、議題區、分類與資料結構）採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant">創用 CC 姓名標示 4.0 國際（CC BY 4.0）</a>，引用時請註明「台中政見島」並附本站網址。</li>
-          <li>程式碼採 MIT 授權，全文見 repo 的 <a href="https://github.com/kcchien/tc-policy-island/blob/main/LICENSE">LICENSE</a>。</li>
-          <li>原文引述與出處快照的著作權屬於各候選人，本站以引用方式呈現，供查證與比較。</li>
+          <li>程式碼採 MIT 授權，全文見 GitHub 專案的<a href="https://github.com/kcchien/tc-policy-island/blob/main/LICENSE">授權條款</a>。</li>
+          <li>原文引述與原文存檔的著作權屬於各候選人，本站以引用方式呈現，供查證與比較。</li>
         </ul>
       </section>
 
