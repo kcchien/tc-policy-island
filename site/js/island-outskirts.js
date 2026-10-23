@@ -50,7 +50,12 @@ function addCloudShadows(material, uniforms) {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec2 vCloudGround;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvCloudGround = (modelMatrix * vec4(transformed, 1.0)).xz;');
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        #ifdef USE_INSTANCING
+          vCloudGround = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xz;
+        #else
+          vCloudGround = (modelMatrix * vec4(transformed, 1.0)).xz;
+        #endif`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>\nvarying vec2 vCloudGround;\nuniform vec4 cloudShadows[${count}];`)
       .replace('#include <color_fragment>', `#include <color_fragment>

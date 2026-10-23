@@ -82,7 +82,13 @@ function waterMaterialOf({ center, near, far }) {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec2 vWaterPos;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWaterPos = (modelMatrix * vec4(transformed, 1.0)).xz;');
+      // 島的側壁是 InstancedMesh（island-body-view.js），世界座標要先乘上實例矩陣。
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vec4 waterWorld = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          waterWorld = instanceMatrix * waterWorld;
+        #endif
+        vWaterPos = (modelMatrix * waterWorld).xz;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
         varying vec2 vWaterPos;
