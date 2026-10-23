@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -115,6 +115,8 @@ test('島嶼檢視的 3D 材質色碼全部被禁用色檢查掃到，且都不�
 test('本 repo 的網站文案與配色，以正式原始資料建置後通過品牌用語掃描與禁用色檢查', () => {
   const dir = mkdtempSync(join(tmpdir(), 'repo-site-'));
   cpSync(repoPath('site'), dir, { recursive: true });
+  // 上一次建置留下的 repo 文件副本可能已過期，不帶進來，免得結果取決於有沒有先建置
+  rmSync(join(dir, 'data', 'repo-files'), { recursive: true, force: true });
   mkdirSync(join(dir, 'data'), { recursive: true });
   writeFileSync(join(dir, 'data', 'dataset.json'), JSON.stringify(buildPublicDataset(raw)));
   const site = openSite(dir);
