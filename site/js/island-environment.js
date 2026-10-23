@@ -3,7 +3,7 @@
 // 著色器的混色比例（光暈、星星、閃光）也取自 island-daylight.js，禁用色測試照同一組比例檢查。
 
 import * as THREE from 'three';
-import { glowLevel, KEYFRAMES, SKY_HALO, STAR_COLOR, WATER_SPARKLE } from './island-daylight.js';
+import { glowLevel, KEYFRAMES, SKY_HALO, STAR_COLOR, WATER_SPARKLE, WATER_STARS } from './island-daylight.js';
 import { SEA_LEVEL } from './island-terrain.js';
 
 const SKY_RADIUS = 300;
@@ -69,6 +69,8 @@ function waterMaterialOf({ center, near, far }) {
     waterShallow: { value: new THREE.Color() },
     waterDeep: { value: new THREE.Color() },
     waterSparkle: { value: new THREE.Color() },
+    waterStar: { value: new THREE.Color(STAR_COLOR) },
+    waterNight: { value: 0 },
     waterTime: { value: 0 },
     waterCenter: { value: new THREE.Vector2(center.x, center.z) },
     waterRange: { value: new THREE.Vector2(near, far) },
@@ -87,6 +89,8 @@ function waterMaterialOf({ center, near, far }) {
         uniform vec3 waterShallow;
         uniform vec3 waterDeep;
         uniform vec3 waterSparkle;
+        uniform vec3 waterStar;
+        uniform float waterNight;
         uniform float waterTime;
         uniform vec2 waterCenter;
         uniform vec2 waterRange;`)
@@ -99,6 +103,11 @@ function waterMaterialOf({ center, near, far }) {
           vec3 water = mix(waterShallow, waterDeep, clamp(depth + drift * 0.08, 0.0, 1.0));
           float glint = sin(p.x * 4.1 + waterTime * 1.7) * sin(p.y * 3.7 - waterTime * 1.3) * sin((p.x + p.y) * 2.3 + waterTime * 2.1);
           water = mix(water, waterSparkle, smoothstep(0.8, 0.98, glint) * (1.0 - 0.7 * depth) * ${WATER_SPARKLE.toFixed(3)});
+          // 星光倒影：水面切成小格，少數格子中央一個小圓點，位置固定不隨時間動；離島越遠越明顯。
+          vec2 cell = p * 1.6;
+          float pick = fract(sin(dot(floor(cell), vec2(127.1, 311.7))) * 43758.5453);
+          float star = step(0.985, pick) * (1.0 - smoothstep(0.08, 0.16, length(fract(cell) - 0.5)));
+          water = mix(water, waterStar, star * waterNight * smoothstep(0.1, 0.5, depth) * ${WATER_STARS.toFixed(3)});
           diffuseColor.rgb *= water;
         }`);
   };
@@ -169,6 +178,7 @@ export function createEnvironment(scene, { center, radius, quality, waterRadius 
       water.waterShallow.value.setHex(lighting.waterShallow);
       water.waterDeep.value.setHex(lighting.waterDeep);
       water.waterSparkle.value.setHex(lighting.sunGlow);
+      water.waterNight.value = lighting.night;
       glowMaterial.color.setScalar(glowLevel(lighting.night));
       renderer.toneMappingExposure = lighting.exposure;
     },

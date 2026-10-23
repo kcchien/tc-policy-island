@@ -58,6 +58,9 @@ export const COLOR_KEYS = new Set([
 export const SKY_HALO = 0.35;
 export const STAR_COLOR = 0xf2edd9;
 export const WATER_SPARKLE = 0.6;
+// 夜裡海面映著的星光：往 STAR_COLOR 最多混到 WATER_STARS（乘上夜間係數）。鏡頭的俯角看不到地平線以上的天空，
+// 星星主要靠海面倒影呈現。
+export const WATER_STARS = 0.8;
 
 // 自動時段：依台灣時間（UTC+8，沒有日光節約時間）選時段，不看瀏覽者的時區。
 // 每段的開始時刻（當天第幾分鐘），19:00 以後到隔天 05:00 是夜晚。

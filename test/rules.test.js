@@ -15,7 +15,7 @@ import brandTermsGate from '../scripts/gates/brand-terms.js';
 import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
 import { extractColors, forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
 import {
-  blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES, SKY_HALO, STAR_COLOR, WATER_SPARKLE,
+  blendLighting, COLOR_KEYS, glowLevel, KEYFRAMES, SKY_HALO, STAR_COLOR, WATER_SPARKLE, WATER_STARS,
 } from '../site/js/island-daylight.js';
 import { RIDGE_RINGS, silhouetteColor, terrainColor } from '../site/js/island-terrain.js';
 
@@ -180,7 +180,9 @@ test('天空的太陽光暈與星星、水面的深淺漂移與閃光、遠山�
           // 水面：淺到深，再往閃光色（太陽光暈色）混到 WATER_SPARKLE。
           const water = mix(l.waterShallow, l.waterDeep, j);
           check(`${at} 水 ${j.toFixed(1)}`, water);
-          check(`${at} 閃光 ${j.toFixed(1)}`, mix((water.r << 16) | (water.g << 8) | water.b, l.sunGlow, WATER_SPARKLE * j));
+          const waterHex = (water.r << 16) | (water.g << 8) | water.b;
+          check(`${at} 閃光 ${j.toFixed(1)}`, mix(waterHex, l.sunGlow, WATER_SPARKLE * j));
+          check(`${at} 星光倒影 ${j.toFixed(1)}`, mix(waterHex, STAR_COLOR, WATER_STARS * j));
         }
         for (let ring = 0; ring < RIDGE_RINGS; ring++) {
           const hex = silhouetteColor(l, ring);

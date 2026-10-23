@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import { ambientAt, planOutskirts, SEA_LEVEL, silhouetteColor, TERRAIN_PALETTE } from './island-terrain.js';
+import { PALETTE } from './island-models.js';
 
 // 夜間係數超過這個值，鳥回巢不畫。
 const BIRDS_UNTIL_NIGHT = 0.75;
@@ -290,8 +291,11 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     };
     solid(new THREE.CylinderGeometry(0.16, 0.26, height * 0.78, 10), TERRAIN_PALETTE.lighthouse, height * 0.39);
     solid(new THREE.CylinderGeometry(0.2, 0.22, height * 0.14, 10), TERRAIN_PALETTE.lighthouseBand, height * 0.45);
-    const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, height * 0.12, 8), environment.glowMaterial);
-    lamp.position.y = height * 0.84;
+    // 發光材質本身是白色乘倍率，顏色由實例色給（與島上路燈同色）。
+    const lamp = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.15, 0.15, height * 0.12, 8), environment.glowMaterial, 1);
+    lamp.setMatrixAt(0, m.makeTranslation(0, height * 0.84, 0));
+    lamp.setColorAt(0, color.setHex(PALETTE.lampGlow));
+    lamp.computeBoundingSphere();
     tower.add(lamp);
     solid(new THREE.ConeGeometry(0.2, height * 0.1, 8), TERRAIN_PALETTE.lighthouseBand, height * 0.95);
     group.add(tower);
