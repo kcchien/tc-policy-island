@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module';
-import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildViewModel } from '../../site/js/view-model.js';
 import { islandLayout } from '../../site/js/island-layout.js';
@@ -23,10 +22,11 @@ export default {
   id: 'fixed-motion',
   name: '動態數量固定：每個議題區格子的動態數量與強度相同，且不隨政見資料改變',
   check(site) {
-    const path = join(site.dir, MOTION_MODULE);
-    if (!existsSync(path)) return [`找不到動態配置模組 ${MOTION_MODULE}`];
+    if (!site.files().includes(MOTION_MODULE)) return [`找不到動態配置模組 ${MOTION_MODULE}`];
     // Node 24 可以同步 require ES 模組；關卡介面是同步的。
-    const { motionPlan, MOTION_LEVELS } = createRequire(import.meta.url)(path);
+    // 配置來自網站上的模組；比對用的簽章（motionSignature）與島嶼配置用 repo 的版本，
+    // 網站上的模組不能自己決定什麼算相同。
+    const { motionPlan, MOTION_LEVELS } = createRequire(import.meta.url)(join(site.dir, MOTION_MODULE));
     const dataset = site.dataset();
     const layout = islandLayout(buildViewModel(dataset));
     const areaIds = layout.tiles.filter((t) => t.kind === 'area').map((t) => t.id);

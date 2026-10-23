@@ -5,17 +5,13 @@
 
 import * as THREE from 'three';
 import { citizenPose, loopPose, motionPlan, vehiclePose } from './island-motion.js';
-import { glowSourceMaterial, sharedGeometry } from './island-kit.js';
-import { material, PALETTE, TILE_SURFACE } from './island-models.js';
+import { material, PALETTE, PARTS, TILE_SURFACE } from './island-models.js';
 
 // 3D 材質色碼，受禁用色檢查（ADR 0001）。衣服只用低飽和的大地色，不用任何政黨或候選人的識別色。
 export const MOTION_PALETTE = {
   road: 0x8c847b,
-  roadEdge: 0x6f6862,
   dike: 0x8f8476,
-  rail: 0x4f4a45,
   skin: 0xc49a7c,
-  hair: 0x3a2f28,
   trousers: 0x4f4a45,
   clothes: [0x8a5a44, 0x9a7b55, 0x6f6a58, 0xa86f5a, 0x7c6f66, 0xb59a74],
   train: 0x7a5c4c,
@@ -29,32 +25,31 @@ export const MOTION_PALETTE = {
   stone: 0xa59a8c,
 };
 
-// 環線的堤頂高度：水面（y = 0.12）之上、格子頂面之下。
+// 環線的堤：堤頂高度在水面（y = 0.12）之上、格子頂面之下；轉角放圓墩補滿接縫。
 const RING_Y = 0.18;
+const DIKE_HEIGHT = 0.08;
+const DIKE_WIDTH = 0.17;
+// 路面：寬度跨過格子間的縫，每段多鋪一點蓋住轉角。
 const ROAD_WIDTH = 0.08;
+const ROAD_THICKNESS = 0.006;
 
-// 與 island-models.js 用同樣的零件代號，同種形體合進同一桶。
-const unitBox = () => sharedGeometry('box', () => new THREE.BoxGeometry(1, 1, 1));
-const unitCyl = (segments = 8) => sharedGeometry(`cyl${segments}:1:1`, () => new THREE.CylinderGeometry(1, 1, 1, segments));
-const unitIco = () => sharedGeometry('ico', () => new THREE.IcosahedronGeometry(1, 0));
+// 零件庫的共用單位幾何（零件代號與 island-models.js 相同，同種形體合進同一桶）。
+const unitBox = () => PARTS.box(1, 1, 1).geometry;
+const unitCyl = (segments = 8) => PARTS.cyl(1, 1, 1, segments).geometry;
+const unitIco = () => PARTS.ico(1).geometry;
 
-// 靜態零件：共用單位幾何加縮放，instancify 會合批。
-function part(geometry, color, { scale = [1, 1, 1], x = 0, y = 0, z = 0, rotY = 0 } = {}) {
-  const m = new THREE.Mesh(geometry, material(color));
-  m.scale.set(...scale);
-  m.position.set(x, y, z);
-  m.rotation.y = rotY;
-  m.castShadow = true;
-  m.receiveShadow = true;
-  return m;
-}
+// 靜態零件：共用單位幾何撐成 scale，instancify 會合批。
+const part = (geometry, color, { scale = [1, 1, 1], ...at } = {}) => PARTS.mesh({ geometry, scale }, color, at);
+
+// 逐實例上色的零件共用一份材質（底色維持預設，乘上實例顏色）。
+let tintedMaterial = null;
 
 // 會動的零件：每種一個 InstancedMesh，原點在零件的轉軸。
-// color 是單一顏色，或每個實例一個顏色的函式 (i) → 色碼（材質底色維持預設，乘上實例顏色）。
-// 發光件用共用的發光材質，顏色同樣寫在實例上。
+// color 是單一顏色，或每個實例一個顏色的函式 (i) → 色碼。發光件用共用的發光材質，顏色同樣寫在實例上。
 function movingMesh(geometry, color, count, { glowMaterial = null } = {}) {
   const perInstance = typeof color === 'function' || glowMaterial;
-  const base = glowMaterial ?? (perInstance ? new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 }) : material(color));
+  tintedMaterial ??= new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 });
+  const base = glowMaterial ?? (perInstance ? tintedMaterial : material(color));
   const mesh = new THREE.InstancedMesh(geometry, base, count);
   if (perInstance) {
     const c = new THREE.Color();
@@ -71,7 +66,9 @@ function movingMesh(geometry, color, count, { glowMaterial = null } = {}) {
 
 const boxGeometry = (w, h, d, { pivot = [0, 0, 0] } = {}) => new THREE.BoxGeometry(w, h, d).translate(...pivot);
 
+// 道具姿勢換算用的暫存，每幀重複使用。
 const ripple = new THREE.Matrix4();
+const jet = new THREE.Vector3();
 
 // 循環道具：每個題材的靜態底座與會動的零件，先在半徑 0.08、高 0.4 以內組好，
 // 放上格子時放大 LOOP_SCALE 倍（半徑 0.1，不碰標記與元素區，見 island-motion.js 的 LOOP_SPOTS）。
@@ -102,7 +99,7 @@ const LOOP_PROPS = {
     moving: [{
       geometry: () => new THREE.ConeGeometry(0.04, 0.14, 6, 1, true).translate(0, -0.07, 0).rotateX(Math.PI),
       color: PALETTE.shallow,
-      transform: (pose, m) => m.makeRotationY(pose.spin).scale(new THREE.Vector3(1, pose.jet, 1)).setPosition(0, 0.12, 0),
+      transform: (pose, m) => m.makeRotationY(pose.spin).scale(jet.set(1, pose.jet, 1)).setPosition(0, 0.12, 0),
     }],
   },
   flag: {
@@ -201,18 +198,19 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   for (const { from, to } of plan.roads) {
     const [dx, dz] = [to[0] - from[0], to[1] - from[1]];
     roads.add(part(unitBox(), MOTION_PALETTE.road, {
-      scale: [Math.hypot(dx, dz) + ROAD_WIDTH * 0.6, 0.006, ROAD_WIDTH],
-      x: (from[0] + to[0]) / 2, y: TILE_SURFACE + 0.003, z: (from[1] + to[1]) / 2,
+      scale: [Math.hypot(dx, dz) + ROAD_WIDTH * 0.6, ROAD_THICKNESS, ROAD_WIDTH],
+      x: (from[0] + to[0]) / 2, y: TILE_SURFACE + ROAD_THICKNESS / 2, z: (from[1] + to[1]) / 2,
       rotY: -Math.atan2(dz, dx),
     }));
   }
-  // 環線：貼著水面的堤，接頭放圓墩補滿轉角；堤上兩條車道各一條軌道。
+  // 環線：貼著水面的堤，火車與公車分走內外兩條車道。
+  const dikeY = RING_Y - DIKE_HEIGHT / 2;
   plan.ring.forEach((from, i) => {
     const to = plan.ring[(i + 1) % plan.ring.length];
     const [dx, dz] = [to[0] - from[0], to[1] - from[1]];
-    const common = { x: (from[0] + to[0]) / 2, z: (from[1] + to[1]) / 2, rotY: -Math.atan2(dz, dx) };
-    roads.add(part(unitBox(), MOTION_PALETTE.dike, { ...common, scale: [Math.hypot(dx, dz), 0.08, 0.17], y: RING_Y - 0.04 }));
-    roads.add(part(unitCyl(8), MOTION_PALETTE.dike, { scale: [0.085, 0.08, 0.085], x: from[0], y: RING_Y - 0.04, z: from[1] }));
+    const at = { x: (from[0] + to[0]) / 2, y: dikeY, z: (from[1] + to[1]) / 2, rotY: -Math.atan2(dz, dx) };
+    roads.add(part(unitBox(), MOTION_PALETTE.dike, { ...at, scale: [Math.hypot(dx, dz), DIKE_HEIGHT, DIKE_WIDTH] }));
+    roads.add(part(unitCyl(8), MOTION_PALETTE.dike, { scale: [DIKE_WIDTH / 2, DIKE_HEIGHT, DIKE_WIDTH / 2], x: from[0], y: dikeY, z: from[1] }));
   });
   scene.add(roads);
 
@@ -261,13 +259,14 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   const carBody = movingMesh(lifted(), (i) => cars[i].spec.color, cars.length);
   const carRoof = movingMesh(lifted(), (i) => cars[i].spec.roof, cars.length);
   const carWindows = movingMesh(new THREE.BoxGeometry(1, 1, 1), PALETTE.windowGlow, cars.length, { glowMaterial });
-  const headlights = movingMesh(new THREE.BoxGeometry(0.008, 0.014, 0.05), PALETTE.lampGlow, cars.length, { glowMaterial });
+  // 車燈只在每輛車的第一節車頭。
+  const leads = cars.filter((car) => car.index === 0);
+  const headlights = movingMesh(new THREE.BoxGeometry(0.008, 0.014, 0.05), PALETTE.lampGlow, leads.length, { glowMaterial });
   scene.add(carBody, carRoof, carWindows, headlights);
 
   const m = new THREE.Matrix4();
   const local = new THREE.Matrix4();
   const place = new THREE.Matrix4();
-  const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
   const up = new THREE.Vector3(0, 1, 0);
   const q = new THREE.Quaternion();
   const v = new THREE.Vector3();
@@ -275,8 +274,13 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   // heading 是 atan2(dz, dx)；零件的長度方向是 +x，繞 y 轉 -heading 才會對齊行進方向。
   const placeAt = (x, y, z, heading, scale = 1) => place.compose(v.set(x, y, z), q.setFromAxisAngle(up, -heading), s.setScalar(scale));
 
+  const citizenMeshes = [body, head, legs];
+  const carMeshes = [carBody, carRoof, carWindows, headlights];
+  const poses = {};
+  const vehiclePoses = new Map();
+
   function update(t) {
-    const poses = Object.fromEntries(Object.keys(LOOP_PROPS).map((theme) => [theme, loopPose(theme, t)]));
+    for (const theme in LOOP_PROPS) poses[theme] = loopPose(theme, t);
     for (const { theme, piece, mesh, spots } of movers) {
       spots.forEach(({ tile, loop }, i) => {
         placeAt(tile.center.x + loop.x, TILE_SURFACE + liftOf(tile.id), tile.center.z + loop.z, loop.mirror ? Math.PI : 0, LOOP_SCALE);
@@ -291,15 +295,15 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
       placeAt(pose.x, TILE_SURFACE + 0.006 + pose.bob + liftOf(tile.id), pose.z, pose.heading);
       body.setMatrixAt(i, place);
       head.setMatrixAt(i, place);
-      for (const side of [0, 1]) {
-        const swing = side === 0 ? pose.legSwing : -pose.legSwing;
-        local.makeRotationZ(swing).setPosition(0, CITIZEN.hip, side === 0 ? -CITIZEN.legGap : CITIZEN.legGap);
-        legs.setMatrixAt(i * 2 + side, m.multiplyMatrices(place, local));
-      }
+      // 兩條腿反向擺動。
+      local.makeRotationZ(pose.legSwing).setPosition(0, CITIZEN.hip, -CITIZEN.legGap);
+      legs.setMatrixAt(i * 2, m.multiplyMatrices(place, local));
+      local.makeRotationZ(-pose.legSwing).setPosition(0, CITIZEN.hip, CITIZEN.legGap);
+      legs.setMatrixAt(i * 2 + 1, m.multiplyMatrices(place, local));
     });
-    for (const mesh of [body, head, legs]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of citizenMeshes) mesh.instanceMatrix.needsUpdate = true;
 
-    const vehiclePoses = new Map(plan.vehicles.map((vehicle) => [vehicle, vehiclePose(plan.ring, vehicle, t)]));
+    for (const vehicle of plan.vehicles) vehiclePoses.set(vehicle, vehiclePose(plan.ring, vehicle, t, plan.ringLength));
     cars.forEach(({ vehicle, index, spec }, i) => {
       const pose = vehiclePoses.get(vehicle)[index];
       placeAt(pose.x, RING_Y, pose.z, pose.heading);
@@ -308,11 +312,12 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
       carRoof.setMatrixAt(i, m.multiplyMatrices(place, local));
       local.makeScale(spec.length * 0.8, spec.height * 0.22, spec.width * 1.04).setPosition(0, spec.height * 0.55, 0);
       carWindows.setMatrixAt(i, m.multiplyMatrices(place, local));
-      // 車燈只在每輛車的第一節車頭。
-      if (index === 0) headlights.setMatrixAt(i, m.multiplyMatrices(place, local.makeTranslation(spec.length / 2 + 0.002, spec.height * 0.3, 0)));
-      else headlights.setMatrixAt(i, hidden);
+      if (index === 0) {
+        local.makeTranslation(spec.length / 2 + 0.002, spec.height * 0.3, 0);
+        headlights.setMatrixAt(leads.indexOf(cars[i]), m.multiplyMatrices(place, local));
+      }
     });
-    for (const mesh of [carBody, carRoof, carWindows, headlights]) mesh.instanceMatrix.needsUpdate = true;
+    for (const mesh of carMeshes) mesh.instanceMatrix.needsUpdate = true;
   }
 
   update(0);

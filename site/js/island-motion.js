@@ -52,9 +52,10 @@ export function motionPlan(layout, { level = 'high' } = {}) {
   const counts = MOTION_LEVELS[level] ?? MOTION_LEVELS.high;
   let areaIndex = 0;
   const tiles = layout.tiles.map(({ id, kind, position }) => {
-    if (kind !== 'area') return { id, kind, center: { x: position.x, z: position.z }, theme: null, loops: [], citizens: [], path: [] };
+    if (kind !== 'area') return { id, kind, center: { x: position.x, z: position.z }, theme: null, loops: [], citizens: [], path: [], pathLength: 0 };
     const theme = MOTION_THEMES[areaIndex % MOTION_THEMES.length].id;
     areaIndex += 1;
+    const path = hexVertices(CITIZEN_APOTHEM).map(([x, z]) => [position.x + x, position.z + z]);
     return {
       id,
       kind,
@@ -67,7 +68,8 @@ export function motionPlan(layout, { level = 'high' } = {}) {
         speed: CITIZEN_SPEED,
         stepSeconds: STEP_SECONDS,
       })),
-      path: hexVertices(CITIZEN_APOTHEM).map(([x, z]) => [position.x + x, position.z + z]),
+      path,
+      pathLength: pathLength(path),
     };
   });
   const { roads, ring } = roadNetwork(layout);
@@ -75,7 +77,7 @@ export function motionPlan(layout, { level = 'high' } = {}) {
     ...Array.from({ length: counts.trains }, (_, i) => ({ kind: 'train', phase: i / counts.trains, speed: TRAIN_SPEED, direction: 1, lane: RING_LANE, cars: 3 })),
     ...Array.from({ length: counts.buses }, (_, i) => ({ kind: 'bus', phase: (i + 0.5) / counts.buses, speed: BUS_SPEED, direction: -1, lane: -RING_LANE, cars: 1 })),
   ];
-  return { level, tiles, roads, ring, vehicles };
+  return { level, tiles, roads, ring, ringLength: pathLength(ring), vehicles };
 }
 
 const keyOf = ([x, z]) => `${Math.round(x * 1e4) + 0},${Math.round(z * 1e4) + 0}`;
@@ -129,9 +131,8 @@ export function pathLength(points) {
 }
 
 // 沿封閉折線走 s 的位置與行進方向（heading = atan2(dz, dx)），s 可為負或超過一圈。
-// lane 是往行進方向右側（俯視、+z 朝下時的右手邊）的偏移。
-export function pointAlong(points, s, { lane = 0 } = {}) {
-  const total = pathLength(points);
+// lane 是往行進方向右側（俯視、+z 朝下時的右手邊）的偏移；total 是預先算好的總長（每幀呼叫時省得重算）。
+export function pointAlong(points, s, { lane = 0, total = pathLength(points) } = {}) {
   let rest = ((s % total) + total) % total;
   for (let i = 0; i < points.length; i++) {
     const [x, z] = points[i];
@@ -152,8 +153,8 @@ const cycle = (t, period) => ((t / period) % 1 + 1) % 1;
 
 // 市民的位置、朝向與腿的擺角（弧度，前後對稱）。
 export function citizenPose(tile, citizen, t) {
-  const s = citizen.phase * pathLength(tile.path) + citizen.speed * t;
-  const { x, z, heading } = pointAlong(tile.path, s);
+  const s = citizen.phase * tile.pathLength + citizen.speed * t;
+  const { x, z, heading } = pointAlong(tile.path, s, { total: tile.pathLength });
   const step = TAU * (cycle(t, citizen.stepSeconds) + citizen.phase);
   return { x, z, heading, legSwing: 0.45 * Math.sin(step), bob: 0.006 * Math.abs(Math.cos(step)) };
 }
@@ -161,14 +162,13 @@ export function citizenPose(tile, citizen, t) {
 // 車廂之間的距離（場景單位，車頭到車頭）。
 export const CAR_SPACING = 0.36;
 
-// 車輛每節車廂的位置與朝向。direction 為 -1 時逆著環線的頂點順序走。
-export function vehiclePose(ring, vehicle, t) {
-  const head = vehicle.phase * pathLength(ring) + vehicle.direction * vehicle.speed * t;
+// 車輛每節車廂的位置與朝向。direction 為 -1 時逆著環線的頂點順序走。total 是環線總長（motionPlan 的 ringLength）。
+export function vehiclePose(ring, vehicle, t, total = pathLength(ring)) {
+  const head = vehicle.phase * total + vehicle.direction * vehicle.speed * t;
   return Array.from({ length: vehicle.cars }, (_, i) => {
-    const s = head - vehicle.direction * i * CAR_SPACING;
-    // 逆向行駛時右側是環線順向的左側。
-    const pose = pointAlong(ring, s, { lane: vehicle.lane });
-    return vehicle.direction < 0 ? { ...pose, heading: pose.heading + Math.PI } : pose;
+    const pose = pointAlong(ring, head - vehicle.direction * i * CAR_SPACING, { lane: vehicle.lane, total });
+    if (vehicle.direction < 0) pose.heading += Math.PI;
+    return pose;
   });
 }
 
