@@ -85,7 +85,7 @@
     "departments": ["原住民族事務委員會"],
     "description": "原住民族的語言文化、職業培力、經濟與健康照顧。",
     "axial": [1, -1],
-    "localElementId": "baxian-mountain"
+    "localElementId": "yuanzui-mountain"
   },
   {
     "id": "hakka-affairs",
@@ -93,7 +93,7 @@
     "departments": ["客家事務委員會"],
     "description": "客家語言、文化與客庄發展。",
     "axial": [-1, 0],
-    "localElementId": "toukeshan"
+    "localElementId": "ban-tiao"
   },
   {
     "id": "environment",
@@ -133,7 +133,7 @@
     "departments": ["建設局"],
     "description": "公園、綠地與遊戲場。建設局的道路橋梁業務歸交通議題區。",
     "axial": [3, -2],
-    "localElementId": "formosan-landlocked-salmon"
+    "localElementId": "qijiawan-creek"
   },
   {
     "id": "civil-affairs",

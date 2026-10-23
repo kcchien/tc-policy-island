@@ -181,7 +181,7 @@ test('議題區指向不存在的元素、兩區共用同一元素、元素缺�
   assert.deepEqual(validationErrors(raw), [
     '元素 el-b：缺少欄位 reason',
     '元素 el-c：欄位 category 應為其中之一：自然景觀、小吃、老建築，實際為 "地標"',
-    '議題區 area-b：在地感元素 el-a 已配給議題區 area-a，每個元素只配一區',
+    '議題區 area-b：在地感元素 el-a 已放在議題區 area-a，每個在地感元素只放一格',
     '議題區 area-c：localElementId 指向不存在的元素 el-x',
   ]);
 });
@@ -198,7 +198,7 @@ test('裝飾格不屬於任何議題區，座標不得與議題區重疊，元�
 
   assert.deepEqual(validationErrors(raw), [
     '裝飾格 tile-2：軸向座標 [1,0] 與 area-b 重複',
-    '裝飾格 tile-3：在地感元素 el-a 已配給議題區 area-a，每個元素只配一區',
+    '裝飾格 tile-3：在地感元素 el-a 已放在議題區 area-a，每個在地感元素只放一格',
   ]);
 });
 

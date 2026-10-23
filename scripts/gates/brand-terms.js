@@ -1,11 +1,17 @@
-import { createScanner, loadBrandTerms, TIER_NAMES } from '../lib/brand-terms.js';
-import { DATASET_PATH } from './site.js';
+import { createScanner, loadBrandTerms, TIER_NAMES, TIERS } from '../lib/brand-terms.js';
+import { DATASET_PATH, THIRD_PARTY } from './site.js';
 
 // 掃描整理者撰寫的文字：網站文案、公開資料集、網址與檔名。
 // 不掃候選人本人的文字：原文引述、出處快照、出處的原網址、存檔網址與標題。
 // three.js 等第三方程式碼不是整理者文字，只掃檔名。
-const SKIP_CONTENT = [/^vendor\//, /^data\/snapshots\//, new RegExp(`^${DATASET_PATH}$`)];
+const SKIP_CONTENT = [THIRD_PARTY, /^data\/snapshots\//];
 const TEXT_FILE = /(\.(html|css|js|mjs|json|svg|txt|md|webmanifest|xml)|\/?_headers|\/?_redirects)$/;
+const CODE_FILE = /\.(css|js|mjs)$/;
+
+// 引號或反引號包住的字串內容。
+function stringLiterals(code) {
+  return [...code.matchAll(/(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g)].map((m) => m[2]);
+}
 
 // 公開資料集中不掃的欄位：候選人本人的文字，以及雜湊、時間戳記這類非文字欄位。
 const SKIP_FIELD = [
@@ -41,12 +47,21 @@ export default {
     const failures = [];
     for (const path of site.files()) {
       failures.push(...describe(`檔名 ${path}`, scan(path)));
+      // 公開資料集逐欄位掃，見下方。
+      if (path === DATASET_PATH) continue;
       if (SKIP_CONTENT.some((pattern) => pattern.test(path)) || !TEXT_FILE.test(path)) continue;
-      failures.push(...describe(path, scan(site.readText(path))));
+      const text = site.readText(path);
+      if (!CODE_FILE.test(path)) {
+        failures.push(...describe(path, scan(text)));
+        continue;
+      }
+      // 程式碼的註解與識別字不是讀者看到的文案，陣營高頻詞只掃字串；品牌用語整份都掃。
+      failures.push(...describe(path, scan(text, ['brand'])));
+      for (const literal of stringLiterals(text)) failures.push(...describe(path, scan(literal, ['frequent'])));
     }
     for (const [path, text] of stringFields(site.dataset(), '')) {
       if (SKIP_FIELD.some((pattern) => pattern.test(path))) continue;
-      const tiers = BRAND_ONLY_FIELD.test(path) ? ['brand'] : ['brand', 'frequent'];
+      const tiers = BRAND_ONLY_FIELD.test(path) ? ['brand'] : TIERS;
       failures.push(...describe(`${DATASET_PATH} ${path}`, scan(text, tiers)));
     }
     return failures;

@@ -19,10 +19,11 @@
 
 ## 抽取的色碼
 
-- 十六進位色碼 `#rgb`、`#rgba`、`#rrggbb`、`#rrggbbaa`；JS 另抽 `0xrrggbb`（three.js 材質寫法）。
-- `rgb()`、`rgba()`、`hsl()`、`hsla()`。
-- CSS 具名顏色（例如 `hotpink`）：CSS 只認屬性值中的字，JS 只認引號內完整的字串。
-- CSS 註解不檢查；完全透明的顏色不檢查；`vendor/` 的第三方程式碼不檢查。
+- 顏色寫法：十六進位 `#rgb`、`#rgba`、`#rrggbb`、`#rrggbbaa`，`rgb()`、`rgba()`、`hsl()`、`hsla()`，以及 CSS 具名顏色（例如 `hotpink`）。
+- CSS 只看大括號內宣告的值，選擇器裡的 `#id`、`:hover` 不算。
+- HTML 與 SVG 只看 `<style>`、`style` 屬性與 `fill`、`stroke`、`color`、`stop-color` 等顏色屬性的值。
+- JS 只看 `0xrrggbb`（three.js 材質寫法），以及整段就是一個顏色的字串（例如 `'#8e4b32'`）。
+- `var()`、`url()` 的內容、註解、完全透明的顏色、`vendor/` 的第三方程式碼都不檢查。
 
 ## 本站配色的檢查結果
 

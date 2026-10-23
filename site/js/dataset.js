@@ -225,7 +225,7 @@ function checkTiles(tiles, elementIds, errors) {
     const elementId = tile.localElementId;
     if (elementId === null) continue;
     if (!elementIds.has(elementId)) errors.push(`${where}：localElementId 指向不存在的元素 ${elementId}`);
-    else if (elementOwner.has(elementId)) errors.push(`${where}：在地感元素 ${elementId} 已配給${elementOwner.get(elementId)}，每個元素只配一區`);
+    else if (elementOwner.has(elementId)) errors.push(`${where}：在地感元素 ${elementId} 已放在${elementOwner.get(elementId)}，每個在地感元素只放一格`);
     else elementOwner.set(elementId, where);
   }
 }

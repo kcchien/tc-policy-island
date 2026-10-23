@@ -211,3 +211,53 @@ test('低飽和的灰青色、透明色與第三方程式碼中的色碼不擋',
 
   assert.equal(code, 0, output);
 });
+
+test('選擇器、錨點、字元參照、url() 與 var() 裡像色碼或顏色名稱的字不算色碼', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'css/main.css': '#add { color: var(--blue-ish); }\na:hover, .navy-link { background: url(img/green.png); }',
+    'index.html': '<a href="page.html#bad">&#123;</a><svg><rect fill="url(#fade)"/></svg><!-- #0000ff -->',
+    'js/island.js': "class A { #add() {} }\n// 舊色 '#0000ff'",
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.equal(code, 0, output);
+});
+
+test('SVG 與 HTML 的 fill、stroke、style 屬性與 <style> 內的色碼也會檢查', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'img/mark.svg': '<svg><rect fill="blue"/><circle stroke="#ff69b4"/></svg>',
+    'index.html': '<style>p { color: purple }</style><p style="background: #2e8b3d">x</p>',
+  });
+
+  const { output } = runGates(site);
+
+  assert.match(output, /img\/mark\.svg：色碼 blue 落在政黨色「藍」/);
+  assert.match(output, /img\/mark\.svg：色碼 #ff69b4 落在候選人識別色「粉紅」/);
+  assert.match(output, /index\.html：色碼 purple 落在候選人識別色「紫」/);
+  assert.match(output, /index\.html：色碼 #2e8b3d 落在政黨色「綠」/);
+});
+
+test('數字代號不因小數點或頓號前後的數字而誤擋，英文用語不擋較長的單字', () => {
+  const site = makeSite((dataset) => {
+    dataset.policies[0].summary = '每公升 0.168 元，路線 168.5 公里，第 12、345 號';
+  }, { ...COMPLIANT_FILES, 'index.html': '<p lang="en">Taichung Weather</p>' });
+
+  const { code, output } = runGates(site);
+
+  assert.equal(code, 0, output);
+});
+
+test('程式碼註解裡的陣營高頻詞不擋，字串裡的文案照擋', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island.js': "// 鏡頭飛行先加速再減速\nconst label = '查詢更安心';",
+  });
+
+  const { output } = runGates(site);
+
+  assert.doesNotMatch(output, /加速/);
+  assert.match(output, /js\/island\.js：含陣營高頻詞「安心」/);
+});

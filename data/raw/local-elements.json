@@ -35,18 +35,11 @@
     "reason": "大甲溪下切形成的河階地形，是自然地形；不收新社花海等由市府舉辦的活動。"
   },
   {
-    "id": "toukeshan",
-    "name": "頭嵙山",
+    "id": "yuanzui-mountain",
+    "name": "鳶嘴山",
     "category": "自然景觀",
-    "place": "北屯區",
-    "reason": "大坑山區的最高峰，是自然山岳；不收大坑一帶由市府興建的步道與設施。"
-  },
-  {
-    "id": "baxian-mountain",
-    "name": "八仙山",
-    "category": "自然景觀",
-    "place": "和平區",
-    "reason": "中央山脈支脈的自然山岳，森林遊樂區由中央林業主管機關管理，與市長任期無關。"
+    "place": "和平區與東勢區交界",
+    "reason": "大雪山林道旁的自然岩峰，是自然山岳，與市長任期無關。"
   },
   {
     "id": "daxueshan",
@@ -70,11 +63,11 @@
     "reason": "台中市最東端的自然高山，與市長任期無關。"
   },
   {
-    "id": "formosan-landlocked-salmon",
-    "name": "櫻花鉤吻鮭",
+    "id": "qijiawan-creek",
+    "name": "七家灣溪",
     "category": "自然景觀",
-    "place": "和平區七家灣溪",
-    "reason": "冰河時期留存的原生魚種，棲地保育由中央機關主管，與市長任期無關。"
+    "place": "和平區",
+    "reason": "大甲溪上游的高山溪流，位於中央管轄的國家公園內，是自然地形，與市長任期無關。"
   },
   {
     "id": "suncake",
@@ -110,6 +103,13 @@
     "category": "小吃",
     "place": "全市",
     "reason": "民間冰店發展出的傳統冰品，與市府政策無關。"
+  },
+  {
+    "id": "ban-tiao",
+    "name": "粄條",
+    "category": "小吃",
+    "place": "東勢區、石岡區等客庄",
+    "reason": "客庄的傳統米食，由民間小吃店傳承，與市府政策無關。"
   },
   {
     "id": "tube-rice-pudding",

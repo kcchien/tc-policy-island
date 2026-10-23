@@ -74,36 +74,63 @@ export function rgbToHsl({ r, g, b }) {
   return { h: (h * 60 + 360) % 360, s, l };
 }
 
-// 從檔案文字抽出色碼，回傳 { raw, h, s, l, alpha }。kind 為副檔名（css、js、html、svg）。
-// CSS 先去掉註解；具名顏色在 CSS 只認屬性值中的字，在 JS 只認引號內完整的字串。
-export function extractColors(text, kind) {
-  const source = kind === 'css' ? text.replace(/\/\*[\s\S]*?\*\//g, '') : text;
+// 一段顏色值（CSS 宣告值、屬性值、JS 字串）裡的色碼。var() 與 url() 的內容不是顏色，先拿掉。
+function colorsInValue(value) {
+  const text = value.replace(/\b(var|url)\([^)]*\)/gi, ' ');
   const found = [];
   const add = (raw, rgb, alpha = 1) => found.push({ raw, ...rgbToHsl(rgb), alpha });
-
-  for (const m of source.matchAll(/#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])/g)) {
+  for (const m of text.matchAll(/#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\w-])/g)) {
     const rgb = hexToRgb(m[1]);
     add(m[0], rgb, rgb.a);
   }
-  if (kind === 'js') {
-    for (const m of source.matchAll(/\b0x([0-9a-fA-F]{6})\b/g)) add(m[0], hexToRgb(m[1]));
-  }
-  for (const m of source.matchAll(/\brgba?\(([^)]*)\)/gi)) {
+  for (const m of text.matchAll(/\brgba?\(([^)]*)\)/gi)) {
     const { parts, alpha } = args(m[1]);
     add(m[0], { r: channel(parts[0], 255), g: channel(parts[1], 255), b: channel(parts[2], 255) }, alpha);
   }
-  for (const m of source.matchAll(/\bhsla?\(([^)]*)\)/gi)) {
+  for (const m of text.matchAll(/\bhsla?\(([^)]*)\)/gi)) {
     const { parts, alpha } = args(m[1]);
     found.push({ raw: m[0], h: ((parseFloat(parts[0]) % 360) + 360) % 360, s: parseFloat(parts[1]) / 100, l: parseFloat(parts[2]) / 100, alpha });
   }
-  const named = kind === 'js'
-    ? new RegExp(`(['"\`])(${NAMED})\\1`, 'gi')
-    : new RegExp(`(?<=:[^;{}<>]*)\\b(${NAMED})\\b`, 'gi');
-  for (const m of source.matchAll(named)) {
-    const name = (kind === 'js' ? m[2] : m[1]);
-    add(name, hexToRgb(NAMED_COLORS[name.toLowerCase()]));
+  for (const m of text.matchAll(new RegExp(`(?<![\\w-])(${NAMED})(?![\\w-])`, 'gi'))) {
+    add(m[1], hexToRgb(NAMED_COLORS[m[1].toLowerCase()]));
   }
   return found;
+}
+
+// CSS 只看宣告值（大括號內「屬性: 值」的值），選擇器裡的 #id 與 :hover 不算。
+function cssValues(css) {
+  return [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/\{([^{}]*)\}/g)]
+    .flatMap((block) => block[1].split(';'))
+    .filter((declaration) => declaration.includes(':'))
+    .map((declaration) => declaration.slice(declaration.indexOf(':') + 1));
+}
+
+// HTML 與 SVG 只看 <style>、style 屬性與顏色屬性（fill、stroke 等）的值。
+function markupValues(markup) {
+  const text = markup.replace(/<!--[\s\S]*?-->/g, '');
+  return [
+    ...[...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].flatMap((m) => cssValues(m[1])),
+    ...[...text.matchAll(/\sstyle\s*=\s*(["'])(.*?)\1/gi)].flatMap((m) => cssValues(`{${m[2]}}`)),
+    ...[...text.matchAll(/\s(?:fill|stroke|color|stop-color|flood-color|lighting-color|bgcolor)\s*=\s*(["'])(.*?)\1/gi)].map((m) => m[2]),
+  ];
+}
+
+// JS 只看 three.js 材質常用的 0xrrggbb，以及整段就是一個顏色的字串（例如 '#8e4b32'、'skyblue'）。
+// 註解先拿掉：區塊註解，以及行首或空白後的 //（網址的 :// 不受影響）。
+function jsColors(source) {
+  const js = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '$1');
+  return [
+    ...[...js.matchAll(/(?<![\w$])0x([0-9a-fA-F]{6})\b/g)]
+      .map((m) => ({ ...rgbToHsl(hexToRgb(m[1])), alpha: 1, raw: m[0] })),
+    ...[...js.matchAll(/(['"`])([^'"`\n]{1,40})\1/g)]
+      .flatMap((m) => colorsInValue(m[2]).filter((color) => color.raw === m[2].trim())),
+  ];
+}
+
+// 從檔案文字抽出色碼，回傳 { raw, h, s, l, alpha }。kind 為副檔名（css、js、html、svg）。
+export function extractColors(text, kind) {
+  if (kind === 'js') return jsColors(text);
+  return (kind === 'css' ? cssValues(text) : markupValues(text)).flatMap(colorsInValue);
 }
 
 function inRange(value, [from, to]) {
