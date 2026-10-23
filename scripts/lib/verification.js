@@ -33,6 +33,27 @@ export function checkLayer1(policy, snapshots) {
   return { status: problems.length === 0 ? 'pass' : 'fail', problems };
 }
 
+// 候選人資料的比對比政見嚴格：學歷與經歷要逐字照公報，只忽略空白與換行
+// （公報因欄寬換行、pdftotext 依字距插入空白），標點與全形半形都要相同。
+const removeWhitespace = (text) => text.replace(/\s+/gu, '');
+
+// 候選人資料的第一層：學歷與經歷每一項都須逐字出現在 profile.sourceId 的出處快照中。回傳格式同 checkLayer1。
+export function checkProfileLayer1(profile, snapshots) {
+  const snapshot = snapshots.get(profile.sourceId) ?? null;
+  if (snapshot === null) return { status: 'fail', problems: [`出處 ${profile.sourceId} 沒有可用的快照`] };
+  const normalized = removeWhitespace(snapshot);
+  const problems = [];
+  for (const field of ['education', 'experience']) {
+    if (profile[field].length === 0) problems.push(`${field} 沒有任何項目`);
+    profile[field].forEach((item, index) => {
+      const text = removeWhitespace(item);
+      if (text === '') problems.push(`${field}[${index}] 沒有任何文字`);
+      else if (!normalized.includes(text)) problems.push(`${field}[${index}] 未逐字出現在出處 ${profile.sourceId} 的快照中`);
+    });
+  }
+  return { status: problems.length === 0 ? 'pass' : 'fail', problems };
+}
+
 // 提示詞檔第一行是「版本：X」，其後以「## 系統提示」「## 判定提示」分段。
 function parsePromptFile(text, path) {
   const version = text.match(/^版本：(\S+)/)?.[1];

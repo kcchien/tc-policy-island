@@ -7,8 +7,22 @@
     "archiveError": "測試夾具不送存檔",
     "snapshotPath": "test/fixtures/snapshots/sample-src-yi.txt",
     "snapshotSha256": "a7c7228e9431485ed5b9b99aa3ee878ba46ab7e5de9f30e2e83597efe95a7906",
+    "snapshotNote": null,
     "sourceType": "official-website",
     "title": "範例乙政見頁",
+    "retrievedAt": "2026-10-23"
+  },
+  {
+    "id": "sample-bulletin-yi",
+    "candidateId": "sample-yi",
+    "url": "https://example.org/bulletin.pdf",
+    "archiveUrl": null,
+    "archiveError": "測試夾具不送存檔",
+    "snapshotPath": "test/fixtures/snapshots/sample-bulletin.txt",
+    "snapshotSha256": "abdffc6c9ef82563e0b4f81734856dd9b49e791b202f1780a243032528eb5fb5",
+    "snapshotNote": "測試夾具，內容虛構",
+    "sourceType": "election-bulletin",
+    "title": "範例選舉公報",
     "retrievedAt": "2026-10-23"
   }
 ]
