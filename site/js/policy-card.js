@@ -11,6 +11,26 @@ import {
   candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
 } from './ui-text.js';
 
+// 桌面島嶼檢視的卡片高度偏好：預設接近全高，使用者按「縮小卡片」改停靠在下方後記住。
+// localStorage 在隱私模式或被封鎖時會丟例外，讀寫失敗就用預設、不記住。
+const HEIGHT_KEY = 'policy-island:card-height';
+
+function readTallPreference() {
+  try {
+    return window.localStorage.getItem(HEIGHT_KEY) !== 'docked';
+  } catch {
+    return true;
+  }
+}
+
+function writeTallPreference(tall) {
+  try {
+    window.localStorage.setItem(HEIGHT_KEY, tall ? 'tall' : 'docked');
+  } catch {
+    // 記不住就下次用預設高度。
+  }
+}
+
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
 export const policyHref = (policyId) => `?policy=${encodeURIComponent(policyId)}`;
 export const areaHref = (areaId) => `?area=${encodeURIComponent(areaId)}`;
@@ -136,7 +156,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
   const dialog = el(
     'dialog',
-    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'docked' },
+    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'tall' },
     el(
       'div',
       { class: 'card-inner' },
@@ -218,13 +238,17 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   };
   expandButton.addEventListener('click', () => setExpanded(!expanded));
 
-  // 桌面島嶼檢視的卡片高度：停靠在下方（上方留給島）或放大成全高。
+  // 桌面島嶼檢視的卡片高度：接近全高（預設），或縮小停靠在下方、上方露出島。
   const setTall = (tall) => {
     dialog.dataset.height = tall ? 'tall' : 'docked';
-    heightButton.setAttribute('aria-pressed', String(tall));
+    heightButton.setAttribute('aria-pressed', String(!tall));
     heightButton.textContent = tall ? T.shrink : T.enlarge;
   };
-  heightButton.addEventListener('click', () => setTall(dialog.dataset.height !== 'tall'));
+  heightButton.addEventListener('click', () => {
+    const tall = dialog.dataset.height !== 'tall';
+    writeTallPreference(tall);
+    setTall(tall);
+  });
 
   filters.addEventListener('submit', (event) => event.preventDefault());
   filters.addEventListener('input', () => {
@@ -256,7 +280,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       render({ focusPolicyId });
       if (!dialog.open) {
         dialog.dataset.snap = 'half';
-        setTall(false);
+        setTall(readTallPreference());
         dialog.showModal();
       }
       const focused = focusPolicyId && body.querySelector(`#card-policy-${CSS.escape(focusPolicyId)}`);

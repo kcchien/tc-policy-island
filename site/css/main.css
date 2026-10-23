@@ -534,8 +534,9 @@ body[data-view="island"] .view-note {
   color: var(--laterite-soft);
 }
 
-/* 桌面島嶼檢視：政見卡片停靠在畫布下方、索引面板左側，約占三分之二高，上方留給島；
-   「放大卡片」改成全高。畫面偏移（island-view.js setCover）把選中的議題區移到卡片上方的可見區正中。遮罩放淡，島仍看得清楚。 */
+/* 桌面島嶼檢視：政見卡片占索引面板左側的接近全高（上下各留 --hud-gap），蓋住標題卡與工具列；
+   「縮小卡片」改為停靠在畫布下方、上方露出島，畫面偏移（island-view.js setCover）把選中的議題區移到可見區正中。
+   偏好記在瀏覽器（policy-card.js）。遮罩放淡。 */
 @media (min-width: 801px) {
   body[data-view="island"] .policy-card {
     position: fixed;
@@ -1249,6 +1250,8 @@ body[data-view="island"] .card-height {
   padding: 0 12px 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* 三欄一律預留捲軸寬度，政見少、不用捲動的欄內容寬才和其他欄相同 */
+  scrollbar-gutter: stable;
   background: var(--rice-deep);
   border-radius: var(--radius);
 }
@@ -1804,8 +1807,9 @@ body[data-view="island"] .card-height {
     font-size: 0.6875rem;
   }
 
-  body[data-view="island"] .site-subtitle {
-    font-size: 0.75rem;
+  /* 全高的政見卡片連索引面板一起蓋住（卡片開著時索引面板不能操作），三欄才不會太窄 */
+  body[data-view="island"] .policy-card[data-height="tall"] {
+    right: var(--hud-gap);
   }
 }
 
@@ -1861,10 +1865,6 @@ body[data-view="island"] .card-height {
 
   body[data-view="island"] .site-title {
     font-size: 1.25rem;
-  }
-
-  body[data-view="island"] .site-subtitle {
-    font-size: 0.6875rem;
   }
 
   body[data-view="island"] .title-disclosure {
