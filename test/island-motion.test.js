@@ -9,6 +9,8 @@ import {
   LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, vehiclePose,
 } from '../site/js/island-motion.js';
 import { islandBody, TILE_SLOTS } from '../site/js/island-body.js';
+import { heroPlan, heroSceneFor, partBounds } from '../site/js/island-heroes.js';
+import { decorPlan } from '../site/js/island-decor.js';
 import { fileURLToPath } from 'node:url';
 import { loadRawData } from '../scripts/lib/raw-data.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
@@ -172,17 +174,22 @@ const SURFACE = 0.44;
 const ELEMENT_MAX_Z = Math.max(TILE_SLOTS.hero.z + TILE_SLOTS.hero.size / 2, TILE_SLOTS.element.area.maxZ);
 const RAW_DIR = fileURLToPath(new URL('../data/raw', import.meta.url));
 const MARKER_TOP = SURFACE + 0.08;
-function blocked(from, camera, { x, z, radius, bottom = 0, height }) {
+// 障礙物是直立圓柱 { x, z, radius, bottom?, height }，或軸對齊的盒子 { min: [x, y, z], max }（y 從格子頂面量起）。
+function blocked(from, camera, obstacle) {
+  const { x, z, radius, bottom = 0, height = obstacle.max?.[1] } = obstacle;
   for (let k = 1; k <= 400; k++) {
     const t = k / 400;
     const [px, py, pz] = from.map((v, i) => v + (camera[i] - v) * t);
     if (py > SURFACE + height) return false;
-    if (py >= SURFACE + bottom && Math.hypot(px - x, pz - z) < radius) return true;
+    if (obstacle.min) {
+      const p = [px, py - SURFACE, pz];
+      if (p.every((c, i) => c >= obstacle.min[i] && c <= obstacle.max[i])) return true;
+    } else if (py >= SURFACE + bottom && Math.hypot(px - x, pz - z) < radius) return true;
   }
   return false;
 }
 
-test('放大後的道具、市民、放滿的主題場景位置與在地感元素都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
+test('放大後的道具、市民、主題場景、在地感元素與靜態裝飾都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
   const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
   const plan = motionPlan(layout);
   const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
@@ -196,10 +203,20 @@ test('放大後的道具、市民、放滿的主題場景位置與在地感元�
       .filter(() => tile.citizens.length > 0)
       .map(({ x, z }) => ({ x, z, radius: CITIZEN_RADIUS, height: CITIZEN_HEIGHT })),
   ]);
-  // 主題場景位置：放滿到高度上限，以外接底面的圓柱近似，主題場景接上後也不得擋到鄰島的標記。
-  const { hero } = TILE_SLOTS;
+  // 主題場景：每個零件的外框照擺放（每座同倍率，朝向不轉）放大平移。在地感元素以外接元素區的圓柱近似。
+  for (const hero of heroPlan(layout)) {
+    const { x, z, scale } = hero.transform;
+    for (const part of heroSceneFor(hero.areaId).parts) {
+      const b = partBounds(part);
+      const offset = [x, 0, z];
+      obstacles.push({ min: b.min.map((v, i) => offset[i] + v * scale), max: b.max.map((v, i) => offset[i] + v * scale) });
+    }
+  }
+  // 靜態裝飾：每件以最寬處為半徑、最高處為高的圓柱近似。
+  for (const tile of decorPlan(layout).tiles) {
+    for (const item of tile.items) obstacles.push({ x: tile.center.x + item.x, z: tile.center.z + item.z, radius: item.reach, height: item.height });
+  }
   for (const tile of layout.tiles.filter((t) => t.heroSlot)) {
-    obstacles.push({ x: tile.position.x + hero.x, z: tile.position.z + hero.z, radius: (hero.size / 2) * Math.SQRT2, height: hero.maxHeight * hero.size });
     const e = tile.elementSlot;
     obstacles.push({
       x: tile.position.x + (e.minX + e.maxX) / 2, z: tile.position.z + (e.minZ + e.maxZ) / 2,

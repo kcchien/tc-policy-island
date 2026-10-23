@@ -46,6 +46,9 @@ const COMPLIANT_FILES = {
   'js/island-motion.js': repoFile('site/js/island-motion.js'),
   'js/island-body.js': repoFile('site/js/island-body.js'),
   'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
+  'js/island-decor.js': repoFile('site/js/island-decor.js'),
+  'js/island-heroes.js': repoFile('site/js/island-heroes.js'),
+  'js/island-layout.js': repoFile('site/js/island-layout.js'),
   'js/ui-text.js': repoFile('site/js/ui-text.js'),
   ...REPO_FILES,
   ...PROFILE_SNAPSHOTS,
@@ -654,6 +657,73 @@ test('網站目錄缺少動態配置模組時，動態數量固定關卡不通�
 
   assert.notEqual(code, 0);
   assert.match(output, /js\/island-motion\.js/);
+});
+
+// 裝飾配置的替身：包住正式的 decorPlan，再由 change 竄改結果，模擬違規的配置。
+const decorModule = (change) => `${repoFile('site/js/island-decor.js').replace('export function decorPlan(', 'function realDecorPlan(')}
+export function decorPlan(layout) {
+  const plan = realDecorPlan(layout);
+  (${change})(plan, layout);
+  return plan;
+}
+`;
+
+test('某個議題區格子比其他格多一件裝飾時，裝飾數量固定關卡不通過並指出格子', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-decor.js': decorModule((plan) => {
+      const tile = plan.tiles.find((t) => t.id === 'area-b');
+      tile.items.push({ ...tile.items.find((i) => i.kind === 'bench'), x: 0.1 });
+    }),
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /✗ 裝飾數量固定：/);
+  assert.match(output, /area-b/);
+});
+
+test('某格的主題場景放大倍率不同、或不是依議題區識別碼選的場景時，裝飾數量固定關卡不通過', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-decor.js': decorModule((plan) => {
+      const [first, second] = plan.tiles.filter((t) => t.kind === 'area');
+      first.hero.transform.scale *= 1.3;
+      second.hero.sceneId = 'education';
+    }),
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /area-a/);
+  assert.match(output, /area-b.*education/);
+});
+
+test('裝飾配置隨政見資料改變時，裝飾數量固定關卡不通過', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-decor.js': decorModule((plan, layout) => {
+      // 有政見的格子多種一棵樹：每格都多，數量仍相同，但隨政見改變。
+      const lit = layout.tiles.flatMap((t) => t.markers).filter((m) => m.lit).length;
+      for (const tile of plan.tiles) for (let i = 0; i < lit; i++) tile.items.push({ ...tile.items[0], kind: 'tree' });
+    }),
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /換一份政見資料/);
+});
+
+test('網站目錄缺少裝飾配置模組時，裝飾數量固定關卡不通過', () => {
+  const { 'js/island-decor.js': _, ...files } = COMPLIANT_FILES;
+
+  const { code, output } = runGates(makeSite(() => {}, files));
+
+  assert.notEqual(code, 0);
+  assert.match(output, /js\/island-decor\.js/);
 });
 
 test('網站目錄放了音檔或程式引用音檔時，不載入音檔關卡不通過並指出檔案', () => {
