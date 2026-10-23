@@ -24,7 +24,13 @@ const MIME = {
 };
 
 async function resolveFile(urlPath) {
-  const path = normalize(join(root, decodeURIComponent(urlPath)));
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath);
+  } catch {
+    return null;
+  }
+  const path = normalize(join(root, decoded));
   if (path !== root && !path.startsWith(root + sep)) return null;
   const info = await stat(path).catch(() => null);
   if (!info) return null;

@@ -1,12 +1,9 @@
 // 檢視模型：公開資料集 → 議題區 × 候選人矩陣。島嶼檢視與表格檢視都只讀這個矩陣。
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
-export const NO_POLICY_LABEL = '未提出相關政見';
+import { CANDIDATE_ORDER_RULES } from './dataset.js';
 
-const CANDIDATE_ORDER_NOTES = {
-  'name-strokes': '候選人排列依姓名筆畫由少到多（號次抽籤前）',
-  'ballot-number': '候選人排列依選委會抽籤號次',
-};
+export const NO_POLICY_LABEL = '未提出相關政見';
 
 export function buildViewModel(dataset) {
   const rows = dataset.issueAreas.map((issueArea) => ({
@@ -29,7 +26,7 @@ export function buildViewModel(dataset) {
   return {
     meta: dataset.meta,
     noPolicyText: `${NO_POLICY_LABEL}（截至 ${dataset.meta.dataCutoffDate}）`,
-    candidateOrderNote: CANDIDATE_ORDER_NOTES[dataset.meta.candidateOrder],
+    candidateOrderNote: CANDIDATE_ORDER_RULES[dataset.meta.candidateOrder].note,
     candidates,
     rows,
   };

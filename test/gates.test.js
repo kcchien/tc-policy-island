@@ -42,6 +42,18 @@ test('公開資料混入未核對政見時，關卡以非零結束碼退出並�
   assert.match(output, /p-a1/);
 });
 
+test('政見缺少核對紀錄時，關卡以中文說明不通過原因', () => {
+  const site = makeSite((dataset) => {
+    delete dataset.policies[0].verification;
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /政見 p-a1 缺少核對紀錄/);
+  assert.doesNotMatch(output, /Cannot/);
+});
+
 test('網站目錄沒有公開資料集時，關卡不通過並提示先建置', () => {
   const dir = mkdtempSync(join(tmpdir(), 'gates-empty-'));
 

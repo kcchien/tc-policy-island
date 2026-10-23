@@ -1,9 +1,7 @@
-import { orderCandidates } from '../../site/js/dataset.js';
+import { CANDIDATE_ORDER_RULES, orderCandidates } from '../../site/js/dataset.js';
 import { buildViewModel } from '../../site/js/view-model.js';
 
 export const EXPECTED_CANDIDATE_COUNT = 3;
-
-const RULE_LABELS = { 'name-strokes': '依姓名筆畫', 'ballot-number': '依號次' };
 
 export default {
   id: 'candidate-columns',
@@ -18,7 +16,7 @@ export default {
     const { candidateOrder, candidates } = orderCandidates(dataset.candidates);
     const expected = candidates.map((c) => c.id);
     if (expected.join() !== actual.join()) {
-      failures.push(`候選人順序應為 ${expected.join('、')}（${RULE_LABELS[candidateOrder]}），實際為 ${actual.join('、')}`);
+      failures.push(`候選人順序應為 ${expected.join('、')}（依${CANDIDATE_ORDER_RULES[candidateOrder].keyName}），實際為 ${actual.join('、')}`);
     }
     if (dataset.meta.candidateOrder !== candidateOrder) {
       failures.push(`meta.candidateOrder 應為 ${candidateOrder}，實際為 ${dataset.meta.candidateOrder}`);

@@ -19,6 +19,18 @@ export const TAICHUNG_DISTRICTS = [
 // 核對狀態：pending 未核對、pass 通過、fail 不通過（第二層稱退回）。
 export const VERIFICATION_STATUSES = ['pending', 'pass', 'fail'];
 
+// 候選人排序規則。key 是排序依據的欄位，note 是頁面上的排序規則說明。
+export const CANDIDATE_ORDER_RULES = {
+  'name-strokes': { key: 'nameStrokes', keyName: '姓名筆畫', note: '候選人排列依姓名筆畫由少到多（號次抽籤前）' },
+  'ballot-number': { key: 'ballotNumber', keyName: '號次', note: '候選人排列依選委會抽籤號次' },
+};
+
+// 全部候選人都有號次才依號次；沒有候選人或尚未抽籤都依筆畫。
+export function candidateOrderOf(candidates) {
+  const byBallot = candidates.length > 0 && candidates.every((c) => c.ballotNumber !== null);
+  return byBallot ? 'ballot-number' : 'name-strokes';
+}
+
 export class DatasetValidationError extends Error {
   constructor(errors) {
     super(`原始資料有 ${errors.length} 處錯誤：\n${errors.join('\n')}`);
@@ -40,7 +52,7 @@ const TYPES = {
   sha256: { desc: '64 位小寫十六進位雜湊', ok: (v) => typeof v === 'string' && SHA256.test(v) },
   strings: { desc: '字串陣列', ok: (v) => Array.isArray(v) && v.every((s) => TYPES.string.ok(s)) },
   axial: { desc: '[q, r] 整數座標', ok: (v) => Array.isArray(v) && v.length === 2 && v.every(Number.isInteger) },
-  sourceType: { desc: `其中之一：${Object.keys(SOURCE_TYPES).join('、')}`, ok: (v) => v in SOURCE_TYPES },
+  sourceType: { desc: `其中之一：${Object.keys(SOURCE_TYPES).join('、')}`, ok: (v) => typeof v === 'string' && Object.hasOwn(SOURCE_TYPES, v) },
   status: { desc: `其中之一：${VERIFICATION_STATUSES.join('、')}`, ok: (v) => VERIFICATION_STATUSES.includes(v) },
   array: { desc: '陣列', ok: Array.isArray },
   object: { desc: '物件', ok: (v) => v !== null && typeof v === 'object' && !Array.isArray(v) },
@@ -169,14 +181,13 @@ function checkCandidates(candidates, sourcesById, errors) {
   if (withBallot.length > 0 && withBallot.length < candidates.length) {
     errors.push('候選人：號次只有部分填寫，須全部填寫（抽籤後）或全部為 null（抽籤前）');
   }
-  const byBallot = withBallot.length === candidates.length && candidates.length > 0;
-  const key = byBallot ? 'ballotNumber' : 'nameStrokes';
+  const rule = CANDIDATE_ORDER_RULES[candidateOrderOf(candidates)];
   const seen = new Map();
   for (const c of candidates) {
-    if (seen.has(c[key])) {
-      errors.push(`候選人 ${c.id}：${byBallot ? '號次' : '姓名筆畫'}與 ${seen.get(c[key])} 相同，無法決定排序`);
+    if (seen.has(c[rule.key])) {
+      errors.push(`候選人 ${c.id}：${rule.keyName}與 ${seen.get(c[rule.key])} 相同，無法決定排序`);
     }
-    seen.set(c[key], c.id);
+    seen.set(c[rule.key], c.id);
     for (const sourceId of c.rawPolicyItems.sourceIds) {
       const source = sourcesById.get(sourceId);
       if (!source) errors.push(`候選人 ${c.id}：rawPolicyItems.sourceIds 指向不存在的出處 ${sourceId}`);
@@ -247,6 +258,7 @@ export function validateRawData(raw) {
   for (const source of sources.valid) {
     if (!refs.candidateIds.has(source.candidateId)) errors.push(`出處 ${source.id}：candidateId 指向不存在的候選人 ${source.candidateId}`);
   }
+  if (Array.isArray(raw?.candidates) && raw.candidates.length === 0) errors.push('候選人：至少要有一位候選人');
   checkCandidates(candidates.valid, refs.sourcesById, errors);
   checkIssueAreas(issueAreas.valid, errors);
   for (const policy of policies.valid) checkPolicy(policy, refs, errors);
@@ -260,12 +272,20 @@ export function isVerified(policy) {
 
 // 有號次（已抽籤）照號次，否則照姓名筆畫。見 ADR 0001。
 export function orderCandidates(candidates) {
-  const byBallot = candidates.every((c) => c.ballotNumber !== null);
-  const key = byBallot ? 'ballotNumber' : 'nameStrokes';
+  const candidateOrder = candidateOrderOf(candidates);
+  const { key } = CANDIDATE_ORDER_RULES[candidateOrder];
   return {
-    candidateOrder: byBallot ? 'ballot-number' : 'name-strokes',
+    candidateOrder,
     candidates: [...candidates].sort((a, b) => a[key] - b[key]),
   };
+}
+
+// 公開的出處：被公開政見引用，或作為候選人原始政見條目總數的依據。
+function publicSourceIds(candidates, policies) {
+  return new Set([
+    ...candidates.flatMap((c) => c.rawPolicyItems.sourceIds),
+    ...policies.flatMap((p) => p.quotes.map((q) => q.sourceId)),
+  ]);
 }
 
 // builtAt 由呼叫端傳入（ISO 8601 字串），讓本函式保持純函式。
@@ -274,11 +294,13 @@ export function buildPublicDataset(raw, { builtAt = null } = {}) {
   if (errors.length > 0) throw new DatasetValidationError(errors);
   const copy = structuredClone(raw);
   const { candidateOrder, candidates } = orderCandidates(copy.candidates);
+  const policies = copy.policies.filter(isVerified);
+  const sourceIds = publicSourceIds(candidates, policies);
   return {
     meta: { ...copy.meta, candidateOrder, builtAt },
     candidates,
     issueAreas: copy.issueAreas,
-    sources: copy.sources,
-    policies: copy.policies.filter(isVerified),
+    sources: copy.sources.filter((s) => sourceIds.has(s.id)),
+    policies,
   };
 }
