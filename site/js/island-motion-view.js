@@ -70,9 +70,11 @@ const boxGeometry = (w, h, d, { pivot = [0, 0, 0] } = {}) => new THREE.BoxGeomet
 const ripple = new THREE.Matrix4();
 const jet = new THREE.Vector3();
 
-// 循環道具：每個題材的靜態底座與會動的零件，先在半徑 0.08、高 0.4 以內組好，
-// 放上格子時放大 LOOP_SCALE 倍（半徑 0.1，不碰標記與元素區，見 island-motion.js 的 LOOP_SPOTS）。
-const LOOP_SCALE = 1.25;
+// 循環道具：每個題材的靜態底座與會動的零件，以原尺寸組好，放上格子時乘配置的倍率（island-motion.js 的 LOOP_SCALE）。
+// 原尺寸的範圍：底座與低處零件在半徑 0.05 以內，高 0.45 以內；會動零件離地 0.18 以上才可伸出到半徑 0.15
+// （對應 island-motion.js 的 LOOP_CORE、LOOP_HEIGHT、LOOP_REACH、LOOP_REACH_FROM，測試據此確認不擋住標記、不進元素區）。
+// 道具周圍的鋪面與灌木不跟著放大，固定 PAD_SCALE 倍；灌木放在朝格心的一側，避開格緣的市民路線。
+const PAD_SCALE = 1.25;
 // moving 的 transform(pose, m) 把零件在道具座標裡的矩陣寫進 m。
 const LOOP_PROPS = {
   windmill: {
@@ -92,12 +94,12 @@ const LOOP_PROPS = {
   },
   fountain: {
     base: () => [
-      part(unitCyl(10), MOTION_PALETTE.stone, { scale: [0.08, 0.04, 0.08], y: 0.02 }),
-      part(unitCyl(10), PALETTE.shallow, { scale: [0.068, 0.01, 0.068], y: 0.042 }),
+      part(unitCyl(10), MOTION_PALETTE.stone, { scale: [0.05, 0.04, 0.05], y: 0.02 }),
+      part(unitCyl(10), PALETTE.shallow, { scale: [0.042, 0.01, 0.042], y: 0.042 }),
       part(unitCyl(6), MOTION_PALETTE.stone, { scale: [0.012, 0.08, 0.012], y: 0.08 }),
     ],
     moving: [{
-      geometry: () => new THREE.ConeGeometry(0.04, 0.14, 6, 1, true).translate(0, -0.07, 0).rotateX(Math.PI),
+      geometry: () => new THREE.ConeGeometry(0.032, 0.14, 6, 1, true).translate(0, -0.07, 0).rotateX(Math.PI),
       color: PALETTE.shallow,
       transform: (pose, m) => m.makeRotationY(pose.spin).scale(jet.set(1, pose.jet, 1)).setPosition(0, 0.12, 0),
     }],
@@ -121,7 +123,7 @@ const LOOP_PROPS = {
     moving: [
       {
         geometry: () => mergeGeometries([
-          boxGeometry(0.2, 0.018, 0.018, { pivot: [0.06, 0, 0] }),
+          boxGeometry(0.18, 0.018, 0.018, { pivot: [0.05, 0, 0] }),
           boxGeometry(0.035, 0.03, 0.03, { pivot: [-0.045, -0.005, 0] }),
         ]),
         color: PALETTE.syrup,
@@ -134,19 +136,19 @@ const LOOP_PROPS = {
         ]),
         color: MOTION_PALETTE.steel,
         // 吊鉤掛在吊臂前端，跟著吊臂轉，上下收放。
-        transform: (pose, m) => m.makeTranslation(0.14 * Math.cos(pose.swing), 0.36 + pose.hook, -0.14 * Math.sin(pose.swing)),
+        transform: (pose, m) => m.makeTranslation(0.12 * Math.cos(pose.swing), 0.36 + pose.hook, -0.12 * Math.sin(pose.swing)),
       },
     ],
   },
   boat: {
     base: () => [
-      part(unitCyl(12), MOTION_PALETTE.stone, { scale: [0.085, 0.03, 0.085], y: 0.015 }),
-      part(unitCyl(12), PALETTE.water, { scale: [0.075, 0.01, 0.075], y: 0.032 }),
+      part(unitCyl(12), MOTION_PALETTE.stone, { scale: [0.05, 0.03, 0.05], y: 0.015 }),
+      part(unitCyl(12), PALETTE.water, { scale: [0.044, 0.01, 0.044], y: 0.032 }),
     ],
     moving: [{
       geometry: () => mergeGeometries([
-        boxGeometry(0.07, 0.015, 0.03, { pivot: [0, 0.008, 0] }),
-        new THREE.ConeGeometry(0.025, 0.06, 3).translate(0, 0.045, 0),
+        boxGeometry(0.046, 0.014, 0.022, { pivot: [0, 0.008, 0] }),
+        new THREE.ConeGeometry(0.02, 0.06, 3).translate(0, 0.045, 0),
       ]),
       color: MOTION_PALETTE.hull,
       transform: (pose, m) => m.makeRotationZ(pose.roll).setPosition(pose.drift, 0.04 + pose.bob, 0),
@@ -171,7 +173,8 @@ function mergeGeometries(list) {
   return merged;
 }
 
-// 市民：身體、頭、兩條腿。腿的原點在髖部，擺動時繞髖部轉。
+// 市民：身體、頭、兩條腿，原尺寸頭頂高 0.16、身寬半徑 0.025，放上格子時乘配置的倍率（island-motion.js 的 CITIZEN_SCALE）。
+// 腿的原點在髖部，擺動時繞髖部轉。
 const CITIZEN = {
   body: () => new THREE.CylinderGeometry(0.02, 0.025, 0.066, 6).translate(0, 0.09, 0),
   head: () => new THREE.SphereGeometry(0.018, 6, 4).translate(0, 0.142, 0),
@@ -218,18 +221,22 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   for (const tile of areas) {
     const group = groupOf(tile.id);
     for (const loop of tile.loops) {
-      const prop = new THREE.Group();
-      prop.position.set(loop.x, TILE_SURFACE, loop.z);
-      prop.scale.setScalar(LOOP_SCALE);
-      prop.rotation.y = loop.mirror ? Math.PI : 0;
+      const at = (scale) => {
+        const holder = new THREE.Group();
+        holder.position.set(loop.x, TILE_SURFACE, loop.z);
+        holder.scale.setScalar(scale);
+        holder.rotation.y = loop.mirror ? Math.PI : 0;
+        group.add(holder);
+        return holder;
+      };
       // 道具周圍的小鋪面與兩叢矮灌木，每格都一樣。
-      prop.add(
+      at(PAD_SCALE).add(
         part(unitCyl(10), MOTION_PALETTE.road, { scale: [0.1, 0.008, 0.1], y: 0.004 }),
-        part(unitIco(), PALETTE.foliage, { scale: [0.03, 0.025, 0.03], x: 0.075, y: 0.02, z: 0.06 }),
-        part(unitIco(), PALETTE.foliageDark, { scale: [0.025, 0.022, 0.025], x: -0.07, y: 0.018, z: 0.07 }),
-        ...LOOP_PROPS[tile.theme].base(),
+        // 兩叢南北對稱：東側道具轉 180 度放，對稱才不會讓灌木換到標記那一側。
+        part(unitIco(), PALETTE.foliage, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: -0.035 }),
+        part(unitIco(), PALETTE.foliageDark, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: 0.035 }),
       );
-      group.add(prop);
+      at(loop.scale).add(...LOOP_PROPS[tile.theme].base());
     }
   }
 
@@ -283,7 +290,7 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     for (const theme in LOOP_PROPS) poses[theme] = loopPose(theme, t);
     for (const { theme, piece, mesh, spots } of movers) {
       spots.forEach(({ tile, loop }, i) => {
-        placeAt(tile.center.x + loop.x, TILE_SURFACE + liftOf(tile.id), tile.center.z + loop.z, loop.mirror ? Math.PI : 0, LOOP_SCALE);
+        placeAt(tile.center.x + loop.x, TILE_SURFACE + liftOf(tile.id), tile.center.z + loop.z, loop.mirror ? Math.PI : 0, loop.scale);
         piece.transform(poses[theme], local);
         mesh.setMatrixAt(i, m.multiplyMatrices(place, local));
       });
@@ -292,10 +299,10 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
 
     citizens.forEach(({ tile, citizen }, i) => {
       const pose = citizenPose(tile, citizen, t);
-      placeAt(pose.x, TILE_SURFACE + 0.006 + pose.bob + liftOf(tile.id), pose.z, pose.heading);
+      placeAt(pose.x, TILE_SURFACE + 0.006 + pose.bob * citizen.scale + liftOf(tile.id), pose.z, pose.heading, citizen.scale);
       body.setMatrixAt(i, place);
       head.setMatrixAt(i, place);
-      // 兩條腿反向擺動。
+      // 兩條腿反向擺動（place 已含倍率，這裡用原尺寸）。
       local.makeRotationZ(pose.legSwing).setPosition(0, CITIZEN.hip, -CITIZEN.legGap);
       legs.setMatrixAt(i * 2, m.multiplyMatrices(place, local));
       local.makeRotationZ(-pose.legSwing).setPosition(0, CITIZEN.hip, CITIZEN.legGap);
