@@ -53,6 +53,15 @@ test('排序規則說明列出兩種規則，標出目前採用的那一種', ()
   ]);
 });
 
+test('整理方法頁有候選人資料一節，照原文公開候選人資料抽取方法', () => {
+  const html = page('method.html');
+  const section = html.match(/<section[^>]*id="profiles"[\s\S]*?<\/section>/)?.[0] ?? '';
+
+  assert.match(html, /<a href="#profiles">候選人資料<\/a>/);
+  assert.match(section, /data-repo-file="data\/extraction\/candidate-profiles\.md"/);
+  assert.match(section, /中選會/);
+});
+
 test('整理方法頁可從首頁的頁首與頁尾進入', () => {
   const html = page('index.html');
   const header = html.match(/<header[\s\S]*?<\/header>/)[0];

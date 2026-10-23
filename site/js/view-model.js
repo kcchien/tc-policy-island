@@ -20,6 +20,7 @@ function sourceView(source) {
     sourceType: source.sourceType,
     sourceTypeName: SOURCE_TYPES[source.sourceType],
     retrievedAt: source.retrievedAt,
+    snapshotNote: source.snapshotNote,
   };
 }
 
@@ -53,6 +54,8 @@ export function buildViewModel(dataset) {
   const candidates = dataset.candidates.map((candidate) => ({
     ...candidate,
     policyCount: dataset.policies.filter((p) => p.candidateId === candidate.id).length,
+    // 候選人資料卡用的出處；公開資料集的 profile 為 null（尚未收錄或未通過逐字比對）時也為 null。
+    profileSource: candidate.profile ? sources.get(candidate.profile.sourceId) : null,
   }));
   return {
     meta: dataset.meta,

@@ -143,14 +143,22 @@ export function islandPoints(layout, { surface, top }) {
   return points;
 }
 
-// 鏡頭在 target 的正南方、與正上方夾 polar 角、距離 distance，看向 target。
-// 回傳各點投影到畫面後的範圍，以正規化座標表示（畫布左右、上下都是 -1~1，上方為正）。
-export function projectedBox(points, { fov, aspect, polar, target, distance }) {
+// 繞 y 軸轉 angle（與 three.js 相同方向：+z 轉向 +x）。
+function rotateY(p, angle) {
+  const [s, c] = [Math.sin(angle), Math.cos(angle)];
+  return { ...p, x: p.x * c + p.z * s, z: -p.x * s + p.z * c };
+}
+
+// 鏡頭在 target 的方位角 azimuth（0 為正南方，與 three.js Spherical 的 theta 相同）、與正上方夾 polar 角、
+// 距離 distance，看向 target。回傳各點投影到畫面後的範圍，以正規化座標表示（畫布左右、上下都是 -1~1，上方為正）。
+export function projectedBox(points, { fov, aspect, polar, target, distance, azimuth = 0 }) {
   const tanV = Math.tan((fov * Math.PI) / 360);
   const [s, c] = [Math.sin(polar), Math.cos(polar)];
-  const eye = { x: target.x, y: target.y + c * distance, z: target.z + s * distance };
+  const eye = { x: 0, y: target.y + c * distance, z: s * distance };
   const box = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
-  for (const p of points) {
+  for (const point of points) {
+    // 整個場景以 target 為中心反轉方位角，鏡頭就回到正南方。
+    const p = rotateY({ x: point.x - target.x, y: point.y, z: point.z - target.z }, -azimuth);
     const v = { x: p.x - eye.x, y: p.y - eye.y, z: p.z - eye.z };
     // 鏡頭的右方 (1, 0, 0)、上方 (0, s, -c)、前方 (0, -c, -s)。
     const depth = -c * v.y - s * v.z;
@@ -165,7 +173,12 @@ export function projectedBox(points, { fov, aspect, polar, target, distance }) {
 }
 
 // 預設視角：調整鏡頭看的點與距離，讓島（islandPoints）投影後在畫布置中，最長邊占畫布 fill 的比例。
-export function frameIsland(points, { fov, aspect, polar, fill = 0.8 }) {
+// azimuth 不為 0 時先把島反轉方位角，算完再把看的點轉回來。
+export function frameIsland(points, { fov, aspect, polar, fill = 0.8, azimuth = 0 }) {
+  if (azimuth !== 0) {
+    const framed = frameIsland(points.map((p) => rotateY(p, -azimuth)), { fov, aspect, polar, fill });
+    return { ...framed, target: rotateY(framed.target, azimuth) };
+  }
   const tanV = Math.tan((fov * Math.PI) / 360);
   const xs = points.map((p) => p.x);
   const zs = points.map((p) => p.z);
@@ -207,27 +220,26 @@ export function orbitCenter(focus, center, distance, { near, far }) {
 
 // 全螢幕畫布的邊緣被浮動元件（索引面板、工具列）遮住時，投影中心改到沒被遮住的區域正中。
 // insets 是四邊被遮住的像素寬度。回傳值給 camera.setViewOffset：在較大的虛擬畫布上取畫布大小的一塊，
-// 鏡頭的 aspect 要設成 fullWidth / fullHeight。垂直視角涵蓋整個虛擬畫布高度，
-// 構圖（frameIsland）改用未遮住區域的長寬比 visibleAspect，與視角半角正切乘上 fovScale 後的視角。
-export function viewOffset({ width, height, insets }) {
+// 鏡頭的 aspect 要設成 fullWidth / fullHeight、垂直視角設成 fov（涵蓋整個虛擬畫布高度）。
+// 畫布本身的垂直視角固定是 canvasFov，偏移只移動投影中心，畫面不會因此縮放（卡片開關時島不忽大忽小）。
+// 構圖（frameIsland）改用未遮住區域的長寬比 visibleAspect 與垂直視角 visibleFov。
+export function viewOffset({ width, height, insets, canvasFov }) {
   const dx = (insets.left - insets.right) / 2;
   const dy = (insets.top - insets.bottom) / 2;
   const fullHeight = height + 2 * Math.abs(dy);
   const visibleHeight = height - insets.top - insets.bottom;
+  const tanCanvas = Math.tan((canvasFov * Math.PI) / 360);
+  const fovOf = (pixels) => (pixels === height ? canvasFov : (360 / Math.PI) * Math.atan((tanCanvas * pixels) / height));
   return {
     fullWidth: width + 2 * Math.abs(dx),
     fullHeight,
     x: dx < 0 ? -2 * dx : 0,
     y: dy < 0 ? -2 * dy : 0,
+    fov: fovOf(fullHeight),
     visibleAspect: (width - insets.left - insets.right) / visibleHeight,
-    fovScale: visibleHeight / fullHeight,
+    visibleFov: fovOf(visibleHeight),
   };
 }
 
-// 鏡頭飛到議題區的時間。減少動態時為 0，直接切到目的地。
-export function flightPlan({ reducedMotion }) {
-  return { durationMs: reducedMotion ? 0 : 900 };
-}
-
-// 飛行進度的緩動（0~1 → 0~1），起訖都放慢。
+// 鏡頭飛行與晝夜補間的緩動（0~1 → 0~1），起訖都放慢。
 export const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);

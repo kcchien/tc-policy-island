@@ -3,7 +3,7 @@ import { DATASET_PATH, THIRD_PARTY } from './site.js';
 import { isVerbatimRepoFile } from './repo-documents.js';
 
 // 掃描整理者撰寫的文字：網站文案、公開資料集、網址與檔名。
-// 不掃候選人本人的文字：原文引述、出處快照、出處的原網址、存檔網址與標題。
+// 不掃候選人本人的文字：原文引述、候選人資料的學歷與經歷、出處快照、出處的原網址、存檔網址與標題。
 // three.js 等第三方程式碼不是整理者文字，只掃檔名。
 const SKIP_CONTENT = [THIRD_PARTY, /^data\/snapshots\//];
 const TEXT_FILE = /(\.(html|css|js|mjs|json|svg|txt|md|webmanifest|xml)|\/?_headers|\/?_redirects)$/;
@@ -17,6 +17,8 @@ function stringLiterals(code) {
 // 公開資料集中不掃的欄位：候選人本人的文字，以及雜湊、時間戳記這類非文字欄位。
 const SKIP_FIELD = [
   /^policies\[[^\]]*\]\.quotes\[\d+\]\.text$/,
+  // 候選人資料的學歷與經歷逐字照中選會公報，由候選人資料關卡驗證逐字出自出處快照。
+  /^candidates\[[^\]]*\]\.profile\.(education|experience)\[\d+\]$/,
   /^sources\[[^\]]*\]\.(url|archiveUrl|title|snapshotSha256)$/,
   /^meta\.builtAt$/,
 ];
