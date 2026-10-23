@@ -8,15 +8,9 @@
       {
         "text": "加速推動台中捷運路網建設，串聯山線、海線、屯區與市中心交通動脈，提升大眾運輸覆蓋率",
         "sourceId": "ho-main"
-      },
-      {
-        "text": "串聯捷運綠線、紅線及屯區環狀線（紫線），建構完整便捷的捷運路網",
-        "sourceId": "ho-main"
       }
     ],
-    "districts": [
-      "南屯區"
-    ],
+    "districts": [],
     "conflictNote": null,
     "verification": {
       "layer1": {
@@ -248,7 +242,7 @@
       },
       {
         "text": "捷運藍線延伸太平將在首任四年內實質動工",
-        "sourceId": "ho-pr-67"
+        "sourceId": "ho-pr-66"
       }
     ],
     "districts": [
@@ -320,9 +314,7 @@
       }
     ],
     "districts": [
-      "清水區",
-      "沙鹿區",
-      "梧棲區"
+      "清水區"
     ],
     "conflictNote": null,
     "verification": {
@@ -351,7 +343,7 @@
       },
       {
         "text": "第一支箭是加速捷運紅線延伸至豐原的核定作業，規劃延伸后里",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -673,11 +665,11 @@
       },
       {
         "text": "優先以豐原為核心，調整放射狀及環狀公車路線，提升準點率與服務品質",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       },
       {
         "text": "全面檢討公車路網與班次，以轉運中心及台中火車站為核心，建構放射狀與環狀並行的路網，串聯幹線與區域接駁，兼顧山海屯城及偏鄉需求",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       }
     ],
     "districts": [
@@ -715,7 +707,7 @@
       },
       {
         "text": "改善新社、和平的公車及聚落接駁服務",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -747,23 +739,23 @@
     "quotes": [
       {
         "text": "改善班次調度並提升運能，運用刷卡大數據找出尖峰客滿路段與站點，針對通勤通學需求增加運能",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       },
       {
         "text": "升級官方「台中Go」交通App與公車動態資訊系統，若班次取消時應主動提供替代路線及轉乘方案",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       },
       {
         "text": "同時落實脫班查核檢討裁罰機制",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       },
       {
         "text": "改善公車駕駛長勞動環境，從薪資排班到休息空間全面檢視",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       },
       {
         "text": "承諾上任後不定期親自搭乘大眾運輸",
-        "sourceId": "ho-pr-66"
+        "sourceId": "ho-pr-65"
       }
     ],
     "districts": [],
@@ -794,7 +786,7 @@
       },
       {
         "text": "將持續盤點 29 區交通瓶頸，積極爭取中央生活圈道路建設經費，加速打通跨區交通路網",
-        "sourceId": "ho-pr-63"
+        "sourceId": "ho-pr-62"
       }
     ],
     "districts": [],
@@ -974,12 +966,35 @@
         "sourceId": "ho-main"
       },
       {
-        "text": "以及學校周邊交通與人行道改善工程",
-        "sourceId": "ho-main"
-      },
-      {
         "text": "並持續擴大通學步道建設，提升生活品質與行人安全",
         "sourceId": "ho-pr-32"
+      }
+    ],
+    "districts": [],
+    "conflictNote": null,
+    "verification": {
+      "layer1": {
+        "status": "pending",
+        "checkedAt": null
+      },
+      "layer2": {
+        "status": "pending",
+        "reason": null,
+        "checklistVersion": null,
+        "model": null,
+        "checkedAt": null
+      }
+    }
+  },
+  {
+    "id": "ho-hsin-chun-027",
+    "candidateId": "ho-hsin-chun",
+    "issueAreaId": "transportation",
+    "summary": "推動南屯學校周邊交通與人行道改善工程。",
+    "quotes": [
+      {
+        "text": "以及學校周邊交通與人行道改善工程",
+        "sourceId": "ho-main"
       }
     ],
     "districts": [
@@ -1001,7 +1016,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-027",
+    "id": "ho-hsin-chun-028",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "增闢綠蔭休閒自行車道與環河自行車路網，串聯公園、河岸、社區與公共運輸站點。",
@@ -1028,7 +1043,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-028",
+    "id": "ho-hsin-chun-029",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "上任第一年導入 AI 智慧交通管控，結合匝道監測資訊調整號誌與分流，改善台 74 線尖峰回堵。",
@@ -1061,7 +1076,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-029",
+    "id": "ho-hsin-chun-030",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "闢建高鐵特區聯外道路，改善高鐵特區交通壅塞。",
@@ -1097,7 +1112,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-030",
+    "id": "ho-hsin-chun-031",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "推動台 63 線中投公路銜接國道 3 號的立體交流道。",
@@ -1131,7 +1146,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-031",
+    "id": "ho-hsin-chun-032",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "推動太平區市民大道第三期與第四期工程。",
@@ -1164,10 +1179,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-032",
+    "id": "ho-hsin-chun-033",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
-    "summary": "東豐快速道路全線通車，完善石岡、東勢的道路銜接，推動東豐快新社聯絡道，並整合國道 4 號、台 74 線與山城聯外道路。",
+    "summary": "東豐快速道路全線通車，改善石岡、東勢的道路銜接與分流，推動東豐快新社聯絡道，並整合國道 4 號、台 74 線與山城聯外道路。",
     "quotes": [
       {
         "text": "加速東豐快速道路全線貫通",
@@ -1183,7 +1198,7 @@
       },
       {
         "text": "加速東豐快速道路全線通車，同步完善石岡、東勢的道路銜接及分流，推動東豐快新社聯絡道",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -1210,7 +1225,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-033",
+    "id": "ho-hsin-chun-034",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "爭取增設台 74 線樂業路至六順路段南下出口匝道。",
@@ -1240,7 +1255,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-034",
+    "id": "ho-hsin-chun-035",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "活化台中港區舊貨運鐵道，轉型為觀光鐵道。",
@@ -1279,10 +1294,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-035",
+    "id": "ho-hsin-chun-036",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
-    "summary": "推動台中國際機場第三航廈、增建滑行道與客機停機坪、完善聯外交通，以 4 年國際航班倍增、年旅客量突破 500 萬人次為目標，並啟動機場門戶及周邊整體開發。",
+    "summary": "推動台中國際機場第三航廈、增建滑行道與客機停機坪、改善聯外交通，以 4 年國際航班倍增、年旅客量突破 500 萬人次為目標，並啟動機場門戶及周邊整體開發。",
     "quotes": [
       {
         "text": "推動機場門戶計畫",
@@ -1322,7 +1337,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-036",
+    "id": "ho-hsin-chun-037",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "開闢拓寬生活圈 4 號道路（含大肚段），完成送案並向中央爭取經費。",
@@ -1361,7 +1376,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-037",
+    "id": "ho-hsin-chun-038",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "新闢中科與台中工業區聯外道路，推動市政路、漢翔路、福林路、福順路延伸拓寬。",
@@ -1390,7 +1405,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-038",
+    "id": "ho-hsin-chun-039",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "要求停車場、公園等公共場所設置夜間安全停車區，加強照明、監視與警示設施。",
@@ -1417,7 +1432,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-039",
+    "id": "ho-hsin-chun-040",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "改善潭子、大雅、神岡與北屯、西屯、豐原交界的道路瓶頸，串聯潭雅神與市區交通路網。",
@@ -1428,7 +1443,7 @@
       },
       {
         "text": "改善潭子與北屯、大雅與西屯、神岡與豐原交界的道路瓶頸及聯外交通",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -1455,10 +1470,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-040",
+    "id": "ho-hsin-chun-041",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
-    "summary": "改善王田交流道周邊交通瓶頸，串聯台 74 線、台 61 線與大肚和美橋，並檢討周邊整體發展。",
+    "summary": "改善王田交流道周邊交通瓶頸，串聯台 74 線、台 61 線與大肚和美橋，重塑烏日、大肚下環線產業廊帶。",
     "quotes": [
       {
         "text": "檢討王田交流道周邊整體發展，改善交通瓶頸，重塑烏日、大肚下環線產業廊帶。",
@@ -1489,14 +1504,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-041",
+    "id": "ho-hsin-chun-042",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "加強豐原車站與轉運站的接駁功能。",
     "quotes": [
       {
         "text": "首先要重振豐原交通樞紐地位，強化豐原車站與轉運站的接駁功能",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -1518,7 +1533,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-042",
+    "id": "ho-hsin-chun-043",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "加強會展期間的接駁、停車與多元路線規劃，改善貨車動線與展館周邊交通。",
@@ -1545,26 +1560,26 @@
     }
   },
   {
-    "id": "ho-hsin-chun-043",
+    "id": "ho-hsin-chun-044",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "水湳轉運中心整合客運售票並設自動售票機，規劃環狀公車接駁會展中心等場館，與中央合作興建銜接國道 1 號的專用道，完工前先導入智慧交通管控。",
     "quotes": [
       {
         "text": "整合客運售票系統，設置自動售票機、服務櫃檯，並提供多元支付方式",
-        "sourceId": "ho-pr-60"
+        "sourceId": "ho-pr-59"
       },
       {
         "text": "強化市區公車路網，規劃環狀接駁路線，串聯台中國際會展中心、綠美圖、逢甲商圈及未來重大場館",
-        "sourceId": "ho-pr-60"
+        "sourceId": "ho-pr-59"
       },
       {
         "text": "與中央合作，加速推動銜接國道 1 號的專用道建設。在專用道完工前，先導入智慧交通管控",
-        "sourceId": "ho-pr-60"
+        "sourceId": "ho-pr-59"
       },
       {
         "text": "強化會展中心與水湳轉運中心的連結",
-        "sourceId": "ho-pr-68"
+        "sourceId": "ho-pr-67"
       }
     ],
     "districts": [],
@@ -1584,7 +1599,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-044",
+    "id": "ho-hsin-chun-045",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "規劃第二環快速聯絡道路，串聯潭子、北屯、太平、大里與霧峰，銜接國道 3 號與國道 6 號。",
@@ -1617,7 +1632,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-045",
+    "id": "ho-hsin-chun-046",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "甲埔大道延伸至大安，銜接國道 3 號與台 61 線西濱快速道路。",
@@ -1646,7 +1661,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-046",
+    "id": "ho-hsin-chun-047",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
     "summary": "推動國道 4 號延伸至台中港。",
@@ -1673,18 +1688,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-047",
+    "id": "ho-hsin-chun-048",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "transportation",
-    "summary": "改建台中港舊港務大樓並與捷運藍線延伸台中港共構，以 BOT 設置港務大樓遊客中心並發展郵輪觀光。",
+    "summary": "改建台中港舊港務大樓，與捷運藍線延伸台中港共構並導入商業機能。",
     "quotes": [
       {
         "text": "推動舊港務大樓改建，與捷運藍線延伸台中港共構，導入商業機能",
         "sourceId": "ho-pr-50"
-      },
-      {
-        "text": "台中港則結合郵輪觀光、港務大樓遊客中心 BOT 及觀光鐵道",
-        "sourceId": "ho-pr-52"
       }
     ],
     "districts": [],
@@ -1704,7 +1715,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-048",
+    "id": "ho-hsin-chun-049",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "逐年把代理教師員額控留比例降到 8% 以下，提高兼任行政教師的工作獎金，並提高任職滿 10 年且教學成績優良教師的獎勵金。",
@@ -1739,7 +1750,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-049",
+    "id": "ho-hsin-chun-050",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "推動跨域學習與特色課程，建置自造教育及科技中心，由教育局統籌高中多元開課與共聘師資。",
@@ -1766,7 +1777,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-050",
+    "id": "ho-hsin-chun-051",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "每位教師配一台載具、每位學生配一台平板，國中小逐步開設程式設計課，並把基礎程式能力納入學習檢核。",
@@ -1797,7 +1808,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-051",
+    "id": "ho-hsin-chun-052",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "加強技職教育與在地產業連結，增加符合產業特色的契合式專班與結合科大的學分班、進修班，投入 AI 教育與智慧製造培訓。",
@@ -1828,7 +1839,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-052",
+    "id": "ho-hsin-chun-053",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "提高特教助理員額與專業陪伴時數，引進業師協同教學與職能訓練課程。",
@@ -1859,7 +1870,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-053",
+    "id": "ho-hsin-chun-054",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "成立實驗教育基地整合師資、課程與場域，並推動委託設立實驗教育大學。",
@@ -1890,7 +1901,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-054",
+    "id": "ho-hsin-chun-055",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "每年編列 1 億元以上預算支持中小學國際交流，增加高中職國際文憑與國際學分課程名額，並推動雙語遠距教學、交換生計畫與雙語數位學伴。",
@@ -1921,10 +1932,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-055",
+    "id": "ho-hsin-chun-056",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
-    "summary": "公私立國中小午餐全面免費，每週 2 天鮮乳（寒暑假不中斷）、3 天水果，每餐補助提高至 80 元，補助團膳業者改善冷鏈設備，免費午餐擴及第一線午餐工作人員。",
+    "summary": "公私立國中小午餐全面免費，每週 2 天鮮乳（寒暑假不中斷）、3 天水果、至少一天有機蔬果與在地食材，每餐補助提高至 80 元，推動中央廚房與多校聯合採購，補助團膳業者改善冷鏈設備，免費午餐擴及第一線午餐工作人員。",
     "quotes": [
       {
         "text": "推動不分公私立學校午餐全面免費",
@@ -1964,7 +1975,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-056",
+    "id": "ho-hsin-chun-057",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "編列專款改善山城圖書館軟硬體，推動校園雙語與數位資訊教育。",
@@ -1975,7 +1986,7 @@
       },
       {
         "text": "同時編列專款改善圖書館軟硬體，推動校園雙語與數位資訊教育",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -2000,7 +2011,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-057",
+    "id": "ho-hsin-chun-058",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "整合產官學資源，建立甲安埔技職人才培育基地。",
@@ -2031,7 +2042,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-058",
+    "id": "ho-hsin-chun-059",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "提高 2 至 6 歲的育兒津貼與幼教津貼。",
@@ -2062,7 +2073,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-059",
+    "id": "ho-hsin-chun-060",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "提高教保人員待遇，穩定托育與幼教人力。",
@@ -2089,7 +2100,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-060",
+    "id": "ho-hsin-chun-061",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "education",
     "summary": "投入資源穩定偏鄉師資、提升教學品質。",
@@ -2116,7 +2127,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-061",
+    "id": "ho-hsin-chun-062",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "成立市府一級機關青年局，整合 15 至 40 歲青年的就學、就業、創業、國際交流與公共參與等政策。",
@@ -2151,7 +2162,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-062",
+    "id": "ho-hsin-chun-063",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "補助 15 至 40 歲青年出國參賽、參展、壯遊與國際交流，個人最高 10 萬元、團體最高 50 萬元。",
@@ -2162,7 +2173,7 @@
       },
       {
         "text": "提供 15 至 40 歲青年海外發展補助，個人最高 10 萬元、團體最高 50 萬元",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -2182,7 +2193,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-063",
+    "id": "ho-hsin-chun-064",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "市府女性局處首長任命比例不少於四分之一。",
@@ -2209,18 +2220,18 @@
     }
   },
   {
-    "id": "ho-hsin-chun-064",
+    "id": "ho-hsin-chun-065",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "把性別意識納入市府各項決策與資源分配。",
     "quotes": [
       {
         "text": "將把性別意識納入市府各項決策",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       },
       {
         "text": "未來市府各局處制定政策、分配資源時，都應納入性別考量",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -2240,7 +2251,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-065",
+    "id": "ho-hsin-chun-066",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "台中港盈餘回饋金提撥一定比例專款用於海線，訂定使用規範，用於地方建設、環境改善、居民健康福利與學生獎助學金。",
@@ -2263,7 +2274,10 @@
       }
     ],
     "districts": [
+      "清水區",
+      "沙鹿區",
       "大甲區",
+      "梧棲區",
       "外埔區",
       "大安區"
     ],
@@ -2283,7 +2297,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-066",
+    "id": "ho-hsin-chun-067",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "成立跨局處的外國人事務專案辦公室，作為洽公、商務與生活的單一窗口，並邀請在台中生活工作的外籍人士參與國際事務委員會。",
@@ -2314,7 +2328,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-067",
+    "id": "ho-hsin-chun-068",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "在市府財政許可與市議會支持下，上任後第一次議會會期提出追加預算，推動普發現金。",
@@ -2345,7 +2359,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-068",
+    "id": "ho-hsin-chun-069",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "成立台中市高溫調適及城市韌性辦公室，統籌各局處盤點高溫熱區、都市林與氣候調適政策。",
@@ -2372,7 +2386,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-069",
+    "id": "ho-hsin-chun-070",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "city-governance",
     "summary": "推動以兒童視角檢視公園、道路與公共設施，依孩子與家長意見逐項改善。",
@@ -2403,7 +2417,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-070",
+    "id": "ho-hsin-chun-071",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "提高生育津貼為第一胎 4 萬元、第二胎 6 萬元、第三胎 8 萬元。",
@@ -2434,7 +2448,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-071",
+    "id": "ho-hsin-chun-072",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "公托、公幼、準公共托育與 2 歲專班名額倍增，其中 0 至 2 歲公托名額倍增，並持續增加非營利與公立幼兒園名額。",
@@ -2485,7 +2499,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-072",
+    "id": "ho-hsin-chun-073",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "增加假日臨時托育與定點托育，延長夜間托育時段。",
@@ -2531,10 +2545,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-073",
+    "id": "ho-hsin-chun-074",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
-    "summary": "建置托育便利 APP。",
+    "summary": "建置托育服務 App。",
     "quotes": [
       {
         "text": "建置托育便利 APP",
@@ -2560,7 +2574,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-074",
+    "id": "ho-hsin-chun-075",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "成立青年志工組織參與國際交流合作，支持青年社團舉辦公共議題與國際交流活動。",
@@ -2587,7 +2601,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-075",
+    "id": "ho-hsin-chun-076",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "保障新移民女性、單親、單身、原住民等婦女權益，加強法律諮詢、就業支持與社福資源。",
@@ -2614,7 +2628,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-076",
+    "id": "ho-hsin-chun-077",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "每胎補助 5 萬元坐月子費用。",
@@ -2645,7 +2659,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-077",
+    "id": "ho-hsin-chun-078",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "發放 0 至 6 歲幼兒每人每月 1,500 元營養津貼，並提高 0 至 6 歲照顧津貼。",
@@ -2676,7 +2690,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-078",
+    "id": "ho-hsin-chun-079",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "持續補助老人健保費。",
@@ -2703,7 +2717,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-079",
+    "id": "ho-hsin-chun-080",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "放寬敬老愛心卡使用範圍到運動、藝文、休閒場域與健保藥局、超商超市、農漁會等通路，計程車每趟抵扣從 85 點提高到 200 點，點數可累積到當年度、不再每月歸零。",
@@ -2745,7 +2759,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-080",
+    "id": "ho-hsin-chun-081",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "加強獨居長者關懷訪視、居家支持與社區照顧服務。",
@@ -2772,7 +2786,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-081",
+    "id": "ho-hsin-chun-082",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "social-welfare",
     "summary": "新建室內親子多功能場館，提供兒童遊戲、運動、青少年活動與銀髮體適能等服務。",
@@ -2811,10 +2825,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-082",
+    "id": "ho-hsin-chun-083",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
-    "summary": "推動青年就業方案，從高中職與大學階段加強職涯輔導與產業銜接，媒合優質企業與在地產業。",
+    "summary": "推動青年就業方案，從高中職與大學階段加強職涯輔導與產業銜接，對接企業與在地產業需求。",
     "quotes": [
       {
         "text": "推動青年就業 3 支箭，從高中職、大學階段開始強化職涯輔導與產業銜接，引導青年跨域學習、累積實作經驗，並對接優質企業與在地產業需求",
@@ -2838,7 +2852,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-083",
+    "id": "ho-hsin-chun-084",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "鼓勵並獎助企業設置托育服務、提供彈性工時與友善育兒措施。",
@@ -2884,7 +2898,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-084",
+    "id": "ho-hsin-chun-085",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "提高女性勞工健康檢查補助。",
@@ -2895,7 +2909,7 @@
       },
       {
         "text": "並提供女性勞工健康檢查補助",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -2915,7 +2929,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-085",
+    "id": "ho-hsin-chun-086",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "提高勞工健康檢查補助，提供心理健康諮詢服務。",
@@ -2942,7 +2956,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-086",
+    "id": "ho-hsin-chun-087",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "增加職業訓練資源與青年就業媒合，支持工會辦理專業研習、在職訓練與 AI 應用課程。",
@@ -2977,7 +2991,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-087",
+    "id": "ho-hsin-chun-088",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "成立 AI 人才培訓機構，開設數位技能與 AI 應用課程，並補助學生與青年訂閱 AI 數位工具。",
@@ -3012,7 +3026,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-088",
+    "id": "ho-hsin-chun-089",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "加強職業安全教育訓練，導入模擬與多體感實境訓練設備及風險預警機制。",
@@ -3043,7 +3057,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-089",
+    "id": "ho-hsin-chun-090",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "labor",
     "summary": "成立樂齡人才服務中心，協助中高齡勞工職涯轉銜、技能再培訓與再就業媒合。",
@@ -3070,7 +3084,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-090",
+    "id": "ho-hsin-chun-091",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "乳癌免費篩檢對象向下延伸至 30 至 39 歲女性。",
@@ -3081,7 +3095,7 @@
       },
       {
         "text": "將免費乳癌篩檢服務向下延伸至 30 至 39 歲女性",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -3101,7 +3115,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-091",
+    "id": "ho-hsin-chun-092",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "0 至 6 歲幼兒免門診部分負擔、疫苗免費接種，並補助兒童腸病毒疫苗。",
@@ -3132,41 +3146,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-092",
+    "id": "ho-hsin-chun-093",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "提供最高 1 萬元產後心理諮商補助。",
     "quotes": [
       {
         "text": "以及最高 1 萬元產後心理諮商補助",
-        "sourceId": "ho-pr-65"
-      }
-    ],
-    "districts": [],
-    "conflictNote": null,
-    "verification": {
-      "layer1": {
-        "status": "pending",
-        "checkedAt": null
-      },
-      "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
-      }
-    }
-  },
-  {
-    "id": "ho-hsin-chun-093",
-    "candidateId": "ho-hsin-chun",
-    "issueAreaId": "health",
-    "summary": "補助 30 至 40 歲單身女性凍卵與保存費用，最高 5 萬元。",
-    "quotes": [
-      {
-        "text": "提供 30 至 40 歲單身女性凍卵及保存費用最高 5 萬元補助",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -3187,6 +3174,33 @@
   },
   {
     "id": "ho-hsin-chun-094",
+    "candidateId": "ho-hsin-chun",
+    "issueAreaId": "health",
+    "summary": "補助 30 至 40 歲單身女性凍卵與保存費用，最高 5 萬元。",
+    "quotes": [
+      {
+        "text": "提供 30 至 40 歲單身女性凍卵及保存費用最高 5 萬元補助",
+        "sourceId": "ho-pr-64"
+      }
+    ],
+    "districts": [],
+    "conflictNote": null,
+    "verification": {
+      "layer1": {
+        "status": "pending",
+        "checkedAt": null
+      },
+      "layer2": {
+        "status": "pending",
+        "reason": null,
+        "checklistVersion": null,
+        "model": null,
+        "checkedAt": null
+      }
+    }
+  },
+  {
+    "id": "ho-hsin-chun-095",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "提供 65 歲以上長者假牙補助，最高 5 萬元。",
@@ -3213,7 +3227,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-095",
+    "id": "ho-hsin-chun-096",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "高風險與弱勢長者免費接種帶狀皰疹疫苗。",
@@ -3244,7 +3258,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-096",
+    "id": "ho-hsin-chun-097",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "增加日間照顧中心與社區照顧據點服務量能，並延長服務時段。",
@@ -3271,7 +3285,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-097",
+    "id": "ho-hsin-chun-098",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "投入資源提升梨山與和平地區的醫療設備、人力、遠距醫療與緊急後送。",
@@ -3304,7 +3318,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-098",
+    "id": "ho-hsin-chun-099",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "成立中部縣市食安聯防治理平台與單一通報窗口，增加食安預算、提高稽查密度與抽驗頻率，結合產官學研增加檢驗量能。",
@@ -3331,14 +3345,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-099",
+    "id": "ho-hsin-chun-100",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "health",
     "summary": "與中央合作推動衛生福利部豐原醫院后里分院。",
     "quotes": [
       {
-        "text": "加速推動衛生福利部豐原醫院后里分院",
-        "sourceId": "ho-pr-58"
+        "text": "也將與中央合作，加速推動衛生福利部豐原醫院后里分院",
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -3360,7 +3374,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-100",
+    "id": "ho-hsin-chun-101",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "掃蕩黑幫、暴力討債與組織犯罪，建立快速應變與跨單位聯防機制，加強治安熱點巡查。",
@@ -3387,7 +3401,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-101",
+    "id": "ho-hsin-chun-102",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "建置科技阻詐預警系統，串聯金融機構、地政與檢警調即時發現異常交易。",
@@ -3414,7 +3428,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-102",
+    "id": "ho-hsin-chun-103",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "運用 AI 數據分析治安熱點與高風險時段，調整警網布建與巡邏調度。",
@@ -3441,7 +3455,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-103",
+    "id": "ho-hsin-chun-104",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "加強校園反毒教育，防止幫派吸收青少年，協助中輟與高風險學生重返校園。",
@@ -3468,7 +3482,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-104",
+    "id": "ho-hsin-chun-105",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "改善警察與消防人員的勤務環境、待遇與福利，逐年汰換裝備並改善老舊廳舍。",
@@ -3499,7 +3513,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-105",
+    "id": "ho-hsin-chun-106",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "補充警消人力，向中央爭取補足警力缺口，提高見警率。",
@@ -3530,7 +3544,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-106",
+    "id": "ho-hsin-chun-107",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "public-safety",
     "summary": "導入 AI 與數位工具處理警政行政文書與重複性作業，減少基層行政負擔。",
@@ -3557,10 +3571,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-107",
+    "id": "ho-hsin-chun-108",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
-    "summary": "在台中通 APP 增設毛孩友善專區，串聯寵物友善店家。",
+    "summary": "在台中通 App 增設寵物專區，串聯寵物友善店家。",
     "quotes": [
       {
         "text": "在台中通 APP 增設毛孩友善專區，串聯寵物友善店家",
@@ -3584,7 +3598,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-108",
+    "id": "ho-hsin-chun-109",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "補助動物醫院增加夜間急診，市民完成動物醫事助理培訓並在本市動物醫院任職滿 1 年可申請全額補助培訓費用。",
@@ -3619,7 +3633,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-109",
+    "id": "ho-hsin-chun-110",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "補助公協會或動保團體開辦寵物課程，市民免費報名。",
@@ -3646,7 +3660,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-110",
+    "id": "ho-hsin-chun-111",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "加強查緝非法繁殖與來源不明犬貓販售，改善動物之家收容品質，到公立動物之家認養犬貓者補助首次疫苗 500 元與一次免費基礎健檢。",
@@ -3681,7 +3695,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-111",
+    "id": "ho-hsin-chun-112",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "辦理寵物食品、寄養與美容等從業人員專業培訓與在職進修。",
@@ -3708,10 +3722,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-112",
+    "id": "ho-hsin-chun-113",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
-    "summary": "發放 500 元寵物消費券，設籍本市且完成寵物登記的飼主可線上申請，在本市消費。",
+    "summary": "發放 500 元寵物消費券，設籍本市且完成寵物登記的飼主可線上申請，在本市消費，並媒合寵物相關產業與農漁會加入。",
     "quotes": [
       {
         "text": "500 元台中版寵物券",
@@ -3719,6 +3733,10 @@
       },
       {
         "text": "線上申請、在地消費",
+        "sourceId": "ho-main"
+      },
+      {
+        "text": "未來將擴大媒合寵物相關產業及農漁會加入",
         "sourceId": "ho-main"
       },
       {
@@ -3743,7 +3761,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-113",
+    "id": "ho-hsin-chun-114",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "推動太平枇杷專區保安林地解編。",
@@ -3772,7 +3790,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-114",
+    "id": "ho-hsin-chun-115",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "成立太平區枇杷食農教育中心。",
@@ -3801,10 +3819,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-115",
+    "id": "ho-hsin-chun-116",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
-    "summary": "結合地區農會建立山城農業品牌與精緻農產品產銷平台，協助水果、花卉、香菇拓展國際市場。",
+    "summary": "結合地區農會建立山城農業品牌與農產品產銷平台，協助水果、花卉、香菇拓展國際市場。",
     "quotes": [
       {
         "text": "建立山城農業品牌，結合地區農會推動精緻農產品產銷平台，協助水果、花卉、香菇等特色產業拓展國際市場。",
@@ -3833,7 +3851,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-116",
+    "id": "ho-hsin-chun-117",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "發展大雅小麥、神岡荔枝、潭子馬鈴薯等農業特色品牌，結合休閒農業。",
@@ -3864,7 +3882,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-117",
+    "id": "ho-hsin-chun-118",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "agriculture-animals",
     "summary": "補助甲安埔導入智慧農業科技，支持農會與農民建立品牌、拓展行銷。",
@@ -3895,7 +3913,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-118",
+    "id": "ho-hsin-chun-119",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "parks",
     "summary": "改善公園寵物專區，增加遮蔭、飲水、清潔與夜間照明設施。",
@@ -3926,7 +3944,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-119",
+    "id": "ho-hsin-chun-120",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "parks",
     "summary": "潭雅神公園綠地倍增，串聯綠園道，更新兒童遊具、體健設施與遮蔭步道。",
@@ -3957,7 +3975,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-120",
+    "id": "ho-hsin-chun-121",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "parks",
     "summary": "推動東勢河濱公園景觀再造，規劃親水空間。",
@@ -3986,10 +4004,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-121",
+    "id": "ho-hsin-chun-122",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "parks",
-    "summary": "推動 2030 年城市綠蔭倍增計畫，盤點公園、校園與公共空間樹木並增加綠蔭，串聯公園、運動場所與公車站形成 10 分鐘綠蔭生活圈。",
+    "summary": "盤點公園、校園與公共空間的樹木與遮蔭，到 2030 年讓城市綠蔭倍增，並串聯公園、運動休閒場所、公車站與日常通行路線，讓市民 10 分鐘內可走到綠蔭空間。",
     "quotes": [
       {
         "text": "「2030 綠蔭倍增計畫」將全面盤點公園、校園及公共空間的樹木數量與遮蔭效果，增加具有降溫功能的城市綠蔭；「10 分鐘綠蔭生活圈」則將串聯公園、運動休閒場所、公車站及市民日常通行路線",
@@ -4013,7 +4031,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-122",
+    "id": "ho-hsin-chun-123",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "parks",
     "summary": "以步行 10 分鐘可及為目標盤點 29 區遊憩空間並新設或改善遊戲場，遊戲場採自然鋪面與遮蔭，並增加青少年戶外遊憩空間。",
@@ -4048,7 +4066,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-123",
+    "id": "ho-hsin-chun-124",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "將台中州廳部分空間轉型為青年創業基地與展演空間。",
@@ -4082,7 +4100,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-124",
+    "id": "ho-hsin-chun-125",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "商圈輔導獎勵補助經費提高至 3 倍，定期舉辦大型活動與手機遊戲行銷，並協助廟東商圈導入 AI、改善環境。",
@@ -4093,7 +4111,7 @@
       },
       {
         "text": "並主張將商圈輔導獎勵補助經費提高至 3 倍，爭取經濟部中小微企業及地方商圈專案補助，協助廟東商圈導入 AI 技術、改善商圈環境",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -4116,7 +4134,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-125",
+    "id": "ho-hsin-chun-126",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "開發大里夏田、塗城產業園區。",
@@ -4145,7 +4163,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-126",
+    "id": "ho-hsin-chun-127",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "開發豐洲科技工業園區二期與潭子聚興產業園區並招商。",
@@ -4156,7 +4174,7 @@
       },
       {
         "text": "推動神岡豐洲科技工業園區二期、潭子聚興產業園區開發招商",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -4180,7 +4198,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-127",
+    "id": "ho-hsin-chun-128",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "第一任 4 年內成立產業轉型中心與單一服務平台，協助傳統產業與中小微企業導入 AI 與智慧製造、銜接新興產業供應鏈。",
@@ -4199,7 +4217,7 @@
       },
       {
         "text": "將成立「產業轉型創新中心」，建立單一服務平台，整合中央與地方的輔導、技術及媒合資源",
-        "sourceId": "ho-pr-57"
+        "sourceId": "ho-pr-56"
       },
       {
         "text": "未來市府將扮演產業整合平台，協助神岡既有的加工製造能量，銜接無人機、無人載具、航太及智慧機械等新興供應鏈",
@@ -4229,7 +4247,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-128",
+    "id": "ho-hsin-chun-129",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "推動台中國際會展中心二期工程，發展會展經濟。",
@@ -4262,7 +4280,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-129",
+    "id": "ho-hsin-chun-130",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "活化台鐵豐原 3 號倉庫為青年創業基地，提供租金補助、培力課程與業師陪伴。",
@@ -4273,7 +4291,7 @@
       },
       {
         "text": "何欣純提出活化台鐵豐原 3 號倉庫，提供租金補助、培力課程及業師陪伴",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -4295,7 +4313,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-130",
+    "id": "ho-hsin-chun-131",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "設立青年創業基地，提供共享辦公、創業孵化與試驗場域，並在山、海、屯、城成立 4 個區域創客中心。",
@@ -4330,7 +4348,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-131",
+    "id": "ho-hsin-chun-132",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "提供青年創業貸款 2 年利息補貼與 2 年辦公租金、設備租賃補助，並建立創業輔導團隊。",
@@ -4361,10 +4379,10 @@
     }
   },
   {
-    "id": "ho-hsin-chun-132",
+    "id": "ho-hsin-chun-133",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
-    "summary": "提供女性創業者創業貸款、利息補貼或補助（上限金額與補助形式出處說法不一）。",
+    "summary": "提供女性創業者創業貸款與補助。",
     "quotes": [
       {
         "text": "針對女性創業者，也將提供最高 50 萬元創業貸款及利息補貼",
@@ -4372,7 +4390,7 @@
       },
       {
         "text": "提供女性創業最高 60 萬元補助",
-        "sourceId": "ho-pr-65"
+        "sourceId": "ho-pr-64"
       }
     ],
     "districts": [],
@@ -4392,7 +4410,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-133",
+    "id": "ho-hsin-chun-134",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "支持青年投入地方創生，協助建立在地品牌與商業模式。",
@@ -4419,7 +4437,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-134",
+    "id": "ho-hsin-chun-135",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "爭取中央在台中設置無人機智慧製造中心，整合研發測試、資安驗證、國際認證、量產與人才培育，形成無人載具產業聚落。",
@@ -4450,7 +4468,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-135",
+    "id": "ho-hsin-chun-136",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "補助企業組團赴海外參展，協助中小微企業品牌行銷與海外接單。",
@@ -4481,7 +4499,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-136",
+    "id": "ho-hsin-chun-137",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "主動協助中小微企業、商圈店家與傳統市場對接中央資源，推動數位轉型與品牌行銷。",
@@ -4516,7 +4534,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-137",
+    "id": "ho-hsin-chun-138",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "串聯建國市場、東區與周邊觀光景點，發展兼具生活、文化與觀光的市場。",
@@ -4545,22 +4563,18 @@
     }
   },
   {
-    "id": "ho-hsin-chun-138",
+    "id": "ho-hsin-chun-139",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
-    "summary": "結合大里軟體園區與纖維工藝博物館發展時尚工藝產業，區公所遷出後把空間還給纖維工藝博物館。",
+    "summary": "結合大里軟體園區、纖維工藝博物館與在地院校設計科系，發展纖維時尚與工藝產業。",
     "quotes": [
       {
         "text": "結合大里軟體園區、全台第一座纖維工藝博物館，串聯高科技、設計時尚與文化創意",
         "sourceId": "ho-pr-06"
       },
       {
-        "text": "將借用空間歸還纖維工藝博物館，投入資源提升展示與教育功能",
-        "sourceId": "ho-pr-62"
-      },
-      {
         "text": "同時結合在地院校的設計創意能量，發展纖維時尚與工藝產業",
-        "sourceId": "ho-pr-62"
+        "sourceId": "ho-pr-61"
       }
     ],
     "districts": [
@@ -4582,14 +4596,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-139",
+    "id": "ho-hsin-chun-140",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "以豐原為核心規劃兩條產業軸帶：向北串聯后里與中科，向西、向南串聯神岡、大雅與潭子。",
     "quotes": [
       {
         "text": "第二項新政是規劃兩大產業創新軸帶，以豐原為核心，向北串聯后里中科及周邊產業，打造「高科技產業創新軸帶」；向西連結神岡、大雅，向南串聯潭子，形成「精密科技創新軸帶」",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -4615,14 +4629,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-140",
+    "id": "ho-hsin-chun-141",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "economy",
     "summary": "向交通部爭取在台中機場設置烘焙及伴手禮專區。",
     "quotes": [
       {
         "text": "並向交通部爭取在台中機場設置烘焙及伴手禮專區",
-        "sourceId": "ho-pr-64"
+        "sourceId": "ho-pr-63"
       }
     ],
     "districts": [],
@@ -4642,7 +4656,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-141",
+    "id": "ho-hsin-chun-142",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
     "summary": "推動社會住宅多元興辦，4 年興建 2,000 戶婚育宅供新婚與育兒家庭申請。",
@@ -4669,7 +4683,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-142",
+    "id": "ho-hsin-chun-143",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
     "summary": "配合中央增加補助，推動老舊社區與公寓的老宅健檢、耐震補強、消防改善與電梯增設。",
@@ -4699,7 +4713,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-143",
+    "id": "ho-hsin-chun-144",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
     "summary": "推動大里三期擴大都市計畫區段徵收。",
@@ -4732,7 +4746,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-144",
+    "id": "ho-hsin-chun-145",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
     "summary": "推動霧峰鄉村地區整體規劃。",
@@ -4761,7 +4775,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-145",
+    "id": "ho-hsin-chun-146",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
     "summary": "推動梧棲社會住宅二期。",
@@ -4773,41 +4787,6 @@
     ],
     "districts": [
       "梧棲區"
-    ],
-    "conflictNote": null,
-    "verification": {
-      "layer1": {
-        "status": "pending",
-        "checkedAt": null
-      },
-      "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
-      }
-    }
-  },
-  {
-    "id": "ho-hsin-chun-146",
-    "candidateId": "ho-hsin-chun",
-    "issueAreaId": "urban-housing",
-    "summary": "重新檢討台中港特定區都市計畫。",
-    "quotes": [
-      {
-        "text": "加速台中港特定區都市計畫通盤檢討，促進土地有效利用、還地於民。",
-        "sourceId": "ho-main"
-      },
-      {
-        "text": "未來將重新檢討台中港特定區都市計畫",
-        "sourceId": "ho-pr-24"
-      }
-    ],
-    "districts": [
-      "烏日區",
-      "龍井區",
-      "大肚區"
     ],
     "conflictNote": null,
     "verification": {
@@ -4859,7 +4838,7 @@
     "id": "ho-hsin-chun-148",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
-    "summary": "推動中科特定區周邊土地開發，完善住宅、商業與公共設施。",
+    "summary": "推動中科特定區周邊土地開發，配置住宅、商業與公共設施。",
     "quotes": [
       {
         "text": "加速推動「中科特定區」周邊土地開發，完善住宅、商業及公共設施配置",
@@ -4888,7 +4867,7 @@
     "id": "ho-hsin-chun-149",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
-    "summary": "完善水湳地區的聯外交通、停車、商業與生活機能。",
+    "summary": "改善水湳地區的聯外交通、停車、商業與生活機能。",
     "quotes": [
       {
         "text": "完善水湳地區聯外交通、停車、商業及生活機能",
@@ -4917,7 +4896,7 @@
     "id": "ho-hsin-chun-150",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "urban-housing",
-    "summary": "通盤檢討后里都市計畫，活化車站周邊與花博場館。",
+    "summary": "活化后里車站周邊與花博場館，並辦理后里都市計畫通盤檢討。",
     "quotes": [
       {
         "text": "加速后里都市計畫通盤檢討，活化車站周邊及花博場館，結合中科基地發展，帶動地方繁榮。",
@@ -5098,7 +5077,7 @@
     "id": "ho-hsin-chun-156",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "tourism",
-    "summary": "完善大肚山登山步道與相關設施。",
+    "summary": "改善大肚山登山步道與相關設施。",
     "quotes": [
       {
         "text": "升級地方觀光建設，持續完善大肚山登山步道及相關設施",
@@ -5203,7 +5182,7 @@
       },
       {
         "text": "同時持續提升綠空廊道，輔導后里泰安與月眉特色街區",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -5245,6 +5224,8 @@
       }
     ],
     "districts": [
+      "清水區",
+      "沙鹿區",
       "梧棲區"
     ],
     "conflictNote": null,
@@ -5266,7 +5247,34 @@
     "id": "ho-hsin-chun-161",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "tourism",
-    "summary": "通盤規劃大坑觀光，串聯歷史文化景點與農特產品，以捷運與公車完善最後一哩路。",
+    "summary": "台中港結合郵輪觀光與觀光鐵道，以 BOT 設置港務大樓遊客中心。",
+    "quotes": [
+      {
+        "text": "台中港則結合郵輪觀光、港務大樓遊客中心 BOT 及觀光鐵道",
+        "sourceId": "ho-pr-52"
+      }
+    ],
+    "districts": [],
+    "conflictNote": null,
+    "verification": {
+      "layer1": {
+        "status": "pending",
+        "checkedAt": null
+      },
+      "layer2": {
+        "status": "pending",
+        "reason": null,
+        "checklistVersion": null,
+        "model": null,
+        "checkedAt": null
+      }
+    }
+  },
+  {
+    "id": "ho-hsin-chun-162",
+    "candidateId": "ho-hsin-chun",
+    "issueAreaId": "tourism",
+    "summary": "通盤規劃大坑觀光，串聯歷史文化景點與農特產品，以捷運與公車路網補足最後一哩路。",
     "quotes": [
       {
         "text": "未來大坑觀光要進行通盤規劃，串聯周邊歷史文化景點及農特產品，並透過捷運、公車路網等公共運輸完善「最後一哩路」",
@@ -5292,7 +5300,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-162",
+    "id": "ho-hsin-chun-163",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "tourism",
     "summary": "串聯大里杙、霧峰林家、光復新村等屯區歷史文化、音樂與農業資源，發展文化觀光。",
@@ -5322,14 +5330,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-163",
+    "id": "ho-hsin-chun-164",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "tourism",
     "summary": "整合山城自然景觀、聚落、旅宿與農事體驗，以整體規劃與國際行銷建立山城觀光品牌。",
     "quotes": [
       {
         "text": "將整合自然景觀、特色聚落、餐飲旅宿與文創產業，結合採果、品茶、農事及手作體驗，透過整體規劃與國際行銷",
-        "sourceId": "ho-pr-58"
+        "sourceId": "ho-pr-57"
       }
     ],
     "districts": [
@@ -5354,7 +5362,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-164",
+    "id": "ho-hsin-chun-165",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "culture",
     "summary": "輔導糕餅、木藝、漆藝等在地產業轉型，發展豐原文化品牌。",
@@ -5383,7 +5391,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-165",
+    "id": "ho-hsin-chun-166",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "culture",
     "summary": "16 歲以下市民免費進入市府所轄藝文場館。",
@@ -5414,7 +5422,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-166",
+    "id": "ho-hsin-chun-167",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "culture",
     "summary": "投入藝術人才培育，爭取更多藝文展演資源與經費。",
@@ -5441,7 +5449,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-167",
+    "id": "ho-hsin-chun-168",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "culture",
     "summary": "修復活化大里菸葉廠，作為結合青年創業、共享空間、文化展演與市集的文創園區。",
@@ -5470,18 +5478,18 @@
     }
   },
   {
-    "id": "ho-hsin-chun-168",
+    "id": "ho-hsin-chun-169",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "culture",
-    "summary": "支持霧峰秋夜爵醒祭持續在霧峰舉辦。",
+    "summary": "區公所遷入新行政中心後，把借用空間歸還纖維工藝博物館，並投入資源提升展示與教育功能。",
     "quotes": [
       {
-        "text": "未來當選市長後，將大力支持活動持續在霧峰舉辦",
-        "sourceId": "ho-pr-56"
+        "text": "將借用空間歸還纖維工藝博物館，投入資源提升展示與教育功能",
+        "sourceId": "ho-pr-61"
       }
     ],
     "districts": [
-      "霧峰區"
+      "大里區"
     ],
     "conflictNote": null,
     "verification": {
@@ -5499,7 +5507,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-169",
+    "id": "ho-hsin-chun-170",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "sports",
     "summary": "在新社、東勢等山城地區興建全民運動館。",
@@ -5535,7 +5543,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-170",
+    "id": "ho-hsin-chun-171",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "sports",
     "summary": "興建大雅、神岡全民運動館。",
@@ -5565,7 +5573,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-171",
+    "id": "ho-hsin-chun-172",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "sports",
     "summary": "在大甲興建全民運動館，設游泳池、複合式球場與多功能運動空間。",
@@ -5598,7 +5606,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-172",
+    "id": "ho-hsin-chun-173",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "sports",
     "summary": "媒合企業資源支持基層體育，改善校園運動設施，支持教練與選手。",
@@ -5625,13 +5633,13 @@
     }
   },
   {
-    "id": "ho-hsin-chun-173",
+    "id": "ho-hsin-chun-174",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "sports",
-    "summary": "全面盤點棒球練習場與各類運動場地，逐一改善球場安全、休息空間與周邊設施。",
+    "summary": "全面盤點各區棒球練習場與運動場地，改善休息空間、安全設施與周邊配套。",
     "quotes": [
       {
-        "text": "將全面盤點各棒球練習場及各類運動場地，逐一檢視球場安全、休息空間與周邊設施",
+        "text": "也提出未來將全面盤點台中各區棒球練習場及運動場地，改善休息空間、安全設施及周邊配套",
         "sourceId": "ho-pr-21"
       }
     ],
@@ -5652,7 +5660,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-174",
+    "id": "ho-hsin-chun-175",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "environment",
     "summary": "文山焚化爐設備汰舊換新，提高垃圾處理量能。",
@@ -5681,7 +5689,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-175",
+    "id": "ho-hsin-chun-176",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "environment",
     "summary": "加快處理大里垃圾掩埋場的既有垃圾。",
@@ -5710,18 +5718,18 @@
     }
   },
   {
-    "id": "ho-hsin-chun-176",
+    "id": "ho-hsin-chun-177",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "environment",
     "summary": "加快中火燃氣機組相關工程與審查，依法儘速核發執照，目標早於 2034 年底達成中火平時發電無煤化。",
     "quotes": [
       {
         "text": "力拚早於 2034 年底達成中火平時發電無煤化的目標",
-        "sourceId": "ho-pr-61"
+        "sourceId": "ho-pr-60"
       },
       {
         "text": "將加速相關工程及審查程序，在嚴謹把關的前提下，依法應核發的執照儘速核發",
-        "sourceId": "ho-pr-61"
+        "sourceId": "ho-pr-60"
       }
     ],
     "districts": [],
@@ -5741,7 +5749,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-177",
+    "id": "ho-hsin-chun-178",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "environment",
     "summary": "清潔隊員夜點費提高 100 元（依時段為 200 元至 220 元），逐年擴編員額並加快臨時人員轉正，加快清潔車輛汰換與裝備更新，環保志工隊每隊每年業務費由 2 萬 4,000 元提高至 6 萬元。",
@@ -5780,7 +5788,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-178",
+    "id": "ho-hsin-chun-179",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
     "summary": "推動汙水下水道建設，提高用戶接管率。",
@@ -5814,7 +5822,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-179",
+    "id": "ho-hsin-chun-180",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
     "summary": "推動南屯老舊自來水管線汰換。",
@@ -5843,7 +5851,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-180",
+    "id": "ho-hsin-chun-181",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
     "summary": "推動沙鹿南山截水溝第三期工程。",
@@ -5872,7 +5880,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-181",
+    "id": "ho-hsin-chun-182",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
     "summary": "鋪設台中港特定區汙水下水道管線。",
@@ -5903,7 +5911,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-182",
+    "id": "ho-hsin-chun-183",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
     "summary": "爭取中央資源整合水庫、聯通管、伏流水與再生水等多元水源，提升供水調度與備援能力。",
@@ -5930,14 +5938,14 @@
     }
   },
   {
-    "id": "ho-hsin-chun-183",
+    "id": "ho-hsin-chun-184",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "water",
-    "summary": "與中央合作完成大智排水最後一段改善，完善水岸廊帶。",
+    "summary": "與中央合作完成大智排水最後一段改善工程。",
     "quotes": [
       {
         "text": "東南區與大里是緊密相連的生活圈，自己長期爭取的旱溪整治已逐段完成，接下來將與何翊綾共同努力，透過中央與地方合作，加速完成最後一哩路的大智排水改善",
-        "sourceId": "ho-pr-59"
+        "sourceId": "ho-pr-58"
       }
     ],
     "districts": [
@@ -5961,7 +5969,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-184",
+    "id": "ho-hsin-chun-185",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "civil-affairs",
     "summary": "持續推動一里一活動中心，設置老少共融的多功能空間，增加日間托老服務、樂齡教室與社區關懷據點。",
@@ -6003,7 +6011,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-185",
+    "id": "ho-hsin-chun-186",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "civil-affairs",
     "summary": "大里聯合行政中心列為重點督導工程，目標 2030 年完工，並安排區公所、戶政、地政等機關進駐。",
@@ -6014,11 +6022,11 @@
       },
       {
         "text": "上任後立即將聯合行政中心列為重點督導工程",
-        "sourceId": "ho-pr-62"
+        "sourceId": "ho-pr-61"
       },
       {
         "text": "力拚 2030 年首任期內提前完工。同時安排區公所、戶政、地政等機關進駐",
-        "sourceId": "ho-pr-62"
+        "sourceId": "ho-pr-61"
       }
     ],
     "districts": [
@@ -6040,7 +6048,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-186",
+    "id": "ho-hsin-chun-187",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "hakka-affairs",
     "summary": "串聯東勢、石岡客庄文化，推動台 3 線客家人文大道。",
@@ -6070,7 +6078,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-187",
+    "id": "ho-hsin-chun-188",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "indigenous-affairs",
     "summary": "保存泰雅族傳統編織工藝，發展部落生態導覽與觀光休閒農業。",
@@ -6102,7 +6110,7 @@
     }
   },
   {
-    "id": "ho-hsin-chun-188",
+    "id": "ho-hsin-chun-189",
     "candidateId": "ho-hsin-chun",
     "issueAreaId": "digital",
     "summary": "市政治理全面導入 AI 科技，提升行政效率與城市安全。",
