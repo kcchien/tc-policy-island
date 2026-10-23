@@ -1,7 +1,7 @@
 // 島嶼檢視的畫質：依裝置選初始畫質，執行中量 fps 自動降級。只做計算，瀏覽器與 Node 共用。
 
 // 三段畫質。pixelRatio 是像素比上限；shadowEvery 是每幾幀更新一次陰影。
-// 陰影那一趟約占每幀繪製呼叫的四成（正式資料約 190 / 430），中畫質每 2 幀更新一次，會動的影子仍有 30 fps。
+// 只有主題場景與大樹投影（靜態），中畫質每 2 幀更新一次陰影，省下一半畫陰影的三角形。
 export const QUALITY_LEVELS = {
   high: { pixelRatio: 1.75, antialias: true, shadows: true, shadowMapSize: 2048, shadowEvery: 1 },
   medium: { pixelRatio: 1.35, antialias: true, shadows: true, shadowMapSize: 1024, shadowEvery: 2 },
