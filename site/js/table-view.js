@@ -4,14 +4,14 @@
 
 import { el } from './dom.js';
 import { NO_MATCH_TEXT } from './filter.js';
+import { rawPolicyItemsText } from './policy-card.js';
 
 function candidateHeader(candidate) {
-  const total = candidate.rawPolicyItems.total;
   const meta = [
     candidate.party,
     candidate.ballotNumber === null ? null : `${candidate.ballotNumber} 號`,
     `公開政見 ${candidate.policyCount} 筆`,
-    `原始政見條目 ${total === null ? '尚未統計' : `${total} 項`}`,
+    rawPolicyItemsText(candidate.rawPolicyItems),
   ].filter(Boolean);
   return el(
     'th',
@@ -22,7 +22,7 @@ function candidateHeader(candidate) {
   );
 }
 
-function policyCell(cell, candidate, row, vm, onOpenCard) {
+function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
   const label = el(
     'span',
     { class: 'cell-candidate', 'aria-hidden': 'true' },
@@ -30,7 +30,7 @@ function policyCell(cell, candidate, row, vm, onOpenCard) {
     candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
   );
   if (cell.policies.length === 0) {
-    const text = cell.status === 'no-matches' ? NO_MATCH_TEXT : vm.noPolicyText;
+    const text = cell.status === 'no-matches' ? NO_MATCH_TEXT : noPolicyText;
     return el('td', { role: 'cell', class: 'policy-cell' }, label, el('p', { class: 'no-policy' }, text));
   }
   return el(
@@ -45,7 +45,7 @@ function policyCell(cell, candidate, row, vm, onOpenCard) {
         if (policy.districts.length > 0) {
           button.append(el('span', { class: 'chip-districts' }, `適用行政區：${policy.districts.join('、')}`));
         }
-        button.addEventListener('click', () => onOpenCard(row.issueArea.id, policy.id));
+        button.addEventListener('click', () => openPolicy(policy.id));
         return el('li', {}, button);
       }),
     ),
@@ -87,7 +87,13 @@ export function renderTable(container, vm, { onOpenCard }) {
           'tr',
           { role: 'row', id: `area-${row.issueArea.id}`, class: 'area-row' },
           areaHeader(row, onOpenCard),
-          row.cells.map((cell, index) => policyCell(cell, vm.candidates[index], row, vm, onOpenCard)),
+          // 依欄標題的候選人順序取格子，不靠陣列位置對應。
+          vm.candidates.map((candidate) =>
+            policyCell(row.cells.find((cell) => cell.candidateId === candidate.id), candidate, {
+              noPolicyText: vm.noPolicyText,
+              openPolicy: (policyId) => onOpenCard(row.issueArea.id, policyId),
+            }),
+          ),
         ),
       ),
     ),

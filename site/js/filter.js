@@ -21,9 +21,11 @@ export function filterViewModel(vm, { query = '', district = '' } = {}) {
   const active = terms.length > 0 || districtFilter !== null;
   if (!active) return { ...vm, filter: { active, query: '', district: null, matchCount: null } };
 
-  const matches = (policy) =>
-    (districtFilter === null || policy.districts.includes(districtFilter)) &&
-    terms.every((term) => searchText(policy).includes(term));
+  const matches = (policy) => {
+    if (districtFilter !== null && !policy.districts.includes(districtFilter)) return false;
+    const text = searchText(policy);
+    return terms.every((term) => text.includes(term));
+  };
 
   const rows = vm.rows
     .map((row) => ({

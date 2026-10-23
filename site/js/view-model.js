@@ -5,8 +5,10 @@ import { CANDIDATE_ORDER_RULES, SOURCE_TYPES } from './dataset.js';
 
 export const NO_POLICY_LABEL = '未提出相關政見';
 
-// 出處快照在網站上的目錄。建置指令把公開出處的快照複製到 site/data/snapshots/。
-export const SNAPSHOT_URL_DIR = './data/snapshots/';
+// 出處快照放在公開資料集（site/data/dataset.json）旁的 snapshots/，檔名沿用原快照檔名。
+// 建置指令依此複製檔案，卡片依此產生連結。
+export const SNAPSHOT_DIR = 'snapshots';
+export const snapshotFileName = (source) => source.snapshotPath.split('/').pop();
 
 function sourceView(source) {
   return {
@@ -14,7 +16,7 @@ function sourceView(source) {
     title: source.title,
     url: source.url,
     archiveUrl: source.archiveUrl,
-    snapshotUrl: SNAPSHOT_URL_DIR + source.snapshotPath.split('/').pop(),
+    snapshotUrl: `./data/${SNAPSHOT_DIR}/${snapshotFileName(source)}`,
     sourceType: source.sourceType,
     sourceTypeName: SOURCE_TYPES[source.sourceType],
     retrievedAt: source.retrievedAt,

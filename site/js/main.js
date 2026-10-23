@@ -54,7 +54,7 @@ function setupViewSwitch(view, webgl) {
     button.setAttribute('aria-pressed', String(button.dataset.view === view));
   }
   const note = document.getElementById('view-note');
-  note.textContent = webgl ? '島嶼檢視準備中，目前提供表格檢視。' : '此裝置不支援 3D 顯示，已改用表格檢視。';
+  note.textContent = webgl ? '島嶼檢視準備中，目前提供表格檢視。' : '此裝置無法顯示島嶼檢視，已改用表格檢視。';
   note.hidden = false;
 }
 
@@ -117,11 +117,11 @@ function startApp(vm, state) {
     state.query = '';
     state.district = '';
     updateUrl();
-    // reset 事件在欄位清空前觸發，等清空後再重畫。
-    setTimeout(render);
+    render();
   });
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
+  updateUrl();
   render();
 
   // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時捲到該列並開卡片。
@@ -137,7 +137,10 @@ function startApp(vm, state) {
 async function start() {
   const state = parseSearch(location.search);
   const webgl = supportsWebGL();
-  setupViewSwitch(chooseView({ requested: state.view, webgl, islandAvailable: ISLAND_AVAILABLE }), webgl);
+  const view = chooseView({ requested: state.view, webgl, islandAvailable: ISLAND_AVAILABLE });
+  // 網址指定的檢視無法使用時，不把它留在網址上。
+  if (state.view !== view) state.view = null;
+  setupViewSwitch(view, webgl);
   setupIntro();
   try {
     const response = await fetch(DATASET_URL);

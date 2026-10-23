@@ -33,6 +33,8 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/policy-card.js    政見卡片（兩種檢視共用）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片
+  js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
+  _headers             Cloudflare Pages 回應標頭（出處快照指定 UTF-8）
   data/dataset.json    建置產物，不進版控
   data/snapshots/      建置時複製的公開出處快照，不進版控
   vendor/three/        three.js r160（島嶼檢視的票加入）

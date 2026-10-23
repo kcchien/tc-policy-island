@@ -13,9 +13,10 @@ export function verificationText({ layer1, layer2 }) {
   ];
 }
 
+export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
+
 export function candidateCountText(areaPolicyCount, rawPolicyItems) {
-  const raw = rawPolicyItems.total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${rawPolicyItems.total} 項`;
-  return `此議題區 ${areaPolicyCount} 筆政見，${raw}`;
+  return `此議題區 ${areaPolicyCount} 筆政見，${rawPolicyItemsText(rawPolicyItems)}`;
 }
 
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
@@ -109,16 +110,15 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
 
   return {
     element: dialog,
-    get isOpen() {
-      return dialog.open;
-    },
     open(row, vm, { focusPolicyId = null } = {}) {
       const { issueArea } = row;
       title.textContent = issueArea.name;
       description.textContent = `${issueArea.description}（對應局處：${issueArea.departments.join('、')}）`;
       shareLink.setAttribute('href', areaHref(issueArea.id));
       body.replaceChildren(
-        ...vm.candidates.map((candidate, index) => candidateColumn(candidate, row.cells[index], vm, focusPolicyId)),
+        ...vm.candidates.map((candidate) =>
+          candidateColumn(candidate, row.cells.find((cell) => cell.candidateId === candidate.id), vm, focusPolicyId),
+        ),
       );
       if (!dialog.open) dialog.showModal();
       const focused = focusPolicyId && body.querySelector(`#card-policy-${CSS.escape(focusPolicyId)}`);
