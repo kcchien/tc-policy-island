@@ -17,11 +17,11 @@ export const WALKWAY = { radius: 1.12, width: 0.16 };
 const LAMP_RADIUS = 1.23;
 
 // 島上的位置（相對格心，場景單位）。每個議題區島都相同，與政見無關（ADR 0001）。
-// hero：主建物（主題場景）。模型在單位空間設計（底面 x、z 在 ±0.5、高 0~maxHeight），放大 size 倍後底面中心放在 (x, z)。
+// hero：主題場景（island-heroes.js）。模型在單位空間設計（底面 x、z 在 ±0.5、高 0~maxHeight），放大 size 倍後底面中心放在 (x, z)。
 //   放在北側（離預設鏡頭較遠），不擋南側的標記。單位空間高過 maxHeight 會擋到東南、西南鄰島的標記
-//   （預設視角的視線測試），placeHero 會把超高的模型等比縮小。
-// element：在地感元素的範圍 { minX, maxX, minZ, maxZ, maxY }，議題區島放在主建物西側當次要元素；
-//   裝飾格沒有標記與主建物，元素放大置中。
+//   （預設視角的視線測試），island-heroes.js 的 heroSlotTransform 會把超高的場景等比縮小。
+// element：在地感元素的範圍 { minX, maxX, minZ, maxZ, maxY }，議題區島放在主題場景西側當次要元素；
+//   裝飾格沒有標記與主題場景，元素放大置中。
 export const TILE_SLOTS = {
   hero: { x: 0, z: -0.4, size: 0.72, maxHeight: 1.2, facing: 0 },
   element: {

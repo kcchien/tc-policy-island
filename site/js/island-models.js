@@ -127,13 +127,16 @@ function conifer(x, z, h = 0.42) {
     mesh(cyl(0.025, 0.035, h * 0.3, 5), PALETTE.timber, { x, y: h * 0.15, z }),
     mesh(cone(h * 0.3, h * 0.55, 6), PALETTE.foliageDark, { x, y: h * 0.45, z }),
     mesh(cone(h * 0.22, h * 0.42, 6), PALETTE.foliage, { x, y: h * 0.72, z }),
+    mesh(cone(h * 0.13, h * 0.26, 6), PALETTE.foliageDark, { x, y: h * 0.93, z }),
   ];
 }
 
+// 闊葉樹：主樹冠旁再疊一團小樹冠，樹形不會是單一顆球。
 function roundTree(x, z, h = 0.36) {
   return [
     mesh(cyl(0.025, 0.035, h * 0.45, 5), PALETTE.timber, { x, y: h * 0.22, z }),
     mesh(ico(h * 0.33), PALETTE.foliage, { x, y: h * 0.68, z }),
+    mesh(ico(h * 0.2), PALETTE.foliageDark, { x: x + h * 0.15, y: h * 0.86, z: z + h * 0.06 }),
   ];
 }
 
@@ -159,6 +162,10 @@ function bowl({ r = 0.5, fill, extras = [] }) {
     mesh(cyl(r, r * 0.6, r * 0.6, 14), PALETTE.porcelain, { y: 0.05 + r * 0.3 }),
     mesh(cyl(r * 0.92, r * 0.92, 0.03, 14), fill, { y: 0.05 + r * 0.58 }),
     ...extras.map((make) => make(0.05 + r * 0.6)),
+    // 碗沿一圈深色口緣，碗旁放一支湯匙。
+    mesh(cyl(r * 1.01, r * 1.01, 0.02, 14), PALETTE.tile, { y: 0.05 + r * 0.6 }),
+    mesh(box(0.06, 0.02, 0.32), PALETTE.porcelain, { x: r + 0.12, y: 0.02, z: 0.1, rotY: 0.4 }),
+    mesh(sphere(0.05, 8, 4), PALETTE.porcelain, { x: r + 0.18, y: 0.025, z: 0.24 }),
   ];
 }
 
@@ -184,6 +191,10 @@ function hall({ w, d, h, roofH = 0.22, wallColor = PALETTE.brick, roofColor = PA
   // 窗櫺把窗分成三格；牆腳一圈石砌台基。
   for (const side of [-1, 1]) parts.push(mesh(box(0.012, h * 0.3, 0.016), PALETTE.timber, { x: side * w * 0.09, y: h * 0.52, z: d / 2 + 0.008 }));
   parts.push(mesh(box(w + 0.04, 0.03, d + 0.04), PALETTE.tile, { y: 0.015 }));
+  // 正中的木門與門前石階，門楣兩側各一盞燈。
+  parts.push(mesh(box(w * 0.16, h * 0.32, 0.014), PALETTE.timber, { y: 0.03 + h * 0.16, z: d / 2 + 0.008 }));
+  parts.push(mesh(box(w * 0.26, 0.025, 0.06), PALETTE.tile, { y: 0.04, z: d / 2 + 0.04 }));
+  for (const side of [-1, 1]) parts.push(glowMesh(sphere(0.022, 6, 4), PALETTE.lampGlow, { x: side * w * 0.14, y: h * 0.82, z: d / 2 + 0.03 }));
   if (swallowtail) {
     parts.push(mesh(box(w + 0.1, 0.04, 0.05), roofColor, { y: h + roofH + 0.01 }));
     for (const side of [-1, 1]) {
@@ -212,6 +223,12 @@ function courtyardHouse({ pond = false } = {}) {
   }
   // 前埕兩側的矮磚牆，中間留出入口。
   for (const side of [-1, 1]) parts.push(mesh(box(0.4, 0.08, 0.04), PALETTE.brick, { x: side * 0.55, y: 0.07, z: 0.48 }));
+  // 前埕的古井（井欄與井蓋）與幾只陶甕。
+  parts.push(
+    mesh(cyl(0.07, 0.08, 0.08, 10), PALETTE.tile, { x: -0.28, y: 0.07, z: 0.18 }),
+    mesh(cyl(0.05, 0.05, 0.012, 10), PALETTE.timber, { x: -0.28, y: 0.115, z: 0.18 }),
+    ...[[0.24, 0.14], [0.3, 0.2], [0.2, 0.22]].map(([x, z]) => mesh(sphere(0.045, 8, 6), PALETTE.lateriteDark, { x, y: 0.07, z })),
+  );
   return group(parts);
 }
 
@@ -221,6 +238,14 @@ function wetland({ birds = 3, channel = false } = {}) {
     mesh(cyl(0.55, 0.58, 0.035, 10), PALETTE.shallow, { x: 0.12, y: 0.03, z: 0.05 }),
   ];
   if (channel) parts.push(mesh(box(0.22, 0.04, 1.2), PALETTE.water, { x: -0.25, y: 0.035, rotY: 0.6 }));
+  // 泥灘上的小石頭與招潮蟹（身體加一隻大螯）。
+  for (const [x, z] of [[-0.35, 0.45], [0.55, -0.5], [-0.62, 0.42]]) parts.push(mesh(rockGeo(0.035), PALETTE.rock, { x, y: 0.04, z }));
+  for (const [x, z] of [[-0.3, -0.52], [0.66, 0.36], [-0.68, 0.0]]) {
+    parts.push(
+      mesh(sphere(0.03, 6, 4), PALETTE.laterite, { x, y: 0.04, z }),
+      mesh(sphere(0.018, 5, 3), PALETTE.syrup, { x: x + 0.035, y: 0.05, z: z + 0.01 }),
+    );
+  }
   const reeds = [[-0.6, -0.15], [-0.55, 0.2], [-0.45, -0.38], [0.6, -0.3], [0.62, 0.15], [-0.1, -0.5], [0.3, -0.48], [0.45, 0.42]];
   for (const [x, z] of reeds) {
     for (const [dx, dz, h] of [[0, 0, 0.32], [0.05, 0.03, 0.26], [-0.04, 0.04, 0.22]]) {
@@ -399,6 +424,9 @@ const BUILDERS = {
       mesh(box(0.12, 0.05, 0.4), PALETTE.wall, { y: 0.07, z: 0.22 }),
       ...pavilion(-0.28), ...pavilion(0.28),
       mesh(box(0.2, 0.05, 0.2), PALETTE.wall, { y: 0.12 }),
+      // 長堤的欄杆柱與湖面的荷葉。
+      ...[-0.6, -0.4, -0.2, 0.2, 0.4, 0.6].map((x) => mesh(box(0.025, 0.07, 0.025), PALETTE.brick, { x, y: 0.13, z: 0.47 })),
+      ...[[-0.55, -0.2], [-0.45, 0.2], [0.55, -0.15], [0.5, 0.18], [0.0, -0.45]].map(([x, z]) => mesh(cyl(0.06, 0.06, 0.01, 8), PALETTE.foliage, { x, y: 0.045, z })),
     );
   },
   // 東海大學路思義教堂：兩對彎曲屋面向上收成尖頂，屋脊中間留一道天窗縫。
@@ -454,23 +482,10 @@ function fitInto(model, area) {
 }
 
 // slot 是元素區 { minX, maxX, minZ, maxZ, maxY }（相對格心），見 island-body.js 的 TILE_SLOTS.element。
+// 議題區島的元素是主題場景（island-heroes.js）旁的次要元素。
 export function localElementModel(element, slot) {
   const build = BUILDERS[element.id] ?? BY_CATEGORY[element.category];
   return build ? fitInto(build(), slot) : null;
-}
-
-// 主建物（主題場景）放進 heroSlot：模型在單位空間設計（底面 x、z 在 ±0.5、高 0~slot.maxHeight），
-// 放大 slot.size 倍，底面中心放在 (slot.x, slot.z)，面向 slot.facing。比 maxHeight 高的模型整體等比縮小，
-// 不擋到鄰島的標記。回傳包好的群組，加進格子群組即可。
-export function placeHero(model, slot) {
-  model.updateMatrixWorld(true);
-  const height = new THREE.Box3().setFromObject(model).max.y;
-  const wrapper = new THREE.Group();
-  wrapper.position.set(slot.x, 0, slot.z);
-  wrapper.rotation.y = slot.facing;
-  wrapper.scale.setScalar(slot.size * Math.min(1, slot.maxHeight / Math.max(height, 1e-6)));
-  wrapper.add(model);
-  return wrapper;
 }
 
 // 候選人標記：同尺寸、同色，只以形狀區分。size 是外接圓半徑。

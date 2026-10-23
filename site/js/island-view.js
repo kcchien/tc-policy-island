@@ -18,11 +18,13 @@ import { createOutskirts } from './island-outskirts.js';
 import { outskirtsWaterRadius } from './island-terrain.js';
 import { createMotion } from './island-motion-view.js';
 import {
-  figureModel, localElementModel, markerModel, placeHero, setMarkerLit, TILE_SURFACE,
+  figureModel, localElementModel, markerModel, setMarkerLit, TILE_SURFACE,
 } from './island-models.js';
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
 import { figurePose, plazaLayout } from './island-plaza.js';
+import { heroPlan } from './island-heroes.js';
+import { buildHeroScene } from './island-hero-view.js';
 import { el } from './dom.js';
 
 const FOV = 32;
@@ -40,9 +42,7 @@ const MODEL_TOP = TILE_SURFACE + 1.1;
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫；onSelectCandidate(candidateId) 在點選候選人人物時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
 // insets() 回傳畫布四邊被浮動元件遮住的像素寬度 { top, right, bottom, left }。
-// heroScene(areaId) 回傳該議題區的主建物模型（單位空間：底面 ±0.5、高 0~1.5）或 null，只依議題區識別碼決定；
-// 由主題場景模組提供，沒給時島上只有主建物基座。
-export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, heroScene = null, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
+export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSelectCandidate, insets = () => ({ top: 0, right: 0, bottom: 0, left: 0 }) }) {
   const quality = initialQuality({
     width: window.innerWidth,
     coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -83,7 +83,9 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   let frame = 0;
   let lastNight = 0;
 
-  // 每格一個群組：島體（island-body-view.js）、主建物、在地感元素、三個標記、議題區名牌。
+  // 每格一個群組：島體（island-body-view.js）、主題場景、在地感元素、三個標記、議題區名牌。
+  // 主題場景放在每島的主題場景位置（heroSlot），只依議題區決定（island-heroes.js）。
+  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
   const tiles = new Map();
   const groups = new Map();
   const pickable = [];
@@ -100,12 +102,11 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
       model.position.y = TILE_SURFACE;
       g.add(model);
     }
-    // 主建物（主題場景）：heroScene(areaId) 回傳單位空間的模型，放進每島同一個 heroSlot。只依議題區決定。
-    const hero = tileInfo.heroSlot && heroScene?.(tileInfo.id);
+    // 議題區的主題場景（只依識別碼，見 island-heroes.js）；heroes 的位置是世界座標，換成格子群組內的座標。
+    const hero = heroes.get(tileInfo.id);
     if (hero) {
-      const placed = placeHero(hero, tileInfo.heroSlot);
-      placed.position.y = TILE_SURFACE;
-      g.add(placed);
+      const { x, z, scale, yaw } = hero.transform;
+      g.add(buildHeroScene(tileInfo.id, { x: x - tileInfo.position.x, y: TILE_SURFACE, z: z - tileInfo.position.z, scale, yaw }));
     }
     const markers = tileInfo.markers.map((info) => {
       const marker = markerModel(info);

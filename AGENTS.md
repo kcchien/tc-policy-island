@@ -39,10 +39,10 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/sheet.js          手機底部抽屜的三段拖曳（snapSheet 純函式、bindSheetDrag）與卡片對話框共用行為（bindSheetDialog）
   js/app-state.js      網址參數與檢視選擇
   js/main.js           進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換
-  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主建物位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
+  js/island-layout.js  島嶼配置（不碰 three.js，Node 可測）：格子位置（格距含水道）、每格的主題場景位置 heroSlot 與在地感元素位置、候選人標記、構圖（可轉方位角）、鏡頭限制、畫面偏移（viewOffset）
   js/island-body.js    島體配置（Node 可測，不 import 其他模組）：島半徑與水道寬、拱橋（每對相鄰島一座，接步道環邊中點）、步道環行人路網、外圈環線（outerLoop）、每島六盞路燈、島上位置 TILE_SLOTS
-  js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、主建物基座、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
-  js/island-models.js  低多邊形模型與 3D 材質色碼（PALETTE，禁用色檢查會掃）；placeHero 把單位空間的主題場景放進 heroSlot
+  js/island-body-view.js 島體的 3D：頂面（程序地面貼圖）、側壁（水面材質）、頂緣圖案帶、步道環、路緣、路燈、淺水環與泡沫環、拱橋；paint 與 setLift 給選取用
+  js/island-models.js  在地感元素、標記與人物模型，以及 3D 材質色碼（PALETTE，禁用色檢查會掃）
   js/island-view.js    島嶼檢視的 3D 場景；main.js 第一次進入島嶼檢視時才動態載入。控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）
   js/island-daylight.js 晝夜：四個時段的關鍵影格（天空、光照、霧、水、夜間係數）與 1.4 秒補間（Node 可測，色碼受禁用色檢查）
   js/island-quality.js 畫質三段、社群 App 內建瀏覽器低畫質、執行中 fps 自動降級（Node 可測）
@@ -50,8 +50,10 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-camera.js  鏡頭（Node 可測）：飛行（1.15 秒、依經過時間、拖曳取消）、卡片遮住範圍的畫面偏移與平滑、預設視角（直式畫面較低俯角並轉方位角）
   js/island-selection.js 選取回饋：選中格子的六角外框（不受遮擋）、呼吸光環、滑過的淡色外框
   js/island-plaza.js   候選人廣場與人物配置（Node 可測，不 import 其他模組）：廣場格、三人同款的零件、尺寸、顏色、待機動畫；關卡「人物一致」直接載入網站目錄裡這一份
-  js/island-parts.js   零件分桶規則（Node 可測）
-  js/island-kit.js     零件庫：共用單位幾何，instancify 把靜態零件合批成 InstancedMesh
+  js/island-parts.js   零件分桶規則與實例縮放微抖動（Node 可測）
+  js/island-kit.js     零件庫：共用單位幾何（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），instancify 把靜態零件合批成 InstancedMesh（主題場景零件用黏土材質與縮放微抖動）
+  js/island-heroes.js  主題場景（Node 可測）：20 個議題區各一座的零件資料（單位空間）、只依識別碼選場景、擺放（heroPlan，島體提供主題場景位置前暫放在元素區西半）、色碼
+  js/island-hero-view.js 主題場景畫成 3D：buildHeroScene(areaId, transform)
   js/island-environment.js 天空漸層球、光源、霧、水面、夜間發光材質
   js/island-terrain.js 外圍地形的配置（Node 可測）：雜訊地形（西側海與浪花線、南北平原的田塊與河流、東側丘陵升高成山脈）、地面色、各畫質的樹、霧、聚落數量、樹群、聚落、霧團、雲、飛鳥與依動畫時間的位置；高度不超過「離島距離 × 斜率」，不擋格子；只讀格子位置
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
@@ -103,7 +105,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 
 開啟候選人資料卡：`main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 
-放主題場景：`createIslandView` 的選項 `heroScene(areaId)` 回傳單位空間的模型（底面 x、z 在 ±0.5、高 0~1.5）或 `null`，island-view.js 用 `placeHero` 放進每個議題區島的 `heroSlot`（每島相同，見 `island-body.js` 的 `TILE_SLOTS.hero`）。只依議題區識別碼決定，不讀政見。
+放主題場景：`island-heroes.js` 的 `heroPlan(layout)` 預設用 `heroSlotTransform` 把每座場景放進該議題區島的 `heroSlot`（每島相同，見 `island-body.js` 的 `TILE_SLOTS.hero`），場景高過 `maxHeight` 時整座等比縮小，不擋鄰島標記。只依議題區識別碼決定，不讀政見。
 
 ### 資料與夾具
 

@@ -1,4 +1,4 @@
-// 島體的 3D 場景：每座小島的頂面（程序地面貼圖）、側壁、頂緣圖案帶、步道環、路緣、主建物基座、路燈，
+// 島體的 3D 場景：每座小島的頂面（程序地面貼圖）、側壁、頂緣圖案帶、步道環、路緣、路燈，
 // 島外的淺水環與泡沫環，以及相鄰島之間的拱橋。配置來自 island-body.js（只看格子位置，不讀政見）。
 // 靜態零件用零件庫的共用幾何，放進格子群組（選取抬高時跟著動），之後由 instancify 合批；
 // 側壁用水面材質、淺水與泡沫環半透明，這三種自己建 InstancedMesh。
@@ -23,7 +23,6 @@ export const BODY_PALETTE = {
   walkway: 0xc4a184,
   walkwayJoint: 0xa8876c,
   curb: 0xe0d0bb,
-  heroPad: 0xd8c6ae,
   // 頂緣圖案帶：每島一個主色與淺色交錯，主色依格子順序輪替，與議題內容無關。
   band: [0xb5734f, 0xa8805a, 0x9a6b52, 0xc08f62, 0x8f6a58],
   bandLight: 0xe6d8c4,
@@ -220,10 +219,6 @@ export function createIslandBody(scene, layout, { groupOf, waterMaterial, plazaI
           scale: [WALKWAY.width * 0.96, 0.002, 0.012],
         });
       }
-    }
-    if (tile.heroSlot) {
-      const { x, z, size } = tile.heroSlot;
-      part(group, 'box', unitBox, BODY_PALETTE.heroPad, { x, y: TILE_SURFACE + 0.01, z, scale: [size * 1.04, 0.02, size * 1.04] });
     }
     const lamps = streetLamps(body.lamps.filter((l) => l.tileId === tile.id).map((l) => [l.x - tile.position.x, l.z - tile.position.z]));
     group.add(lamps);

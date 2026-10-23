@@ -3,7 +3,10 @@
 // 會動的零件不要用共用幾何，或在 mesh.userData.dynamic 設 true，instancify 會略過。
 
 import * as THREE from 'three';
-import { partBuckets } from './island-parts.js';
+import { partBuckets, scaleJitter } from './island-parts.js';
+
+// 合批零件的黏土材質數值。
+const CLAY ={ roughness: 0.78, metalness: 0 };
 
 const geometries = new Map();
 
@@ -17,6 +20,52 @@ export function sharedGeometry(key, make) {
   return geometries.get(key);
 }
 
+// 圓角盒：細分的單位立方體，把每個頂點收進內盒再沿法向推出圓角半徑 radius。
+function roundedBox(radius = 0.12, segments = 4) {
+  const geometry = new THREE.BoxGeometry(1, 1, 1, segments, segments, segments);
+  const pos = geometry.attributes.position;
+  const inner = 0.5 - radius;
+  const v = new THREE.Vector3();
+  const core = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    core.set(THREE.MathUtils.clamp(v.x, -inner, inner), THREE.MathUtils.clamp(v.y, -inner, inner), THREE.MathUtils.clamp(v.z, -inner, inner));
+    v.sub(core).normalize().multiplyScalar(radius).add(core);
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+// 主題場景的零件形體（island-heroes.js 的 HERO_SHAPES）：每種都裝在 ±0.5 的單位立方體裡，用縮放撐成零件尺寸。
+const KIT_SHAPES = {
+  box: () => new THREE.BoxGeometry(1, 1, 1),
+  rbox: () => roundedBox(),
+  cyl: () => new THREE.CylinderGeometry(0.5, 0.5, 1, 14),
+  cone: () => new THREE.ConeGeometry(0.5, 1, 14),
+  sphere: () => new THREE.SphereGeometry(0.5, 16, 12),
+  ico: () => new THREE.IcosahedronGeometry(0.5, 1),
+  // 圓頂：半球壓成高 1，底面在 y = -0.5。
+  dome: () => new THREE.SphereGeometry(0.5, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 2, 1).translate(0, -0.5, 0),
+  // 環：立在 x-y 平面（鐘面、車輪、籃框），外徑 1，厚度方向 z 撐滿 ±0.5。
+  torus: () => new THREE.TorusGeometry(0.4, 0.1, 8, 20).scale(1, 1, 5),
+  // 稜柱：三角形剖面在 x-y 平面（底寬 1、頂點在上），沿 z 拉長，當雙坡屋頂與鋸齒屋頂。
+  prism: () => {
+    const shape = new THREE.Shape([new THREE.Vector2(-0.5, -0.5), new THREE.Vector2(0.5, -0.5), new THREE.Vector2(0, 0.5)]);
+    return new THREE.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false }).translate(0, 0, -0.5);
+  },
+  // 四坡屋頂：四邊錐轉 45 度，底面是邊長 1 的正方形。
+  hip: () => new THREE.ConeGeometry(Math.SQRT1_2, 1, 4, 1).rotateY(Math.PI / 4),
+};
+const GLOW_SHAPES = { glowbox: 'box', glowsphere: 'sphere' };
+
+// 主題場景零件的共用幾何與是否發光。shape 是 HERO_SHAPES 之一。
+export function kitShape(shape) {
+  const base = GLOW_SHAPES[shape] ?? shape;
+  if (!KIT_SHAPES[base]) throw new Error(`零件庫沒有形體 ${shape}`);
+  return { geometry: sharedGeometry(`kit:${base}`, KIT_SHAPES[base]), glow: base !== shape };
+}
+
 // 發光零件的來源材質：只用來標記「這是發光件」與它的顏色，instancify 會換成共用的發光材質。
 export function glowSourceMaterial(color) {
   const m = new THREE.MeshBasicMaterial({ color });
@@ -24,11 +73,16 @@ export function glowSourceMaterial(color) {
   return m;
 }
 
-// 材質種類：發光、雙面、一般。透明材質不收（透明物件要排序，合批後會畫錯）。
-function materialKind(material) {
+// 主題場景零件庫的形體（kitShape 建的幾何）：用黏土材質並加縮放微抖動。
+// 其他零件（格子、在地感元素、路燈、路面）維持原本的低多邊形 flatShading，不受影響。
+const isClayShape = (shape) => shape.startsWith('kit:');
+
+// 材質種類：發光、黏土、雙面、一般。透明材質不收（透明物件要排序，合批後會畫錯）。
+function materialKind(material, shape) {
   if (material.userData.glow) return 'glow';
   if (material.transparent || !(material instanceof THREE.MeshStandardMaterial)) return null;
-  return material.side === THREE.DoubleSide ? 'standard-double' : 'standard';
+  if (material.side === THREE.DoubleSide) return 'standard-double';
+  return isClayShape(shape) ? 'clay' : 'standard';
 }
 
 // 往上找第一個 userData.areaId，點到零件時才知道是哪個議題區。
@@ -47,7 +101,7 @@ export function instancify(root, { glowMaterial }) {
   root.traverse((object) => {
     if (!object.isMesh || object.isInstancedMesh || object.userData.dynamic) return;
     const shape = object.geometry.userData.kitShape;
-    const kind = shape && materialKind(object.material);
+    const kind = shape && materialKind(object.material, shape);
     if (!kind) return;
     parts.push({
       shape,
@@ -69,12 +123,21 @@ export function instancify(root, { glowMaterial }) {
   const base = {
     standard: new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 }),
     'standard-double': new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0, side: THREE.DoubleSide }),
+    // 霧面黏土：roughness 0.78、metalness 0，不用 flatShading，圓角與曲面看起來柔和。
+    clay: new THREE.MeshStandardMaterial({ roughness: CLAY.roughness, metalness: CLAY.metalness }),
     glow: glowMaterial,
   };
   const color = new THREE.Color();
+  const jitter = new THREE.Matrix4();
+  let serial = 0;
   const meshes = partBuckets(parts).map((bucket) => {
     const mesh = new THREE.InstancedMesh(bucket.items[0].geometry, base[bucket.material], bucket.items.length);
     bucket.items.forEach((part, i) => {
+      // 主題場景零件的縮放微抖動（island-parts.js 的 scaleJitter），共面的零件錯開一點，不會 z-fighting。
+      if (isClayShape(part.shape)) {
+        const j = scaleJitter(serial++);
+        part.transform.multiply(jitter.makeScale(j, j, j));
+      }
       mesh.setMatrixAt(i, part.transform);
       mesh.setColorAt(i, color.setHex(part.color));
     });

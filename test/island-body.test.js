@@ -101,7 +101,7 @@ test('行人路網：每島步道環 12 個節點連成一圈，橋連起相鄰�
   }
 });
 
-test('每個議題區島有同一個主建物位置與在地感元素位置，都在步道環內，彼此與三個標記、循環道具不重疊', () => {
+test('每個議題區島有同一個主題場景位置與在地感元素位置，都在步道環內，彼此與三個標記、循環道具不重疊', () => {
   const layout = realLayout();
   const areas = layout.tiles.filter((t) => t.kind === 'area');
   const inner = (WALKWAY.radius * Math.sqrt(3)) / 2 - WALKWAY.width / 2;
@@ -115,7 +115,7 @@ test('每個議題區島有同一個主建物位置與在地感元素位置，�
     assert.deepEqual(tile.elementSlot, areas[0].elementSlot, tile.id);
   }
   const { heroSlot, elementSlot, markers } = areas[0];
-  // 主建物在單位空間設計（底面 ±0.5），放大 size 倍後的範圍。
+  // 主題場景在單位空間設計（底面 ±0.5），放大 size 倍後的範圍。
   const hero = { minX: heroSlot.x - heroSlot.size / 2, maxX: heroSlot.x + heroSlot.size / 2, minZ: heroSlot.z - heroSlot.size / 2, maxZ: heroSlot.z + heroSlot.size / 2 };
   const markerBoxes = markers.map((m) => ({ minX: m.offset.x - m.radius, maxX: m.offset.x + m.radius, minZ: m.offset.z - m.radius, maxZ: m.offset.z + m.radius }));
   const loopBoxes = LOOP_SPOTS.map(({ x, z }) => ({ minX: x - LOOP_CORE, maxX: x + LOOP_CORE, minZ: z - LOOP_CORE, maxZ: z + LOOP_CORE }));
@@ -125,13 +125,13 @@ test('每個議題區島有同一個主建物位置與在地感元素位置，�
   // 標記以外接圓檢查。
   for (const m of markers) assert.ok(hexNorm(m.offset.x, m.offset.z) + m.radius < inner, `${m.shape} 標記壓到步道環`);
   for (const box of [...markerBoxes, ...loopBoxes]) {
-    assert.ok(!overlaps(hero, box), '主建物壓到標記或道具');
+    assert.ok(!overlaps(hero, box), '主題場景壓到標記或道具');
     assert.ok(!overlaps(elementSlot, box), '在地感元素壓到標記或道具');
   }
-  assert.ok(!overlaps(hero, elementSlot), '主建物與在地感元素重疊');
-  // 主建物在北側（離鏡頭較遠），不擋南側的標記。
+  assert.ok(!overlaps(hero, elementSlot), '主題場景與在地感元素重疊');
+  // 主題場景在北側（離鏡頭較遠），不擋南側的標記。
   assert.ok(hero.maxZ < Math.min(...markerBoxes.map((b) => b.minZ)));
-  assert.ok(heroSlot.size >= 0.6, `主建物太小 ${heroSlot.size}`);
+  assert.ok(heroSlot.size >= 0.6, `主題場景太小 ${heroSlot.size}`);
 
   for (const tile of layout.tiles.filter((t) => t.kind === 'decorative')) {
     assert.equal(tile.heroSlot, null);
