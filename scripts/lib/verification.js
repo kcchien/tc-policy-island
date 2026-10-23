@@ -1,6 +1,7 @@
 // 核對（見 ADR 0002）。第一層：原文引述須逐字出現在出處快照中。
 // 第二層：獨立 AI 依檢核表判定摘要；本模組負責組提示詞、解析輸出與寫成核對紀錄，不呼叫 claude。
 import { readFileSync } from 'node:fs';
+import { readJson } from './raw-data.js';
 
 // 比對用的正規化：全形半形統一、移除空白與換行、移除標點。
 // 夾在兩個數字之間的標點保留（小數點、千分位、日期與時間），避免「1.5」與「15」被視為相同。
@@ -32,10 +33,6 @@ export function checkLayer1(policy, snapshots) {
   return { status: problems.length === 0 ? 'pass' : 'fail', problems };
 }
 
-function readJson(path) {
-  return JSON.parse(readFileSync(path, 'utf8'));
-}
-
 // 提示詞檔第一行是「版本：X」，其後以「## 系統提示」「## 判定提示」分段。
 function parsePromptFile(text, path) {
   const version = text.match(/^版本：(\S+)/)?.[1];
@@ -56,25 +53,18 @@ export function loadVerificationRules(paths) {
   for (const key of ['brand', 'frequent']) {
     if (!Array.isArray(brandTerms[key])) throw new Error(`品牌用語清單 ${paths.brandTerms} 缺少 ${key} 陣列`);
   }
-  return {
-    checklist,
-    prompt,
-    brandTerms,
-    checklistVersion: `${checklist.version}（品牌用語清單 ${brandTerms.version}）`,
-  };
+  return { checklist, prompt, brandTerms, checklistVersion: checklist.version };
 }
 
 export const HIDDEN_NAME_MASK = '○○';
 
 // 只代入摘要、原文引述、檢核表與品牌用語清單。候選人、議題區、出處等一律不給。
 // 盲測：品牌用語只代入 term，不帶 candidate 與 note；hiddenNames（候選人姓名與政黨名稱）
-// 在摘要與原文引述中以 ○○ 遮蔽，本身含這些名稱的品牌用語整筆不代入（由上線關卡的品牌用語掃描處理）。
+// 在品牌用語、摘要與原文引述中一律以 ○○ 遮蔽。三處遮法相同，比對摘要與原文、品牌用語不受影響。
 export function buildLayer2Request(rules, policy, { hiddenNames = [] } = {}) {
   const names = [...new Set(hiddenNames.filter(Boolean))].sort((a, b) => b.length - a.length);
   const mask = (text) => names.reduce((out, name) => out.replaceAll(name, HIDDEN_NAME_MASK), text);
-  const termList = (entries) =>
-    entries.map((e) => e.term).filter((term) => !names.some((name) => term.includes(name)))
-      .map((term) => `- ${term}`).join('\n') || '（無）';
+  const termList = (entries) => entries.map((e) => `- ${mask(e.term)}`).join('\n') || '（無）';
   const values = {
     checklistVersion: rules.checklist.version,
     checklist: rules.checklist.items.map((item, i) => `${i + 1}. ${item.title}：${item.rule}`).join('\n'),
@@ -136,6 +126,9 @@ export function parseLayer2Output(stdout) {
   if (verdict === null || typeof verdict !== 'object') return malformed('回覆不是 JSON 判定');
   if (!Object.hasOwn(LAYER2_VERDICTS, verdict.verdict)) return malformed(`verdict 應為「通過」或「退回」，實際為 ${JSON.stringify(verdict.verdict)}`);
   if (typeof verdict.reason !== 'string' || verdict.reason.trim() === '') return malformed('reason 應為非空字串');
-  const model = Object.keys(envelope.modelUsage ?? {})[0] ?? null;
+  // claude -p 可能另外呼叫輔助模型，輸出最多的才是做判定的模型。
+  const [model = null] = Object.entries(envelope.modelUsage ?? {})
+    .sort(([, a], [, b]) => (b?.outputTokens ?? 0) - (a?.outputTokens ?? 0))
+    .map(([name]) => name);
   return { status: LAYER2_VERDICTS[verdict.verdict], reason: verdict.reason.trim(), model };
 }

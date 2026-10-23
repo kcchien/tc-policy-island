@@ -52,7 +52,7 @@ test('核對指令對全部政見跑兩層核對，結果寫回原始資料', ()
     layer2: {
       status: 'pass',
       reason: '假判定：通過',
-      checklistVersion: '1（品牌用語清單 fixture-1）',
+      checklistVersion: '1',
       model: 'fake-model',
       checkedAt: '2026-10-24',
     },
@@ -82,14 +82,15 @@ test('每筆政見各開一個全新 claude -p session：不帶工具與設定�
 
 test('--candidate 只核對指定候選人的政見，其他候選人的紀錄不變', () => {
   const rawDir = copySample();
-  const before = readPolicies(rawDir, 'sample-jia');
+  const otherFile = join(rawDir, 'policies', 'sample-jia.json');
+  const before = readFileSync(otherFile, 'utf8');
 
   const { code, output, calls } = verify(rawDir, ['--candidate', 'sample-yi']);
 
   assert.equal(code, 0, output);
   assert.equal(calls.length, 1);
   assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.model, 'fake-model');
-  assert.deepEqual(readPolicies(rawDir, 'sample-jia'), before);
+  assert.equal(readFileSync(otherFile, 'utf8'), before);
 });
 
 test('--candidate 指向不存在的候選人時以非零結束碼退出', () => {
@@ -106,6 +107,10 @@ test('--skip-passed 只跑未核對或已退回的政見', () => {
     p.verification.layer2.status = 'fail';
   });
 
+  editPolicy(rawDir, 'sample-jia', 'sample-jia-001', (p) => {
+    p.verification.layer2.checklistVersion = '1';
+  });
+
   const { code, output, calls } = verify(rawDir, ['--skip-passed']);
 
   assert.equal(code, 0, output);
@@ -113,6 +118,15 @@ test('--skip-passed 只跑未核對或已退回的政見', () => {
   assert.equal(policyById(rawDir, 'sample-jia', 'sample-jia-001').verification.layer2.model, 'sample-model');
   assert.equal(policyById(rawDir, 'sample-jia', 'sample-jia-002').verification.layer2.status, 'pass');
   assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.status, 'pass');
+});
+
+test('--skip-passed 會重跑以舊版檢核表通過的政見', () => {
+  const rawDir = copySample();
+
+  const { calls } = verify(rawDir, ['--skip-passed', '--candidate', 'sample-yi']);
+
+  assert.equal(calls.length, 1);
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.checklistVersion, '1');
 });
 
 test('第一層不通過就不送第二層，第二層維持未核對', () => {
@@ -148,7 +162,8 @@ test('出處快照雜湊與出處紀錄不符時，第一層不通過', () => {
 
 test('第二層退回或輸出格式錯誤時寫成不通過，並記錄原因', () => {
   const rejected = copySample();
-  verify(rejected, ['--candidate', 'sample-yi'], { verdict: '退回' });
+  const { output } = verify(rejected, ['--candidate', 'sample-yi'], { verdict: '退回' });
+  assert.match(output, /sample-yi-001：第一層通過、第二層退回/);
   const malformed = copySample();
   verify(malformed, ['--candidate', 'sample-yi'], { verdict: 'malformed' });
 

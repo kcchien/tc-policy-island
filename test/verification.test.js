@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -116,6 +116,18 @@ test('第二層：合法的退回判定解析為 fail，保留退回理由', () 
   });
 });
 
+test('第二層：輸出回報多個模型時，模型名稱取輸出最多的那個（做判定的模型）', () => {
+  const output = claudeOutput({
+    structured_output: { verdict: '通過', reason: '符合檢核表' },
+    modelUsage: {
+      'helper-model': { inputTokens: 50, outputTokens: 3 },
+      'judge-model': { inputTokens: 800, outputTokens: 400 },
+    },
+  });
+
+  assert.equal(parseLayer2Output(output).model, 'judge-model');
+});
+
 test('第二層：沒有結構化輸出時，從回覆文字解析固定格式的判定', () => {
   const output = claudeOutput({ result: '{"verdict":"通過","reason":"符合檢核表"}' });
 
@@ -162,7 +174,7 @@ test('第二層提示詞：含檢核表全部項目、品牌用語、摘要與�
   assert.ok(request.prompt.includes(POLICY.quotes[0].text));
   assert.doesNotMatch(request.prompt, /\{\{/);
   assert.ok(request.systemPrompt.length > 0);
-  assert.equal(request.checklistVersion, '1（品牌用語清單 fixture-1）');
+  assert.equal(request.checklistVersion, '1');
 });
 
 test('第二層提示詞：不含候選人、議題區、出處與抽取資訊', () => {
@@ -174,17 +186,16 @@ test('第二層提示詞：不含候選人、議題區、出處與抽取資訊',
   }
 });
 
-test('第二層提示詞：品牌用語清單只代入詞本身，不含候選人姓名與政黨名稱（盲測）', () => {
-  // 正式清單每筆的 candidate 與 note 會寫到真實候選人，這裡故意放進去，確認不會漏給核對 AI。
-  const leaked = ['江啟臣', '何欣純', '洪麗華', '中國國民黨', '民主進步黨', '司法正義黨'];
+test('第二層提示詞：品牌用語清單只代入詞本身，不帶 candidate 與 note（盲測）', () => {
+  const leaked = ['範例甲', '範例乙', '範例丙', '範例甲黨', '範例乙黨', '範例丙黨', '筆記'];
   const brandTerms = join(mkdtempSync(join(tmpdir(), 'rules-')), 'brand-terms.json');
   writeFileSync(brandTerms, JSON.stringify({
     version: 'leak-test',
     brand: [
-      { term: '範例口號', candidate: '江啟臣', note: '中國國民黨提名的江啟臣使用' },
-      { term: '七星市政', candidate: '何欣純', note: '民主進步黨提名的何欣純使用' },
+      { term: '範例口號', candidate: '範例甲', note: '範例甲黨提名的範例甲使用（筆記）' },
+      { term: '七星市政', candidate: '範例乙', note: '範例乙黨提名的範例乙使用（筆記）' },
     ],
-    frequent: [{ term: '超級', candidate: '洪麗華', note: '司法正義黨洪麗華' }],
+    frequent: [{ term: '超級', candidate: '範例丙', note: '範例丙黨範例丙（筆記）' }],
   }));
 
   const request = buildLayer2Request(loadVerificationRules({ ...RULE_PATHS, brandTerms }), POLICY);
@@ -196,7 +207,23 @@ test('第二層提示詞：品牌用語清單只代入詞本身，不含候選�
   }
 });
 
-test('第二層提示詞：本身含候選人姓名或政黨名稱的品牌用語不代入提示詞', () => {
+// 管理者要求：正式品牌用語清單組出的提示詞不得含三位候選人的姓名與政黨名稱。
+// 正式清單由 #3 建立在 data/rules/brand-terms.json，檔案還不存在時略過。
+const REAL_BRAND_TERMS = repoPath('data/rules/brand-terms.json');
+test('第二層提示詞：用正式品牌用語清單與候選人資料組出的提示詞不含候選人姓名與政黨名稱', { skip: !existsSync(REAL_BRAND_TERMS) && '尚無 data/rules/brand-terms.json' }, () => {
+  const leaked = ['江啟臣', '何欣純', '洪麗華', '中國國民黨', '民主進步黨', '司法正義黨'];
+  const candidates = JSON.parse(readFileSync(repoPath('data/raw/candidates.json'), 'utf8'));
+  const rules = loadVerificationRules({ ...RULE_PATHS, brandTerms: REAL_BRAND_TERMS });
+
+  const request = buildLayer2Request(rules, POLICY, { hiddenNames: candidates.flatMap((c) => [c.name, c.party]) });
+
+  for (const name of leaked) {
+    assert.ok(!request.prompt.includes(name), name);
+    assert.ok(!request.systemPrompt.includes(name), name);
+  }
+});
+
+test('第二層提示詞：品牌用語本身含候選人姓名或政黨名稱時，遮蔽名稱後仍代入', () => {
   const brandTerms = join(mkdtempSync(join(tmpdir(), 'rules-')), 'brand-terms.json');
   writeFileSync(brandTerms, JSON.stringify({
     version: 'leak-test',
@@ -219,6 +246,8 @@ test('第二層提示詞：本身含候選人姓名或政黨名稱的品牌用�
   assert.ok(request.prompt.includes('範例口號'));
   assert.ok(!request.prompt.includes('範例甲'));
   assert.ok(!request.prompt.includes('範例乙'));
+  assert.ok(request.prompt.includes('- 台中的市長○○'));
+  assert.ok(request.prompt.includes('- ○○加油'));
   assert.ok(request.prompt.includes('○○主張在範例區增設三條公車路線。'));
   assert.ok(request.prompt.includes('我○○承諾，在範例區增設三條範例公車路線。'));
 });
@@ -235,7 +264,7 @@ test('紀錄寫入：第一層通過、第二層通過時寫入兩層結果、�
   const verification = recordVerification({
     layer1: { status: 'pass' },
     layer2: { status: 'pass', reason: '摘要忠於原文', model: 'claude-opus-5-5' },
-    checklistVersion: '1（品牌用語清單 fixture-1）',
+    checklistVersion: '1',
     checkedAt: '2026-10-23',
   });
 
@@ -244,7 +273,7 @@ test('紀錄寫入：第一層通過、第二層通過時寫入兩層結果、�
     layer2: {
       status: 'pass',
       reason: '摘要忠於原文',
-      checklistVersion: '1（品牌用語清單 fixture-1）',
+      checklistVersion: '1',
       model: 'claude-opus-5-5',
       checkedAt: '2026-10-23',
     },

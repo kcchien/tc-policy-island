@@ -10,7 +10,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { isVerified, validateRawData } from '../site/js/dataset.js';
-import { loadRawData } from './lib/raw-data.js';
+import { loadRawData, readJson } from './lib/raw-data.js';
 import {
   buildLayer2Request,
   checkLayer1,
@@ -35,7 +35,10 @@ const { values } = parseArgs({
   },
 });
 
-const STATUS_TEXT = { pass: '通過', fail: '不通過', pending: '未核對' };
+const STATUS_TEXT = {
+  layer1: { pass: '通過', fail: '不通過', pending: '未核對' },
+  layer2: { pass: '通過', fail: '退回', pending: '未核對' },
+};
 
 // 快照路徑相對 repo 根目錄。檔案不存在或雜湊與出處紀錄不符時視為沒有可用的快照。
 function readSnapshots(sources) {
@@ -89,15 +92,24 @@ function runLayer2(request) {
   }
 }
 
-function writePolicies(rawDir, policiesById) {
+// 政見識別碼 → 所在的 policies/*.json，寫回時只重寫該檔。
+function policyFiles(rawDir) {
   const dir = join(rawDir, 'policies');
-  for (const name of readdirSync(dir).filter((n) => n.endsWith('.json')).sort()) {
-    const path = join(dir, name);
-    const records = JSON.parse(readFileSync(path, 'utf8'));
-    const updated = records.map((p) => policiesById.get(p.id) ?? p);
-    writeFileSync(path, `${JSON.stringify(updated, null, 2)}\n`);
+  const fileOf = new Map();
+  for (const name of readdirSync(dir).filter((n) => n.endsWith('.json'))) {
+    for (const p of readJson(join(dir, name))) fileOf.set(p.id, join(dir, name));
   }
+  return fileOf;
 }
+
+function writePolicy(path, policy) {
+  const records = readJson(path).map((p) => (p.id === policy.id ? policy : p));
+  writeFileSync(path, `${JSON.stringify(records, null, 2)}\n`);
+}
+
+// 兩層都以現行檢核表版本通過才算已通過；檢核表升版後舊的通過要重跑。
+const passedWithCurrentChecklist = (policy, checklistVersion) =>
+  isVerified(policy) && policy.verification.layer2.checklistVersion === checklistVersion;
 
 function main() {
   const rawDir = resolve(values.raw);
@@ -110,20 +122,22 @@ function main() {
   for (const id of values.candidate ?? []) {
     if (!candidateIds.has(id)) throw new Error(`--candidate ${id} 不是原始資料中的候選人`);
   }
+  const brandTerms = resolve(values['brand-terms']);
+  if (!existsSync(brandTerms)) throw new Error(`品牌用語清單 ${values['brand-terms']} 不存在，用 --brand-terms 指定路徑`);
   const rules = loadVerificationRules({
     checklist: join(REPO_ROOT, 'data/verification/checklist.json'),
     prompt: join(REPO_ROOT, 'data/verification/layer2-prompt.md'),
-    brandTerms: resolve(values['brand-terms']),
+    brandTerms,
   });
   const { snapshots, notes } = readSnapshots(raw.sources);
   for (const note of notes) console.log(note);
 
   const targets = raw.policies
     .filter((p) => !values.candidate || values.candidate.includes(p.candidateId))
-    .filter((p) => !values['skip-passed'] || !isVerified(p));
+    .filter((p) => !values['skip-passed'] || !passedWithCurrentChecklist(p, rules.checklistVersion));
   // 遮蔽全部候選人（不只本筆政見的候選人）的姓名與政黨，核對 AI 無從得知是誰的政見。
   const hiddenNames = raw.candidates.flatMap((c) => [c.name, c.party]);
-  const updated = new Map();
+  const fileOf = policyFiles(rawDir);
   const tally = { pass: 0, fail: 0 };
   for (const policy of targets) {
     const layer1 = checkLayer1(policy, snapshots);
@@ -135,15 +149,14 @@ function main() {
       model: values.model,
       checkedAt: values.date,
     });
-    updated.set(policy.id, policy);
     // 每筆寫回一次，中途中止時已完成的結果不會遺失。
-    writePolicies(rawDir, updated);
+    writePolicy(fileOf.get(policy.id), policy);
 
     const passed = isVerified(policy);
     tally[passed ? 'pass' : 'fail'] += 1;
     const { layer2: record } = policy.verification;
     const detail = layer1.status === 'pass' ? `；${record.reason}` : `；${layer1.problems.join('；')}`;
-    console.log(`${policy.id}：第一層${STATUS_TEXT[layer1.status]}、第二層${STATUS_TEXT[record.status]}${detail}`);
+    console.log(`${policy.id}：第一層${STATUS_TEXT.layer1[layer1.status]}、第二層${STATUS_TEXT.layer2[record.status]}${detail}`);
   }
   console.log(`核對完成：${targets.length} 筆，兩層皆通過 ${tally.pass} 筆、未通過 ${tally.fail} 筆（檢核表版本 ${rules.checklistVersion}）`);
 }
