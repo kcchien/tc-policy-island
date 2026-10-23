@@ -53,7 +53,7 @@ export const TERRAIN_PALETTE = {
 // lighting 是 island-daylight.js 的關鍵影格或補間結果。
 export function silhouetteColor(lighting, ring) {
   const shade = mixColor(TERRAIN_PALETTE.farRidge, TERRAIN_PALETTE.farRidgeNight, lighting.night);
-  return mixColor(shade, lighting.skyHorizon, 0.3 + 0.2 * ring);
+  return mixColor(shade, lighting.skyHorizon, 0.45 + 0.18 * ring);
 }
 
 // 外圍物件的高度上限是「離最近格子邊緣的距離 × 斜率」：斜率小於鏡頭最低仰角的正切，
@@ -307,6 +307,8 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
     const colors = kind === 'conifer' ? TERRAIN_PALETTE.conifer : TERRAIN_PALETTE.canopy;
     trees.push({
       kind, x, y, z, height,
+      // 樹幹露出樹冠下方的高度：針葉樹冠低垂，闊葉樹幹較長。
+      trunk: height * (kind === 'conifer' ? 0.18 : 0.3),
       radius: height * (kind === 'conifer' ? 0.3 + rand() * 0.08 : 0.4 + rand() * 0.1),
       rotation: rand() * Math.PI * 2,
       color: colors[Math.floor(rand() * colors.length)],
@@ -409,42 +411,53 @@ export function planOutskirts(layout, { quality = 'high', seed = 2026 } = {}) {
     const r = rMin + span * rand();
     return [cx + Math.cos(a) * r, cz + Math.sin(a) * r];
   };
+  // 每座小島：top 是島頂高度；第一座放得下燈塔的立燈塔（lighthouse 為 true），其餘各種一棵闊葉樹（tree）。
+  // 燈塔或樹的頂端都在高度上限下方；還沒有燈塔時，最後一個名額留給放得下燈塔的小島。
   const islets = [];
   let lighthouse = null;
   const LIGHTHOUSE_HEIGHT = 2.2;
+  const ISLET_TREE = { height: 0.6, radius: 0.35 };
   for (let attempt = 0; islets.length < detail.islets && attempt < 5000; attempt++) {
     const [x, z] = westward(R * 0.5 + 6, extent * 0.8);
     const radius = 0.8 + rand() * 0.9;
     const height = 0.5 + rand() * 0.6;
-    if (!seaClear(x, z, radius + 0.6) || SEA_LEVEL + height > clearanceAt(x, z)) continue;
-    if (islets.some((o) => Math.hypot(o.x - x, o.z - z) < 7)) continue;
-    const top = SEA_LEVEL + height * 0.8;
-    // 第一座放得下燈塔的小島立燈塔。
-    if (!lighthouse && top + LIGHTHOUSE_HEIGHT <= clearanceAt(x, z)) lighthouse = { x, z, y: top, height: LIGHTHOUSE_HEIGHT };
-    else if (!lighthouse && islets.length === detail.islets - 1) continue;
-    islets.push({ x, z, radius, height, rotation: rand() * Math.PI * 2 });
+    const top = SEA_LEVEL + height;
+    if (!seaClear(x, z, radius + 0.6) || islets.some((o) => Math.hypot(o.x - x, o.z - z) < 7)) continue;
+    const canLight = top + LIGHTHOUSE_HEIGHT <= clearanceAt(x, z);
+    const hasLight = !lighthouse && canLight;
+    if (!lighthouse && !canLight && islets.length === detail.islets - 1) continue;
+    if (!hasLight && top + ISLET_TREE.height > clearanceAt(x, z)) continue;
+    const islet = { x, z, radius, height, top, rotation: rand() * Math.PI * 2, lighthouse: hasLight, tree: null };
+    if (hasLight) lighthouse = { x, z, y: top, height: LIGHTHOUSE_HEIGHT };
+    else islet.tree = { ...ISLET_TREE, color: TERRAIN_PALETTE.canopy[Math.floor(rand() * TERRAIN_PALETTE.canopy.length)] };
+    islets.push(islet);
   }
-  const BOAT_HEIGHT = 1.1;
+  // 帆船：top 是桅杆頂離海面的高度（帆高乘上船的大小，加上隨波起伏的振幅）。整圈每一點都要放得下桅杆。
+  const SAIL_HEIGHT = 1.1;
   const boats = [];
   for (let attempt = 0; boats.length < detail.boats && attempt < 5000; attempt++) {
     const [x, z] = westward(R * 0.5 + 8, extent * 0.7);
     const radius = 3 + rand() * 3;
+    const size = 0.8 + rand() * 0.25;
+    const top = SAIL_HEIGHT * size + BOAT_BOB;
     if (!seaClear(x, z, radius + 0.6)) continue;
-    // 整圈每一點都要放得下桅杆。
     let fits = true;
     for (let k = 0; k < 16 && fits; k++) {
       const a = (k / 16) * Math.PI * 2;
-      fits = SEA_LEVEL + BOAT_HEIGHT <= clearanceAt(x + Math.cos(a) * radius, z + Math.sin(a) * radius);
+      fits = SEA_LEVEL + top <= clearanceAt(x + Math.cos(a) * radius, z + Math.sin(a) * radius);
     }
     if (!fits || islets.some((o) => Math.hypot(o.x - x, o.z - z) < radius + o.radius + 1)) continue;
-    boats.push({ x, z, radius, speed: (0.02 + rand() * 0.015) * (rand() < 0.5 ? 1 : -1), phase: rand() * Math.PI * 2, size: 0.8 + rand() * 0.25 });
+    boats.push({ x, z, radius, size, top, speed: (0.02 + rand() * 0.015) * (rand() < 0.5 ? 1 : -1), phase: rand() * Math.PI * 2 });
   }
 
   return {
     quality, detail, extent, center: { x: cx, z: cz }, heightAt, colorAt, clearanceAt,
-    trees, houses, fogBanks, clouds, flock, birds, ridges, islets, lighthouse, boats, boatHeight: BOAT_HEIGHT,
+    trees, houses, fogBanks, clouds, flock, birds, ridges, islets, lighthouse, boats, sailHeight: SAIL_HEIGHT,
   };
 }
+
+// 帆船隨波上下的振幅。
+const BOAT_BOB = 0.03;
 
 // 動畫時間 t（秒，見 island-clock.js）時雲、霧團、飛鳥、帆船的位置與水面波紋的時間。只依 t 決定，t 停住就全部靜止。
 export function ambientAt(plan, t) {
@@ -455,7 +468,7 @@ export function ambientAt(plan, t) {
       z: b.z + Math.sin(a) * b.radius,
       // 繞 y 軸的轉角：船身（區域 z 軸）朝前進方向的圓周切線（speed 為負時反向）。隨波輕微上下與左右搖。
       heading: -a + (b.speed < 0 ? Math.PI : 0),
-      bob: 0.03 * Math.sin(t * 1.3 + i * 2.1),
+      bob: BOAT_BOB * Math.sin(t * 1.3 + i * 2.1),
       roll: 0.05 * Math.sin(t * 0.9 + i),
     };
   });

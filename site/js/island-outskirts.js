@@ -142,7 +142,7 @@ function wingGeometry(side) {
   return g;
 }
 
-// environment 是 createEnvironment 的結果（水面材質要加雲影）。回傳 { plan, update(t, dt, env) }；env 有 night 與 fog（霧色）。
+// environment 是 createEnvironment 的結果（水面材質要加雲影）。回傳 { plan, update(t, dt, env) }；env 有 night、fog（霧色）與 skyHorizon（地平線色）。
 export function createOutskirts(scene, { layout, quality, environment }) {
   const plan = planOutskirts(layout, { quality: quality.level });
   const group = new THREE.Group();
@@ -171,16 +171,15 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     const mesh = new THREE.InstancedMesh(geometry, treeMaterial, Math.max(1, trees.length));
     mesh.count = trees.length;
     trees.forEach((tree, i) => {
-      const trunkHeight = tree.height * (kind === 'conifer' ? 0.18 : 0.3);
       q.setFromAxisAngle(up, tree.rotation);
-      mesh.setMatrixAt(i, m.compose(p.set(tree.x, tree.y + trunkHeight, tree.z), q, s.set(tree.radius, tree.height - trunkHeight, tree.radius)));
+      mesh.setMatrixAt(i, m.compose(p.set(tree.x, tree.y + tree.trunk, tree.z), q, s.set(tree.radius, tree.height - tree.trunk, tree.radius)));
       mesh.setColorAt(i, color.setHex(tree.color));
     });
     return { mesh, trees };
   });
   canopies.flatMap(({ trees }) => trees).forEach((tree, i) => {
     q.setFromAxisAngle(up, tree.rotation);
-    trunk.setMatrixAt(i, m.compose(p.set(tree.x, tree.y - 0.05, tree.z), q, s.set(tree.radius * 0.2, tree.height * 0.3 + 0.05, tree.radius * 0.2)));
+    trunk.setMatrixAt(i, m.compose(p.set(tree.x, tree.y - 0.05, tree.z), q, s.set(tree.radius * 0.2, tree.trunk + 0.08, tree.radius * 0.2)));
   });
   for (const mesh of [trunk, ...canopies.map((c) => c.mesh)]) {
     mesh.receiveShadow = true;
@@ -247,8 +246,6 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   // 遠山剪影：每圈一個不受光照與霧的平面帶，顏色每幀依時段算（silhouetteColor），越外圈越接近地平線色。
   const ridgeMeshes = plan.ridges.map((ring) => {
     const mesh = new THREE.Mesh(ridgeGeometry(plan, ring), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, fog: false, toneMapped: false }));
-    // 外圈先畫，內圈蓋在上面。
-    mesh.renderOrder = -1;
     group.add(mesh);
     return mesh;
   });
@@ -260,17 +257,18 @@ export function createOutskirts(scene, { layout, quality, environment }) {
     Math.max(1, plan.islets.length),
   );
   islets.count = plan.islets.length;
-  const isletTrees = plan.islets.filter((o) => !(plan.lighthouse && o.x === plan.lighthouse.x && o.z === plan.lighthouse.z));
+  const isletTrees = plan.islets.filter((o) => o.tree);
   const isletCanopy = new THREE.InstancedMesh(broadleafCanopy(), treeMaterial, Math.max(1, isletTrees.length));
   isletCanopy.count = isletTrees.length;
   plan.islets.forEach((islet, i) => {
     q.setFromAxisAngle(up, islet.rotation);
-    islets.setMatrixAt(i, m.compose(p.set(islet.x, SEA_LEVEL - 0.3, islet.z), q, s.set(islet.radius, islet.height + 0.3, islet.radius)));
+    islets.setMatrixAt(i, m.compose(p.set(islet.x, SEA_LEVEL - 0.3, islet.z), q, s.set(islet.radius, islet.top - SEA_LEVEL + 0.3, islet.radius)));
   });
   isletTrees.forEach((islet, i) => {
+    const { height, radius } = islet.tree;
     q.setFromAxisAngle(up, islet.rotation);
-    isletCanopy.setMatrixAt(i, m.compose(p.set(islet.x, SEA_LEVEL + islet.height * 0.85, islet.z), q, s.set(0.35, 0.6, 0.35)));
-    isletCanopy.setColorAt(i, color.setHex(TERRAIN_PALETTE.canopy[i % TERRAIN_PALETTE.canopy.length]));
+    isletCanopy.setMatrixAt(i, m.compose(p.set(islet.x, islet.top - 0.05, islet.z), q, s.set(radius, height, radius)));
+    isletCanopy.setColorAt(i, color.setHex(islet.tree.color));
   });
   for (const mesh of [islets, isletCanopy]) {
     mesh.castShadow = true;
@@ -302,7 +300,7 @@ export function createOutskirts(scene, { layout, quality, environment }) {
   // 帆船：船身與三角帆各一個 InstancedMesh，每幀依動畫時間擺位置。
   const hullGeometry = new THREE.CylinderGeometry(0.12, 0.08, 0.7, 6, 1).rotateX(Math.PI / 2).scale(1, 0.6, 1).translate(0, 0.05, 0);
   const sailGeometry = new THREE.BufferGeometry();
-  sailGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.12, -0.22, 0, plan.boatHeight, 0.02, 0, 0.12, 0.26], 3));
+  sailGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.12, -0.22, 0, plan.sailHeight, 0.02, 0, 0.12, 0.26], 3));
   sailGeometry.computeVertexNormals();
   const hulls = new THREE.InstancedMesh(hullGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.hull, flatShading: true, roughness: 0.85 }), Math.max(1, plan.boats.length));
   const sails = new THREE.InstancedMesh(sailGeometry, new THREE.MeshStandardMaterial({ color: TERRAIN_PALETTE.sail, side: THREE.DoubleSide, flatShading: true, roughness: 0.9 }), Math.max(1, plan.boats.length));
@@ -327,10 +325,10 @@ export function createOutskirts(scene, { layout, quality, environment }) {
       const { clouds, fogBanks, birds, boats, waterTime } = ambientAt(plan, t);
       environment.setWaterTime(waterTime);
 
-      // 霧色等於地平線色（island-daylight.js），遠山剪影往這個顏色混。
-      if (env.fog !== undefined) {
+      // 遠山剪影往地平線色混。
+      if (env.skyHorizon !== undefined) {
         ridgeLighting.night = night;
-        ridgeLighting.skyHorizon = env.fog;
+        ridgeLighting.skyHorizon = env.skyHorizon;
         ridgeMeshes.forEach((mesh, i) => mesh.material.color.setHex(silhouetteColor(ridgeLighting, i)));
       }
 

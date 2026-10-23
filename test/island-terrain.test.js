@@ -105,16 +105,22 @@ test('小島、燈塔、帆船都在島西側的海上，頂端在高度上限�
   for (const islet of plan.islets) {
     assert.ok(islet.x < layout.bounds.minX, '小島在島西側');
     for (let k = 0; k < 8; k++) assert.ok(sea(islet.x + Math.cos(k) * (islet.radius + 0.5), islet.z + Math.sin(k) * (islet.radius + 0.5)), '小島四周是海');
-    assert.ok(SEA_LEVEL + islet.height <= plan.clearanceAt(islet.x, islet.z));
+    // 島頂加上島上的樹（燈塔那座看燈塔）都在上限下方。
+    const top = islet.top + (islet.lighthouse ? plan.lighthouse.height : islet.tree.height);
+    assert.ok(top <= plan.clearanceAt(islet.x, islet.z), `小島頂端 ${top.toFixed(2)}`);
   }
   const { lighthouse } = plan;
-  assert.ok(plan.islets.some((islet) => islet.x === lighthouse.x && islet.z === lighthouse.z), '燈塔立在一座小島上');
+  const lit = plan.islets.filter((islet) => islet.lighthouse);
+  assert.equal(lit.length, 1, '恰好一座小島立燈塔');
+  assert.deepEqual([lit[0].x, lit[0].z, lit[0].top], [lighthouse.x, lighthouse.z, lighthouse.y]);
+  assert.equal(lit[0].tree, null);
   assert.ok(lighthouse.y + lighthouse.height <= plan.clearanceAt(lighthouse.x, lighthouse.z));
+  for (const boat of plan.boats) assert.ok(boat.top >= plan.sailHeight * boat.size, '桅杆頂含船的大小');
   for (let t = 0; t < 900; t += 13) {
-    for (const boat of ambientAt(plan, t).boats) {
+    ambientAt(plan, t).boats.forEach((boat, i) => {
       assert.ok(boat.x < layout.bounds.minX && sea(boat.x, boat.z), `帆船 (${boat.x.toFixed(1)}, ${boat.z.toFixed(1)})`);
-      assert.ok(SEA_LEVEL + plan.boatHeight <= plan.clearanceAt(boat.x, boat.z));
-    }
+      assert.ok(SEA_LEVEL + plan.boats[i].top <= plan.clearanceAt(boat.x, boat.z));
+    });
   }
 });
 

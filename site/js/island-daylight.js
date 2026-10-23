@@ -97,8 +97,9 @@ export const glowLevel = (night) => 0.28 + night * 1.5;
 
 // 目前時段與切換補間。now 是毫秒（performance.now()）。
 export function createDaylight({ initial = DEFAULT_TIME_OF_DAY } = {}) {
-  let current = initial;
-  let from = KEYFRAMES[initial];
+  // 不認得的初始時段（例如沒有給）用預設時段。
+  let current = KEYFRAMES[initial] ? initial : DEFAULT_TIME_OF_DAY;
+  let from = KEYFRAMES[current];
   let start = -Infinity;
 
   const at = (now) => {

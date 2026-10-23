@@ -10,7 +10,7 @@ import {
 } from './island-camera.js';
 import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
-import { createDaylight, KEYFRAMES } from './island-daylight.js';
+import { createDaylight } from './island-daylight.js';
 import { createAnimator } from './island-clock.js';
 import { createEnvironment } from './island-environment.js';
 import { instancify } from './island-kit.js';
@@ -73,7 +73,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
   const center = new THREE.Vector3(bounds.center.x, 0, bounds.center.z);
 
   // 晝夜、天空、光照與發光材質。
-  const daylight = createDaylight(KEYFRAMES[timeOfDay] ? { initial: timeOfDay } : {});
+  const daylight = createDaylight({ initial: timeOfDay });
   const environment = createEnvironment(scene, { center, radius: bounds.radius, quality, waterRadius: outskirtsWaterRadius(bounds) });
   // 裝飾動畫的時間；後續的動畫用 animator.add 註冊（見 island-clock.js）。
   const animator = createAnimator({ reducedMotion });
@@ -229,7 +229,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, onSel
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
-    animator.tick(now, { night: lighting.night, fog: lighting.fog });
+    animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
     frame += 1;
