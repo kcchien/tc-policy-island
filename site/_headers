@@ -1,0 +1,3 @@
+# Cloudflare Pages 回應標頭。出處快照是中文純文字，明確指定 UTF-8 以免亂碼。
+/data/snapshots/*
+  Content-Type: text/plain; charset=utf-8

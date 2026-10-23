@@ -1,58 +1,102 @@
-// 表格檢視（陽春版）：只讀檢視模型，不直接碰公開資料集。設計與互動由表格檢視的票負責。
+// 表格檢視：議題區 × 候選人。只讀檢視模型（可為 filterViewModel 篩選後的版本），不直接碰公開資料集。
+// 800px 以下由 CSS 改為單欄，所以每個元素明確標上 ARIA 表格角色，避免 display 改變後失去表格語意。
+// 每格的候選人名稱只在單欄時顯示，對螢幕閱讀器隱藏（欄標題已提供）。
 
-function el(tag, attrs = {}, ...children) {
-  const node = document.createElement(tag);
-  for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
-  node.append(...children);
-  return node;
-}
+import { el } from './dom.js';
+import { NO_MATCH_TEXT } from './filter.js';
+import { rawPolicyItemsText } from './policy-card.js';
 
 function candidateHeader(candidate) {
-  const total = candidate.rawPolicyItems.total;
   const meta = [
     candidate.party,
     candidate.ballotNumber === null ? null : `${candidate.ballotNumber} 號`,
     `公開政見 ${candidate.policyCount} 筆`,
-    `原始政見條目 ${total === null ? '尚未統計' : `${total} 項`}`,
-    candidate.dataStatus,
+    rawPolicyItemsText(candidate.rawPolicyItems),
   ].filter(Boolean);
   return el(
     'th',
-    { scope: 'col' },
+    { scope: 'col', role: 'columnheader', class: 'candidate-col' },
     el('span', { class: 'candidate-name' }, candidate.name),
     ...meta.map((text) => el('span', { class: 'candidate-meta' }, text)),
+    candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
   );
 }
 
-function policyCell(cell, noPolicyText) {
-  if (cell.status === 'no-policies') return el('td', {}, el('span', { class: 'no-policy' }, noPolicyText));
-  return el('td', {}, el('ul', { class: 'policy-list' }, ...cell.policies.map((p) => el('li', {}, p.summary))));
+function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
+  const label = el(
+    'span',
+    { class: 'cell-candidate', 'aria-hidden': 'true' },
+    candidate.name,
+    candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
+  );
+  if (cell.policies.length === 0) {
+    const text = cell.status === 'no-matches' ? NO_MATCH_TEXT : noPolicyText;
+    return el('td', { role: 'cell', class: 'policy-cell' }, label, el('p', { class: 'no-policy' }, text));
+  }
+  return el(
+    'td',
+    { role: 'cell', class: 'policy-cell' },
+    label,
+    el(
+      'ul',
+      { class: 'policy-list' },
+      cell.policies.map((policy) => {
+        const button = el('button', { type: 'button', class: 'policy-chip' }, el('span', { class: 'chip-summary' }, policy.summary));
+        if (policy.districts.length > 0) {
+          button.append(el('span', { class: 'chip-districts' }, `適用行政區：${policy.districts.join('、')}`));
+        }
+        button.addEventListener('click', () => openPolicy(policy.id));
+        return el('li', {}, button);
+      }),
+    ),
+  );
 }
 
-export function renderTable(container, vm) {
+function areaHeader(row, onOpenCard) {
+  const button = el('button', { type: 'button', class: 'area-open' }, '看政見卡片');
+  button.addEventListener('click', () => onOpenCard(row.issueArea.id, null));
+  return el(
+    'th',
+    { scope: 'row', role: 'rowheader', class: 'area-cell' },
+    el('span', { class: 'area-name' }, row.issueArea.name),
+    el('span', { class: 'area-departments' }, row.issueArea.departments.join('、')),
+    button,
+  );
+}
+
+export function renderTable(container, vm, { onOpenCard }) {
+  if (vm.rows.length === 0) {
+    container.replaceChildren(el('p', { class: 'empty-result' }, NO_MATCH_TEXT));
+    return;
+  }
   const table = el(
     'table',
-    { class: 'policy-table' },
-    el('caption', { class: 'order-note' }, vm.candidateOrderNote),
+    { class: 'policy-table', role: 'table', 'aria-describedby': 'candidate-order-note' },
+    el('caption', { class: 'visually-hidden' }, '各議題區候選人政見對照表'),
+    el('colgroup', {}, el('col', { class: 'area-col' }), vm.candidates.map(() => el('col', { class: 'candidate-col' }))),
     el(
-      'colgroup',
-      {},
-      el('col', { class: 'area-col' }),
-      ...vm.candidates.map(() => el('col', {})),
+      'thead',
+      { role: 'rowgroup' },
+      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, '議題區'), vm.candidates.map(candidateHeader)),
     ),
-    el('thead', {}, el('tr', {}, el('th', { scope: 'col' }, '議題區'), ...vm.candidates.map(candidateHeader))),
     el(
       'tbody',
-      {},
-      ...vm.rows.map((row) =>
+      { role: 'rowgroup' },
+      vm.rows.map((row) =>
         el(
           'tr',
-          { id: `area-${row.issueArea.id}` },
-          el('th', { scope: 'row' }, row.issueArea.name),
-          ...row.cells.map((cell) => policyCell(cell, vm.noPolicyText)),
+          { role: 'row', id: `area-${row.issueArea.id}`, class: 'area-row' },
+          areaHeader(row, onOpenCard),
+          // 依欄標題的候選人順序取格子，不靠陣列位置對應。
+          vm.candidates.map((candidate) =>
+            policyCell(row.cells.find((cell) => cell.candidateId === candidate.id), candidate, {
+              noPolicyText: vm.noPolicyText,
+              openPolicy: (policyId) => onOpenCard(row.issueArea.id, policyId),
+            }),
+          ),
         ),
       ),
     ),
   );
-  container.replaceChildren(el('div', { class: 'table-scroll' }, table));
+  container.replaceChildren(table);
 }

@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+// 核對指令測試用的假 claude（沒有 .js 副檔名，node --test 不會當成測試檔執行）。
+// 讀 stdin 的提示詞，把參數、工作目錄與提示詞逐行附加到 FAKE_CLAUDE_LOG，
+// 依 FAKE_CLAUDE_VERDICT（通過、退回、malformed）輸出 claude -p --output-format json 格式的結果。
+import { appendFileSync, readFileSync } from 'node:fs';
+
+const prompt = readFileSync(0, 'utf8');
+appendFileSync(process.env.FAKE_CLAUDE_LOG, `${JSON.stringify({ args: process.argv.slice(2), cwd: process.cwd(), prompt })}\n`);
+
+const verdict = process.env.FAKE_CLAUDE_VERDICT ?? '通過';
+const output = {
+  type: 'result',
+  subtype: 'success',
+  is_error: false,
+  result: verdict === 'malformed' ? '我覺得可以。' : '',
+  modelUsage: { 'fake-model': { inputTokens: 1, outputTokens: 1 } },
+};
+if (verdict !== 'malformed') output.structured_output = { verdict, reason: `假判定：${verdict}` };
+process.stdout.write(JSON.stringify(output));
