@@ -22,7 +22,7 @@ const CLICK_SLOP = 6;
 const LABEL_WIDE = new THREE.Vector3(0, TILE_SURFACE + 1.35, -0.45);
 const LABEL_NARROW = new THREE.Vector3(0, TILE_SURFACE + 0.9, -0.2);
 // 構圖時算進的高度：格子頂面加上元素模型的最高高度（island-models.js 的元素區）。
-const MODEL_TOP = TILE_SURFACE + 1.25;
+const MODEL_TOP = TILE_SURFACE + 1.1;
 
 // onSelectArea(areaId) 在使用者點選議題區格子時呼叫。
 // reducedMotion 是讀取目前「減少動態」設定的函式，讓使用者中途改設定也會生效。
@@ -240,13 +240,23 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
   // 點選：射線打到的第一個議題區格子。
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  let down = null;
+  // 依 pointerId 記每根手指按下的位置；同時有兩指以上（雙指縮放）就整次不算點選。
+  const downs = new Map();
+  let multiTouch = false;
+  const release = (event) => {
+    downs.delete(event.pointerId);
+    if (downs.size === 0) multiTouch = false;
+  };
   renderer.domElement.addEventListener('pointerdown', (event) => {
-    down = { x: event.clientX, y: event.clientY };
+    downs.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (downs.size > 1) multiTouch = true;
   });
+  renderer.domElement.addEventListener('pointercancel', release);
   renderer.domElement.addEventListener('pointerup', (event) => {
-    if (!down || Math.hypot(event.clientX - down.x, event.clientY - down.y) > CLICK_SLOP) return;
-    down = null;
+    const down = downs.get(event.pointerId);
+    const isClick = down && !multiTouch && Math.hypot(event.clientX - down.x, event.clientY - down.y) <= CLICK_SLOP;
+    release(event);
+    if (!isClick) return;
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
@@ -286,12 +296,6 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea }) {
     showAll() {
       if (home) flyTo(home.target, home.distance);
     },
-    select,
     resize,
-    dispose() {
-      observer.disconnect();
-      controls.dispose();
-      renderer.dispose();
-    },
   };
 }

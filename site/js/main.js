@@ -134,6 +134,8 @@ function startApp(vm, state, initialView) {
     return island;
   };
 
+  const scrollToTableRow = (areaId) => document.getElementById(`area-${areaId}`)?.scrollIntoView({ block: 'start' });
+
   const highlightTableRow = () => {
     for (const row of tableRoot.querySelectorAll('.area-row')) {
       row.classList.toggle('is-selected', row.id === `area-${selectedArea}`);
@@ -177,7 +179,7 @@ function startApp(vm, state, initialView) {
       });
     } else {
       highlightTableRow();
-      if (selectedArea) document.getElementById(`area-${selectedArea}`)?.scrollIntoView({ block: 'start' });
+      if (selectedArea) scrollToTableRow(selectedArea);
     }
   }
 
@@ -226,7 +228,7 @@ function startApp(vm, state, initialView) {
   if (policyRow) {
     openCard(policyRow.issueArea.id, state.policy);
   } else if (state.area && vm.rows.some((r) => r.issueArea.id === state.area)) {
-    if (view === 'table') document.getElementById(`area-${state.area}`)?.scrollIntoView({ block: 'start' });
+    if (view === 'table') scrollToTableRow(state.area);
     openCard(state.area, null);
   }
 }

@@ -2,6 +2,7 @@
 // 3D 材質色碼只寫在 PALETTE，一律用 0xrrggbb，上線關卡「禁用色檢查」會掃這些色碼（ADR 0001）。
 
 import * as THREE from 'three';
+import { markerOutline } from './island-layout.js';
 
 export const PALETTE = {
   background: 0xe8e0d2,
@@ -106,6 +107,13 @@ function roundTree(x, z, h = 0.36) {
   ];
 }
 
+// 平頂台地：八邊形截錐，南北向壓扁成 depthScale 倍。
+function mesa(top, bottom, height, depthScale) {
+  const geometry = cyl(top, bottom, height, 8);
+  geometry.scale(1, 1, depthScale);
+  return geometry;
+}
+
 // 以拉伸剖面做的山脊或台地：剖面在 x-y 平面，沿 z 拉伸 depth。
 function ridge(points, depth, color) {
   const shape = new THREE.Shape(points.map(([x, y]) => new THREE.Vector2(x, y)));
@@ -203,18 +211,19 @@ function snowPeak(r, h, x, z, { snow = true, color = PALETTE.rock, segments = 6,
 
 const BUILDERS = {
   // 大肚山：紅土台地，頂部平坦，坡面紅土裸露，台地上一排樹。
+  // 四面都收斜，北緣不會是一整面牆，擋不到北鄰格的標記。
   'dadu-plateau': () => group(
-    ridge([[-0.78, 0], [0.78, 0], [0.55, 0.36], [0.3, 0.42], [-0.35, 0.42], [-0.6, 0.34]], 0.95, PALETTE.laterite),
-    mesh(box(0.84, 0.03, 0.8), PALETTE.foliage, { y: 0.43 }),
-    ridge([[-0.78, 0], [-0.6, 0.34], [-0.66, 0]], 0.95, PALETTE.lateriteDark),
-    ...[-0.32, -0.08, 0.16].flatMap((x, i) => roundTree(x, -0.2 + i * 0.18, 0.34).map((m) => (m.position.y += 0.44, m))),
+    mesh(mesa(0.5, 0.8, 0.4, 0.66), PALETTE.laterite, { y: 0.2 }),
+    mesh(mesa(0.5, 0.5, 0.03, 0.66), PALETTE.foliage, { y: 0.415 }),
+    ...[-0.25, 0, 0.25].flatMap((x, i) => roundTree(x, -0.08 + (i % 2) * 0.14, 0.32).map((m) => (m.position.y += 0.43, m))),
   ),
-  // 鐵砧山：形如鐵砧的平頂山丘。
+  // 鐵砧山：形如鐵砧的平頂山丘，山腰內縮、頂部外擴。
   'tiezhen-mountain': () => group(
-    ridge([[-0.78, 0], [0.78, 0], [0.5, 0.18], [0.62, 0.5], [-0.62, 0.5], [-0.5, 0.18]], 0.9, PALETTE.rock),
-    mesh(box(1.26, 0.04, 0.92), PALETTE.foliage, { y: 0.52 }),
-    ...conifer(-0.35, -0.15, 0.36).map((m) => (m.position.y += 0.54, m)),
-    ...conifer(0.3, 0.1, 0.32).map((m) => (m.position.y += 0.54, m)),
+    mesh(mesa(0.42, 0.8, 0.26, 0.66), PALETTE.rock, { y: 0.13 }),
+    mesh(mesa(0.62, 0.42, 0.2, 0.66), PALETTE.rock, { y: 0.36 }),
+    mesh(mesa(0.62, 0.62, 0.03, 0.66), PALETTE.foliage, { y: 0.475 }),
+    ...conifer(-0.25, -0.05, 0.3).map((m) => (m.position.y += 0.49, m)),
+    ...conifer(0.22, 0.1, 0.28).map((m) => (m.position.y += 0.49, m)),
   ),
   // 高美濕地：泥灘、淺水、蘆葦與白鷺。
   'gaomei-wetland': () => wetland(),
@@ -334,7 +343,7 @@ const BUILDERS = {
     return group(
       mesh(box(1.5, 0.04, 1.0), PALETTE.mud, { y: 0.02 }),
       ...[-0.25, 0.05, 0.35].map((z) => mesh(box(1.4, 0.03, 0.04), PALETTE.lateriteDark, { y: 0.05, z })),
-      ...[[-0.5, -0.38], [-0.1, -0.4], [0.3, -0.36], [-0.3, -0.08], [0.1, -0.1], [0.5, -0.12]].flatMap(([x, z]) => plant(x, z, 1.2)),
+      ...[[0.05, -0.22], [-0.3, 0.06], [0.3, 0.04], [0.58, 0.12], [-0.02, 0.14]].flatMap(([x, z]) => plant(x, z, 1.2)),
       mesh(rockGeo(0.22), PALETTE.taro, { x: -0.3, y: 0.24, z: 0.32 }),
       mesh(new THREE.SphereGeometry(0.17, 8, 6, 0, Math.PI), PALETTE.shavedIce, { x: 0.25, y: 0.12, z: 0.3, rotX: -Math.PI / 2 }),
     );
@@ -390,10 +399,11 @@ const BY_CATEGORY = {
 };
 
 // 元素區：有標記的議題區格子留出南側的標記帶，元素放在北側；裝飾格沒有標記，元素可以放大置中。
-// 範圍是相對格心的 x、z 與最高高度。格子頂面半徑 0.96，標記帶從 z = 0.32 開始；
-// 北側不超過 -0.74，免得碰到北鄰格子的標記帶。
+// 範圍是相對格心的 x、z 與最高高度。格子頂面半徑 0.96，標記帶從 z = 0.32 開始。
+// 鏡頭在南方，本格北半部就在西北、東北鄰格標記帶的正前方，所以北緣收在 -0.66、高度上限 1，
+// 北面也不做整面的高牆；以預設視角從鏡頭對每個標記打射線檢查過不會被遮住。
 const ELEMENT_AREA = {
-  area: { minX: -0.76, maxX: 0.76, minZ: -0.74, maxZ: 0.24, maxY: 1.25 },
+  area: { minX: -0.76, maxX: 0.76, minZ: -0.66, maxZ: 0.24, maxY: 1 },
   decorative: { minX: -0.8, maxX: 0.8, minZ: -0.7, maxZ: 0.7, maxY: 1.35 },
 };
 
@@ -422,27 +432,24 @@ export function localElementModel(element, kind = 'area') {
 }
 
 // 候選人標記：同尺寸、同色，只以形狀區分。size 是外接圓半徑。
-function markerShape(shape, size) {
-  if (shape === 'circle') {
+// 形狀畫在 x-y 平面，之後轉成平躺：平面上的 y 對應世界的 -z。
+function markerShape(marker) {
+  if (marker.sides === 0) {
     const s = new THREE.Shape();
-    s.absarc(0, 0, size, 0, Math.PI * 2, false);
+    s.absarc(0, 0, marker.radius, 0, Math.PI * 2, false);
     return s;
   }
-  const sides = shape === 'triangle' ? 3 : 4;
-  const start = shape === 'triangle' ? Math.PI / 2 : Math.PI / 4;
-  return new THREE.Shape(Array.from({ length: sides }, (_, i) => {
-    const a = start + (i / sides) * Math.PI * 2;
-    return new THREE.Vector2(Math.cos(a) * size, Math.sin(a) * size);
-  }));
+  return new THREE.Shape(markerOutline(marker).map(([x, z]) => new THREE.Vector2(x, -z)));
 }
 
 const MARKER_DEPTH = 0.07;
+// material() 依顏色快取，切換亮暗只是換回同一個共用材質，不會越換越多。
 const litMaterial = () => material(PALETTE.markerLit, { emissive: PALETTE.markerGlow, emissiveIntensity: 0.6 });
 const offMaterial = () => material(PALETTE.markerOff, { transparent: true, opacity: 0.55 });
 
-// 標記平躺在格子上、略為墊高，從斜上方看得到形狀。
-export function markerModel({ shape, size }) {
-  const geometry = new THREE.ExtrudeGeometry(markerShape(shape, size), { depth: MARKER_DEPTH, bevelEnabled: false, curveSegments: 16 });
+// 標記平躺在格子上、略為墊高，從斜上方看得到形狀。marker 是 islandLayout 的標記資料。
+export function markerModel(marker) {
+  const geometry = new THREE.ExtrudeGeometry(markerShape(marker), { depth: MARKER_DEPTH, bevelEnabled: false, curveSegments: 16 });
   geometry.rotateX(-Math.PI / 2);
   const m = new THREE.Mesh(geometry, offMaterial());
   m.castShadow = true;

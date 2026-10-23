@@ -6,13 +6,13 @@ import { NO_MATCH_TEXT } from './filter.js';
 import { NO_POLICY_LABEL } from './view-model.js';
 import { islandLayout, markerLegend } from './island-layout.js';
 
-function markerBadge(marker, legendEntry, offText) {
+function markerBadge(marker, offText) {
   const state = marker.lit ? '有政見' : offText;
   return el(
     'span',
-    { class: `marker-badge${marker.lit ? ' is-lit' : ''}`, 'data-candidate': marker.candidateId, 'data-lit': String(marker.lit), title: `${legendEntry.name}：${state}` },
+    { class: `marker-badge${marker.lit ? ' is-lit' : ''}`, 'data-candidate': marker.candidateId, 'data-lit': String(marker.lit), title: `${marker.name}：${state}` },
     el('span', { 'aria-hidden': 'true' }, marker.symbol),
-    el('span', { class: 'visually-hidden' }, `${legendEntry.name}${state}`),
+    el('span', { class: 'visually-hidden' }, `${marker.name}${state}`),
   );
 }
 
@@ -27,7 +27,6 @@ export function renderLegend(container, vm) {
 
 // filtered 是篩選後的檢視模型（未篩選時就是 vm）。被篩掉的議題區不列出。
 export function renderIslandList(container, vm, filtered, { selectedId, onPick }) {
-  const legend = new Map(markerLegend(vm).map((entry) => [entry.candidateId, entry]));
   const shown = new Set(filtered.rows.map((row) => row.issueArea.id));
   const offText = filtered.filter?.active ? NO_MATCH_TEXT : NO_POLICY_LABEL;
   const items = islandLayout(vm, { filtered })
@@ -37,7 +36,7 @@ export function renderIslandList(container, vm, filtered, { selectedId, onPick }
         'button',
         { type: 'button', class: 'island-item', 'data-area': tile.id, 'aria-current': tile.id === selectedId ? 'true' : null },
         el('span', { class: 'island-item-name' }, tile.name),
-        el('span', { class: 'island-item-markers' }, tile.markers.map((m) => markerBadge(m, legend.get(m.candidateId), offText))),
+        el('span', { class: 'island-item-markers' }, tile.markers.map((m) => markerBadge(m, offText))),
       );
       button.addEventListener('click', () => onPick(tile.id));
       return el('li', {}, button);

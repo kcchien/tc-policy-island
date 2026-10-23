@@ -3,16 +3,32 @@
 // 格子配置的做法見 docs/rules/island-layout.md。
 
 // 候選人依排序配形狀，三人同色同尺寸，只以形狀區分（ADR 0001）。
+// sides 是多邊形邊數（0 為圓），start 是第一個頂點的方位角：三角形尖端朝北（-z），正方形邊與格線平行。
 export const MARKER_SHAPES = [
-  { shape: 'circle', symbol: '○' },
-  { shape: 'triangle', symbol: '△' },
-  { shape: 'square', symbol: '□' },
+  { shape: 'circle', symbol: '○', sides: 0, start: 0 },
+  { shape: 'triangle', symbol: '△', sides: 3, start: -Math.PI / 2 },
+  { shape: 'square', symbol: '□', sides: 4, start: Math.PI / 4 },
 ];
 
 // 格心到頂點的距離（場景單位）。
 export const HEX_SIZE = 1;
-// 標記尺寸固定，不隨政見數量改變。
-const MARKER_SIZE = 0.2;
+// 標記尺寸固定，不隨政見數量改變。尺寸以面積計：三種形狀的面積都等於半徑 MARKER_SIZE 的圓，
+// 外接圓相同的話三角形只有圓的四成大，看起來就不是同尺寸。
+const MARKER_SIZE = 0.17;
+
+// 等面積下各形狀的外接圓半徑：正 n 邊形面積 = n/2 · r² · sin(2π/n)。
+function circumradius(sides, size) {
+  if (sides === 0) return size;
+  return size * Math.sqrt((2 * Math.PI) / (sides * Math.sin((2 * Math.PI) / sides)));
+}
+
+// 多邊形標記的頂點，相對標記中心的 [x, z]。
+export function markerOutline({ sides, start, radius }) {
+  return Array.from({ length: sides }, (_, i) => {
+    const a = start + (i / sides) * Math.PI * 2;
+    return [Math.cos(a) * radius, Math.sin(a) * radius];
+  });
+}
 // 三個標記排在格子南側（靠近鏡頭的一側），由西到東依候選人排序。
 const MARKER_SPACING = 0.42;
 const MARKER_ROW_Z = 0.52;
@@ -36,9 +52,13 @@ function markersOf(row, legend) {
     const cell = row?.cells.find((c) => c.candidateId === entry.candidateId);
     return {
       candidateId: entry.candidateId,
+      name: entry.name,
       shape: entry.shape,
       symbol: entry.symbol,
+      sides: entry.sides,
+      start: entry.start,
       size: MARKER_SIZE,
+      radius: circumradius(entry.sides, MARKER_SIZE),
       lit: Boolean(cell && cell.policies.length > 0),
       offset: { x: (index - offset) * MARKER_SPACING, z: MARKER_ROW_Z },
     };

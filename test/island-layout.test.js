@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, orbitCenter, projectedBox, qualityFor,
+  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, qualityFor,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -27,6 +27,25 @@ test('每個議題區一格，每格三個同尺寸標記，依候選人排序�
   );
   const sizes = new Set(layout.tiles.flatMap((tile) => tile.markers.map((m) => m.size)));
   assert.equal(sizes.size, 1);
+});
+
+test('三種形狀的標記面積相同，同一列相鄰標記不重疊，也不伸進北側的元素區', () => {
+  const layout = islandLayout(viewModelOf(makeRaw()));
+  const [tile] = layout.tiles;
+
+  const polygonArea = (pts) => Math.abs(pts.reduce((s, [x, z], i) => {
+    const [nx, nz] = pts[(i + 1) % pts.length];
+    return s + x * nz - nx * z;
+  }, 0)) / 2;
+  const areas = tile.markers.map((m) => (m.sides === 0 ? Math.PI * m.radius ** 2 : polygonArea(markerOutline(m))));
+  for (const area of areas) assert.ok(Math.abs(area - areas[0]) < 1e-9, `面積 ${areas}`);
+
+  const extents = tile.markers.map((m) => {
+    const pts = m.sides === 0 ? [[-m.radius, 0], [m.radius, 0], [0, -m.radius]] : markerOutline(m);
+    return { minX: m.offset.x + Math.min(...pts.map((p) => p[0])), maxX: m.offset.x + Math.max(...pts.map((p) => p[0])), minZ: m.offset.z + Math.min(...pts.map((p) => p[1])) };
+  });
+  for (let i = 1; i < extents.length; i++) assert.ok(extents[i].minX > extents[i - 1].maxX, '相鄰標記重疊');
+  for (const e of extents) assert.ok(e.minZ > 0.24, `標記伸進元素區 ${e.minZ}`);
 });
 
 test('標記亮或灰與檢視模型每格的狀態一致', () => {
@@ -108,7 +127,7 @@ test('島的範圍涵蓋所有格子，中心在範圍正中', () => {
 test('圖例依候選人排序列出形狀與姓名', () => {
   const vm = viewModelOf(makeRaw());
 
-  assert.deepEqual(markerLegend(vm), [
+  assert.deepEqual(markerLegend(vm).map(({ candidateId, name, shape, symbol }) => ({ candidateId, name, shape, symbol })), [
     { candidateId: 'cand-a', name: '候選人甲', shape: 'circle', symbol: '○' },
     { candidateId: 'cand-b', name: '候選人乙', shape: 'triangle', symbol: '△' },
     { candidateId: 'cand-c', name: '候選人丙', shape: 'square', symbol: '□' },
