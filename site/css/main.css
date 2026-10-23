@@ -448,6 +448,52 @@ body[data-view="island"] .view-note {
   cursor: grab;
 }
 
+.island-canvas.is-hovering {
+  cursor: pointer;
+}
+
+/* 滑鼠滑過格子時，游標右下方顯示議題區編號與名稱（名牌關閉時也看得到） */
+.island-hover {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--charcoal);
+  color: var(--rice);
+  font-size: 0.8125rem;
+  pointer-events: none;
+  transform: translate(14px, 14px);
+}
+
+.island-hover .island-label-number {
+  color: var(--laterite-soft);
+}
+
+/* 桌面島嶼檢視：政見卡片停靠在畫布下方、索引面板左側，上方留給島；
+   畫面偏移（island-view.js setCover）把選中的議題區移到卡片上方的可見區正中。遮罩放淡，島仍看得清楚。 */
+@media (min-width: 801px) {
+  body[data-view="island"] .policy-card {
+    position: fixed;
+    inset: auto calc(var(--panel-width) + 2 * var(--hud-gap)) var(--hud-gap) var(--hud-gap);
+    width: auto;
+    height: min(48dvh, 520px);
+    margin: 0;
+    box-shadow: var(--float-shadow);
+  }
+
+  body[data-view="island"] .policy-card .card-inner {
+    height: 100%;
+  }
+}
+
+body[data-view="island"] .policy-card::backdrop {
+  background: color-mix(in srgb, var(--charcoal) 10%, transparent);
+}
+
 .island-canvas:active {
   cursor: grabbing;
 }
