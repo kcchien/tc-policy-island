@@ -2,17 +2,161 @@
   {
     "id": "transportation",
     "name": "交通",
-    "departments": ["交通局"],
-    "description": "暫用條目，正式議題區清單由後續票提供。",
+    "departments": ["交通局", "捷運工程局", "建設局"],
+    "description": "捷運、鐵路、公車、道路與橋梁、停車、自行車路網、機場與港口聯外交通。建設局只含道路橋梁業務。",
+    "axial": [-5, 1],
+    "localElementId": "dadu-plateau"
+  },
+  {
+    "id": "public-safety",
+    "name": "治安與消防",
+    "departments": ["警察局", "消防局"],
+    "description": "治安、交通執法、反詐騙、緊急救護與消防、災害防救，以及警消人員的勤務與待遇。",
+    "axial": [-3, -2],
+    "localElementId": "tiezhen-mountain"
+  },
+  {
+    "id": "economy",
+    "name": "產業經濟",
+    "departments": ["經濟發展局"],
+    "description": "產業發展、招商投資、會展、新創、商圈與公有市場、產業園區。",
+    "axial": [-3, 0],
+    "localElementId": "suncake"
+  },
+  {
+    "id": "labor",
+    "name": "勞工",
+    "departments": ["勞工局"],
+    "description": "勞工權益、職業訓練、就業媒合、職業安全與勞工健康。",
     "axial": [0, 0],
-    "localElementId": null
+    "localElementId": "bubble-tea"
+  },
+  {
+    "id": "agriculture-animals",
+    "name": "農業與動物保護",
+    "departments": ["農業局"],
+    "description": "農業與漁業生產、農產品行銷、農業災害預警，以及動物保護防疫處主管的寵物、動物收容與動物醫療。",
+    "axial": [-3, -1],
+    "localElementId": "dajia-taro"
+  },
+  {
+    "id": "tourism",
+    "name": "觀光",
+    "departments": ["觀光旅遊局"],
+    "description": "觀光景點與路線、旅遊接駁、觀光產業輔導。",
+    "axial": [3, -1],
+    "localElementId": "xue-mountain"
   },
   {
     "id": "social-welfare",
     "name": "社會福利",
     "departments": ["社會局"],
-    "description": "暫用條目，正式議題區清單由後續票提供。",
-    "axial": [1, 0],
-    "localElementId": null
+    "description": "托育與育兒津貼、生育津貼、兒少與婦女福利、老人福利與敬老愛心卡、身心障礙與弱勢扶助、新住民家庭服務。",
+    "axial": [-5, 0],
+    "localElementId": "tube-rice-pudding"
+  },
+  {
+    "id": "health",
+    "name": "醫療衛生",
+    "departments": ["衛生局"],
+    "description": "疫苗與健康檢查、婦幼與生育保健、長期照顧、衛生所與醫療資源、心理健康。",
+    "axial": [-4, 1],
+    "localElementId": "mitou-ice"
+  },
+  {
+    "id": "education",
+    "name": "教育",
+    "departments": ["教育局"],
+    "description": "國中小與高中職、幼兒園、師資、課程與技職教育、校園設施、營養午餐、特殊教育與實驗教育。",
+    "axial": [-4, 0],
+    "localElementId": "luce-chapel"
+  },
+  {
+    "id": "culture",
+    "name": "文化",
+    "departments": ["文化局"],
+    "description": "藝文活動與場館、文化資產、設計與文化產業。",
+    "axial": [-2, 0],
+    "localElementId": "lake-pavilion"
+  },
+  {
+    "id": "indigenous-affairs",
+    "name": "原住民族事務",
+    "departments": ["原住民族事務委員會"],
+    "description": "原住民族的語言文化、職業培力、經濟與健康照顧。",
+    "axial": [1, -1],
+    "localElementId": "yuanzui-mountain"
+  },
+  {
+    "id": "hakka-affairs",
+    "name": "客家事務",
+    "departments": ["客家事務委員會"],
+    "description": "客家語言、文化與客庄發展。",
+    "axial": [-1, 0],
+    "localElementId": "ban-tiao"
+  },
+  {
+    "id": "environment",
+    "name": "環境保護",
+    "departments": ["環境保護局"],
+    "description": "空氣品質與減碳、廢棄物與資源回收、焚化爐、噪音、病媒防治、清潔人員。",
+    "axial": [-4, -1],
+    "localElementId": "gaomei-wetland"
+  },
+  {
+    "id": "water",
+    "name": "水利",
+    "departments": ["水利局"],
+    "description": "防洪治水、雨水下水道、水資源、河川與水岸。",
+    "axial": [0, -1],
+    "localElementId": "xinshe-terraces"
+  },
+  {
+    "id": "urban-housing",
+    "name": "都市發展與住宅",
+    "departments": ["都市發展局"],
+    "description": "都市計畫、舊市區再生、社會住宅與住宅補貼、建築安全與老屋。",
+    "axial": [-1, -1],
+    "localElementId": "shekou-lin-residence"
+  },
+  {
+    "id": "sports",
+    "name": "運動",
+    "departments": ["運動局"],
+    "description": "運動中心與運動場館、全民運動推廣。",
+    "axial": [2, -1],
+    "localElementId": "daxueshan"
+  },
+  {
+    "id": "parks",
+    "name": "公園綠地",
+    "departments": ["建設局"],
+    "description": "公園、綠地與遊戲場。建設局的道路橋梁業務歸交通議題區。",
+    "axial": [3, -2],
+    "localElementId": "qijiawan-creek"
+  },
+  {
+    "id": "civil-affairs",
+    "name": "民政",
+    "departments": ["民政局"],
+    "description": "區里行政、里活動中心、戶政與宗教禮俗。",
+    "axial": [-2, -1],
+    "localElementId": "xiaoyun-manor"
+  },
+  {
+    "id": "digital",
+    "name": "數位發展",
+    "departments": ["數位發展局"],
+    "description": "智慧城市、市政數據與資訊系統、數位服務。",
+    "axial": [-3, 1],
+    "localElementId": "da-mian-geng"
+  },
+  {
+    "id": "city-governance",
+    "name": "市政治理",
+    "departments": ["秘書處", "財政局", "法制局", "新聞局", "地方稅務局", "主計處", "人事處", "政風處", "研究發展考核委員會"],
+    "description": "市府組織與人事、財政與稅務、法制、國際事務，以及向中央爭取、全市性目標等沒有單一主辦局處的事項。",
+    "axial": [-2, 1],
+    "localElementId": "mayi-soup"
   }
 ]

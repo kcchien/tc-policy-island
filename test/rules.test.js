@@ -1,0 +1,106 @@
+// 正式規則資料（data/rules/、data/raw/ 的議題區與元素清單、docs/rules/ 對照表）的一致性檢查。
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { cpSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildPublicDataset } from '../site/js/dataset.js';
+import { loadRawData } from '../scripts/lib/raw-data.js';
+import { createScanner, loadBrandTerms } from '../scripts/lib/brand-terms.js';
+import { openSite } from '../scripts/gates/site.js';
+import brandTermsGate from '../scripts/gates/brand-terms.js';
+import forbiddenColorsGate from '../scripts/gates/forbidden-colors.js';
+
+const repoPath = (path) => fileURLToPath(new URL(`../${path}`, import.meta.url));
+const raw = loadRawData(repoPath('data/raw'));
+
+// 對照表每一列：| 編號 | 政見 | 議題區 | 依據 |
+function mappingRows() {
+  const text = readFileSync(repoPath('docs/rules/policy-area-mapping.md'), 'utf8');
+  return text.split('\n')
+    .filter((line) => /^\| (江|何|洪)-/.test(line))
+    .map((line) => {
+      const [id, policy, area] = line.split('|').slice(1).map((cell) => cell.trim());
+      return { id, policy, area };
+    });
+}
+
+test('對照表每條政見恰好對到一個存在的議題區，編號不重複', () => {
+  const names = new Set(raw.issueAreas.map((a) => a.name));
+  const rows = mappingRows();
+  const unknown = rows.filter((row) => !names.has(row.area)).map((row) => `${row.id}→${row.area}`);
+  const ids = rows.map((row) => row.id);
+
+  assert.deepEqual(unknown, []);
+  assert.equal(new Set(ids).size, ids.length);
+});
+
+test('對照表涵蓋研究筆記的全部條目：江啟臣十大亮點與百大新政 117 項、何欣純領域政見 52 條、洪麗華 8 條', () => {
+  const ids = new Set(mappingRows().map((row) => row.id.replace(/[a-e]$/, '')));
+  const expected = [
+    ...Array.from({ length: 10 }, (_, i) => `江-亮點-${i + 1}`),
+    ...[['01', 22], ['02', 25], ['03', 19], ['04', 32], ['05', 19]]
+      .flatMap(([section, count]) => Array.from({ length: count }, (_, i) => `江-${section}-${i + 1}`)),
+    ...Array.from({ length: 52 }, (_, i) => `何-領域-${i + 1}`),
+    ...Array.from({ length: 8 }, (_, i) => `洪-${i + 1}`),
+  ];
+
+  assert.deepEqual(expected.filter((id) => !ids.has(id)), []);
+});
+
+test('每個議題區都至少有一條已知政見（沒有政見的局處不設區）', () => {
+  const used = new Set(mappingRows().map((row) => row.area));
+
+  assert.deepEqual(raw.issueAreas.filter((a) => !used.has(a.name)).map((a) => a.name), []);
+});
+
+test('每個議題區配一個在地感元素，元素清單每項都放在島上', () => {
+  const tiles = [...raw.issueAreas, ...raw.decorativeTiles];
+
+  assert.deepEqual(raw.issueAreas.filter((a) => a.localElementId === null).map((a) => a.id), []);
+  const placed = new Set(tiles.map((t) => t.localElementId));
+  assert.deepEqual(raw.localElements.filter((e) => !placed.has(e.id)).map((e) => e.id), []);
+});
+
+test('議題區與裝飾格連成一座島', () => {
+  const tiles = [...raw.issueAreas, ...raw.decorativeTiles].map((t) => t.axial.join(','));
+  const all = new Set(tiles);
+  const seen = new Set([tiles[0]]);
+  const queue = [tiles[0]];
+  const neighbors = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]];
+  while (queue.length > 0) {
+    const [q, r] = queue.pop().split(',').map(Number);
+    for (const [dq, dr] of neighbors) {
+      const key = `${q + dq},${r + dr}`;
+      if (all.has(key) && !seen.has(key)) {
+        seen.add(key);
+        queue.push(key);
+      }
+    }
+  }
+
+  assert.deepEqual(tiles.filter((t) => !seen.has(t)), []);
+});
+
+test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專案名）不含品牌用語與陣營高頻詞', () => {
+  const scan = createScanner(loadBrandTerms());
+  const pkg = JSON.parse(readFileSync(repoPath('package.json'), 'utf8'));
+  // Cloudflare Pages 專案名依 spec 與 package.json 的 name 相同。
+  const names = [pkg.name, ...execFileSync('git', ['ls-files'], { cwd: repoPath(''), encoding: 'utf8' }).split('\n').filter(Boolean)];
+
+  assert.equal(pkg.name, 'tc-policy-island');
+  assert.deepEqual(names.filter((name) => scan(name).length > 0), []);
+});
+
+test('本 repo 的網站文案與配色，以正式原始資料建置後通過品牌用語掃描與禁用色檢查', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'repo-site-'));
+  cpSync(repoPath('site'), dir, { recursive: true });
+  mkdirSync(join(dir, 'data'), { recursive: true });
+  writeFileSync(join(dir, 'data', 'dataset.json'), JSON.stringify(buildPublicDataset(raw)));
+  const site = openSite(dir);
+
+  assert.deepEqual(brandTermsGate.check(site), []);
+  assert.deepEqual(forbiddenColorsGate.check(site), []);
+});

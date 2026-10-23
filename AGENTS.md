@@ -41,10 +41,13 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   vendor/three/        three.js r160（島嶼檢視的票加入）
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
+  local-elements.json  decorative-tiles.json   元素清單與裝飾格（可省略，視為空陣列）
   sources/<candidateId>.json   每位候選人一檔，陣列
   policies/<candidateId>.json  每位候選人一檔，陣列
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
 data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版
+data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
+docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
 test/                  node:test 測試；test/fixtures/ 放夾具
 ```
@@ -55,7 +58,9 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 
 - **meta**：`dataCutoffDate`（YYYY-MM-DD）、`checklistVersion?`。公開資料集另加 `candidateOrder`（`name-strokes` 或 `ballot-number`）與 `builtAt`。
 - **候選人**：`id`、`name`、`party`、`ballotNumber?`、`nameStrokes`、`rawPolicyItems { total?, sourceIds[] }`（原始政見條目總數與其出處，`total` 為 `null` 表示尚未統計）、`dataStatus?`（例如「尚無一手來源」）。號次須全部為 `null`（抽籤前，依筆畫排序）或全部填寫（抽籤後，依號次排序）；排序鍵不得相同。
-- **議題區**：`id`、`name`、`departments[]`、`description`、`axial [q, r]`（不得重複）、`localElementId?`。
+- **議題區**：`id`、`name`、`departments[]`、`description`、`axial [q, r]`、`localElementId?`。清單依 `docs/rules/classification-rules.md` 劃分，數量與島的格數無關。
+- **元素**：`id`、`name`、`category`（`LOCAL_ELEMENT_CATEGORIES`：自然景觀、小吃、老建築）、`place`、`reason`（與任何市長任期的政績無關的理由）。
+- **裝飾格**：`id`、`axial [q, r]`、`localElementId?`。島上沒有議題區的格子。議題區與裝飾格的座標不得重複，每個元素只放一格。公開資料集另含 `localElements` 與 `decorativeTiles`。
 - **出處**：`id`、`candidateId`、`url`、`archiveUrl?`、`archiveError?`（存檔失敗原因）、`snapshotPath`（相對 repo 根目錄）、`snapshotSha256`、`sourceType`（`official-website`、`official-facebook`、`policy-presentation`、`election-bulletin`，中文名見 `SOURCE_TYPES`）、`title`、`retrievedAt`。
 - **政見**：`id`、`candidateId`、`issueAreaId`（恰好一個）、`summary`、`quotes[] { text, sourceId }`（至少一則，出處須屬同一位候選人）、`districts[]`（`TAICHUNG_DISTRICTS` 的 29 區正式名稱，可空）、`conflictNote?`（出處說法不一標註）、`verification`。
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、或列在 `rawPolicyItems.sourceIds` 的那些。
@@ -69,6 +74,7 @@ test/                  node:test 測試；test/fixtures/ 放夾具
 
 - `data/raw/` 只放從一手來源抽取的真實資料。示範或測試用的政見一律放 `test/fixtures/`，候選人用虛構的「範例甲乙丙」「候選人甲乙丙」，不掛真實候選人的名字。
 - 新增上線關卡：在 `scripts/gates/` 寫一個 `{ id, name, check(site) }` 模組（`check` 回傳失敗訊息陣列，`site.dataset()` 讀公開資料集），加進 `scripts/gates/index.js` 的 `GATES`，並在 `test/gates.test.js` 用夾具網站目錄驗證擋下違規、放行合規。
+- 品牌用語掃描與禁用色檢查讀 `data/rules/` 的正式清單；`site.files()` 列出網站目錄全部檔案，`site.readText(path)` 讀檔。改清單或新增網站文案後跑 `node --test test/rules.test.js`，它會用正式資料檢查本站文案、檔名與專案名。
 - `test/` 底下的 `.js` 都會被 `node --test` 當成測試檔執行，夾具模組不要有副作用。
 - 無頭 Chrome 的 `--window-size` 有最小寬度，390px 截圖會被裁切，手機版改用可模擬裝置寬度的瀏覽器驗證。
 

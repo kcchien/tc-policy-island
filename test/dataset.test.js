@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildPublicDataset, DatasetValidationError } from '../site/js/dataset.js';
-import { makeRaw, policy, passedVerification, pendingVerification } from './fixtures/make-raw.js';
+import { makeRaw, policy, localElement, passedVerification, pendingVerification } from './fixtures/make-raw.js';
 
 test('未通過兩層核對的政見不會出現在公開資料集', () => {
   const raw = makeRaw();
@@ -156,6 +156,58 @@ test('驗證失敗的錯誤物件 message 含錯誤數量與每一行訊息', ()
     name: 'DatasetValidationError',
     message: '原始資料有 1 處錯誤：\n政見 p-a1：缺少欄位 summary',
   });
+});
+
+test('議題區指向元素清單中的元素，公開資料集附上完整元素清單', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-a'), localElement('el-b')];
+  raw.issueAreas[0].localElementId = 'el-a';
+
+  const dataset = buildPublicDataset(raw);
+
+  assert.deepEqual(dataset.localElements.map((e) => e.id), ['el-a', 'el-b']);
+  assert.equal(dataset.issueAreas[0].localElementId, 'el-a');
+});
+
+test('議題區指向不存在的元素、兩區共用同一元素、元素缺理由時列出每一處', () => {
+  const raw = makeRaw();
+  const noReason = localElement('el-b');
+  delete noReason.reason;
+  raw.localElements = [localElement('el-a'), noReason, { ...localElement('el-c'), category: '地標' }];
+  raw.issueAreas[0].localElementId = 'el-a';
+  raw.issueAreas[1].localElementId = 'el-a';
+  raw.issueAreas.push({ ...raw.issueAreas[1], id: 'area-c', axial: [2, 0], localElementId: 'el-x' });
+
+  assert.deepEqual(validationErrors(raw), [
+    '元素 el-b：缺少欄位 reason',
+    '元素 el-c：欄位 category 應為其中之一：自然景觀、小吃、老建築，實際為 "地標"',
+    '議題區 area-b：在地感元素 el-a 已放在議題區 area-a，每個在地感元素只放一格',
+    '議題區 area-c：localElementId 指向不存在的元素 el-x',
+  ]);
+});
+
+test('裝飾格不屬於任何議題區，座標不得與議題區重疊，元素不得與議題區共用', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-a'), localElement('el-b')];
+  raw.issueAreas[0].localElementId = 'el-a';
+  raw.decorativeTiles = [
+    { id: 'tile-1', axial: [5, 5], localElementId: 'el-b' },
+    { id: 'tile-2', axial: [1, 0], localElementId: null },
+    { id: 'tile-3', axial: [6, 6], localElementId: 'el-a' },
+  ];
+
+  assert.deepEqual(validationErrors(raw), [
+    '裝飾格 tile-2：軸向座標 [1,0] 與 area-b 重複',
+    '裝飾格 tile-3：在地感元素 el-a 已放在議題區 area-a，每個在地感元素只放一格',
+  ]);
+});
+
+test('合法的裝飾格隨公開資料集公開', () => {
+  const raw = makeRaw();
+  raw.localElements = [localElement('el-b')];
+  raw.decorativeTiles = [{ id: 'tile-1', axial: [5, 5], localElementId: 'el-b' }];
+
+  assert.deepEqual(buildPublicDataset(raw).decorativeTiles, raw.decorativeTiles);
 });
 
 test('公開資料集保留出處說法不一標註、適用行政區與建置時間', () => {
