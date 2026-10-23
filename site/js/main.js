@@ -135,6 +135,9 @@ function startApp(vm, state, initialView) {
     },
   });
   document.body.append(candidateDialog.element);
+  // 名牌要避開的浮動元件（見 stageObstacles）開關時，請島嶼檢視重排名牌。鏡頭沒動時不會自己重排。
+  const refreshLabels = () => withIsland((controller) => controller.refreshLabels());
+  candidateDialog.element.addEventListener('close', refreshLabels);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
@@ -144,6 +147,7 @@ function startApp(vm, state, initialView) {
     indexToggle.setAttribute('aria-expanded', String(open));
     if (open) indexClose.focus();
     else if (returnFocus) indexToggle.focus();
+    refreshLabels();
   };
   indexToggle.addEventListener('click', () => setPanelOpen(!panel.classList.contains('is-open')));
   indexClose.addEventListener('click', () => setPanelOpen(false, { returnFocus: true }));
@@ -159,6 +163,19 @@ function startApp(vm, state, initialView) {
       return { top: titleCard.getBoundingClientRect().bottom, right: 0, bottom: Math.max(0, height - bar.top), left: 0 };
     }
     return { top: bar.bottom, right: Math.max(0, width - panel.getBoundingClientRect().left), bottom: 0, left: 0 };
+  };
+
+  // 名牌要避開的浮動元件：標題卡、工具列（桌面是各組按鈕，手機是整條膠囊列）、索引面板、說明文字與開著的卡片。
+  const stageObstacles = () => {
+    const nodes = [
+      titleCard,
+      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
+      panel,
+      document.getElementById('view-note'),
+      card.element.open && card.element,
+      candidateDialog.element.open && candidateDialog.element,
+    ];
+    return nodes.filter(Boolean).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
   };
 
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
@@ -181,6 +198,7 @@ function startApp(vm, state, initialView) {
   const applyLabels = () => {
     document.getElementById('tool-labels').setAttribute('aria-pressed', String(hud.labels));
     stage.classList.toggle('labels-off', !hud.labels);
+    refreshLabels();
   };
   for (const button of document.querySelectorAll('[data-time]')) {
     button.addEventListener('click', () => {
@@ -221,6 +239,7 @@ function startApp(vm, state, initialView) {
           onSelectArea: (areaId) => openCard(areaId, null),
           onSelectCandidate: openCandidateCard,
           insets: stageInsets,
+          obstacles: stageObstacles,
         });
         controller.update(filtered);
         // 卡片開關、手機抽屜換段或拖曳時，畫面偏移跟著卡片遮住的範圍走。
@@ -260,6 +279,7 @@ function startApp(vm, state, initialView) {
     state.candidate = candidateId;
     updateUrl();
     candidateDialog.open(vm, candidateId);
+    refreshLabels();
     return true;
   };
 
@@ -272,7 +292,7 @@ function startApp(vm, state, initialView) {
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const show = () => card.open(row, vm, { focusPolicyId: policyId });
+    const show = () => card.open(row, vm, { focusPolicyId: policyId, filter: { query: state.query, district: state.district } });
     if (view === 'island') {
       setPanelOpen(false);
       renderIslandPanel();

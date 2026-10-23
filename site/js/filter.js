@@ -14,18 +14,25 @@ function searchText(policy) {
 }
 
 // 關鍵字比對摘要、原文引述與適用行政區；以空白分開的每個詞都要符合。
-// district 須是 29 區正式名稱之一，其他值視為未篩選。
-export function filterViewModel(vm, { query = '', district = '' } = {}) {
+// district 須是 29 區正式名稱之一，其他值視為未篩選。全站篩選與政見卡片的欄內篩選共用。
+// 回傳 { active, district, matches(policy) }；district 是生效的行政區（沒有時為 null）。
+export function policyMatcher({ query = '', district = '' } = {}) {
   const terms = normalize(query).split(/\s+/).filter(Boolean);
   const districtFilter = TAICHUNG_DISTRICTS.includes(district) ? district : null;
-  const active = terms.length > 0 || districtFilter !== null;
-  if (!active) return { ...vm, filter: { active, query: '', district: null, matchCount: null } };
-
-  const matches = (policy) => {
-    if (districtFilter !== null && !policy.districts.includes(districtFilter)) return false;
-    const text = searchText(policy);
-    return terms.every((term) => text.includes(term));
+  return {
+    active: terms.length > 0 || districtFilter !== null,
+    district: districtFilter,
+    matches(policy) {
+      if (districtFilter !== null && !policy.districts.includes(districtFilter)) return false;
+      const text = searchText(policy);
+      return terms.every((term) => text.includes(term));
+    },
   };
+}
+
+export function filterViewModel(vm, { query = '', district = '' } = {}) {
+  const { active, district: districtFilter, matches } = policyMatcher({ query, district });
+  if (!active) return { ...vm, filter: { active, query: '', district: null, matchCount: null } };
 
   const rows = vm.rows
     .map((row) => ({
