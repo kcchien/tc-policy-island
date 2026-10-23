@@ -100,7 +100,7 @@ test('本 repo 的檔名、專案名稱（package.json 與 Cloudflare Pages 專�
 
 test('島嶼檢視的 3D 材質、天空、光照與發光色碼全部被禁用色檢查掃到，且都不在禁用範圍內', () => {
   const { ranges } = loadForbiddenColors();
-  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js', 'site/js/island-selection.js'];
+  const files = ['site/js/island-models.js', 'site/js/island-view.js', 'site/js/island-daylight.js', 'site/js/island-environment.js', 'site/js/island-kit.js', 'site/js/island-selection.js', 'site/js/island-motion-view.js'];
   let scanned = 0;
   for (const file of files) {
     const text = readFileSync(repoPath(file), 'utf8');

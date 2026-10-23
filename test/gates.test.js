@@ -43,6 +43,7 @@ const COMPLIANT_FILES = {
   'index.html': '<!doctype html><title>台中政見島</title><p>由 AI 依公開資料整理，與任何候選人或政黨無關。</p>',
   'css/main.css': ':root { --laterite: #8e4b32; --rice: #f4efe6; --water: #7d9a98; }\nbody { color: rgb(47, 44, 41); background: var(--rice); }',
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
+  'js/island-motion.js': repoFile('site/js/island-motion.js'),
   'js/island-plaza.js': repoFile('site/js/island-plaza.js'),
   ...REPO_FILES,
   ...PROFILE_SNAPSHOTS,
@@ -480,4 +481,53 @@ test('沒有候選人廣場或網站目錄缺少人物配置模組時，人物�
   assert.match(missing.output, /js\/island-plaza\.js/);
   assert.notEqual(empty.code, 0);
   assert.match(empty.output, /候選人廣場/);
+});
+
+// 動態配置的替身：包住正式的 motionPlan，再由 change 竄改結果，模擬違規的配置。
+const motionModule = (change) => `${repoFile('site/js/island-motion.js').replace('export function motionPlan(', 'function realMotionPlan(')}
+export function motionPlan(layout, options) {
+  const plan = realMotionPlan(layout, options);
+  (${change})(plan, layout);
+  return plan;
+}
+`;
+
+test('某個議題區格子的市民比其他格多時，動態數量固定關卡不通過並指出格子', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-motion.js': motionModule((plan) => {
+      plan.tiles[1].citizens.push({ ...plan.tiles[1].citizens[0], phase: 0.9 });
+    }),
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /✗ 動態數量固定：/);
+  assert.match(output, /area-b/);
+});
+
+test('動態配置隨政見資料改變時，動態數量固定關卡不通過', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'js/island-motion.js': motionModule((plan, layout) => {
+      // 依標記亮暗調整車速：有亮起的標記越多車越快。
+      const lit = layout.tiles.flatMap((t) => t.markers).filter((m) => m.lit).length;
+      for (const v of plan.vehicles) v.speed += lit;
+    }),
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /換一份政見資料/);
+});
+
+test('網站目錄缺少動態配置模組時，動態數量固定關卡不通過', () => {
+  const { 'js/island-motion.js': _, ...files } = COMPLIANT_FILES;
+
+  const { code, output } = runGates(makeSite(() => {}, files));
+
+  assert.notEqual(code, 0);
+  assert.match(output, /js\/island-motion\.js/);
 });
