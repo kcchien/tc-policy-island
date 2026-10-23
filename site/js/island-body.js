@@ -100,8 +100,10 @@ export function islandBody(layout) {
 
 const sideNodeId = (tileId, side) => `${tileId}:s${side % 6}`;
 
-// 拱橋：橋面由 planks 片甲板組成，橋面中間拱起 rise（場景單位），兩端貼齊步道。寬度讓公車與火車在欄杆內側。
-export const BRIDGE = { planks: 9, rise: 0.06, width: 0.2 };
+// 拱橋：橋面由 planks 片甲板組成，橋面中間拱起 rise（場景單位），兩端貼齊步道。
+// 寬度讓中間的公車與火車車道（來回兩向）和兩側的市民步道分開，都在欄杆內側（island-motion.js 的 SPUR_LANE）。
+// 欄杆只立在步道環外緣以外的那段，不擋步道上的車與市民。
+export const BRIDGE = { planks: 9, rise: 0.06, width: 0.42 };
 
 // 點 { x, z } 在哪座島的頂面上（尖頂六角形內），回傳格子識別碼；在水道或橋面中段時回傳 null。
 // 選取抬高時，車輛用它判斷要不要跟著抬。

@@ -175,6 +175,9 @@ function bridgeParts(parent, { from, to, length }) {
     const slope = Math.atan((bridgeLift(t + 0.01) - bridgeLift(t - 0.01)) / (0.02 * length));
     const at = { x: from[0] + dx * length * t, y: TILE_SURFACE + WALK_LIFT + bridgeLift(t), z: from[1] + dz * length * t };
     part(parent, 'box', unitBox, BODY_PALETTE.plank, { ...at, rotY: -heading, rotZ: slope, scale: [step * 0.88, 0.022, BRIDGE.width] });
+    // 欄杆只在步道環外緣以外：橋頭那幾片甲板蓋在步道上，車與市民從那裡轉上橋。
+    const along = length * t;
+    if (along < WALKWAY.width / 2 || along > length - WALKWAY.width / 2) continue;
     for (const side of [-1, 1]) {
       const off = side * (BRIDGE.width / 2 - 0.008);
       part(parent, 'box', unitBox, BODY_PALETTE.rail, {
