@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { partBuckets, scaleJitter } from './island-parts.js';
 
 // 合批零件的黏土材質數值。
-export const CLAY = { roughness: 0.78, metalness: 0 };
+const CLAY ={ roughness: 0.78, metalness: 0 };
 
 const geometries = new Map();
 
@@ -62,6 +62,7 @@ const GLOW_SHAPES = { glowbox: 'box', glowsphere: 'sphere' };
 // 主題場景零件的共用幾何與是否發光。shape 是 HERO_SHAPES 之一。
 export function kitShape(shape) {
   const base = GLOW_SHAPES[shape] ?? shape;
+  if (!KIT_SHAPES[base]) throw new Error(`零件庫沒有形體 ${shape}`);
   return { geometry: sharedGeometry(`kit:${base}`, KIT_SHAPES[base]), glow: base !== shape };
 }
 
@@ -72,11 +73,16 @@ export function glowSourceMaterial(color) {
   return m;
 }
 
-// 材質種類：發光、雙面、一般。透明材質不收（透明物件要排序，合批後會畫錯）。
-function materialKind(material) {
+// 主題場景零件庫的形體（kitShape 建的幾何）：用黏土材質並加縮放微抖動。
+// 其他零件（格子、在地感元素、路燈、路面）維持原本的低多邊形 flatShading，不受影響。
+const isClayShape = (shape) => shape.startsWith('kit:');
+
+// 材質種類：發光、黏土、雙面、一般。透明材質不收（透明物件要排序，合批後會畫錯）。
+function materialKind(material, shape) {
   if (material.userData.glow) return 'glow';
   if (material.transparent || !(material instanceof THREE.MeshStandardMaterial)) return null;
-  return material.side === THREE.DoubleSide ? 'standard-double' : 'standard';
+  if (material.side === THREE.DoubleSide) return 'standard-double';
+  return isClayShape(shape) ? 'clay' : 'standard';
 }
 
 // 往上找第一個 userData.areaId，點到零件時才知道是哪個議題區。
@@ -95,7 +101,7 @@ export function instancify(root, { glowMaterial }) {
   root.traverse((object) => {
     if (!object.isMesh || object.isInstancedMesh || object.userData.dynamic) return;
     const shape = object.geometry.userData.kitShape;
-    const kind = shape && materialKind(object.material);
+    const kind = shape && materialKind(object.material, shape);
     if (!kind) return;
     parts.push({
       shape,
@@ -114,10 +120,11 @@ export function instancify(root, { glowMaterial }) {
     if (part.material === 'glow') part.object.material.dispose();
   }
 
-  // 霧面黏土：roughness 0.78、metalness 0，不用 flatShading，圓角與曲面看起來柔和。
   const base = {
-    standard: new THREE.MeshStandardMaterial({ roughness: CLAY.roughness, metalness: CLAY.metalness }),
-    'standard-double': new THREE.MeshStandardMaterial({ roughness: CLAY.roughness, metalness: CLAY.metalness, side: THREE.DoubleSide }),
+    standard: new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0 }),
+    'standard-double': new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.9, metalness: 0, side: THREE.DoubleSide }),
+    // 霧面黏土：roughness 0.78、metalness 0，不用 flatShading，圓角與曲面看起來柔和。
+    clay: new THREE.MeshStandardMaterial({ roughness: CLAY.roughness, metalness: CLAY.metalness }),
     glow: glowMaterial,
   };
   const color = new THREE.Color();
@@ -126,9 +133,11 @@ export function instancify(root, { glowMaterial }) {
   const meshes = partBuckets(parts).map((bucket) => {
     const mesh = new THREE.InstancedMesh(bucket.items[0].geometry, base[bucket.material], bucket.items.length);
     bucket.items.forEach((part, i) => {
-      // 縮放微抖動（island-parts.js 的 scaleJitter），共面的零件錯開一點，不會 z-fighting。
-      const j = scaleJitter(serial++);
-      part.transform.multiply(jitter.makeScale(j, j, j));
+      // 主題場景零件的縮放微抖動（island-parts.js 的 scaleJitter），共面的零件錯開一點，不會 z-fighting。
+      if (isClayShape(part.shape)) {
+        const j = scaleJitter(serial++);
+        part.transform.multiply(jitter.makeScale(j, j, j));
+      }
       mesh.setMatrixAt(i, part.transform);
       mesh.setColorAt(i, color.setHex(part.color));
     });

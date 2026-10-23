@@ -1,13 +1,13 @@
 // 主題場景：每個議題區一座一眼可辨的小型立體場景（例如交通是公車站與公車、教育是學校與操場）。
 // 只做計算，不碰 three.js，瀏覽器與 Node 共用；畫成 3D 在 island-hero-view.js。
-// 場景只依議題區識別碼決定，不讀政見資料（ADR 0001：主題建物依議題區決定，每格數量固定）。
+// 場景只依議題區識別碼決定，不讀政見資料（ADR 0001：靜態裝飾每格數量固定，主題場景依議題區決定）。
 // 主題必須中性，不用與特定市長任期綁定的地標或建設，造型一律是通用的公車站、學校、診所。
 //
 // 單位空間：底面 x、z 在 ±0.5，高度 0 到 1.5，場景正面朝 +z（南，鏡頭那一側）。
 // 零件 { shape, color, size: [寬, 高, 深], at: [x, y, z]（零件外框中心）, rot?: [x, y, z]（弧度，XYZ 順序）, yaw? }，
 // 最後的變換是「平移 at · 繞 y 轉 yaw · rot · 縮放 size」。每種 shape 的單位幾何都裝在 ±0.5 的立方體裡（見 HERO_SHAPES）。
 
-// 零件形體，對應零件庫的單位幾何（island-kit.js 的 kitGeometry）。
+// 零件形體，對應零件庫的單位幾何（island-kit.js 的 KIT_SHAPES，經 kitShape 取用；新增形體兩邊都要加）。
 // 'glowbox'、'glowsphere' 是發光件（窗、燈），夜裡亮起。
 export const HERO_SHAPES = ['box', 'rbox', 'cyl', 'cone', 'sphere', 'ico', 'dome', 'torus', 'prism', 'hip', 'glowbox', 'glowsphere'];
 
@@ -44,8 +44,6 @@ export const HERO_COLORS = {
   ochre: 0xc9a463,
 };
 
-// 單位空間的範圍。
-export const HERO_SPACE = { half: 0.5, height: 1.5 };
 // 地台：每座場景底下一塊薄圓角板，零件從地台頂面（PAD）往上放。
 const PAD = 0.04;
 
@@ -938,7 +936,7 @@ export function heroSceneFor(areaId) {
   return HERO_SCENES[areaId] ?? GENERIC_SCENE;
 }
 
-// 暫放位置：島體改版（每島主建物位置 heroSlot）之前，主題場景放在現有格子元素區的西半，
+// 暫放位置：島體改版提供每島的主題場景位置（heroSlot）之前，主題場景放在現有格子元素區的西半，
 // 在地感元素縮到東半（island-models.js 的 ELEMENT_AREA.secondary）。
 // 縮放 0.76 讓最高的場景（約 1.31）放大後不超過 1，不擋北鄰格的標記；南緣不進標記帶（z ≤ 0.24）。
 export const TEMPORARY_SLOT = { dx: -0.3, dz: -0.2, scale: 0.76 };
@@ -947,7 +945,7 @@ export function temporarySlot(tile) {
 }
 
 // 每個議題區格子的主題場景與擺放：{ areaId, sceneId, transform: { x, z, scale, yaw } }。
-// 只讀格子的識別碼、種類與位置，不讀標記亮暗與政見。slotOf(tile) 決定擺放（島體提供主建物位置後換掉）。
+// 只讀格子的識別碼、種類與位置，不讀標記亮暗與政見。slotOf(tile) 決定擺放（島體提供主題場景位置後傳入，取代暫放位置）。
 export function heroPlan(layout, { slotOf = temporarySlot } = {}) {
   return layout.tiles
     .filter((tile) => tile.kind === 'area')

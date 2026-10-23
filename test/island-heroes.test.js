@@ -74,7 +74,13 @@ test('暫放位置：主題場景放大後仍在格子的元素區內，不擋�
     const { min, max } = sceneBounds(heroSceneFor(hero.areaId));
     const s = hero.transform.scale;
     assert.ok(hero.transform.z - tile.position.z + max[2] * s <= 0.24 + 1e-9, '主題場景伸進標記帶');
-    assert.ok(Math.abs(hero.transform.x - tile.position.x) + 0.5 * s <= 0.8, '主題場景超出格子東西兩側');
+    // 外框四角都在格子頂面（尖頂六角形，外接半徑 0.96）內。
+    const r = 0.96 * layout.hexSize;
+    for (const x of [min[0], max[0]]) for (const z of [min[2], max[2]]) {
+      const dx = Math.abs(hero.transform.x - tile.position.x + x * s);
+      const dz = Math.abs(hero.transform.z - tile.position.z + z * s);
+      assert.ok(dx <= (r * Math.sqrt(3)) / 2 && dz <= r - dx / Math.sqrt(3), `${hero.areaId} 的角 (${x}, ${z}) 超出格子頂面`);
+    }
   }
   // 每座場景用暫放的縮放都不超過元素區的高度上限 1。
   const s = heroPlan(layout)[0].transform.scale;
