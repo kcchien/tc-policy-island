@@ -174,7 +174,7 @@ test('第二層提示詞：含檢核表全部項目、品牌用語、摘要與�
   assert.ok(request.prompt.includes(POLICY.quotes[0].text));
   assert.doesNotMatch(request.prompt, /\{\{/);
   assert.ok(request.systemPrompt.length > 0);
-  assert.equal(request.checklistVersion, '1');
+  assert.equal(request.checklistVersion, rules.checklist.version);
 });
 
 test('第二層提示詞：不含候選人、議題區、出處與抽取資訊', () => {
@@ -255,7 +255,7 @@ test('第二層提示詞：品牌用語本身含候選人姓名或政黨名稱�
 test('檢核表與提示詞的版本不一致時拒絕載入', () => {
   const dir = mkdtempSync(join(tmpdir(), 'rules-'));
   const prompt = join(dir, 'layer2-prompt.md');
-  writeFileSync(prompt, readFileSync(RULE_PATHS.prompt, 'utf8').replace('版本：1', '版本：2'));
+  writeFileSync(prompt, readFileSync(RULE_PATHS.prompt, 'utf8').replace(/^版本：\S+/, '版本：不同版本'));
 
   assert.throws(() => loadVerificationRules({ ...RULE_PATHS, prompt }), /版本/);
 });

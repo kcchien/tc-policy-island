@@ -11,6 +11,8 @@ const VERIFY_SCRIPT = repoPath('scripts/verify.js');
 const SAMPLE_RAW = repoPath('test/fixtures/raw-sample');
 const FAKE_CLAUDE = repoPath('test/fixtures/fake-claude');
 const BRAND_TERMS = repoPath('test/fixtures/rules/brand-terms.json');
+// 核對指令讀正式檢核表，這是現行版本。
+const CHECKLIST_VERSION = JSON.parse(readFileSync(repoPath('data/verification/checklist.json'), 'utf8')).version;
 
 function copySample() {
   const rawDir = mkdtempSync(join(tmpdir(), 'verify-raw-'));
@@ -52,7 +54,7 @@ test('核對指令對全部政見跑兩層核對，結果寫回原始資料', ()
     layer2: {
       status: 'pass',
       reason: '假判定：通過',
-      checklistVersion: '1',
+      checklistVersion: CHECKLIST_VERSION,
       model: 'fake-model',
       checkedAt: '2026-10-24',
     },
@@ -122,7 +124,7 @@ test('--skip-passed 只跑未核對或已退回的政見', () => {
   });
 
   editPolicy(rawDir, 'sample-jia', 'sample-jia-001', (p) => {
-    p.verification.layer2.checklistVersion = '1';
+    p.verification.layer2.checklistVersion = CHECKLIST_VERSION;
   });
 
   const { code, output, calls } = verify(rawDir, ['--skip-passed']);
@@ -140,7 +142,7 @@ test('--skip-passed 會重跑以舊版檢核表通過的政見', () => {
   const { calls } = verify(rawDir, ['--skip-passed', '--candidate', 'sample-yi']);
 
   assert.equal(calls.length, 1);
-  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.checklistVersion, '1');
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.checklistVersion, CHECKLIST_VERSION);
 });
 
 test('第一層不通過就不送第二層，第二層維持未核對', () => {
