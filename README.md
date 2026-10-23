@@ -17,4 +17,8 @@ node scripts/preview.js    # 本機預覽 http://localhost:8000/
 
 ## 授權
 
-整理內容採 CC BY 4.0，程式碼採 MIT，原文引述的著作權屬於各候選人。
+整理內容（摘要、議題區、分類與資料結構）採 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，程式碼採 MIT（見 [LICENSE](LICENSE)），原文引述與出處快照的著作權屬於各候選人。完整說明見網站的整理方法頁（`site/method.html`）。
+
+## 更正
+
+發現錯誤請到本 repo 的 GitHub Issues 回報，附上政見卡片上的政見連結與有誤的地方。

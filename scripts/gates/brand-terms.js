@@ -1,5 +1,6 @@
 import { createScanner, loadBrandTerms, TIER_NAMES, TIERS } from '../lib/brand-terms.js';
 import { DATASET_PATH, THIRD_PARTY } from './site.js';
+import { isVerbatimRepoFile } from './repo-documents.js';
 
 // 掃描整理者撰寫的文字：網站文案、公開資料集、網址與檔名。
 // 不掃候選人本人的文字：原文引述、出處快照、出處的原網址、存檔網址與標題。
@@ -50,6 +51,8 @@ export default {
       // 公開資料集逐欄位掃，見下方。
       if (path === DATASET_PATH) continue;
       if (SKIP_CONTENT.some((pattern) => pattern.test(path)) || !TEXT_FILE.test(path)) continue;
+      // 引用 repo 文件照原文公開，比照原文引述不掃；與 repo 檔案不一致時照掃，由引用 repo 文件關卡擋下。
+      if (isVerbatimRepoFile(site, path)) continue;
       const text = site.readText(path);
       if (!CODE_FILE.test(path)) {
         failures.push(...describe(path, scan(text)));

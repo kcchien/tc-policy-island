@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildPublicDataset } from '../site/js/dataset.js';
+import { REPO_DOCUMENTS, repoFileSitePath } from '../site/js/repo-documents.js';
 import { makeRaw, pendingVerification } from './fixtures/make-raw.js';
 
 const GATES_SCRIPT = fileURLToPath(new URL('../scripts/gates.js', import.meta.url));
@@ -25,11 +26,17 @@ function makeSite(tamper = () => {}, files = {}) {
   return dir;
 }
 
+// 建置時逐字複製到網站目錄的 repo 文件（引用 repo 文件）。必要的那幾份不在就不能上線。
+const repoFile = (path) => readFileSync(fileURLToPath(new URL(`../${path}`, import.meta.url)), 'utf8');
+const REPO_FILES = Object.fromEntries(REPO_DOCUMENTS.filter((doc) => !doc.optional)
+  .map((doc) => [repoFileSitePath(doc.path), repoFile(doc.path)]));
+
 // 合規網站文案與配色，取自本站實際使用的寫法。
 const COMPLIANT_FILES = {
   'index.html': '<!doctype html><title>台中政見島</title><p>由 AI 依公開資料整理，與任何候選人或政黨無關。</p>',
   'css/main.css': ':root { --laterite: #8e4b32; --rice: #f4efe6; --water: #7d9a98; }\nbody { color: rgb(47, 44, 41); background: var(--rice); }',
   'js/island.js': "const ground = new MeshStandardMaterial({ color: 0x8e4b32 });\nconst sea = '#7d9a98';",
+  ...REPO_FILES,
 };
 
 function runGates(siteDir) {
@@ -260,4 +267,60 @@ test('程式碼註解裡的陣營高頻詞不擋，字串裡的文案照擋', ()
 
   assert.doesNotMatch(output, /加速/);
   assert.match(output, /js\/island\.js：含陣營高頻詞「安心」/);
+});
+
+// 引用 repo 文件：規則文件與清單照原文公開，品牌用語掃描不掃，改由關卡驗證與 repo 檔案逐字相同。
+
+test('引用 repo 文件照原文含品牌用語時，品牌用語掃描不擋', () => {
+  const site = makeSite(() => {}, COMPLIANT_FILES);
+
+  const { code, output } = runGates(site);
+
+  assert.match(repoFile('docs/rules/brand-terms.md'), /臺中味/);
+  assert.equal(code, 0, output);
+});
+
+test('引用 repo 文件與 repo 檔案不一致時不通過，夾帶的文字也照樣被品牌用語掃描擋下', () => {
+  const path = repoFileSitePath('docs/rules/classification-rules.md');
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, [path]: `${REPO_FILES[path]}\n本站推薦六星市政。\n` });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /data\/repo-files\/docs\/rules\/classification-rules\.md：與 repo 檔案 docs\/rules\/classification-rules\.md 不一致/);
+  assert.match(output, /data\/repo-files\/docs\/rules\/classification-rules\.md：含品牌用語「六星」/);
+});
+
+test('引用 repo 文件目錄裡出現清單以外的檔案時不通過', () => {
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'data/repo-files/docs/notes.md': '整理者的話' });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /data\/repo-files\/docs\/notes\.md：不在引用 repo 文件清單中/);
+});
+
+test('缺少必要的引用 repo 文件時不通過，選用的核對報告缺少不擋', () => {
+  const missing = repoFileSitePath('data/verification/checklist.json');
+  const { [missing]: _, ...files } = COMPLIANT_FILES;
+
+  const { code, output } = runGates(makeSite(() => {}, files));
+
+  assert.notEqual(code, 0);
+  assert.match(output, /缺少引用 repo 文件 data\/verification\/checklist\.json/);
+  assert.doesNotMatch(output, /report/);
+});
+
+test('頁面上引用 repo 文件的容器標註清單以外的檔案時不通過，容器內寫在頁面的文字照常掃描', () => {
+  const site = makeSite(() => {}, {
+    ...COMPLIANT_FILES,
+    'method.html': '<section data-repo-file="docs/research/candidates-2026.md"><p>研究筆記</p></section>'
+      + '<section data-repo-file="docs/rules/brand-terms.md"><p>六星</p></section>',
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /method\.html：引用 repo 文件的容器標註 docs\/research\/candidates-2026\.md，不在引用 repo 文件清單中/);
+  assert.match(output, /method\.html：含品牌用語「六星」/);
 });
