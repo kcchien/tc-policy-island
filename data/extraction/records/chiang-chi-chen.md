@@ -46,7 +46,7 @@
 
 ## 出處存檔
 
-76 個出處中 10 個有 Wayback Machine 存檔網址。其餘在抽取時遇到 Wayback Machine 限流（回應 HTTP 429 或拒絕連線），依管理者決定照實記錄 `archiveError`、不重試，補送存檔另行集中處理。其中寫「抽取階段未再送存檔」的出處是限流後沒有送出，不是送了失敗。
+76 個出處全部有 Wayback Machine 存檔網址。抽取時只有 10 個取得存檔網址，其餘遇到 Wayback Machine 限流（回應 HTTP 429 或拒絕連線），照實記錄 `archiveError`、不重試。2026-10-23 核對階段以單一流程依序補送這 66 個出處（每筆間隔 20 秒，失敗時退避 60、120、240、480 秒重試），全部取得存檔網址，`archiveError` 已清為空。chiang-page-04 與 chiang-page-30 送出時 Wayback Machine 回傳的是 2026-10-18 已有的存檔。
 
 出處識別碼用中性編號：主要政見頁 `chiang-main`，政見子頁 `chiang-page-NN`，新聞稿 `chiang-pr-NN`，依網址排序。快照檔名會出現在網站上，所以不沿用官網網址中品牌用語的英譯。
 
@@ -56,78 +56,78 @@
 | chiang-page-01 | https://taichungway.tw/central-taiwan-airport-gateway | https://web.archive.org/web/20261023100741/https://taichungway.tw/central-taiwan-airport-gateway |
 | chiang-page-02 | https://taichungway.tw/city-safety-first-responders | https://web.archive.org/web/20261023100805/https://taichungway.tw/city-safety-first-responders |
 | chiang-page-03 | https://taichungway.tw/city-safety-smart-safety-net | https://web.archive.org/web/20261023100831/https://taichungway.tw/city-safety-smart-safety-net |
-| chiang-page-04 | https://taichungway.tw/city-safety-tech-enforcement | 失敗：Wayback Machine 回應 HTTP 429 |
-| chiang-page-05 | https://taichungway.tw/exhibition-economy-city-pavilion | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-06 | https://taichungway.tw/exhibition-economy-mice-tourism | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-07 | https://taichungway.tw/exhibition-economy-startup-accelerator | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-08 | https://taichungway.tw/exhibition-economy-taichung-hub | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-09 | https://taichungway.tw/multicultural-city-hakka-heritage | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-10 | https://taichungway.tw/multicultural-city-indigenous-support | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-11 | https://taichungway.tw/multicultural-city-new-immigrants | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-12 | https://taichungway.tw/old-town-revival-community-arts | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-13 | https://taichungway.tw/old-town-revival-culture-investment | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-14 | https://taichungway.tw/old-town-revival-night-economy | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-15 | https://taichungway.tw/parenting-friendly-city-childcare-support | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-16 | https://taichungway.tw/parenting-friendly-city-maternal-care | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-17 | https://taichungway.tw/parenting-friendly-city-parental-leave | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-18 | https://taichungway.tw/robot-manufacturing-city-ai-industry | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-19 | https://taichungway.tw/robot-manufacturing-city-steam-education | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-20 | https://taichungway.tw/robot-manufacturing-city-tech-education | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-21 | https://taichungway.tw/robot-manufacturing-city-vocational-training | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-04 | https://taichungway.tw/city-safety-tech-enforcement | https://web.archive.org/web/20261018103547/https://taichungway.tw/city-safety-tech-enforcement |
+| chiang-page-05 | https://taichungway.tw/exhibition-economy-city-pavilion | https://web.archive.org/web/20261023103943/https://taichungway.tw/exhibition-economy-city-pavilion |
+| chiang-page-06 | https://taichungway.tw/exhibition-economy-mice-tourism | https://web.archive.org/web/20261023104023/https://taichungway.tw/exhibition-economy-mice-tourism |
+| chiang-page-07 | https://taichungway.tw/exhibition-economy-startup-accelerator | https://web.archive.org/web/20261023104109/https://taichungway.tw/exhibition-economy-startup-accelerator |
+| chiang-page-08 | https://taichungway.tw/exhibition-economy-taichung-hub | https://web.archive.org/web/20261023104307/https://taichungway.tw/exhibition-economy-taichung-hub |
+| chiang-page-09 | https://taichungway.tw/multicultural-city-hakka-heritage | https://web.archive.org/web/20261023104445/https://taichungway.tw/multicultural-city-hakka-heritage |
+| chiang-page-10 | https://taichungway.tw/multicultural-city-indigenous-support | https://web.archive.org/web/20261023104624/https://taichungway.tw/multicultural-city-indigenous-support |
+| chiang-page-11 | https://taichungway.tw/multicultural-city-new-immigrants | https://web.archive.org/web/20261023104705/https://taichungway.tw/multicultural-city-new-immigrants |
+| chiang-page-12 | https://taichungway.tw/old-town-revival-community-arts | https://web.archive.org/web/20261023104746/https://taichungway.tw/old-town-revival-community-arts |
+| chiang-page-13 | https://taichungway.tw/old-town-revival-culture-investment | https://web.archive.org/web/20261023104825/https://taichungway.tw/old-town-revival-culture-investment |
+| chiang-page-14 | https://taichungway.tw/old-town-revival-night-economy | https://web.archive.org/web/20261023104904/https://taichungway.tw/old-town-revival-night-economy |
+| chiang-page-15 | https://taichungway.tw/parenting-friendly-city-childcare-support | https://web.archive.org/web/20261023105027/https://taichungway.tw/parenting-friendly-city-childcare-support |
+| chiang-page-16 | https://taichungway.tw/parenting-friendly-city-maternal-care | https://web.archive.org/web/20261023105106/https://taichungway.tw/parenting-friendly-city-maternal-care |
+| chiang-page-17 | https://taichungway.tw/parenting-friendly-city-parental-leave | https://web.archive.org/web/20261023105145/https://taichungway.tw/parenting-friendly-city-parental-leave |
+| chiang-page-18 | https://taichungway.tw/robot-manufacturing-city-ai-industry | https://web.archive.org/web/20261023105224/https://taichungway.tw/robot-manufacturing-city-ai-industry |
+| chiang-page-19 | https://taichungway.tw/robot-manufacturing-city-steam-education | https://web.archive.org/web/20261023105304/https://taichungway.tw/robot-manufacturing-city-steam-education |
+| chiang-page-20 | https://taichungway.tw/robot-manufacturing-city-tech-education | https://web.archive.org/web/20261023105348/https://taichungway.tw/robot-manufacturing-city-tech-education |
+| chiang-page-21 | https://taichungway.tw/robot-manufacturing-city-vocational-training | https://web.archive.org/web/20261023105506/https://taichungway.tw/robot-manufacturing-city-vocational-training |
 | chiang-page-22 | https://taichungway.tw/senior-care-age-friendly-housing | https://web.archive.org/web/20261023101127/https://taichungway.tw/senior-care-age-friendly-housing |
 | chiang-page-23 | https://taichungway.tw/senior-care-community-hubs | https://web.archive.org/web/20261023101151/https://taichungway.tw/senior-care-community-hubs |
 | chiang-page-24 | https://taichungway.tw/senior-care-long-term-care-office | https://web.archive.org/web/20261023101214/https://taichungway.tw/senior-care-long-term-care-office |
 | chiang-page-25 | https://taichungway.tw/smart-agriculture-brand-upgrade | https://web.archive.org/web/20261023101239/https://taichungway.tw/smart-agriculture-brand-upgrade |
-| chiang-page-26 | https://taichungway.tw/smart-agriculture-disaster-alert | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-27 | https://taichungway.tw/smart-agriculture-university-partnership | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-28 | https://taichungway.tw/smart-transport-public-transit | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-29 | https://taichungway.tw/smart-transport-smart-roads | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-30 | https://taichungway.tw/smart-transport-walkable-streets | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-page-31 | https://taichungway.tw/taichung-20-minute-city | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-01 | https://taichungway.tw/press-release-20-minute-city-gis-policy | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-02 | https://taichungway.tw/press-release-agriculture-5-policies | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-03 | https://taichungway.tw/press-release-aidc-trainer-aircraft-ai | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-04 | https://taichungway.tw/press-release-amcham-taichung-dinner | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-05 | https://taichungway.tw/press-release-beiqu-briefing-lu-chen-zheng-xian | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-06 | https://taichungway.tw/press-release-beitun-hq-openings | 失敗：Wayback Machine 連線失敗：fetch failed |
-| chiang-pr-07 | https://taichungway.tw/press-release-beitun-shen-youlian-joint-briefing | 失敗：Wayback Machine 連線失敗：fetch failed |
+| chiang-page-26 | https://taichungway.tw/smart-agriculture-disaster-alert | https://web.archive.org/web/20261023105549/https://taichungway.tw/smart-agriculture-disaster-alert |
+| chiang-page-27 | https://taichungway.tw/smart-agriculture-university-partnership | https://web.archive.org/web/20261023105629/https://taichungway.tw/smart-agriculture-university-partnership |
+| chiang-page-28 | https://taichungway.tw/smart-transport-public-transit | https://web.archive.org/web/20261023105708/https://taichungway.tw/smart-transport-public-transit |
+| chiang-page-29 | https://taichungway.tw/smart-transport-smart-roads | https://web.archive.org/web/20261023105748/https://taichungway.tw/smart-transport-smart-roads |
+| chiang-page-30 | https://taichungway.tw/smart-transport-walkable-streets | https://web.archive.org/web/20261018102455/https://taichungway.tw/smart-transport-walkable-streets |
+| chiang-page-31 | https://taichungway.tw/taichung-20-minute-city | https://web.archive.org/web/20261023105907/https://taichungway.tw/taichung-20-minute-city |
+| chiang-pr-01 | https://taichungway.tw/press-release-20-minute-city-gis-policy | https://web.archive.org/web/20261023110005/https://taichungway.tw/press-release-20-minute-city-gis-policy |
+| chiang-pr-02 | https://taichungway.tw/press-release-agriculture-5-policies | https://web.archive.org/web/20261023110121/https://taichungway.tw/press-release-agriculture-5-policies |
+| chiang-pr-03 | https://taichungway.tw/press-release-aidc-trainer-aircraft-ai | https://web.archive.org/web/20261023110256/https://taichungway.tw/press-release-aidc-trainer-aircraft-ai |
+| chiang-pr-04 | https://taichungway.tw/press-release-amcham-taichung-dinner | https://web.archive.org/web/20261023110342/https://taichungway.tw/press-release-amcham-taichung-dinner |
+| chiang-pr-05 | https://taichungway.tw/press-release-beiqu-briefing-lu-chen-zheng-xian | https://web.archive.org/web/20261023110421/https://taichungway.tw/press-release-beiqu-briefing-lu-chen-zheng-xian |
+| chiang-pr-06 | https://taichungway.tw/press-release-beitun-hq-openings | https://web.archive.org/web/20261023110518/https://taichungway.tw/press-release-beitun-hq-openings |
+| chiang-pr-07 | https://taichungway.tw/press-release-beitun-shen-youlian-joint-briefing | https://web.archive.org/web/20261023110605/https://taichungway.tw/press-release-beitun-shen-youlian-joint-briefing |
 | chiang-pr-08 | https://taichungway.tw/press-release-beitun-waipu-briefings | https://web.archive.org/web/20261023101511/https://taichungway.tw/press-release-beitun-waipu-briefings |
 | chiang-pr-09 | https://taichungway.tw/press-release-central-west-district-briefing | https://web.archive.org/web/20261023101630/https://taichungway.tw/press-release-central-west-district-briefing |
-| chiang-pr-10 | https://taichungway.tw/press-release-coastal-daan-dajia-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-11 | https://taichungway.tw/press-release-culture-flagship-15-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-12 | https://taichungway.tw/press-release-dadu-longjing-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-13 | https://taichungway.tw/press-release-dakeng-hiking-tourism | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-14 | https://taichungway.tw/press-release-dongfeng-expressway-third-section | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-15 | https://taichungway.tw/press-release-education-6-priority-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-16 | https://taichungway.tw/press-release-fengyuan-policy-briefing | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-17 | https://taichungway.tw/press-release-fire-phoenix-tech-rescue | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-18 | https://taichungway.tw/press-release-four-hq-openings-xitun-nanqu-dali | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-19 | https://taichungway.tw/press-release-haixian-zhang-qing-zhao | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-20 | https://taichungway.tw/press-release-hanxi-nightmarket-3-arrows | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-21 | https://taichungway.tw/press-release-indigenous-5-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-22 | https://taichungway.tw/press-release-jiaanpu-20-minute-city | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-23 | https://taichungway.tw/press-release-jianguo-market-10th-anniversary | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-24 | https://taichungway.tw/press-release-lien-chiachen-hq | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-25 | https://taichungway.tw/press-release-lishan-smart-agriculture | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-26 | https://taichungway.tw/press-release-longjing-senior-card-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-27 | https://taichungway.tw/press-release-medical-longterm-care-support-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-28 | https://taichungway.tw/press-release-mice-economy-168 | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-29 | https://taichungway.tw/press-release-mrt-blue-line-groundbreaking | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-30 | https://taichungway.tw/press-release-nantun-briefing-20-minute-city | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-31 | https://taichungway.tw/press-release-new-residents-4-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-32 | https://taichungway.tw/press-release-parenting-13-policies | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-33 | https://taichungway.tw/press-release-pharmacist-support-group | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-34 | https://taichungway.tw/press-release-robot-policy-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-35 | https://taichungway.tw/press-release-shalu-coastal-transport | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-36 | https://taichungway.tw/press-release-smart-city-safety-net-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-37 | https://taichungway.tw/press-release-south-nantun-briefings | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-38 | https://taichungway.tw/press-release-taichung-airport-expansion | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-39 | https://taichungway.tw/press-release-traffic-smart-era-policy-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-40 | https://taichungway.tw/press-release-tucheng-taiping-market-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-41 | https://taichungway.tw/press-release-tunqu-transport-blueprint | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-42 | https://taichungway.tw/press-release-women-support-association-launch | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-43 | https://taichungway.tw/press-release-wuqi-briefing-sea-air-ports | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
-| chiang-pr-44 | https://taichungway.tw/press-release-zhongxiao-nantun-market-canvass | 失敗：Wayback Machine 限流，前一批送存檔被拒絕連線，抽取階段未再送存檔，待集中補送 |
+| chiang-pr-10 | https://taichungway.tw/press-release-coastal-daan-dajia-briefings | https://web.archive.org/web/20261023110648/https://taichungway.tw/press-release-coastal-daan-dajia-briefings |
+| chiang-pr-11 | https://taichungway.tw/press-release-culture-flagship-15-policies | https://web.archive.org/web/20261023110731/https://taichungway.tw/press-release-culture-flagship-15-policies |
+| chiang-pr-12 | https://taichungway.tw/press-release-dadu-longjing-canvass | https://web.archive.org/web/20261023110810/https://taichungway.tw/press-release-dadu-longjing-canvass |
+| chiang-pr-13 | https://taichungway.tw/press-release-dakeng-hiking-tourism | https://web.archive.org/web/20261023110851/https://taichungway.tw/press-release-dakeng-hiking-tourism |
+| chiang-pr-14 | https://taichungway.tw/press-release-dongfeng-expressway-third-section | https://web.archive.org/web/20261023110930/https://taichungway.tw/press-release-dongfeng-expressway-third-section |
+| chiang-pr-15 | https://taichungway.tw/press-release-education-6-priority-policies | https://web.archive.org/web/20261023111009/https://taichungway.tw/press-release-education-6-priority-policies |
+| chiang-pr-16 | https://taichungway.tw/press-release-fengyuan-policy-briefing | https://web.archive.org/web/20261023111127/https://taichungway.tw/press-release-fengyuan-policy-briefing |
+| chiang-pr-17 | https://taichungway.tw/press-release-fire-phoenix-tech-rescue | https://web.archive.org/web/20261023111243/https://taichungway.tw/press-release-fire-phoenix-tech-rescue |
+| chiang-pr-18 | https://taichungway.tw/press-release-four-hq-openings-xitun-nanqu-dali | https://web.archive.org/web/20261023111409/https://taichungway.tw/press-release-four-hq-openings-xitun-nanqu-dali |
+| chiang-pr-19 | https://taichungway.tw/press-release-haixian-zhang-qing-zhao | https://web.archive.org/web/20261023111449/https://taichungway.tw/press-release-haixian-zhang-qing-zhao |
+| chiang-pr-20 | https://taichungway.tw/press-release-hanxi-nightmarket-3-arrows | https://web.archive.org/web/20261023111529/https://taichungway.tw/press-release-hanxi-nightmarket-3-arrows |
+| chiang-pr-21 | https://taichungway.tw/press-release-indigenous-5-policies | https://web.archive.org/web/20261023111609/https://taichungway.tw/press-release-indigenous-5-policies |
+| chiang-pr-22 | https://taichungway.tw/press-release-jiaanpu-20-minute-city | https://web.archive.org/web/20261023111649/https://taichungway.tw/press-release-jiaanpu-20-minute-city |
+| chiang-pr-23 | https://taichungway.tw/press-release-jianguo-market-10th-anniversary | https://web.archive.org/web/20261023111729/https://taichungway.tw/press-release-jianguo-market-10th-anniversary |
+| chiang-pr-24 | https://taichungway.tw/press-release-lien-chiachen-hq | https://web.archive.org/web/20261023111813/https://taichungway.tw/press-release-lien-chiachen-hq |
+| chiang-pr-25 | https://taichungway.tw/press-release-lishan-smart-agriculture | https://web.archive.org/web/20261023111948/https://taichungway.tw/press-release-lishan-smart-agriculture |
+| chiang-pr-26 | https://taichungway.tw/press-release-longjing-senior-card-briefings | https://web.archive.org/web/20261023112029/https://taichungway.tw/press-release-longjing-senior-card-briefings |
+| chiang-pr-27 | https://taichungway.tw/press-release-medical-longterm-care-support-launch | https://web.archive.org/web/20261023112108/https://taichungway.tw/press-release-medical-longterm-care-support-launch |
+| chiang-pr-28 | https://taichungway.tw/press-release-mice-economy-168 | https://web.archive.org/web/20261023112236/https://taichungway.tw/press-release-mice-economy-168 |
+| chiang-pr-29 | https://taichungway.tw/press-release-mrt-blue-line-groundbreaking | https://web.archive.org/web/20261023112411/https://taichungway.tw/press-release-mrt-blue-line-groundbreaking |
+| chiang-pr-30 | https://taichungway.tw/press-release-nantun-briefing-20-minute-city | https://web.archive.org/web/20261023112546/https://taichungway.tw/press-release-nantun-briefing-20-minute-city |
+| chiang-pr-31 | https://taichungway.tw/press-release-new-residents-4-policies | https://web.archive.org/web/20261023112625/https://taichungway.tw/press-release-new-residents-4-policies |
+| chiang-pr-32 | https://taichungway.tw/press-release-parenting-13-policies | https://web.archive.org/web/20261023112717/https://taichungway.tw/press-release-parenting-13-policies |
+| chiang-pr-33 | https://taichungway.tw/press-release-pharmacist-support-group | https://web.archive.org/web/20261023112757/https://taichungway.tw/press-release-pharmacist-support-group |
+| chiang-pr-34 | https://taichungway.tw/press-release-robot-policy-launch | https://web.archive.org/web/20261023112951/https://taichungway.tw/press-release-robot-policy-launch |
+| chiang-pr-35 | https://taichungway.tw/press-release-shalu-coastal-transport | https://web.archive.org/web/20261023113037/https://taichungway.tw/press-release-shalu-coastal-transport |
+| chiang-pr-36 | https://taichungway.tw/press-release-smart-city-safety-net-launch | https://web.archive.org/web/20261023113117/https://taichungway.tw/press-release-smart-city-safety-net-launch |
+| chiang-pr-37 | https://taichungway.tw/press-release-south-nantun-briefings | https://web.archive.org/web/20261023113158/https://taichungway.tw/press-release-south-nantun-briefings |
+| chiang-pr-38 | https://taichungway.tw/press-release-taichung-airport-expansion | https://web.archive.org/web/20261023113338/https://taichungway.tw/press-release-taichung-airport-expansion |
+| chiang-pr-39 | https://taichungway.tw/press-release-traffic-smart-era-policy-launch | https://web.archive.org/web/20261023113416/https://taichungway.tw/press-release-traffic-smart-era-policy-launch |
+| chiang-pr-40 | https://taichungway.tw/press-release-tucheng-taiping-market-canvass | https://web.archive.org/web/20261023113456/https://taichungway.tw/press-release-tucheng-taiping-market-canvass |
+| chiang-pr-41 | https://taichungway.tw/press-release-tunqu-transport-blueprint | https://web.archive.org/web/20261023113536/https://taichungway.tw/press-release-tunqu-transport-blueprint |
+| chiang-pr-42 | https://taichungway.tw/press-release-women-support-association-launch | https://web.archive.org/web/20261023113617/https://taichungway.tw/press-release-women-support-association-launch |
+| chiang-pr-43 | https://taichungway.tw/press-release-wuqi-briefing-sea-air-ports | https://web.archive.org/web/20261023113657/https://taichungway.tw/press-release-wuqi-briefing-sea-air-ports |
+| chiang-pr-44 | https://taichungway.tw/press-release-zhongxiao-nantun-market-canvass | https://web.archive.org/web/20261023113736/https://taichungway.tw/press-release-zhongxiao-nantun-market-canvass |
 
 ## 十大亮點
 
@@ -1978,3 +1978,13 @@
 網址：https://taichungway.tw/way
 
 結果：不收。經歷與立委任內政績回顧（「爭取」經費、已完工建設）。少數帶未來時態的句子都是既有工程的進度或立委身分的持續爭取，例如「預計2026年年底東勢到石岡段通車」「持續爭取3.2億經費改善南區」「未來結合亞洲大學附設醫院，打造健康產業園區」（與江-03-12 相關）、「爭取捷運紅線到豐原」（與江-01-1 相關），都不是市長任內的新承諾
+
+## 核對
+
+2026-10-23 依 `docs/adr/0002-ai-verification-instead-of-human-review.md` 執行兩層核對。各輪結果與退回原因摘要見 `data/verification/report.md`。
+
+- 第一層：149 筆全部通過，沒有修改引述。
+- 第二層先以檢核表版本 1 跑：第 1 輪退回 54 筆，依理由改寫後第 2 輪全部通過。版本 1 的理由常寫出品牌用語與陣營高頻詞，理由會進公開資料集，上線關卡擋下，所以檢核表與提示詞升為版本 2（要求理由不寫出清單中的詞），全部重跑。
+- 版本 2：第 1 輪退回 12 筆，第 2 輪退回 1 筆（chiang-chi-chen-045），第 3 輪全部通過。
+- 同一筆累計退回（兩個版本合計）最多 2 次：chiang-chi-chen-006、chiang-chi-chen-045、chiang-chi-chen-077。沒有政見退回達三次，沒有刪除。
+- 退回的摘要只依該筆自己的原文引述與退回理由修改，並符合抽取指示。修改由核對 session 撰寫，當時 repo 內只有江啟臣的政見資料，沒有其他候選人的資料可參考。修改後的摘要以 `data/raw/policies/chiang-chi-chen.json` 為準。

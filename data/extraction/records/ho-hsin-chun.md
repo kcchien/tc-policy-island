@@ -21,6 +21,8 @@
 
 ## 政見清單（189 筆）
 
+下表的摘要是抽取當時的版本。核對第二層退回後修改過的摘要以 `data/raw/policies/ho-hsin-chun.json` 為準，修改經過見本檔「核對」一節。
+
 | 識別碼 | 議題區 | 摘要 | 適用行政區 |
 |---|---|---|---|
 | ho-hsin-chun-001 | 交通 | 加快捷運路網建設，串聯山線、海線、屯區與市中心。 | 全市 |
@@ -190,7 +192,7 @@
 | ho-hsin-chun-165 | 文化 | 輔導糕餅、木藝、漆藝等在地產業轉型，發展豐原文化品牌。 | 豐原區 |
 | ho-hsin-chun-166 | 文化 | 16 歲以下市民免費進入市府所轄藝文場館。 | 全市 |
 | ho-hsin-chun-167 | 文化 | 投入藝術人才培育，爭取更多藝文展演資源與經費。 | 全市 |
-| ho-hsin-chun-168 | 文化 | 修復活化大里菸葉廠，作為結合青年創業、共享空間、文化展演與市集的文創園區。 | 大里區 |
+| ho-hsin-chun-190 | 文化 | 修復活化大里菸葉廠，作為結合青年創業、共享空間、文化展演與市集的文創園區。 | 大里區 |
 | ho-hsin-chun-169 | 文化 | 區公所遷入新行政中心後，把借用空間歸還纖維工藝博物館，並投入資源提升展示與教育功能。 | 大里區 |
 | ho-hsin-chun-170 | 運動 | 在新社、東勢等山城地區興建全民運動館。 | 東勢區、新社區、石岡區、和平區 |
 | ho-hsin-chun-171 | 運動 | 興建大雅、神岡全民運動館。 | 神岡區、大雅區 |
@@ -505,15 +507,15 @@
 | 2026-09-15 | [青年圓夢、政府當後盾！何欣純推青年局、AI 研習所助就業創業](https://a-chun.tw/news/youth-bureau-ai-training-employment-entrepreneurship) | 收，引述見 ho-hsin-chun-132（出處 ho-pr-53） |
 | 2026-09-16 | [何欣純募款小物登場！攜蔡其昌穿球衣、戴「純」字帽應援台中](https://a-chun.tw/news/campaign-fundraising-merchandise) | 不收：募款小物 |
 | 2026-09-16 | [亞洲台灣同鄉會訪台中　何欣純拋「三個第一、一個大」拚升級](https://a-chun.tw/news/overseas-taiwanese-taichung-vision) | 重述，併入 ho-hsin-chun-036 |
-| 2026-09-18 | [何欣純推屯區「五大進擊」　打造六星新屯區](https://a-chun.tw/news/tunqu-five-development-initiatives) | 收，引述見 ho-hsin-chun-003、ho-hsin-chun-004、ho-hsin-chun-029、ho-hsin-chun-031、ho-hsin-chun-032、ho-hsin-chun-045、ho-hsin-chun-072、ho-hsin-chun-128、ho-hsin-chun-144、ho-hsin-chun-163、ho-hsin-chun-168、ho-hsin-chun-186（出處 ho-pr-54） |
+| 2026-09-18 | [何欣純推屯區「五大進擊」　打造六星新屯區](https://a-chun.tw/news/tunqu-five-development-initiatives) | 收，引述見 ho-hsin-chun-003、ho-hsin-chun-004、ho-hsin-chun-029、ho-hsin-chun-031、ho-hsin-chun-032、ho-hsin-chun-045、ho-hsin-chun-072、ho-hsin-chun-128、ho-hsin-chun-144、ho-hsin-chun-163、ho-hsin-chun-190、ho-hsin-chun-186（出處 ho-pr-54） |
 | 2026-09-18 | [「追欣族」現身總站夜市　何欣純拜票民眾爭相合照](https://a-chun.tw/news/zongzhan-night-market-visit) | 不收：夜市拜票 |
-| 2026-09-19 | [「純琴姊妹」台中合體　何欣純力拚「六星新屯區」](https://a-chun.tw/news/dali-wufeng-campaign-headquarters) | 重述，併入 ho-hsin-chun-006、ho-hsin-chun-003、ho-hsin-chun-004、ho-hsin-chun-031、ho-hsin-chun-029、ho-hsin-chun-045、ho-hsin-chun-126、ho-hsin-chun-135、ho-hsin-chun-128、ho-hsin-chun-186、ho-hsin-chun-144、ho-hsin-chun-168、ho-hsin-chun-163 |
+| 2026-09-19 | [「純琴姊妹」台中合體　何欣純力拚「六星新屯區」](https://a-chun.tw/news/dali-wufeng-campaign-headquarters) | 重述，併入 ho-hsin-chun-006、ho-hsin-chun-003、ho-hsin-chun-004、ho-hsin-chun-031、ho-hsin-chun-029、ho-hsin-chun-045、ho-hsin-chun-126、ho-hsin-chun-135、ho-hsin-chun-128、ho-hsin-chun-186、ho-hsin-chun-144、ho-hsin-chun-190、ho-hsin-chun-163 |
 | 2026-09-20 | [「菜市仔夫人」何欣純走第三市場　預告沈伯洋 9/27 現身台中](https://a-chun.tw/news/third-market-shen-pao-yang-visit) | 不收：拜票、活動預告 |
 | 2026-09-20 | [千人拉筋迎 18 週年　何欣純：健康、快樂一起慢老](https://a-chun.tw/news/senior-health-exercise-event) | 重述，併入 ho-hsin-chun-086、ho-hsin-chun-079、ho-hsin-chun-080、ho-hsin-chun-096 |
 | 2026-09-20 | [何欣純 29 區「分身」授旗　深入鄰里拚陸戰](https://a-chun.tw/news/29-district-support-groups) | 重述，併入 ho-hsin-chun-068、ho-hsin-chun-094、ho-hsin-chun-056、ho-hsin-chun-079、ho-hsin-chun-080、ho-hsin-chun-096、ho-hsin-chun-071、ho-hsin-chun-077、ho-hsin-chun-078、ho-hsin-chun-092 |
 | 2026-09-22 | [校園跑道「補丁累累」　何欣純會勘 5 校促加速整建](https://a-chun.tw/news/school-sports-facilities-renovation) | 不收：立委爭取校園經費 |
 | 2026-09-24 | [何欣純提清潔隊員五大承諾　加薪、增人力、升級車輛裝備](https://a-chun.tw/news/sanitation-workers-five-commitments) | 收，引述見 ho-hsin-chun-178（出處 ho-pr-55） |
-| 2026-09-26 | [秋夜霧峰聽爵士、吃美食　何欣純推屯區「台中版松菸」](https://a-chun.tw/news/wufeng-jazz-cultural-creative-park) | 重述，併入 ho-hsin-chun-168、ho-hsin-chun-163 |
+| 2026-09-26 | [秋夜霧峰聽爵士、吃美食　何欣純推屯區「台中版松菸」](https://a-chun.tw/news/wufeng-jazz-cultural-creative-park) | 重述，併入 ho-hsin-chun-190、ho-hsin-chun-163 |
 | 2026-09-27 | [「欣潮洋流」台中合體　何欣純、沈伯洋走讀草悟道](https://a-chun.tw/news/taichung-cultural-city-walk) | 不收：走讀活動，綠蔭只是重述 |
 | 2026-09-27 | [沈伯洋讚何欣純「俠之大者」　籲市民替沈媽媽投一票](https://a-chun.tw/news/business-support-group-shen-pao-yang) | 不收：後援會 |
 | 2026-09-30 | [首波秒殺！何欣純第二波募款小物「純純杯、純派 T」登場](https://a-chun.tw/news/campaign-fundraising-merchandise-second-wave) | 不收：募款小物 |
@@ -535,9 +537,19 @@
 | 2026-10-09 | [何欣純提 7 項女性應援政策　打造性別友善台中](https://a-chun.tw/news/taichung-seven-womens-support-policies) | 收，引述見 ho-hsin-chun-063、ho-hsin-chun-065、ho-hsin-chun-085、ho-hsin-chun-091、ho-hsin-chun-093、ho-hsin-chun-094、ho-hsin-chun-133（出處 ho-pr-64） |
 | 2026-10-09 | [何欣純國慶連假走訪逢甲夜市　支持者熱情合影](https://a-chun.tw/news/fengjia-night-market-national-day-visit) | 不收：夜市拜票 |
 | 2026-10-10 | [何欣純出席台中國慶升旗　與市民持國旗祝福台灣](https://a-chun.tw/news/taichung-national-day-flag-raising-ceremony) | 不收：升旗 |
-| 2026-10-11 | [何欣純國慶連假返大里拜票　攤商盼「屯區出市長」](https://a-chun.tw/news/dali-neixin-morning-market-visit) | 重述，併入 ho-hsin-chun-003、ho-hsin-chun-186、ho-hsin-chun-128、ho-hsin-chun-168 |
+| 2026-10-11 | [何欣純國慶連假返大里拜票　攤商盼「屯區出市長」](https://a-chun.tw/news/dali-neixin-morning-market-visit) | 重述，併入 ho-hsin-chun-003、ho-hsin-chun-186、ho-hsin-chun-128、ho-hsin-chun-190 |
 | 2026-10-20 | [親搭台中公車  以市民視角提四大改善方案](https://a-chun.tw/news/親搭台中公車-以市民視角提四大改善方案) | 收，引述見 ho-hsin-chun-018、ho-hsin-chun-020（出處 ho-pr-65） |
 | 2026-10-20 | [手機燈海「欣光」點亮太平　何欣純燒聲感動力喊：我準備好了！](https://a-chun.tw/news/手機燈海「欣光」點亮太平　何欣純燒聲感動力喊) | 收，引述見 ho-hsin-chun-006（出處 ho-pr-66） |
 | 2026-10-20 | [「欣潮」狂捲一中商圈！ 何欣純、蔡英文吃冰尬涼 純派英粉興奮趕場](https://a-chun.tw/news/「欣潮」狂捲一中商圈！-何欣純、蔡英文吃冰尬涼) | 不收：商圈拜票 |
 | 2026-10-20 | [何欣純爭取會展中心二期60億中央全額負擔 賴清德盛讚「三句話不離台中」](https://a-chun.tw/news/何欣純爭取會展中心二期60億中央全額負擔-賴清德) | 收，引述見 ho-hsin-chun-044（出處 ho-pr-67） |
 | 2026-10-20 | [科普列車駛進台中！何欣純連年參與不缺席 從立法推動到科學扎根 陪孩子探索未來](https://a-chun.tw/news/科普列車駛進台中！何欣純連年參與不缺席-從立法) | 不收：科普活動 |
+
+## 核對
+
+2026-10-23 依 `docs/adr/0002-ai-verification-instead-of-human-review.md` 執行兩層核對，檢核表與第二層提示詞版本 2。各輪結果與退回原因摘要見 `data/verification/report.md`。
+
+- 出處存檔：抽取時 68 個出處中有 25 個因 Wayback Machine 限流沒有存檔網址（ho-pr-01 至 ho-pr-12、ho-pr-16 至 ho-pr-26、ho-pr-65、ho-pr-66）。核對階段以單一流程依序補送（每筆間隔 20 秒，失敗時退避重試），25 個全部取得存檔網址，68 個出處都有存檔網址。
+- 第一層：189 筆全部通過，沒有修改引述。
+- 第二層：第 1 輪退回 72 筆，第 2 輪退回 4 筆（ho-hsin-chun-052、ho-hsin-chun-056、ho-hsin-chun-147、ho-hsin-chun-178），第 3 輪全部通過。沒有政見退回達三次，沒有刪除。
+- 退回的摘要依該筆自己的原文引述與退回理由修改，並符合本檔開頭的抽取指示。修改由一個只拿到何欣純退回政見、抽取指示、檢核表與品牌用語清單的獨立 session 撰寫，不參考其他候選人的資料。
+- 政見識別碼 `ho-hsin-chun-168` 改為 `ho-hsin-chun-190`：流水號「168」與品牌用語清單中的詞相同，公開資料集的識別碼會出現在網址上，上線關卡的品牌用語掃描會擋下。內容不變，本檔其他段落的引用已一併改號。

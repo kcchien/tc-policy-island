@@ -22,15 +22,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的多線並行、完成藍線、橘線與延伸線動工、藍線與台鐵海線轉乘，原文引述中都有，沒有扭曲原意。摘要沒有評價字眼、品牌用語清單中的詞或陣營高頻詞清單中的詞，也沒有加入原文沒有的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -55,15 +55,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的內容都能在原文引述中找到，只把原文的動詞換成中性的「推動」，沒有改變原意。摘要沒有評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞，更沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -71,7 +71,7 @@
     "id": "chiang-chi-chen-003",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "推動捷運紅線完成審議，串聯一中至豐原的商圈。",
+    "summary": "推動捷運紅線審議，串聯一中至豐原等商圈。",
     "quotes": [
       {
         "text": "全力推動捷運紅線加速審議、串聯一中至豐原等重要商圈",
@@ -84,15 +84,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的內容都能在原文中找到，只刪去了原文中表示強調的修飾語，原意沒有改變。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -100,7 +100,7 @@
     "id": "chiang-chi-chen-004",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "推動捷運綠線延伸至大坑，並向中央爭取支持。",
+    "summary": "推動捷運紅線及綠線延伸至大坑，並持續爭取中央支持。",
     "quotes": [
       {
         "text": "將加速推動捷運紅線及綠線延伸大坑，持續爭取中央支持",
@@ -113,15 +113,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的路線、地點與爭取中央支持等內容都能在原文引述中找到，未改變原意，也沒有新增數字、對象或承諾。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -129,7 +129,7 @@
     "id": "chiang-chi-chen-005",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "推動屯區環狀捷運紫線並與綠線串聯，藍線延伸至太平，橘線通往大里與霧峰。",
+    "summary": "推動屯區環狀紫線並與捷運綠線串聯，並推動藍線延伸至太平、橘線通往大里及霧峰。",
     "quotes": [
       {
         "text": "將全力推動屯區環狀紫線，與捷運綠線串聯",
@@ -148,15 +148,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要所寫的紫線與綠線串聯、藍線延伸至太平、橘線通往大里及霧峰，都能在原文引述中找到，原意沒有改變，也沒有評價字眼。摘要沒有使用兩份清單中的詞，也沒有原文以外的數字或承諾，五項都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -164,7 +164,7 @@
     "id": "chiang-chi-chen-006",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "整合台 74 線、國道與生活圈道路，形成四條環狀道路加一條幹線的路網。",
+    "summary": "整合台 74 線、國道與生活圈路網，改善交通幹線。",
     "quotes": [
       {
         "text": "四環一線，完善交通幹線",
@@ -179,15 +179,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要所述整合臺74線、國道與生活圈路網及改善交通幹線，皆見於原文引述，沒有加入原文以外的數字或承諾。摘要不含評價字眼，也沒有使用兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -218,15 +218,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的「優先推動」「打通」「串聯烏日、大肚、龍井」「補齊大肚與龍井的外環路網」都能在原文引述中找到，沒有改變原意，也沒有超出原文的數字或承諾。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -249,15 +249,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容，即要求中央讓國道四號高架延伸進港區、臺中港聯外道路立體化，都能在原文引述中找到。摘要沒有評價字眼，沒有清單中的用語，也沒有原文以外的數字、期限或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -279,15 +279,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述逐字相同，路段範圍與要做的事都出自原文，沒有扭曲原意。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -310,15 +310,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要「推動甲埔大道延伸」與原文引述意思一致，沒有扭曲或增減。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字、期限或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -326,7 +326,7 @@
     "id": "chiang-chi-chen-011",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "東豐快速道路豐原至東勢段目標 118 年全線通車，並延伸至新社。",
+    "summary": "東豐快速道路豐原至東勢段目標 118 年全線通車，並推動延伸至新社。",
     "quotes": [
       {
         "text": "東豐快速道路（豐原至東勢段）也力拚118年全線通車",
@@ -345,15 +345,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的路段、118 年通車目標和延伸至新社，原文引述裡都有，原意沒有改變；「目標」是「力拚」的中性改寫。摘要沒有評價字眼，也沒有用到兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -361,7 +361,7 @@
     "id": "chiang-chi-chen-012",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "向中央爭取擴建台中國際機場航廈與第三航廈、增加直飛航班，以年旅運量 1,000 萬人次為目標，規劃高速公路直通機場，並以都市計畫變更整合機場周邊土地。",
+    "summary": "向中央爭取擴建台中國際機場航廈與既有設施、增加直飛航班，以年旅運量 1,000 萬人次為目標，推動第三航廈規劃建設與高速公路直通機場，並以都市計畫變更整合機場周邊土地。",
     "quotes": [
       {
         "text": "推動「臺中進臺中出」國門升級計畫",
@@ -396,15 +396,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容（向中央爭取航廈與既有設施擴建、更多直飛航班、年旅運量一千萬人次目標、第三航廈規劃建設、高速公路直通機場、以都市計畫變更整合周邊土地）都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也沒有使用兩份清單中的任何詞。數字與原文相符，沒有超出原文的承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -412,7 +412,7 @@
     "id": "chiang-chi-chen-013",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "推動台鐵海線鐵路雙軌化與高架化。",
+    "summary": "推動鐵路高架雙軌化，以及鐵路海線雙軌與高架化。",
     "quotes": [
       {
         "text": "加速推動鐵路高架雙軌化",
@@ -427,15 +427,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容（鐵路高架雙軌化、鐵路海線雙軌與高架化）都能在原文引述中找到，也沒有加上數字、期限或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。原文中描述推動快慢的修飾語沒有保留，這是中性改寫，沒有改變政見內容。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -443,7 +443,7 @@
     "id": "chiang-chi-chen-014",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "為高鐵台中站特區規劃聯外專用匝道並拓寬平面道路。",
+    "summary": "為高鐵特區規劃聯外專用匝道並拓寬平面道路。",
     "quotes": [
       {
         "text": "增闢高鐵站區聯外道路",
@@ -458,15 +458,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與第二句原文引述一致，對象都是高鐵特區，項目都是規劃聯外專用匝道和拓寬平面道路，沒有加上原文沒有的數字、期限或承諾。摘要不含評價字眼，也不含兩份清單中的詞。五項都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -493,15 +493,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的地點（學校、醫院、大眾運輸樞紐周邊）和做法（翻新人行道、改善無障礙坡道、檢討行人庇護島、增加假日行人徒步區），原文引述裡都有，沒有改變原意，也沒有多出原文沒有的數字或承諾。摘要沒有評價字眼，也沒有品牌用語清單中的詞；原文中屬於陣營高頻詞清單的詞，摘要已經換成中性說法「增加」。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -509,7 +509,7 @@
     "id": "chiang-chi-chen-016",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "在捷運路網完工前，市民搭乘公車全程免費，包含幹線、市區與捷運接駁公車。",
+    "summary": "推動市民搭乘公車全程免費，包含幹線、市區與捷運接駁公車，並在捷運路網完工前推動。",
     "quotes": [
       {
         "text": "市民公車免費，培養公共運輸習慣",
@@ -528,15 +528,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的市民搭公車全程免費、包含幹線、市區與捷運接駁，以及在捷運路網完工前推動，都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞，更沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -544,7 +544,7 @@
     "id": "chiang-chi-chen-017",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "以豐原、水湳、台中車站、烏日高鐵四個轉運站為節點開行快捷公車，並開行台中機場往返高鐵與各轉運中心的快速公車。",
+    "summary": "以豐原、水湳、台中車站、烏日高鐵四個轉運站為節點建立快捷公車，並改善台中機場往返高鐵及中部各大轉運中心的快速公車聯營。",
     "quotes": [
       {
         "text": "建立重大節點的高效快捷公車",
@@ -563,15 +563,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的四個轉運站、快捷公車，以及機場往返高鐵和各轉運中心的快速公車聯營，都能在原文引述中找到，沒有改變原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -600,15 +600,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要只把原文換個說法，地點與設站內容都與原文相同，沒有評價字眼。摘要沒有用到兩份清單中的任何詞，也沒有加上原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -616,7 +616,7 @@
     "id": "chiang-chi-chen-019",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "市府編列預算補足公車駕駛薪資，重新盤點公車路線與班次，生活圈內以高頻次循環公車串聯，跨區以快速公車對接，並以 AI 提高準點率。",
+    "summary": "市府編列預算補足公車駕駛的薪資缺口，重新盤點公車路線與班次，生活圈內以高頻次循環公車串聯，跨區以高快速公路公車對接，並導入 AI 提高準點率。",
     "quotes": [
       {
         "text": "完善公車路網，補足駕駛人力",
@@ -639,15 +639,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的薪資補貼、路線與班次盤點、循環公車與跨區公車對接、導入 AI 提高準點率，都能在原文引述中找到。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有加上原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -655,7 +655,7 @@
     "id": "chiang-chi-chen-020",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "編列 30 億元打通自行車路網斷點，串成四條路線、兩條環線與一個城區的自行車路網。",
+    "summary": "編列 30 億元打通單車路網斷點，串起單車路網。",
     "quotes": [
       {
         "text": "打造「四線兩環一城」單車路網",
@@ -670,15 +670,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的金額、打通斷點、串起路網都能在原文引述中找到，只把原文的專名改寫成一般說法，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。數字 30 億元與原文一致，沒有加上原文沒有的承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -701,15 +701,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要所述的增加公共電動輔助自行車數量，以及試辦附設兒童安全座椅的親子共享自行車，都能在原文引述中找到，沒有誇大或添加承諾。摘要不含評價字眼，沒有使用兩份清單中的任何一詞，也沒有超出原文的數字或對象。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -732,15 +732,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的試辦無人駕駛公車、在偏鄉提供無人計程車預約服務，都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -748,7 +748,7 @@
     "id": "chiang-chi-chen-023",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "將主要商圈與捷運樞紐周邊的平面停車場改建為立體停車場並導入自動化停車，盤點公有土地、結合民間資源增加停車空間。",
+    "summary": "在主要商圈與捷運樞紐將低效率的平面停車場改建為立體停車場並導入全自動停車服務，並盤點公有土地、結合民間資源增加立體、共享等停車空間。",
     "quotes": [
       {
         "text": "務實增加停車空間，科技協助好停車",
@@ -767,15 +767,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的地點、改建平面停車場為立體停車場、導入全自動停車服務、盤點公有土地與結合民間資源，原文都有。原文裡的修飾語在摘要中省略了，但沒有改變原意。摘要沒有評價字眼，沒有兩份清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -783,7 +783,7 @@
     "id": "chiang-chi-chen-024",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "在各區推動道路刨鋪平整計畫，導入 AI 預警與循環材料。",
+    "summary": "在各區推動道路燙平計畫，導入 AI 預警及循環材料。",
     "quotes": [
       {
         "text": "升級道路燙平計畫",
@@ -802,15 +802,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的「各區」「道路燙平計畫」「導入AI預警及循環材料」都能在原文引述中找到，沒有改變原意，也沒有原文以外的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -818,7 +818,7 @@
     "id": "chiang-chi-chen-025",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "改善道路瓶頸路段，提高行車安全與順暢。",
+    "summary": "打通道路瓶頸，提高用路安全與順暢。",
     "quotes": [
       {
         "text": "打通道路瓶頸，用路安全又順暢",
@@ -829,15 +829,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文找到，「提高」只描述原文所說的用路安全與順暢的結果，沒有改變原意。摘要不含評價字眼，不含兩份清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -868,15 +868,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容（從嚴取締毒駕酒駕、導入毒品快篩與夜間科技執法儀器、警政衛生社會局共同的防治通報網、依大數據找出熱點進行常態聯合稽查）都能在原文引述中找到，未改變原意，也沒有超出原文的數字或承諾。摘要不含評價字眼，也未使用兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -895,15 +895,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的「公私部門合作防制詐騙」與「追查詐騙案件」都對得上原文引述，沒有改變原意，也沒有加入評價字眼。摘要裡沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -911,7 +911,7 @@
     "id": "chiang-chi-chen-028",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "public-safety",
-    "summary": "提高警消健康檢查補助（40 歲以上每年 4,500 元、未滿 40 歲每年 3,500 元），成立消防職業安全衛生室，汰換輕量化高防護消防衣與執勤裝備，導入 AI、無人機與無人載具協助救災，並更新救護車設備。",
+    "summary": "提高警消健康檢查補助（40 歲以上每年 4,500 元、未滿 40 歲每年 3,500 元），成立消防職業安全衛生室，汰換並購置輕量化高防護消防衣，增購高防護科技執勤裝備，導入 AI、無人機與無人載具協助救災，並更新救護車設備。",
     "quotes": [
       {
         "text": "強化警消執勤安全，提高福利待遇",
@@ -942,15 +942,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的補助金額、年齡分組、消防職業安全衛生室、消防衣與執勤裝備、AI與無人機及無人載具、救護車設備，都能在原文引述中找到，沒有加入原文沒有的數字或承諾。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞；原文用了陣營高頻詞清單中的詞的地方，摘要已改成中性說法，或省略不影響原意的修飾詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -977,15 +977,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的對象（老舊住宅、人口密集社區、高齡長輩）和措施（老屋健康檢查、屋內無障礙改善的診斷與補助），原文引述中都找得到，沒有扭曲原意。摘要沒有評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字、期限或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -993,7 +993,7 @@
     "id": "chiang-chi-chen-030",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "urban-housing",
-    "summary": "試辦老屋通用設計改善專案。",
+    "summary": "試辦老屋通用設計專案。",
     "quotes": [
       {
         "text": "試辦老屋通用設計專案",
@@ -1004,15 +1004,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容相同，沒有扭曲原意。摘要不含評價字眼，也不含兩份清單中的詞，沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1031,15 +1031,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的補助對象「住宅安全防護」與原文一致，原文中屬於陣營高頻詞清單的那個詞已改為中性的「改善」，「設施」是對防護內容的一般說法，沒有改變原意。摘要不含評價字眼、品牌用語清單中的詞或陣營高頻詞清單中的詞，也沒有加上原文沒有的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1062,15 +1062,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的對象（民間住宅、公辦都更、社會住宅）和做法（鼓勵並輔導取得銀髮住宅標章）都能在原文找到，把「社宅」寫成全稱沒有改變原意。摘要省略了「全面」和「符合國內外標準的」等修飾語，沒有改變政見的對象與做法。摘要不含評價字眼、兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1078,7 +1078,7 @@
     "id": "chiang-chi-chen-033",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "發展台中為機器人製造城市：建立軟硬體整合平台協助中小企業轉型，推動機器人智慧製造園區並設單一窗口，與國內外產學及廠商合作設置機器人實驗示範園區，吸引外商研發總部進駐。",
+    "summary": "串起精密機械、半導體、AI、光學與資通訊廠商建立軟硬體整合平台協助中小企業，推動 AI 機器人智慧製造園區並提供從研發、測試到量產的單一窗口，與喬治亞理工學院、東海大學等校合作設置機器人實驗示範園區，並攜手 AIT 吸引外商研發總部進駐。",
     "quotes": [
       {
         "text": "打造TRMC臺灣機器人製造城市",
@@ -1121,15 +1121,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的整合平台、製造園區、單一窗口、與學校合作設置示範園區、與 AIT 合作吸引外商研發總部等各項，都能在原文引述中找到對應，沒有扭曲或誇大原意。摘要沒有評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1137,7 +1137,7 @@
     "id": "chiang-chi-chen-034",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "建立無人載具與實體 AI 產業聚落，設置無人載具系統整合與高階製造中心，並推動低空經濟示範區。",
+    "summary": "整合產學研資源與國際合作，建立無人載具及實體 AI 產業生態系，設置無人載具系統整合與高階製造中心，並推動低空經濟示範區。",
     "quotes": [
       {
         "text": "未來應該整合產學研資源與國際合作，打造「臺中無人載具及實體AI產業生態系」，推動傳統精密機械升級智慧製造",
@@ -1156,15 +1156,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的整合產學研與國際合作、建立無人載具及實體 AI 產業生態系、設置系統整合與高階製造中心、推動低空經濟示範區，都能在原文引述中找到，沒有改變原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1172,7 +1172,7 @@
     "id": "chiang-chi-chen-035",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "成立由市長領導的跨局處會議展覽推動辦公室，建置六個會展平台與八項工具，並依在地優勢產業爭取舉辦自行車、工具機、自動化工業與運動器材展。",
+    "summary": "成立跨局處一站式的會展推動辦公室，並由市長親自領導會展專案辦公室；建置六個會展平台與八項工具，並依台中優勢產業爭取舉辦國際自行車展、國際工具機展、自動化工業大展及運動器材展。",
     "quotes": [
       {
         "text": "創造臺中會展經濟168，發揮「前店後廠」優勢",
@@ -1203,15 +1203,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的辦公室、市長親自領導、六個平台、八項工具和四個展會，原文引述中都有，數字也和原文一致，沒有加上原文沒有的承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1219,7 +1219,7 @@
     "id": "chiang-chi-chen-036",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "由市府在國際大展中組成台中主題館，帶領在地中小企業聯合參展並分攤行銷成本，並與米蘭、斯圖加特、鳳凰城等城市建立展會互惠與企業媒合。",
+    "summary": "由市府主導在國際指標型大展中組織台中主題館，協助產業海外參展並分攤基層中小企業的行銷成本，並與米蘭、斯圖加特、鳳凰城等產業城市建立展會互惠、企業媒合及市場合作。",
     "quotes": [
       {
         "text": "組織「臺中館」協助產業海外參展",
@@ -1246,15 +1246,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的市府主導、在國際指標型大展組織主題館、協助產業海外參展、分攤基層中小企業行銷成本，以及與米蘭、斯圖加特、鳳凰城建立合作，原文引述都有，沒有改變原意。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1262,7 +1262,7 @@
     "id": "chiang-chi-chen-037",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "tourism",
-    "summary": "整合觀光旅宿、旅行社與商圈，為會展商務客設計商圈與城市走讀套裝路線，並透過旅遊平台推送會展旅遊方案。",
+    "summary": "整合觀光旅宿、旅行社與商圈，為國際買家設計商圈散策與城市走讀套裝路線，並與國內外旅遊平台合作推送會展旅遊方案給商務消費者。",
     "quotes": [
       {
         "text": "公私串聯，推廣會展旅遊路線",
@@ -1285,15 +1285,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的串聯旅宿、旅行社與商圈，為國際買家設計套裝路線，以及與國內外旅遊平台合作推送方案，都能在原文引述中找到，沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞；原文裡的品牌用語已經刪掉，沒有寫進摘要。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1301,7 +1301,7 @@
     "id": "chiang-chi-chen-038",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "tourism",
-    "summary": "開辦主題式觀光接駁專車。",
+    "summary": "推動主題式觀光接駁專車。",
     "quotes": [
       {
         "text": "推動主題式觀光接駁專車",
@@ -1312,15 +1312,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容一致，沒有評價字眼。摘要未使用兩份清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1339,15 +1339,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要把原文的「觀旅」寫成全稱「觀光旅遊」，意思沒有改變，其餘內容與原文一致，也沒有加入評價字眼、數字或原文沒有的承諾。摘要不含兩份清單中的任何一詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1366,15 +1366,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述一致，只去掉引號，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，更沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1393,15 +1393,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要以中性說法寫出原文要提高勞工權益基金挹注經費的意思，沒有扭曲原意，也沒有加上原文沒有的數字、對象或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1409,7 +1409,7 @@
     "id": "chiang-chi-chen-042",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "labor",
-    "summary": "成立人工智慧應用學院，結合企業與學校為在職員工、婦女與農民提供免費的 AI 應用與智慧製造訓練，並建立技能認證與企業加薪輔導機制。",
+    "summary": "成立 AI 學院：由政府結合企業、大專院校及研究機構提供在職員工 AI 應用與智慧製造訓練，建立技能認證及企業加薪輔導機制，為勞工提供免費培訓，並協助婦女提升職場技能、協助農民掌握數位工具。",
     "quotes": [
       {
         "text": "成立AI賦能學院，加值勞工競爭力",
@@ -1436,15 +1436,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的各項內容（政府結合企業、大專院校及研究機構辦理在職訓練、技能認證與加薪輔導、為勞工免費培訓、協助婦女提升職場技能、協助農民掌握數位工具）都能在原文引述中找到，沒有扭曲原意。摘要沒有評價字眼，也沒有使用兩份清單中的詞。摘要沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1463,15 +1463,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要「協助高齡者持續就業」對應原文「強化銀髮職場續航力」，意思一致，沒有誇大或縮小，也不含評價字眼。摘要沒有使用品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1502,15 +1502,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的三項內容都能在原文引述中找到：引進國際機構進駐、由國際導師媒合海外資金的活動、盤點閒置公有空間改建，沒有評價字眼，也沒有超出原文的數字或承諾。摘要中創業輔助機構的名稱含有陣營高頻詞清單中的詞，但這是固定的專有名稱，沒有意思相同的中性說法可以替換，所以不違反第四項。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1518,7 +1518,7 @@
     "id": "chiang-chi-chen-045",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "將舊台中縣議會改造為青年創業育成基地與加速器。",
+    "summary": "將舊台中縣議會改造為青年創業育成基地，接軌國際導師與產業資源。",
     "quotes": [
       {
         "text": "舊縣議會變身新創基地",
@@ -1539,15 +1539,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的改造舊縣議會、青年創業育成基地、接軌國際導師與產業資源，都能在原文引述中找到，沒有扭曲原意，也沒有原文以外的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1566,15 +1566,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的「更多市政場域」和「人工智慧應用的試驗場域」都對應原文引述，沒有改變原意。摘要不含評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字或承諾，各項都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1601,15 +1601,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的對象（高中與大專的新住民第二代青年）和內容（培力、實務活動與國際交流）都能在原文引述中找到，沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1617,7 +1617,7 @@
     "id": "chiang-chi-chen-048",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "設籍台中、取得中央微型創業貸款的新住民創業者，由市府延長補貼貸款利息。",
+    "summary": "設籍台中並獲中央微型創業鳳凰貸款等貸款的新住民創業者，給予延長利息補貼。",
     "quotes": [
       {
         "text": "新住民微型創業貸款利息補貼",
@@ -1632,15 +1632,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文引述中找到，「等貸款」只是補足原文「等」所指的貸款類別，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1648,7 +1648,7 @@
     "id": "chiang-chi-chen-049",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "輔導市場與夜市攤商：檢討規費與租金、補貼青年微型創業貸款利息、協助導入數位支付與網路行銷，並補助夜市的環保設備。",
+    "summary": "檢討規費與租金並提供輔導機制，引入微型創業貸款利息補貼鼓勵青年留在台中，結合數位支付、物流配送與網路行銷協助攤商拓展客源，並補助夜市環保設備。",
     "quotes": [
       {
         "text": "未來將檢討並提供合理的規費與租金輔導機制",
@@ -1671,15 +1671,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的規費與租金檢討及輔導機制、微型創業貸款利息補貼、數位支付與物流配送及網路行銷協助攤商，以及補助夜市環保設備，都能在原文引述中找到，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1702,15 +1702,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要所寫的服務對象（原住民）、開辦高階精緻製造業培訓、青少年職涯探索，都能在兩句原文引述中找到，沒有扭曲原意，也沒有加上原文沒有的數字或承諾。摘要沒有評價字眼，「高階精緻」是原文用來說明產業類別的詞，不是評價。摘要也沒有使用品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1733,15 +1733,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的補助主體、全額補助、設籍條件、15 至 64 歲的年齡範圍與微型保險項目，都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1749,7 +1749,7 @@
     "id": "chiang-chi-chen-052",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "以台中火車站為中心，將新民街倉庫群至干城、台糖生態園一帶改造為文創聚落與現場音樂展演空間，籌辦鐵道沿線音樂活動，並以水湳流行影音中心作為流行產業孵化基地。",
+    "summary": "以台中火車站為中心，將新民街倉庫群至干城、台糖生態園一帶設置文創聚落與 Live House 展演空間並籌辦演唱活動，以水湳流行影音中心作為流行產業鏈孵化基地，並與日、韓、泰等國際音樂祭交流。",
     "quotes": [
       {
         "text": "推動星光計畫，點亮活化舊城區",
@@ -1772,15 +1772,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容（以火車站為中心、新民街倉庫群至干城與台糖生態園的文創聚落及 Live House 展演空間、籌辦演唱活動、水湳流行影音中心作為產業鏈孵化基地、與日韓泰國際音樂祭交流）都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也沒有用到兩份清單中的詞。摘要沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1788,7 +1788,7 @@
     "id": "chiang-chi-chen-053",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "公有市場加裝冷氣並發展市場特色，編列專案預算改善全市傳統市場的衛生、採光通風、停車與動線。",
+    "summary": "公有市場加裝冷氣並發展市場特色；編列專案預算全面改善全市傳統市場的公共衛生、停車空間與動線規劃，並持續改善採光、通風與空調。",
     "quotes": [
       {
         "text": "公有市場裝冷氣，打造特色市場",
@@ -1807,15 +1807,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要裡的裝冷氣、市場特色、專案預算，以及公共衛生、停車、動線、採光、通風與空調等項目都能在原文引述中找到，沒有扭曲原意。摘要不含評價字眼，也沒有用到兩份清單中的詞。摘要沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1823,7 +1823,7 @@
     "id": "chiang-chi-chen-054",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "economy",
-    "summary": "繼續舉辦台中購物節，結合會展中心、商圈、零售業、觀光與演藝活動，將參展廠商與國際買家的消費導入商圈。",
+    "summary": "結合會展中心、商圈與零售業舉辦購物節，將參展廠商及國際買家的消費導入購物節，並串聯台中購物節、各大商圈、觀光旅遊與演藝活動。",
     "quotes": [
       {
         "text": "購物節再升級，商圈文創更在地",
@@ -1842,15 +1842,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的每項內容都能在原文引述中找到，沒有改變原意，也沒有加入原文沒有的數字或承諾。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞，五項檢核都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1869,15 +1869,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要以「振興」對應原文「復興」，以「木材產業」對應原文「木業」，意思相同，沒有扭曲原意。摘要不含評價字眼，也不含兩份清單中的任何一詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1885,7 +1885,7 @@
     "id": "chiang-chi-chen-056",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "活化具文化資產身分的老屋。",
+    "summary": "活化文資老屋。",
     "quotes": [
       {
         "text": "活化文資老屋",
@@ -1896,15 +1896,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述字句一致，內容沒有扭曲或增減，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也沒有使用兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1943,15 +1943,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容（與設計團隊重做品牌識別與包裝、與星級餐廳聯名、帶農民參加海內外展覽、設立農漁牧加值平台開拓通路、把農產做成會展伴手禮）都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，沒有用到品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -1986,15 +1986,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的補助、媒合學校與農會及農民、三項技術發展和農地實地驗證，原文引述中都有，沒有扭曲原意，也沒有原文以外的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2002,7 +2002,7 @@
     "id": "chiang-chi-chen-059",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "agriculture-animals",
-    "summary": "將台中農業資訊系統改為 APP，整合氣象預警、即時菜價與線上補助申請，並提供拍照上傳由 AI 辨識作物病蟲害的功能。",
+    "summary": "將台中農業資訊系統改為 APP，整合氣象預警、即時菜價與線上補助申請，並提供上傳作物生病照片、由 AI 即時辨識並給出建議的功能。",
     "quotes": [
       {
         "text": "升級「臺中農易通APP」",
@@ -2021,15 +2021,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的內容都能在原文中找到：把網頁版系統改成 APP、整合氣象預警、即時菜價與線上補助申請，以及上傳作物照片由 AI 辨識並給建議，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2037,7 +2037,7 @@
     "id": "chiang-chi-chen-060",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "agriculture-animals",
-    "summary": "建置針對特定產區與作物的農業災害預警細胞廣播簡訊，預測到天災時主動通知該區農民。",
+    "summary": "建置針對特定產區、作物的農業災害預警細胞簡訊系統，預測到天災時主動發送指引給該區農民。",
     "quotes": [
       {
         "text": "建置精準即時農業災害預警細胞簡訊",
@@ -2052,15 +2052,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的建置細胞簡訊系統、針對特定產區與作物、預測到天災時主動發送指引給該區農民，都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也沒有使用兩份清單中的詞。摘要沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2079,15 +2079,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述一致，只把「及」改成「與」並省略「必須」，原意沒有改變。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2095,7 +2095,7 @@
     "id": "chiang-chi-chen-062",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "agriculture-animals",
-    "summary": "代表台中在比賽獲得優秀名次的農產品，市府提高獎勵金。",
+    "summary": "代表台中獲得優秀名次時，由市府提高獎勵金。",
     "quotes": [
       {
         "text": "只要代表臺中獲得優秀名次，市府就應提高獎勵、加碼頒發獎勵金",
@@ -2106,15 +2106,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的條件（代表台中獲得優秀名次）和做法（市府提高獎勵金）都出自原文引述，沒有扭曲原意，也沒有加上原文沒有的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2133,15 +2133,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容相同，只多了空格和句號，沒有增減或改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2160,15 +2160,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要用中性說法改寫原文中陣營高頻詞清單中的詞，內容只有增加醫療凍卵補助，與原文意思相符。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2195,15 +2195,15 @@
     "conflictNote": "產後父母心理諮商的補助額度：育兒子頁與多篇新聞稿寫「父母各 3 次」，豐原政見說明會新聞稿寫「各3小時」。",
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的申請對象改為父母都可申請、父母各 3 次，以及另一出處寫的各 3 小時，都能在原文引述中找到，兩種寫法也都照原文標明。摘要沒有評價字眼，也沒有用到兩份清單中的詞，數字都沒有超出原文。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2230,15 +2230,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的補助對象（設籍、懷孕28至36週的孕婦）和補助項目（RSV疫苗），原文引述裡都找得到，數字也和原文一致，沒有加上原文沒有的承諾。摘要沒有褒貶字眼，也沒有用到兩份清單裡的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2265,15 +2265,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的 6 歲以下免費施打腸病毒疫苗，以及補助符合條件的嬰幼兒施打腸病毒 A71 型疫苗，原文引述中都有，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2281,7 +2281,7 @@
     "id": "chiang-chi-chen-068",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "產後到宅坐月子服務的補助時數提高到 40 小時。",
+    "summary": "產後到宅月嫂補助時數提高到 40 小時。",
     "quotes": [
       {
         "text": "提高產後到宅月嫂補助",
@@ -2296,15 +2296,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述一致，「40 小時」也出自原文，沒有另外加上的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2312,7 +2312,7 @@
     "id": "chiang-chi-chen-069",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "敬老愛心卡維持每月 1000 點，點數當年度內不歸零，計程車單趟補助提高到 200 點或 200 元（各出處寫法不同），可折抵 YouBike、長青學苑報名費與掛號費，並開放部分點數在農會與特約藥局使用。",
+    "summary": "敬老愛心卡維持每月 1000 點，點數當年度內不歸零、改採年度結算；計程車單趟扣抵提高到 200 點（另一出處寫補貼由 100 元提高至 200 元起跳，再一出處寫朝 200 元邁進）；可折抵 YouBike 2.0E、長青學苑報名費與掛號費；每月可用部分點數在農會與特約藥局採買保健品，並規劃一定額度可於農漁會消費。",
     "quotes": [
       {
         "text": "升級愛心敬老卡，擴大範圍更好用",
@@ -2343,15 +2343,15 @@
     "conflictNote": "計程車單趟補助的說法不一：銀髮子頁與多篇新聞稿寫「翻倍至 200 點」或「最高折抵200點」，北屯競總新聞稿寫「由現行100元加碼提高至200元起跳」，大安大甲說明會新聞稿寫「朝200元邁進」。",
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容（每月 1000 點、年度內不歸零並改採年度結算、計程車單趟 200 點及各出處的金額寫法、YouBike 2.0E、長青學苑報名費、掛號費、農會與特約藥局、農漁會消費）都能在原文引述中找到，數字也都來自原文。摘要沒有評價字眼，也沒有用到兩份清單中的任何一詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2359,7 +2359,7 @@
     "id": "chiang-chi-chen-070",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "health",
-    "summary": "補助設籍台中的重症弱勢族群與 65 歲以上長輩接種帶狀皰疹疫苗，採定額或全額補助。",
+    "summary": "設籍台中的重症弱勢族群與 65 歲以上長輩在接受必要性的公衛檢查後，提供免預約、定額或全額的帶狀皰疹疫苗施打補助。",
     "quotes": [
       {
         "text": "補助弱勢族群接種帶狀皰疹疫苗",
@@ -2374,15 +2374,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的對象、前提條件、補助方式與年齡門檻都能在原文引述中找到，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2401,15 +2401,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的「增設」與原文一致，「改善」是用中性說法改寫原文的另一個動作，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，更沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2436,15 +2436,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到在衛生局下設長照處、整合醫事照護與社福體系，以及從失能評估、居家照顧到喘息服務都由同一窗口辦理，這些內容都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也不含兩份清單中的任何一詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2467,15 +2467,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要所寫的建置智慧衛生所與網路視訊看診，原文引述都有提到，沒有加入評價字眼，也沒有超出原文的數字或承諾。摘要未使用兩份清單中的任何詞語。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2504,15 +2504,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的舊衛生局大樓、舊縣府周邊，以及健康照護、公共服務、綠地與停車等功能，都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有使用兩份清單中的詞，沒有加上原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2535,15 +2535,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的是依長輩需求、在社區設置具特色的長照 C 據點，每一項都能在原文引述中找到，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。摘要沒有超出原文的數字、範圍或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2551,7 +2551,7 @@
     "id": "chiang-chi-chen-076",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "education",
-    "summary": "開辦供長輩就讀的全齡專班課程。",
+    "summary": "推動全齡專班課程。",
     "quotes": [
       {
         "text": "推動全齡專班課程，助長輩圓夢",
@@ -2562,15 +2562,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要「推動全齡專班課程」與原文用字一致，雖未寫出原文後半句的目的，但沒有扭曲或改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2578,7 +2578,7 @@
     "id": "chiang-chi-chen-077",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "health",
-    "summary": "推動長者肌力訓練計畫，預防肌少症。",
+    "summary": "推動避免長者肌少症的計畫。",
     "quotes": [
       {
         "text": "推動銀髮好肌力計畫，避免肌少症",
@@ -2589,15 +2589,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的是推動計畫、避免肌少症，這些都能在原文找到。「長者」對應原文計畫名稱中指稱年長者的字，沒有超出原文的對象。摘要沒有評價字眼，沒有用到品牌用語清單或陣營高頻詞清單中的詞，也沒有加上數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2605,7 +2605,7 @@
     "id": "chiang-chi-chen-078",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "health",
-    "summary": "以人工智慧遠距監測長者居家健康，並導入居家安全與防跌監測，優先照顧獨居高齡女性。",
+    "summary": "推動 AI 主動遠距監測，並導入 AI 居家安全與防跌監測，優先關注獨居高齡女性。",
     "quotes": [
       {
         "text": "推動AI主動遠距監測，居家即醫院",
@@ -2620,15 +2620,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容都能在兩則原文引述中找到，沒有改變原意，也沒有加入原文沒有的數字、期限或對象。摘要不含評價字眼，也沒有使用兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2647,15 +2647,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的對象（3K 危勞產業勞工）、事項（健康檢查補助）和方向（提高補助）都與原文相符，沒有加上原文以外的數字、期限或承諾。摘要沒有評價字眼，也沒有品牌用語清單中的詞。原文動詞屬於陣營高頻詞清單中的詞，摘要已改用中性說法「增加」。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2678,15 +2678,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的服務對象、三種語言與律師、心理諮商服務都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2718,15 +2718,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到派遣配備檢測與物理治療設備的長照車進入山城部落，以及檢討文化健康站的資源配置，這些內容都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，更沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2745,15 +2745,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述一致，只把「於原鄉外」改寫為「在原鄉以外」，意思不變。摘要不含評價字眼，也不含兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2761,7 +2761,7 @@
     "id": "chiang-chi-chen-083",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "延續 65 歲以上長者免繳健保費的補助。",
+    "summary": "延續 65 歲以上長者免繳健保費政策。",
     "quotes": [
       {
         "text": "上任後將延續65歲以上長者免繳健保費政策",
@@ -2776,15 +2776,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述一致，延續65歲以上長者免繳健保費政策的對象與作法都出自原文。摘要沒有評價字眼，也沒有用到兩份清單中的詞。數字與原文相同，沒有額外承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2792,7 +2792,7 @@
     "id": "chiang-chi-chen-084",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "health",
-    "summary": "重大健康、公衛、醫療、長照與藥事政策讓專業人員參與決策，並邀請藥師代表參與健康治理。",
+    "summary": "重大健康、公衛、醫療、長照與藥事政策讓專業人員實質參與，並邀請藥師代表參與 AI 智慧城市與健康治理等核心決策。",
     "quotes": [
       {
         "text": "未來重大健康、公衛、醫療、長照與藥事政策，將讓專業人員實質參與",
@@ -2807,15 +2807,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文引述中找到，只省去表示時間的字，沒有改變原意，也沒有加上數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2823,7 +2823,7 @@
     "id": "chiang-chi-chen-085",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "成立由市長召集的婦幼發展委員會，統籌少子化對策、婦女權益、幼兒托育與孕產婦照顧業務。",
+    "summary": "成立由府級召集的婦幼發展委員會，統籌少子化對策、婦女權益、幼兒托育與孕產婦照顧業務。",
     "quotes": [
       {
         "text": "成立「婦幼發展委員會」",
@@ -2838,15 +2838,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的府級召集、委員會名稱與四項統籌業務都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有兩份清單中的詞，沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2854,7 +2854,7 @@
     "id": "chiang-chi-chen-086",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "孕婦乘車補助的使用期限延長到產後一年。",
+    "summary": "孕婦專車的使用期限延長至產後一年。",
     "quotes": [
       {
         "text": "加碼好孕專車延長使用至產後一年",
@@ -2869,15 +2869,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的專車使用期限延長至產後一年，與原文引述一致，沒有加入原文以外的數字、對象或承諾。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞；「孕婦專車」是一般描述，不是原文計畫名稱的諧音或變體。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2900,15 +2900,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述「親子車位免費停車4小時」意思相同，4小時的時數也出現在原文中，沒有加上原文沒有的承諾。摘要沒有評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2916,7 +2916,7 @@
     "id": "chiang-chi-chen-088",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "social-welfare",
-    "summary": "市府的準公共托嬰補助從每月 1,400 元提高到 3,000 元，逐步朝第二胎以上零月費；未送托家庭的育兒津貼每月增加 1,000 元。",
+    "summary": "準公共托嬰補助從每月 1,400 元提高到 3,000 元，逐步朝第二胎以上零月費；未送托家庭的育兒津貼每月增加 1,000 元。",
     "quotes": [
       {
         "text": "加碼補助準公共托嬰、育兒津貼加碼千元",
@@ -2939,15 +2939,15 @@
     "conflictNote": "準公共托育補助的金額寫法不同：育兒子頁與育兒政策新聞稿寫市府加碼從每月 1,400 元提高到 3,000 元，豐原政見說明會新聞稿寫「提高準公托補助至最高每月1萬6千元」，沒有說明兩個數字的關係。",
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的內容和數字（每月 1,400 元提高到 3,000 元、第二胎以上零月費、未送托家庭每月 1,000 元）都出現在原文引述中，沒有改變原意，也沒有新增承諾。摘要不含評價字眼，也沒有使用兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -2970,15 +2970,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的補足勞保給付以外 20% 的差額、育嬰留職停薪期間領到 100% 薪資，原文都有，數字也和原文一致。摘要沒有評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3005,15 +3005,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的預約附近臨時托育的 APP 和鼓勵企業辦理共同托育，原文引述中都有，意思沒有改變。摘要沒有評價字眼，也沒有用到兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3034,15 +3034,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的地區（南屯及新興人口移入區）和項目（公共托育、幼兒教保）都出自原文引述。摘要把原文的動詞改寫為「增加」，意思一致。摘要沒有評價字眼，沒有用到品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3069,15 +3069,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的範圍、公廁增設的設備和參考範本，都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼、品牌用語清單中的詞或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3100,15 +3100,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的開發校園行政 AI 系統、自動彙整報表與評鑑資料、減少教師行政工作，在原文引述中都找得到，原意沒有改變。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3131,15 +3131,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容都能在原文引述中找到，「人工智慧」是 AI 的中文寫法，「找出學生的學習盲點」對應原文的定位學習盲點，原意沒有改變。摘要沒有評價字眼，也沒有兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3147,7 +3147,7 @@
     "id": "chiang-chi-chen-095",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "education",
-    "summary": "成立科技教育發展中心，統一編組科技教材與師資，把程式、微型機器人與生成式 AI 融入幼兒園到高中的課程。",
+    "summary": "成立科技教育發展中心，統一調度全市的數位教育資源、編組科技教材與師資，把程式邏輯、微型機器人與生成式 AI 的基礎應用融入幼兒園到高中的課程。",
     "quotes": [
       {
         "text": "成立「科技教育發展中心」",
@@ -3170,15 +3170,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中成立中心、統一調度全市數位教育資源、編組教材與師資、把三項基礎應用融入幼兒園到高中課程，都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，沒有加上原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3201,15 +3201,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述「增設職業探索中心」一致，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3236,15 +3236,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容（幼兒到高中的示範學校、STEAM 動手做教育、山海屯城及高鐵門戶五個生活圈的示範據點）都能在原文引述中找到，沒有改變原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，不含品牌用語清單中的詞，也不含陣營高頻詞清單中的詞；原文中屬於陣營高頻詞清單的詞，摘要已改用中性的「推動」。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3267,15 +3267,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的編列主體、每年至少 10 億元，以及校舍、廁所、跑道與防墜設施等項目，都能在原文引述中找到；「改建」與原文「重建」意思相近，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，數字與對象都沒有超出原文。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3298,15 +3298,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容皆可在原文引述中找到，並刪去原文的形容語「大刀闊斧」，未含評價字眼。摘要未使用品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3314,7 +3314,7 @@
     "id": "chiang-chi-chen-100",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "education",
-    "summary": "增加雙語教學，逐步讓每所學校都有外籍教師。",
+    "summary": "推動雙語教學，逐步邁向每所學校都有外籍教師。",
     "quotes": [
       {
         "text": "雙語教學Plus，校校有外師Plus",
@@ -3329,15 +3329,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫推動雙語教學、逐步邁向每所學校都有外籍教師，與原文引述的內容相符，沒有改變原意，也沒有加入原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3364,15 +3364,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的免費午餐、改善營養、由農會與農民契作讓在地食材優先進入學校，以及推動低碳食農教育，都能在原文引述中找到，原意沒有改變。摘要不含評價字眼，也不含品牌用語清單中的詞或陣營高頻詞清單中的詞。摘要沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3391,15 +3391,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要「降低校園營養師與學生的人數比」與原文引述意思相同，沒有扭曲原意，也沒有加入原文以外的數字、對象或承諾。摘要不含評價字眼，也不含兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3407,7 +3407,7 @@
     "id": "chiang-chi-chen-103",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "education",
-    "summary": "增加特教助理員，並彈性調降有特教學生班級的普通生人數。",
+    "summary": "充實特教助理員，並彈性調降普通生人數。",
     "quotes": [
       {
         "text": "充實特教助理員、彈性調降普通生人數",
@@ -3418,15 +3418,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容都出自原文引述，只補了一個連接詞，沒有改變原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞，沒有額外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3445,15 +3445,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述一致，只把管教標準前的「建立」改寫為「訂定」，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3472,15 +3472,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的三項內容（逐年調降生師比、降低代理教師比例、代理教師全年聘用）都能在原文引述中找到，原文中全年聘期緊接在代理教師之後，指的是同一對象，原意沒有改變。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3488,7 +3488,7 @@
     "id": "chiang-chi-chen-106",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "education",
-    "summary": "教育經費維持占市府預算最高的比例。",
+    "summary": "教育經費比例維持最高。",
     "quotes": [
       {
         "text": "教育經費比例將維持最高",
@@ -3503,15 +3503,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容與原文引述「教育經費比例將維持最高」相符，沒有改變原意，也沒有加入原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3530,15 +3530,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述意思相同，都是由國中小提供正式的客語專任教師職缺，沒有扭曲原意或加上原文沒有的內容。摘要不含評價字眼，也沒有用到兩份清單中的詞，更沒有加入原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3561,15 +3561,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述「爭取臺灣設計展重返臺中」意思一致，沒有扭曲原意。摘要沒有評價字眼，也沒有用到兩份清單中的詞。摘要沒有原文以外的數字或承諾，五項都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3577,7 +3577,7 @@
     "id": "chiang-chi-chen-109",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "將台中市文化建設基金會轉型為台中設計中心，讓專業設計參與捷運站、公有市場與公園的規劃。",
+    "summary": "將台中文化建設基金會轉型為台中設計中心，讓專業設計參與捷運站、公有市場及全齡公園規劃。",
     "quotes": [
       {
         "text": "轉型臺中文化建設基金會為「臺中設計中心」",
@@ -3592,15 +3592,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文引述中找到，只把「臺」寫成「台」，沒有改變原意。摘要不含評價字眼，也不含品牌用語清單或陣營高頻詞清單中的詞，沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3608,7 +3608,7 @@
     "id": "chiang-chi-chen-110",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "全年每週與每月都安排主題藝文活動。",
+    "summary": "全年持續舉辦藝文活動，固定安排主題與節日。",
     "quotes": [
       {
         "text": "全年藝文不間斷，「週週有主題、月月有節日」",
@@ -3619,15 +3619,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文找到：「全年持續舉辦藝文活動」對應原文的全年藝文不間斷，「固定安排主題與節日」對應原文按週、按月的安排，沒有誇大，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼、品牌用語清單中的詞或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3657,15 +3657,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的車站、串聯的各處歷史空間，以及組成城市博物館群，都能在原文引述中找到，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3673,7 +3673,7 @@
     "id": "chiang-chi-chen-112",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "整合在地劇團、樂團與街頭藝術家，到 29 個行政區的廟口、社區活動中心與公園演出。",
+    "summary": "將藝文活動帶進 29 個行政區的廟口、社區活動中心與公園。",
     "quotes": [
       {
         "text": "推動巷弄文化小蜜蜂",
@@ -3692,15 +3692,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的藝文活動、29個行政區、廟口、社區活動中心與公園，都能在原文引述中找到，沒有改變原意，也沒有多出數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3708,7 +3708,7 @@
     "id": "chiang-chi-chen-113",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "culture",
-    "summary": "與國際藝術節簽署合作，引進國際藝文展演，並帶台中的樂團與藝術家到國際演出。",
+    "summary": "主動與國際指標性藝術節簽署合作，引進全球頂尖藝文展演，並帶台中的獨立樂團與新銳藝術家走向國際舞台。",
     "quotes": [
       {
         "text": "擴大臺中與國際藝文品牌交流",
@@ -3723,15 +3723,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要幾乎逐字取自第二句原文引述，只把「帶著」改成「帶」、「臺」改成「台」，原意沒有改變，也沒有加上原文沒有的數字、對象或承諾。「指標性」「頂尖」「新銳」都是原文用來說明合作與引進對象的字眼，不是對政見本身的評價。摘要沒有使用品牌用語清單中的詞，也沒有使用陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3762,15 +3762,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的合作單位、媒合中心，以及補助、低利融資、版權媒合、海外市場拓銷等項目都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3793,15 +3793,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的內容（企業出資認養古蹟或贊助藝文演出，市府給予獎勵、稅費減免與表揚）都能在原文引述中找到，沒有改變原意。摘要沒有褒貶字眼，也沒有用到兩份清單中的任何詞。摘要裡沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3824,15 +3824,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的地點、孵化器、共同工作室與啟動資源都出自原文引述，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3851,15 +3851,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要內容都能在原文引述中找到，沒有改變原意，也沒有評價字眼。摘要未使用品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3884,15 +3884,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的園區改善、興建實驗劇場、導入沉浸式 DIY 體驗，都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3911,15 +3911,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的是把巧聖仙師文化祭規劃成國際節慶，原文引述能對應這些內容，也沒有扭曲原意。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3927,7 +3927,7 @@
     "id": "chiang-chi-chen-120",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "hakka-affairs",
-    "summary": "與產學合作推動大埔腔客語 AI 數位保存計畫，採集耆老語音建立資料庫與 AI 模型。",
+    "summary": "聯手產學研推動大埔腔客語 AI 數位保存計畫，採集地方耆老的原生語音，建立資料庫與 AI 模型。",
     "quotes": [
       {
         "text": "扎根客語教育與「大埔腔」AI 數位保存",
@@ -3942,15 +3942,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的合作對象、計畫名稱、採集耆老語音以及建立資料庫與 AI 模型等內容，都能在原文引述中找到，「推動」與原文「發起」的意思一致。摘要沒有評價字眼，也沒有使用兩份清單中的詞，更沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3973,15 +3973,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的三件事都能在原文引述中找到，沒有改變原意：創辦音樂祭、結合客家山歌與現代流行樂、推動客語流行音樂。摘要沒有評價字眼，沒有原文以外的數字或承諾，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -3989,7 +3989,7 @@
     "id": "chiang-chi-chen-122",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "tourism",
-    "summary": "在和平區梨山與谷關創辦音樂祭。",
+    "summary": "創辦串聯梨山、和平、谷關的音樂祭。",
     "quotes": [
       {
         "text": "創辦（和平）梨山、谷關「山和谷音樂祭」",
@@ -4006,15 +4006,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的「創辦」「串聯梨山、和平、谷關」「音樂祭」都出自原文引述，沒有改變原意。摘要不含評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞。摘要中沒有超出原文的數字、範圍或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4035,15 +4035,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的各項內容都能在原文引述中找到，其中「原住民文化」是「原民文化」的完整寫法，意思相同。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4068,15 +4068,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的步道總體檢、無障礙平緩步道、智慧導覽與生態教育、結合溫泉發展休閒，都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4099,15 +4099,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的建立族語與祭儀資料庫、採集部落耆老記憶、在都會社區與校園開設情境式實作工坊，都能在原文引述中找到；省略部分形容詞不改變原意。摘要沒有評價字眼，也沒有使用兩份清單中的詞，沒有加上原文沒有的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4126,15 +4126,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要只去掉原文的引號，內容和原文引述一致，沒有加入數字或承諾。摘要沒有評價字眼，也沒有用到兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4161,15 +4161,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫到的設置層級、單一窗口功能與納入新住民及其第二代參與，原文引述中都有，沒有改變原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4177,7 +4177,7 @@
     "id": "chiang-chi-chen-128",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "digital",
-    "summary": "建置台中市自主管理的人工智慧與數據中心。",
+    "summary": "建置台中市主權 AI 與數據中心。",
     "quotes": [
       {
         "text": "建置「臺中市主權AI與數據中心」",
@@ -4188,15 +4188,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容一致，只把「臺」寫成「台」並在英文縮寫前後加空格，原意沒有改變。摘要沒有評價字眼，沒有用到品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4227,15 +4227,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的八類通報資訊整合、跨局處預警平台，以及用大數據與 AI 比對高風險家庭等信號，在原文引述中都找得到，數字「八」也與原文相同。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。原文中「符合個資法的前提」這項條件沒有寫進摘要，但這是省略，沒有改變原意，也沒有增加原文以外的承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4243,7 +4243,7 @@
     "id": "chiang-chi-chen-130",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "建置以 AI 自動辨識道路坑洞與標線磨損的巡檢系統，並在主要瓶頸路口設置依即時車流調整的 AI 號誌。",
+    "summary": "建置以 AI 自動辨識道路坑洞與標線磨損的巡檢系統，並逐步更新 AI 號誌系統，覆蓋主要交通瓶頸路口，依即時車流調節紅綠燈。",
     "quotes": [
       {
         "text": "建立即時AI輔助交通系統、全域智慧巡檢",
@@ -4262,15 +4262,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要寫的巡檢系統以 AI 辨識坑洞與標線磨損，以及號誌系統逐步更新、覆蓋主要交通瓶頸路口、依即時車流調節紅綠燈，都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞。摘要沒有原文以外的數字、期限、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4289,15 +4289,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要把原文的 AI 寫成人工智慧，治理寫成管理，並用「增加使用範圍」描述原文的動作，意思相符，也沒有原文以外的內容。摘要不含評價字眼，不含品牌用語清單中的詞，也不含陣營高頻詞清單中的詞，沒有額外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4316,15 +4316,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要以「建置」改寫原文的「構築」，意思相同，其他內容都出自原文引述。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4347,15 +4347,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的內容（推動噪音監測系統、結合聲音照相與車牌辨識）都能在原文引述中找到，沒有改變原意，也沒有加上原文沒有的數字或承諾。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4363,7 +4363,7 @@
     "id": "chiang-chi-chen-134",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "environment",
-    "summary": "推動記錄減碳成果的制度並管制污染與燃煤，市民搭免費公車可累積綠色里程點數折抵公共自行車費用。",
+    "summary": "推動減碳制度並控制污染、管理燃煤；市民搭乘免費公車可累積綠色里程點數，折抵 iBike 騎乘費用。",
     "quotes": [
       {
         "text": "推動「減碳存摺」控污管煤",
@@ -4378,15 +4378,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要以中性說法改寫原文中的計畫名稱，控制污染、管理燃煤、搭免費公車累積綠色里程點數及折抵 iBike 騎乘費用，都能在原文找到。摘要沒有評價字眼，也沒有用到兩份清單中的詞；沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4409,15 +4409,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要以「提高城市防災能力」「加強防救災合作」改寫原文兩句，內容與原意相符。摘要沒有評價字眼，也沒有兩份清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4436,15 +4436,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要把原文的「多元」「去化模式」改寫為「多種」「處理方式」，意思一致，沒有增減內容。摘要不含評價字眼，也不含兩份清單中的詞，沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4452,7 +4452,7 @@
     "id": "chiang-chi-chen-137",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "parks",
-    "summary": "將公園改建為適合各年齡層共融與療癒的公園。",
+    "summary": "推動更新共融療癒全齡公園。",
     "quotes": [
       {
         "text": "推動美樂地plus，升級「共融療癒全齡公園」",
@@ -4463,15 +4463,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的內容都能在原文找到，用「更新」作為原文動詞的中性說法，沒有改變原意。摘要沒有評價字眼，也沒有品牌用語清單或陣營高頻詞清單中的詞，更沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4490,15 +4490,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容一致，沒有增減或改變原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的任何詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4517,15 +4517,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的地點與設施名稱都出自原文引述，「設置」只是說明要做的事，沒有加上數字、期限或其他承諾。摘要不含評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4546,15 +4546,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容（建設步道、在濱海樂園增設運動區）都能在原文引述中找到，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞；原文開頭的品牌用語已經刪掉。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4575,15 +4575,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要只把原文的「規劃將鰲峰山打造成綜合休閒園區」換句話說，意思沒有改變。摘要沒有評價字眼，沒有用到兩份清單中的詞，也沒有原文以外的數字或承諾，五項都符合。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4591,7 +4591,7 @@
     "id": "chiang-chi-chen-142",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "sports",
-    "summary": "興建符合 250 公尺國際標準的室內自由車場館。",
+    "summary": "推動興建符合 250 公尺國際標準的室內自由車場館。",
     "quotes": [
       {
         "text": "推動興建符合250公尺國際標準的室內自由車場館",
@@ -4602,15 +4602,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容一致，只在數字前後加了空格，沒有扭曲原意，也沒有原文以外的數字或承諾。摘要不含評價字眼，也沒有用到兩份清單中的任何一詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4618,7 +4618,7 @@
     "id": "chiang-chi-chen-143",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "urban-housing",
-    "summary": "推動多元型態的社會住宅並持續增加興建量。",
+    "summary": "推動多元社會住宅，並持續興建社會住宅。",
     "quotes": [
       {
         "text": "落實居住正義，推動臺中多元社會住宅",
@@ -4633,15 +4633,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容（推動多元社會住宅、持續興建社會住宅）都出自原文引述，沒有改變原意，也沒有增加數字或承諾。摘要沒有評價字眼，也沒有用到兩份清單中的詞。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4649,7 +4649,7 @@
     "id": "chiang-chi-chen-144",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "urban-housing",
-    "summary": "劃分山城、海線、屯區、市區及高鐵門戶特區五個生活圈，盤點並補足各區生活機能，讓市民在 20 分鐘通勤範圍內滿足就醫、就學與就業需求。",
+    "summary": "以山城、海線、屯區、市區及高鐵門戶特區五個生活圈為範圍，讓市民在 20 分鐘通勤範圍內滿足就醫、就學與就業等日常需求，均衡地方發展。",
     "quotes": [
       {
         "text": "打造「20分鐘生活圈」均衡地方發展",
@@ -4668,15 +4668,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要提到的五個生活圈、20 分鐘通勤範圍、就醫就學就業需求與均衡地方發展，都能在原文引述中找到，沒有改變原意，也沒有加上原文以外的數字或承諾。摘要沒有評價字眼，也沒有用到品牌用語清單或陣營高頻詞清單中的詞及其變體。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4699,15 +4699,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要中的分配依據（各區面積、道路現況、實際需求）、基層建設預算，以及不只以人口數為依據，都能在原文引述中找到，沒有改變原意。摘要沒有評價字眼，沒有品牌用語清單或陣營高頻詞清單中的詞，也沒有原文以外的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4715,7 +4715,7 @@
     "id": "chiang-chi-chen-146",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "transportation",
-    "summary": "爭取交通部與行政院提高捷運建設的補助比例。",
+    "summary": "協助爭取交通部及行政院合理提高補助比例。",
     "quotes": [
       {
         "text": "江啟臣承諾會全力協助爭取交通部及行政院合理提高補助比例",
@@ -4726,15 +4726,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要各項內容都出自原文引述，沒有改變原意；「合理」是原文本來就有的限定語，不是整理者加上的評價。摘要沒有使用兩份清單中的詞，也沒有超出原文的數字、對象或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4757,15 +4757,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的兩項內容都能在原文兩句引述中找到對應，「改善」是原文用詞的中性改寫，「寵物公園」與原文所指相同，沒有改變原意。摘要中沒有評價字眼、品牌用語清單中的詞、陣營高頻詞清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4773,7 +4773,7 @@
     "id": "chiang-chi-chen-148",
     "candidateId": "chiang-chi-chen",
     "issueAreaId": "agriculture-animals",
-    "summary": "改善動物之家，結合收容與教育並推動送養。",
+    "summary": "更新動物之家，涵蓋收容、教育與讓動物再回家。",
     "quotes": [
       {
         "text": "動物之家升級，收容教育再回家",
@@ -4784,15 +4784,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要的收容、教育、再回家三項都能在原文引述中找到，以「更新」作中性改寫，沒有改變原意。摘要不含評價字眼，也沒有使用品牌用語清單或陣營高頻詞清單中的詞。摘要沒有加入原文沒有的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   },
@@ -4811,15 +4811,15 @@
     "conflictNote": null,
     "verification": {
       "layer1": {
-        "status": "pending",
-        "checkedAt": null
+        "status": "pass",
+        "checkedAt": "2026-10-23"
       },
       "layer2": {
-        "status": "pending",
-        "reason": null,
-        "checklistVersion": null,
-        "model": null,
-        "checkedAt": null
+        "status": "pass",
+        "reason": "摘要與原文引述內容一致，沒有增減或改變原意，也沒有評價字眼。摘要沒有用到兩份清單中的詞，也沒有超出原文的數字或承諾。",
+        "checklistVersion": "2",
+        "model": "claude-opus-5-5",
+        "checkedAt": "2026-10-23"
       }
     }
   }

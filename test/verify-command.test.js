@@ -11,6 +11,8 @@ const VERIFY_SCRIPT = repoPath('scripts/verify.js');
 const SAMPLE_RAW = repoPath('test/fixtures/raw-sample');
 const FAKE_CLAUDE = repoPath('test/fixtures/fake-claude');
 const BRAND_TERMS = repoPath('test/fixtures/rules/brand-terms.json');
+// 核對指令讀正式檢核表，這是現行版本。
+const CHECKLIST_VERSION = JSON.parse(readFileSync(repoPath('data/verification/checklist.json'), 'utf8')).version;
 
 function copySample() {
   const rawDir = mkdtempSync(join(tmpdir(), 'verify-raw-'));
@@ -27,12 +29,12 @@ function editPolicy(rawDir, candidateId, id, change) {
   writeFileSync(join(rawDir, 'policies', `${candidateId}.json`), JSON.stringify(policies));
 }
 
-function verify(rawDir, args = [], { verdict = '通過' } = {}) {
+function verify(rawDir, args = [], { verdict = '通過', barrier = 0, stderrBytes = 0 } = {}) {
   const log = join(mkdtempSync(join(tmpdir(), 'verify-log-')), 'calls.jsonl');
   const result = spawnSync(
     process.execPath,
     [VERIFY_SCRIPT, '--raw', rawDir, '--claude', FAKE_CLAUDE, '--brand-terms', BRAND_TERMS, '--date', '2026-10-24', ...args],
-    { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_LOG: log, FAKE_CLAUDE_VERDICT: verdict } },
+    { encoding: 'utf8', env: { ...process.env, FAKE_CLAUDE_LOG: log, FAKE_CLAUDE_VERDICT: verdict, FAKE_CLAUDE_BARRIER: String(barrier), FAKE_CLAUDE_STDERR_BYTES: String(stderrBytes) }, timeout: 30_000 },
   );
   const calls = existsSync(log)
     ? readFileSync(log, 'utf8').trim().split('\n').map((line) => JSON.parse(line))
@@ -52,7 +54,7 @@ test('核對指令對全部政見跑兩層核對，結果寫回原始資料', ()
     layer2: {
       status: 'pass',
       reason: '假判定：通過',
-      checklistVersion: '1',
+      checklistVersion: CHECKLIST_VERSION,
       model: 'fake-model',
       checkedAt: '2026-10-24',
     },
@@ -78,6 +80,37 @@ test('每筆政見各開一個全新 claude -p session：不帶工具與設定�
     assert.ok(!cwd.startsWith(repoPath('')), cwd);
     for (const leaked of ['範例甲', '範例乙', '範例丙', 'sample-']) assert.ok(!prompt.includes(leaked), leaked);
   }
+});
+
+test('--jobs 讓第二層同時跑多筆，每筆仍是各自的全新 session 與暫存目錄', () => {
+  const rawDir = copySample();
+
+  const { code, output, calls } = verify(rawDir, ['--jobs', '2'], { barrier: 2 });
+
+  assert.equal(code, 0, output);
+  assert.equal(calls.length, 3);
+  assert.equal(new Set(calls.map((c) => c.cwd)).size, 3);
+  for (const id of ['sample-jia-001', 'sample-jia-002']) {
+    assert.equal(policyById(rawDir, 'sample-jia', id).verification.layer2.status, 'pass', id);
+  }
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.status, 'pass');
+});
+
+test('--jobs 不是正整數時以非零結束碼退出，不送第二層', () => {
+  const { code, output, calls } = verify(copySample(), ['--jobs', '0']);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /--jobs/);
+  assert.equal(calls.length, 0);
+});
+
+test('claude 在 stderr 輸出大量訊息時，核對不會卡住', () => {
+  const rawDir = copySample();
+
+  const { code, output } = verify(rawDir, ['--candidate', 'sample-yi'], { stderrBytes: 1024 * 1024 });
+
+  assert.equal(code, 0, output);
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.status, 'pass');
 });
 
 test('--candidate 只核對指定候選人的政見，其他候選人的紀錄不變', () => {
@@ -108,7 +141,7 @@ test('--skip-passed 只跑未核對或已退回的政見', () => {
   });
 
   editPolicy(rawDir, 'sample-jia', 'sample-jia-001', (p) => {
-    p.verification.layer2.checklistVersion = '1';
+    p.verification.layer2.checklistVersion = CHECKLIST_VERSION;
   });
 
   const { code, output, calls } = verify(rawDir, ['--skip-passed']);
@@ -126,7 +159,7 @@ test('--skip-passed 會重跑以舊版檢核表通過的政見', () => {
   const { calls } = verify(rawDir, ['--skip-passed', '--candidate', 'sample-yi']);
 
   assert.equal(calls.length, 1);
-  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.checklistVersion, '1');
+  assert.equal(policyById(rawDir, 'sample-yi', 'sample-yi-001').verification.layer2.checklistVersion, CHECKLIST_VERSION);
 });
 
 test('第一層不通過就不送第二層，第二層維持未核對', () => {
