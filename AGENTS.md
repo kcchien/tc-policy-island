@@ -55,6 +55,11 @@ site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
   js/island-outskirts.js 外圍地形的 3D 場景：地形網格（每面一色）、樹群與聚落 InstancedMesh、霧團、雲與雲影、飛鳥；用 addAnimation 的時間移動
   js/island-motion.js  動態配置（Node 可測）：每格循環動畫題材、市民、路網、環線與車輛，以及各自隨時間的姿勢；只讀格子，不讀政見，受關卡「動態數量固定」檢查
   js/island-motion-view.js 把動態配置畫成 3D：循環道具、市民、公車與火車、路面與環線堤，會動的零件每種一個 InstancedMesh
+  js/bgm-score.js      背景音樂的樂曲（Node 可測）：固定種子產生的 32 小節循環，G 宮五聲音階，鼓組、貝斯、和弦、撥弦與拉弦旋律都是純資料
+  js/bgm-schedule.js   背景音樂的前瞻排程（每格時間由起點與格數算出，不漂移）與播放偏好的判斷（Node 可測）
+  js/bgm-synth.js      背景音樂的音色：Web Audio 即時合成，不用音檔（關卡「不載入音檔」）
+  js/bgm-player.js     背景音樂的播放：第一次開啟才建立 AudioContext；renderBars 用離線音訊環境渲染前幾小節供試聽
+  js/bgm-control.js    工具列的音樂開關與音量滑桿：預設靜音，分頁隱藏暫停，減少動態時不恢復播放，偏好記在 localStorage
   js/island-list.js    索引面板：議題區清單（含編號）、標記圖例（候選人分頁的卡片在 candidate-card.js）
   js/dom.js            建立 DOM 節點的小工具（不用 innerHTML）
   js/repo-documents.js 引用 repo 文件清單 REPO_DOCUMENTS（整理方法頁照原文公開的檔案）
