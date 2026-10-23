@@ -116,6 +116,12 @@ export const ISLAND_TEXT = {
   noWebgl: '此裝置無法顯示島嶼檢視，已改用表格檢視。',
 };
 
+// 工具列的背景音樂開關（用按下與否表示開或關，名稱固定）與音量滑桿。
+export const MUSIC_TEXT = {
+  button: '背景音樂',
+  volume: '音樂音量',
+};
+
 // 載入失敗。錯誤細節只寫進瀏覽器主控台，畫面不顯示。
 export const LOAD_TEXT = {
   datasetFailed: '政見資料載入失敗，請稍後重新整理。',
