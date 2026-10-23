@@ -48,6 +48,9 @@ test('送存檔失敗時不給存檔網址，記錄失敗原因', async () => {
   const offline = fakeFetch(() => { throw new Error('getaddrinfo ENOTFOUND web.archive.org'); });
   assert.deepEqual(await requestArchive(PAGE, offline), { archiveUrl: null, archiveError: 'Wayback Machine 連線失敗：getaddrinfo ENOTFOUND web.archive.org' });
 
+  const refusedConnection = fakeFetch(() => { throw new TypeError('fetch failed', { cause: Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }) }); });
+  assert.deepEqual(await requestArchive(PAGE, refusedConnection), { archiveUrl: null, archiveError: 'Wayback Machine 連線失敗：fetch failed（ECONNREFUSED）' });
+
   const noSnapshot = fakeFetch(() => ({ ok: true, status: 200, url: 'https://web.archive.org/save/https://example.org/policy', headers: new Headers() }));
   assert.deepEqual(await requestArchive(PAGE, noSnapshot), { archiveUrl: null, archiveError: 'Wayback Machine 沒有回傳存檔網址' });
 });

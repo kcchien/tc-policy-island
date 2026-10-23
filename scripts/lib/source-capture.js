@@ -55,7 +55,9 @@ export async function requestArchive(url, { fetch = globalThis.fetch } = {}) {
   try {
     response = await fetch(`${WAYBACK_SAVE}${url}`, { redirect: 'follow', signal: AbortSignal.timeout(ARCHIVE_TIMEOUT_MS) });
   } catch (error) {
-    return { archiveUrl: null, archiveError: `Wayback Machine 連線失敗：${error.message}` };
+    // fetch 的錯誤訊息只有「fetch failed」，底層原因在 cause。
+    const cause = error.cause?.code ?? error.cause?.message;
+    return { archiveUrl: null, archiveError: `Wayback Machine 連線失敗：${error.message}${cause ? `（${cause}）` : ''}` };
   }
   if (!response.ok) return { archiveUrl: null, archiveError: `Wayback Machine 回應 HTTP ${response.status}` };
   const location = response.headers.get('content-location');
