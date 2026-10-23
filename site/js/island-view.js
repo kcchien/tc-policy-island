@@ -4,8 +4,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, flightPlan, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
-import { approachInsets, combineInsets, coverInsets, createCameraFlight, homeView, isDrag, sameInsets } from './island-camera.js';
+import { cameraLimits, islandLayout, islandPoints, orbitCenter, tileCorners, viewOffset } from './island-layout.js';
+import {
+  approachInsets, combineInsets, coverInsets, createCameraFlight, flightDuration, homeView, isDrag, sameInsets,
+} from './island-camera.js';
 import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
 import { createDaylight } from './island-daylight.js';
@@ -16,7 +18,7 @@ import { hexTile, localElementModel, markerModel, PALETTE, setMarkerLit, streetL
 import { el } from './dom.js';
 
 const FOV = 32;
-// 窄畫面的名牌改成直書（見 LABEL_NARROW）。全景的俯角與方位角由 island-camera.js 的 homeView 依長寬比決定。
+// 窄畫面的名牌改成直書（見 LABEL_NARROW）。預設視角的俯角與方位角由 island-camera.js 的 homeView 依長寬比決定。
 const NARROW_WIDTH = 600;
 // 飛到議題區時鏡頭與格子的距離。
 const FOCUS_DISTANCE = 14;
@@ -220,7 +222,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     applyOffset();
     const narrow = width <= NARROW_WIDTH;
     for (const anchor of labelAnchors) anchor.position.copy(narrow ? LABEL_NARROW : LABEL_WIDE);
-    // 全景只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
+    // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
     const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect, fill: 0.8 });
     Object.assign(controls, cameraLimits(bounds, view.distance));
@@ -240,15 +242,13 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
     camera.lookAt(target);
   }
 
-  // 鏡頭飛到 target，距離為 distance；沒給 view 時保持目前的方位角與俯角，給了就轉到該視角。
+  // 鏡頭飛到 target，距離為 distance；沒給 polar 與 azimuth 時保持目前的俯角與方位角。
   // 減少動態時直接切過去。
-  function flyTo(target, distance, done = () => {}, view = null) {
+  function flyTo({ target, distance, polar, azimuth }, done = () => {}) {
     const offset = camera.position.clone().sub(controls.target);
     const spherical = new THREE.Spherical().setFromVector3(offset);
-    if (view) {
-      spherical.phi = view.polar;
-      spherical.theta = view.azimuth;
-    }
+    spherical.phi = polar ?? spherical.phi;
+    spherical.theta = azimuth ?? spherical.theta;
     spherical.radius = THREE.MathUtils.clamp(distance, controls.minDistance, controls.maxDistance);
     spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
     const toPosition = target.clone().add(new THREE.Vector3().setFromSpherical(spherical));
@@ -260,7 +260,7 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
       from: { target: controls.target.clone(), position: camera.position.clone() },
       to: { target: target.clone(), position: toPosition },
       now: performance.now(),
-      durationMs: flightPlan({ reducedMotion: reducedMotion() }).durationMs,
+      durationMs: flightDuration({ reducedMotion: reducedMotion() }),
       onArrive: done,
     });
     // 減少動態時飛行時間為 0：立刻落在目的地。
@@ -447,17 +447,19 @@ export function createIslandView(stage, { vm, reducedMotion, onSelectArea, inset
       if (!tile) return false;
       select(areaId);
       const target = new THREE.Vector3(tile.group.position.x, TILE_SURFACE, tile.group.position.z);
-      flyTo(target, Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE), done);
+      flyTo({ target, distance: Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE) }, done);
       return true;
     },
-    // 回到全景視角，選中的議題區不變。
+    // 工具列的「全景」：回到預設視角，選中的議題區不變。
     showAll() {
-      if (home) flyTo(home.target, home.distance, undefined, home);
+      if (home) flyTo(home);
     },
     // 政見卡片遮住的範圍（getBoundingClientRect，卡片關閉時傳 null）。畫面偏移把投影中心移到其餘可見區正中，
     // 選中的議題區落在可見區中央；鏡頭不動，偏移平滑跟上，減少動態時直接到位。
     setCover(rect) {
       const box = stage.getBoundingClientRect();
+      // 表格檢視時畫布隱藏、量不到大小，不更新；卡片關閉時一律清掉偏移。
+      if (rect && (box.width === 0 || box.height === 0)) return;
       const local = rect
         ? { left: rect.left - box.left, top: rect.top - box.top, right: rect.right - box.left, bottom: rect.bottom - box.top }
         : { left: 0, top: 0, right: 0, bottom: 0 };

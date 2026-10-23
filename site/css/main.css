@@ -488,10 +488,10 @@ body[data-view="island"] .view-note {
   body[data-view="island"] .policy-card .card-inner {
     height: 100%;
   }
+}
 
-  body[data-view="island"] .policy-card::backdrop {
-    background: color-mix(in srgb, var(--charcoal) 10%, transparent);
-  }
+body[data-view="island"] .policy-card::backdrop {
+  background: color-mix(in srgb, var(--charcoal) 10%, transparent);
 }
 
 .island-canvas:active {
@@ -1594,10 +1594,6 @@ body[data-view="island"] .view-note {
 
   .policy-card::backdrop {
     background: color-mix(in srgb, var(--charcoal) 20%, transparent);
-  }
-
-  body[data-view="island"] .policy-card::backdrop {
-    background: color-mix(in srgb, var(--charcoal) 10%, transparent);
   }
 
   .card-inner {

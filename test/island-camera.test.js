@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout, islandPoints, projectedBox } from '../site/js/island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, FLIGHT_MS, homeView, isDrag,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, FLIGHT_MS, flightDuration, homeView, isDrag,
 } from '../site/js/island-camera.js';
 import { makeRaw } from './fixtures/make-raw.js';
 
@@ -66,9 +66,10 @@ test('飛行途中改飛別處：新的飛行取代前一段，前一段抵達�
 });
 
 test('減少動態時飛行時間為 0，第一幀就落在目的地', () => {
+  assert.equal(flightDuration({ reducedMotion: false }), FLIGHT_MS);
   const flight = createCameraFlight();
   let arrived = 0;
-  flight.start({ from, to, now: 0, durationMs: 0, onArrive: () => (arrived += 1) });
+  flight.start({ from, to, now: 0, durationMs: flightDuration({ reducedMotion: true }), onArrive: () => (arrived += 1) });
 
   assert.deepEqual(flight.step(0), to);
   assert.equal(arrived, 1);
@@ -121,7 +122,7 @@ const taichungLike = () => {
   return islandPoints(islandLayout(buildViewModel(buildPublicDataset(raw))), { surface: 0.44, top: 1.5 });
 };
 
-test('直式畫面的全景用較低俯角並轉一點方位角，島比正南方構圖大；橫式畫面維持正南方', () => {
+test('直式畫面的預設視角用較低俯角並轉一點方位角，島比正南方構圖大；橫式畫面維持正南方', () => {
   const points = taichungLike();
   const portraitAspect = 390 / 600;
 

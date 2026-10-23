@@ -1,9 +1,9 @@
-// 島嶼檢視的鏡頭：飛行、拖曳判斷、卡片造成的畫面偏移、直式全景的構圖。
+// 島嶼檢視的鏡頭：飛行、拖曳判斷、卡片造成的畫面偏移、預設視角（直式畫面另轉方位角）。
 // 只做計算，不碰 three.js 與 DOM，瀏覽器與 Node 共用。
 
 import { easeInOut, frameIsland } from './island-layout.js';
 
-// 飛到議題區的時間（毫秒）。減少動態時由 flightPlan 改成 0。
+// 飛到議題區的時間（毫秒）。
 export const FLIGHT_MS = 1150;
 // 按下後移動超過這個像素數算拖曳（旋轉、縮放），在範圍內算點選。
 export const DRAG_SLOP = 6;
@@ -11,7 +11,7 @@ export const DRAG_SLOP = 6;
 const OFFSET_RATE = 6;
 // 卡片蓋住大半畫面（手機抽屜拉到全螢幕）時，偏移後仍保留的可見高度與寬度比例，免得投影退化。
 const MIN_VISIBLE = 0.2;
-// 全景的俯角（與正上方的夾角）。直式畫面較低、並在 PORTRAIT_AZIMUTHS 裡挑讓島最大的方位角，
+// 預設視角的俯角（與正上方的夾角）。直式畫面較低、並在 PORTRAIT_AZIMUTHS 裡挑讓島最大的方位角，
 // 讓島的對角線沿著直式螢幕擺；橫式維持正南方。
 const POLAR_LANDSCAPE = 0.68;
 const POLAR_PORTRAIT = 0.9;
@@ -57,6 +57,9 @@ export function createCameraFlight() {
     },
   };
 }
+
+// 飛行時間：減少動態時為 0，第一幀就落在目的地。
+export const flightDuration = ({ reducedMotion }) => (reducedMotion ? 0 : FLIGHT_MS);
 
 export function isDrag(down, point, slop = DRAG_SLOP) {
   return Boolean(down) && Math.hypot(point.x - down.x, point.y - down.y) > slop;
@@ -107,7 +110,7 @@ export function approachInsets(current, target, dt, { reducedMotion = false } = 
 
 export const sameInsets = (a, b) => Object.keys(ZERO).every((side) => a[side] === b[side]);
 
-// 全景視角：橫式畫面從正南方、較高的俯角看；直式畫面用較低的俯角，並挑讓島最大（距離最近）的方位角。
+// 預設視角：橫式畫面從正南方、較高的俯角看；直式畫面用較低的俯角，並挑讓島最大（距離最近）的方位角。
 // azimuths 可指定候選方位角（測試用）。回傳 { polar, azimuth, target, distance }。
 export function homeView(points, { fov, aspect, fill = 0.8, azimuths = PORTRAIT_AZIMUTHS }) {
   const portrait = aspect < PORTRAIT_BELOW;

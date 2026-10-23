@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, flightPlan, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, tileCorners, viewOffset,
+  cameraLimits, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, tileCorners, viewOffset,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -231,11 +231,6 @@ test('飛到議題區後再縮遠，旋轉中心逐步回到島中心，島不�
   assert.deepEqual(orbitCenter(focus, center, 30, range), center);
   assert.deepEqual(orbitCenter(focus, center, 45, range), center);
   assert.deepEqual(orbitCenter(focus, center, 19.5, range), { x: 2.5, z: -1.5 });
-});
-
-test('開啟減少動態時鏡頭不飛行，直接切到目的地', () => {
-  assert.equal(flightPlan({ reducedMotion: true }).durationMs, 0);
-  assert.ok(flightPlan({ reducedMotion: false }).durationMs > 0);
 });
 
 test('浮動元件遮住畫布邊緣時，投影中心移到沒被遮住的區域正中，構圖用該區域的長寬比', () => {

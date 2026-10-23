@@ -241,10 +241,5 @@ export function viewOffset({ width, height, insets, canvasFov }) {
   };
 }
 
-// 鏡頭飛到議題區的時間。減少動態時為 0，直接切到目的地。
-export function flightPlan({ reducedMotion }) {
-  return { durationMs: reducedMotion ? 0 : 1150 };
-}
-
-// 飛行進度的緩動（0~1 → 0~1），起訖都放慢。
+// 鏡頭飛行與晝夜補間的緩動（0~1 → 0~1），起訖都放慢。
 export const easeInOut = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
