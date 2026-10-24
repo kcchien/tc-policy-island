@@ -171,7 +171,9 @@ function startApp(vm, state, initialView) {
   syncShortlistButton();
 
   // 閱讀進度：看過的議題區只記在讀者的瀏覽器，索引與表格打淡勾；有紀錄時才出現說明與「清除紀錄」。
-  let seen = parseSeen(readStorage(SEEN_KEY));
+  // 已不存在的議題區（舊紀錄）略過，否則只剩舊識別碼時會出現說明卻沒有任何淡勾。
+  const areaIds = new Set(vm.rows.map((row) => row.issueArea.id));
+  let seen = new Set([...parseSeen(readStorage(SEEN_KEY))].filter((id) => areaIds.has(id)));
   const clearSeenButton = el('button', { type: 'button', class: 'reading-clear' }, READING_TEXT.clear);
   const readingProgress = el('p', { class: 'reading-progress' }, el('span', {}, READING_TEXT.note), clearSeenButton);
   const setSeen = (next) => {
