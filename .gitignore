@@ -4,6 +4,9 @@ site/data/snapshots/
 site/data/repo-files/
 site/data/repo-files.json
 
+# 政見音檔：由維護者在部署機器用 node scripts/speak.js 生成，清單 manifest.json 進版控
+data/audio/*.mp3
+
 # 本專案零 npm 相依，不應出現
 node_modules/
 

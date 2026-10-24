@@ -60,6 +60,7 @@
 ### 資料與夾具
 
 - `data/raw/` 只放從一手來源抽取的真實資料。示範或測試用的政見一律放 `test/fixtures/`，候選人用虛構的「範例甲乙丙」「候選人甲乙丙」，不掛真實候選人的名字。
+- `data/audio/*.mp3` 不進版控，由維護者在部署機器用 `node scripts/speak.js` 生成（要裝 ffmpeg）；清單 `data/audio/manifest.json` 進版控。音檔不齊時建置不公開任何音檔，所以 CI 沒有音檔也會過。
 - 新增上線關卡：在 `scripts/gates/` 寫一個 `{ id, name, check(site) }` 模組（`check` 回傳失敗訊息陣列，`site.dataset()` 讀公開資料集），加進 `scripts/gates/index.js` 的 `GATES`，並在 `test/gates.test.js` 用夾具網站目錄驗證擋下違規、放行合規。
 - 品牌用語掃描與禁用色檢查讀 `data/rules/` 的正式清單；`site.files()` 列出網站目錄全部檔案，`site.readText(path)` 讀檔。改清單或新增網站文案後跑 `node --test test/rules.test.js`，它會用正式資料檢查本站文案、檔名與專案名。
 - 給市民看的文字（頁面 HTML、`site/js/ui-text.js`、公開資料集中整理者撰寫的欄位）不得外漏內部細節：檔案路徑、副檔名、工具名、字型名、模型代號、程式欄位名、版本識別碼、雜湊值與「出處快照」「存檔網址」這類內部術語，由上線關卡「受眾文案」（`scripts/lib/audience-text.js`）擋下。畫面用白話：出處快照寫「原文存檔」、存檔網址寫「網頁備份」、核對兩層寫「原文逐字比對」「AI 依公開檢核表檢查」。原文引述、候選人資料原文與逐字公開的 repo 文件不掃。

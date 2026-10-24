@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+// 政見語音指令測試用的假 ffmpeg（沒有 .js 副檔名，node --test 不會當成測試檔執行）。
+// 參數同 scripts/speak.js 呼叫 ffmpeg 的方式：-i <輸入檔> ⋯ <輸出檔>。
+// 不轉碼，輸出「TRANSCODED-<-b:a 的值>:」加上輸入位元組；沒指定 libmp3lame 單聲道或改了取樣率時以非零結束碼退出。
+import { readFileSync, writeFileSync } from 'node:fs';
+
+const args = process.argv.slice(2);
+const value = (flag) => args[args.indexOf(flag) + 1];
+if (value('-c:a') !== 'libmp3lame' || value('-ac') !== '1' || args.includes('-ar')) {
+  console.error(`假 ffmpeg 收到非預期的參數：${args.join(' ')}`);
+  process.exit(1);
+}
+writeFileSync(args.at(-1), Buffer.concat([Buffer.from(`TRANSCODED-${value('-b:a')}:`), readFileSync(value('-i'))]));

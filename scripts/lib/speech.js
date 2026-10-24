@@ -2,11 +2,18 @@
 // speechScript 把一條政見組成送語音合成服務的文字，三位候選人同一樣板、不帶候選人資訊；
 // speechParts 把超過單次上限的文字依句子拆段。生成指令是 scripts/speak.js，清單 data/audio/manifest.json 由它寫出。
 // audioProblems 對照公開政見與清單找出缺少或不符的音檔，生成指令、建置指令與上線關卡「音檔只來自政見語音清單」共用。
+// findFfmpeg 與 transcodeSpeech 把服務回傳的 mp3 轉成 SPEECH_VOICE.bitrate 的單聲道 mp3，只有生成指令用。
 
+import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { promisify } from 'node:util';
 
-// 三位候選人共用的語音設定，照原樣寫進清單的 voice。改任何一項，清單裡的音檔全部要重生成。
-export const SPEECH_VOICE = { provider: 'voai', name: '國賢', style: '預設', model: 'Neo', speed: 1 };
+// 三位候選人共用的語音設定，照原樣寫進清單的 voice。bitrate 是轉碼後的位元率（單聲道、取樣率不變）。
+// 只改 bitrate 時可用 node scripts/speak.js --reencode 轉既有音檔；改其他任何一項，清單裡的音檔全部要重生成。
+export const SPEECH_VOICE = { provider: 'voai', name: '國賢', style: '預設', model: 'Neo', speed: 1, bitrate: '48k' };
 
 // 語音合成服務單次請求的文字上限（字數）。
 export const SPEECH_CHAR_LIMIT = 1000;
@@ -102,4 +109,47 @@ export function audioProblems(policies, manifest, fileSha256Of) {
     if (actual !== item.fileSha256) return [`${where}：音檔與清單的雜湊不符`];
     return [];
   });
+}
+
+// PATH 找不到時再看這些常見安裝位置。
+export const FFMPEG_CANDIDATES = {
+  darwin: ['/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg'],
+  linux: ['/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'],
+  win32: [],
+};
+
+// 依序找環境變數 FFMPEG_PATH、PATH、常見安裝位置裡的 ffmpeg。
+export function findFfmpeg({ explicit = process.env.FFMPEG_PATH, pathEnv = process.env.PATH ?? '', platform = process.platform, exists = existsSync } = {}) {
+  if (explicit) {
+    if (!exists(explicit)) throw new Error(`找不到 ffmpeg：${explicit}（環境變數 FFMPEG_PATH）`);
+    return explicit;
+  }
+  const name = platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+  const fromPath = pathEnv.split(platform === 'win32' ? ';' : ':').filter(Boolean).map((dir) => join(dir, name));
+  const found = [...fromPath, ...(FFMPEG_CANDIDATES[platform] ?? [])].find((path) => exists(path));
+  if (!found) throw new Error('找不到 ffmpeg，政見音檔要用它轉碼：請先安裝（例如 brew install ffmpeg 或 apt install ffmpeg），或用環境變數 FFMPEG_PATH 指定執行檔');
+  return found;
+}
+
+const execFileAsync = promisify(execFile);
+
+// 把一個 mp3 轉成 SPEECH_VOICE.bitrate 的單聲道 mp3（libmp3lame，取樣率不變），去掉中繼資料讓同樣輸入得到同樣位元組。
+// 輸入輸出走暫存目錄，結束時刪掉。
+export async function transcodeSpeech(bytes, ffmpeg) {
+  const dir = mkdtempSync(join(tmpdir(), 'tpi-speech-'));
+  try {
+    const input = join(dir, 'input.mp3');
+    const output = join(dir, 'output.mp3');
+    writeFileSync(input, bytes);
+    await execFileAsync(ffmpeg, [
+      '-hide_banner', '-loglevel', 'error', '-y', '-i', input,
+      '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:a', '+bitexact',
+      '-c:a', 'libmp3lame', '-b:a', SPEECH_VOICE.bitrate, '-ac', '1', output,
+    ]);
+    return readFileSync(output);
+  } catch (error) {
+    throw new Error(`ffmpeg 轉碼失敗：${(error.stderr || error.message).trim().slice(0, 300)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
