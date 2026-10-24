@@ -53,7 +53,7 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js
 
 ### 網址參數
 
-網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
+網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`conflict=1` 只看兩說並列（有出處說法不一標註）的政見、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
 
 ### 開啟候選人資料卡
 

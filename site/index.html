@@ -135,6 +135,14 @@
             <option value="">全部行政區</option>
           </select>
         </div>
+        <!-- 只看兩說並列：文案由 main.js 從畫面文案模組填入 -->
+        <div class="field field-conflict">
+          <label class="conflict-toggle" for="conflict-only">
+            <input id="conflict-only" name="conflict" type="checkbox" aria-describedby="conflict-hint" />
+            <span id="conflict-only-label"></span>
+          </label>
+          <p class="field-hint" id="conflict-hint"></p>
+        </div>
         <button type="reset" class="filter-reset">清除</button>
       </form>
       <p class="result-status" id="result-status" role="status"></p>

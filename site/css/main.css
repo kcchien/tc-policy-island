@@ -609,6 +609,40 @@ select {
   flex: 0 1 12rem;
 }
 
+/* 只看兩說並列：勾選框加一句說明，佔滿一列 */
+.field-conflict {
+  flex: 1 1 100%;
+  order: 1;
+  gap: 0;
+}
+
+.conflict-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* 蓋過 .field label 的小字灰色 */
+.field .conflict-toggle {
+  color: var(--charcoal);
+  font-size: 0.9375rem;
+}
+
+.conflict-toggle input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--laterite);
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
 /* 16px 避免 iOS 聚焦時自動放大 */
 .filters input,
 .filters select {
@@ -1261,6 +1295,12 @@ body[data-view="island"] .policy-card::backdrop {
   font-size: 0.75rem;
 }
 
+/* 表格的兩說並列標籤：樣式同政見卡片的 .policy-flag，另起一行 */
+.policy-chip .policy-flag {
+  margin-top: 6px;
+  font-size: 0.75rem;
+}
+
 .no-policy,
 .empty-result {
   margin: 0;
@@ -1553,11 +1593,21 @@ body[data-view="island"] .card-height {
   font-size: 0.75rem;
 }
 
+/* 出處說法不一（兩說並列）：實心主色膠囊加左右箭頭，一眼可辨；三人同樣式，仍是中性的主色 */
 .policy-flag {
-  padding: 0 8px;
-  border: 1px solid var(--laterite-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 10px 1px 8px;
   border-radius: 999px;
-  color: var(--laterite);
+  background: var(--laterite);
+  color: var(--rice);
+  font-weight: bold;
+}
+
+.policy-flag::before {
+  content: "⇄" / "";
+  font-weight: normal;
 }
 
 .policy-more {

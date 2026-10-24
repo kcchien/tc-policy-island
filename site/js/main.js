@@ -16,7 +16,7 @@ import { pickRandomArea } from './random-area.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
 import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
-import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
+import { FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 import { scheduleView, taipeiDate } from './election-schedule.js';
 import { renderSchedule, setupScheduleToggle } from './schedule-view.js';
@@ -106,6 +106,7 @@ function startApp(vm, state, initialView) {
   const form = document.getElementById('filters');
   const search = document.getElementById('search');
   const district = document.getElementById('district');
+  const conflictOnly = document.getElementById('conflict-only');
   const status = document.getElementById('result-status');
   const stage = document.getElementById('island-stage');
   const panel = document.getElementById('index-panel');
@@ -462,7 +463,7 @@ function startApp(vm, state, initialView) {
   }
 
   const render = () => {
-    filtered = filterViewModel(vm, { query: state.query, district: state.district });
+    filtered = filterViewModel(vm, { query: state.query, district: state.district, conflictOnly: state.conflict });
     renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard });
     highlightTableRow();
     renderIslandPanel();
@@ -472,16 +473,21 @@ function startApp(vm, state, initialView) {
 
   search.value = state.query;
   setupDistricts(district, state.district);
+  conflictOnly.checked = state.conflict;
+  document.getElementById('conflict-only-label').textContent = FILTER_TEXT.conflictOnly;
+  document.getElementById('conflict-hint').textContent = FILTER_TEXT.conflictHint;
   form.addEventListener('submit', (event) => event.preventDefault());
   form.addEventListener('input', () => {
     state.query = search.value;
     state.district = district.value;
+    state.conflict = conflictOnly.checked;
     updateUrl();
     render();
   });
   form.addEventListener('reset', () => {
     state.query = '';
     state.district = '';
+    state.conflict = false;
     updateUrl();
     render();
   });

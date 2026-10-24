@@ -53,6 +53,8 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
         if (policy.districts.length > 0) {
           button.append(el('span', { class: 'chip-districts' }, T.districts(policy.districts)));
         }
+        // 兩說並列：與政見卡片同一個標籤，三人同樣式。
+        if (policy.conflictNote) button.append(el('span', { class: 'policy-flag' }, T.conflictFlag));
         button.addEventListener('click', () => openPolicy(policy.id));
         return el('li', {}, button);
       }),

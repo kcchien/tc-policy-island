@@ -113,6 +113,30 @@ test('未知的行政區名稱不當成篩選條件', () => {
   assert.deepEqual(shape(filtered), shape(vm));
 });
 
+test('只看兩說並列：只留有出處說法不一標註的政見，其他條件照樣並用', () => {
+  const raw = makeRaw();
+  raw.policies[1].conflictNote = '官網寫延伸到太平，臉書寫延伸到大里';
+  const a2 = policy('p-a2', 'cand-a', undefined, 'area-b');
+  a2.conflictNote = '兩個來源的所數不同';
+  a2.summary = '每區設一所托育中心';
+  raw.policies.push(a2);
+  const vm = buildViewModel(buildPublicDataset(raw));
+
+  const filtered = filterViewModel(vm, { conflictOnly: true });
+
+  assert.deepEqual(shape(filtered), [
+    ['area-a', [['no-matches', []], ['has-policies', ['p-b1']], ['no-matches', []]]],
+    ['area-b', [['has-policies', ['p-a2']], ['no-matches', []], ['no-matches', []]]],
+  ]);
+  assert.deepEqual(filtered.filter, { active: true, query: '', district: null, conflictOnly: true, matchCount: 2 });
+  assert.deepEqual(filterViewModel(vm, { conflictOnly: true, query: '托育' }).rows.map((row) => row.issueArea.id), ['area-b']);
+});
+
+test('沒有開啟只看兩說並列時，篩選結果記為 false', () => {
+  assert.equal(filterViewModel(sampleViewModel(), {}).filter.conflictOnly, false);
+  assert.equal(filterViewModel(sampleViewModel(), { query: '公車' }).filter.conflictOnly, false);
+});
+
 test('政見卡片的欄內篩選與全站篩選用同一套比對：關鍵字比對摘要、原文與行政區，行政區須完全相符', () => {
   const vm = sampleViewModel();
   const policies = vm.rows.flatMap((row) => row.cells.flatMap((cell) => cell.policies));
