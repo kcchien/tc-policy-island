@@ -1,4 +1,4 @@
-// 候選人資料卡：中選會公開的姓名、政黨、出生年、學歷、經歷，逐字呈現，不加整理者撰寫的介紹或評語（ADR 0001）。
+// 候選人資料卡：中選會公開的姓名、政黨、出生年、學歷、經歷逐字呈現；正式肖像依 ADR 0001 有限例外。
 // 索引面板的「候選人」分頁與對話框（表格欄頭「看候選人資料」、網址 candidate 參數）共用同一張卡片。
 // 三張卡片永遠一起排列，由 CSS 讓三張同尺寸；開啟某位候選人只是捲到並標示那一張，不單獨放大。
 // profileCardContent 是純函式，Node 可測；其餘只在瀏覽器使用。畫面文字取自 ui-text.js。
@@ -7,6 +7,7 @@ import { el } from './dom.js';
 import { markerLegend } from './island-layout.js';
 import { sourceLinks } from './policy-card.js';
 import { bindSheetDialog } from './sheet.js';
+import { portraitSet, createPortraitBatch } from './candidate-portraits.js';
 import { DIALOG_TEXT, PROFILE_TEXT as T, profileVerificationText, snapshotNoteText, SOURCE_TEXT } from './ui-text.js';
 
 // candidate 是檢視模型的候選人（附 profileSource）。學歷與經歷一項一行，照資料集原樣，不斷句、不合併。
@@ -38,6 +39,38 @@ export function profileCardContent(candidate) {
 
 // 分享用連結不帶檢視，由讀者的裝置決定用哪一種檢視開啟。
 export const candidateHref = (candidateId) => `?candidate=${encodeURIComponent(candidateId)}`;
+
+let portraitBatch;
+let portraitKey;
+const portraitGroups = new WeakMap();
+
+// 只有這個共用元件掛載照片。索引與對話框共用失敗狀態，不留下單張或破圖。
+function mountPortraits(container, candidates) {
+  portraitGroups.get(container)?.dispose();
+  const portraits = portraitSet(candidates);
+  if (!portraits.length) { portraitBatch?.fail(); return; }
+  const key = portraits.map(p => p.url).join('|');
+  if (key !== portraitKey) {
+    portraitBatch?.fail();
+    portraitBatch = createPortraitBatch();
+    portraitKey = key;
+  }
+  const batch = portraitBatch;
+  const figures = candidates.map((candidate, i) => {
+    const photo = portraits[i];
+    const img = el('img', { src: photo.url, alt: T.portraitAlt(candidate.name), width: 72, height: 96 });
+    img.addEventListener('error', batch.fail);
+    const figure = el('figure', { class: 'profile-portrait', hidden: true }, img,
+      el('figcaption', {}, el('a', { href: candidate.profileSource.url, target: '_blank', rel: 'noopener noreferrer' }, T.portraitSource(photo.electionYear)),
+        el('br'), el('a', { href: './method.html#candidate-portraits' }, T.portraitMethod)));
+    container.children[i].querySelector('.profile-head').after(figure);
+    return figure;
+  });
+  portraitGroups.set(container, batch.reveal(figures.map(f => f.querySelector('img')), {
+    show: () => figures.forEach(f => { f.hidden = false; }),
+    hide: () => figures.forEach(f => { f.hidden = true; }),
+  }));
+}
 
 function sourceBlock(source) {
   return el(
@@ -92,6 +125,7 @@ export function renderProfileCards(container, vm, { idPrefix, focusId = null }) 
     ...vm.candidates.map((candidate) =>
       profileCard(profileCardContent(candidate), { idPrefix, focused: candidate.id === focusId, symbol: symbols.get(candidate.id) })),
   );
+  mountPortraits(container, vm.candidates);
 }
 
 // 回傳對話框控制器：open(vm, candidateId) 開啟並捲到該候選人的卡片，不回傳值。桌面為置中對話框，800px 以下為底部抽屜。

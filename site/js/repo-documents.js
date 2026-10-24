@@ -22,6 +22,7 @@ export const REPO_DOCUMENTS = [
   { id: 'layer2-prompt', path: 'data/verification/layer2-prompt.md', format: 'text' },
   { id: 'extraction-instructions', path: 'data/extraction/instructions.md', format: 'markdown' },
   { id: 'candidate-profiles', path: 'data/extraction/candidate-profiles.md', format: 'markdown' },
+  { id: 'candidate-portraits', path: 'data/extraction/candidate-portraits.md', format: 'markdown' },
   { id: 'verification-report', path: 'data/verification/report.md', format: 'markdown', optional: true },
   { id: 'speech-manifest', path: 'data/audio/manifest.json', format: 'text', optional: true },
   { id: 'local-elements', path: 'docs/rules/local-elements.md', format: 'markdown' },

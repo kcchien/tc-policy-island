@@ -17,9 +17,10 @@ data/raw/              原始資料（建置輸入）
   sources/<candidateId>.json   每位候選人一檔，陣列
   policies/<candidateId>.json  每位候選人一檔，陣列
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
-data/extraction/       政見抽取指示 instructions.md、判準裁決紀錄 judgement-log.md、候選人資料抽取方法 candidate-profiles.md、每位候選人的抽取紀錄 records/、PDF 字型對照檔 glyph-maps/
+data/extraction/       政見抽取指示 instructions.md、判準裁決紀錄 judgement-log.md、候選人資料抽取方法 candidate-profiles.md、正式肖像抽取方法 candidate-portraits.md、每位候選人的抽取紀錄 records/、PDF 字型對照檔 glyph-maps/
 data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版；核對報告寫在 report.md（整理方法頁照原文公開，還沒有時顯示「尚未產生」）
 data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256，48 kbps 單聲道，不進版控）與清單 manifest.json（進版控），由 scripts/speak.js 生成
+data/portraits/        正式肖像 PNG 與 manifest.json，來源、原件及影像雜湊、頁面物件與姓名位置核對、授權依據；全部進版控
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
@@ -37,6 +38,7 @@ site/
   data/dataset.json    建置產物，不進版控
   data/snapshots/      建置時複製的公開出處快照，不進版控
   data/repo-files/     建置時逐字複製的引用 repo 文件，與清單 data/repo-files.json 都不進版控
+  data/portraits/      建置時通過來源授權、姓名對應、尺寸與雜湊核對才三人一起複製，不進版控
   vendor/three/        three.js r160（three@0.160.0 的 three.module.min.js、OrbitControls、CSS2DRenderer 與授權）
 ```
 
@@ -46,7 +48,7 @@ site/
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js  js/reading-progress.js
 js/shortlist.js  js/shortlist-dialog.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/policy-text.js  js/report-link.js  js/candidate-card.js  js/sheet.js
-js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  js/election-schedule.js  js/schedule-view.js
+js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  js/election-schedule.js  js/schedule-view.js  js/candidate-portraits.js
 ```
 
 ### 檢視模型
@@ -58,6 +60,8 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  
 網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`conflict=1` 只看兩說並列（有出處說法不一標註）的政見、`view`（`island` 或 `table`）、`pick` 我的對照單勾選的政見（逗號分隔；進站時以網址為準寫回瀏覽器、從網址移除並打開對照單，分享網址由對照單的「複製網址」產生）。不支援 WebGL 時一律用表格檢視。
 
 ### 開啟候選人資料卡
+
+正式肖像只由 `candidate-card.js` 掛載，索引與對話框共用同一個 `candidate-portraits.js` 批次失敗狀態。每組三張全部解碼、尺寸相符後才一起顯示；任一組失敗時，所有組與之後重畫均回退。公開候選人的 `portrait` 只在建置階段由 `scripts/lib/portraits.js` 核對完整清單後加入；檢視模型沿用該欄位，其他檢視不讀。
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 
@@ -143,9 +147,9 @@ js/repo-documents.js  js/markdown.js  js/method-content.js  js/method.js
 ```
 build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  speak.js  verify.js   指令入口，參數看各腳本的 --help
 lib/      archive-queue.js  audience-text.js  brand-terms.js  cdp.js  colors.js  deploy.js
-          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  speech.js  usage.js  verification.js
+          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  speech.js  usage.js  verification.js  portraits.js
 gates/    index.js（關卡清單 GATES）  site.js（讀取網站目錄的入口）
           audience-text.js  brand-terms.js  candidate-columns.js  candidate-profiles.js  dataset-structure.js
           figure-consistency.js  fixed-decor.js  fixed-motion.js  forbidden-colors.js  audio-files.js
-          repo-documents.js  verified-policies.js   每項關卡一個模組
+          repo-documents.js  verified-policies.js  candidate-portraits.js   每項關卡一個模組
 ```

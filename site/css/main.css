@@ -2197,6 +2197,18 @@ body[data-view="island"] .card-height {
   font-size: 0.875rem;
 }
 
+.profile-portrait {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.profile-portrait[hidden] { display: none; }
+.profile-portrait img { display: block; width: 72px; height: 96px; object-fit: contain; }
+.profile-portrait figcaption { font-size: 0.75rem; line-height: 1.6; overflow-wrap: anywhere; }
+
 .profile-fields dt {
   color: var(--charcoal-soft);
 }

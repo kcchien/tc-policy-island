@@ -2,6 +2,7 @@
 // 公開出處的出處快照一併複製到資料集旁，位置規則見 view-model.js 的 SNAPSHOT_DIR；
 // 整理方法頁的引用 repo 文件也逐字複製到資料集旁，見 repo-documents.js。
 // 政見語音全有或全無：每條公開政見都有相符音檔才複製音檔並加 audioUrl，見 scripts/lib/speech.js。
+// 正式肖像全有或全無：三人的來源授權與本機影像全通過才複製並加 portrait，見 scripts/lib/portraits.js。
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +13,7 @@ import { REPO_DOCUMENTS, REPO_FILES_DIR, REPO_FILES_MANIFEST } from '../site/js/
 import { loadRawData, readJson } from './lib/raw-data.js';
 import { AUDIO_DIR, AUDIO_MANIFEST, audioProblems, audioUrlOf, sha256 } from './lib/speech.js';
 import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
+import { PORTRAIT_DIR, PORTRAIT_MANIFEST, portraitProblems, attachPortraits } from './lib/portraits.js';
 
 const USAGE = formatUsage({
   summary: '建置公開資料集：原始資料 → 公開資料集，連同公開出處的出處快照與整理方法頁引用的 repo 文件。',
@@ -26,6 +28,7 @@ const USAGE = formatUsage({
         ['--raw <目錄>', '原始資料目錄（預設 data/raw）；看夾具資料用 test/fixtures/raw-sample'],
         ['--out <路徑>', '公開資料集的輸出檔（預設 site/data/dataset.json）'],
         ['--audio <目錄>', '政見語音的音檔目錄，清單是其中的 manifest.json（預設 data/audio）'],
+        ['--portraits <目錄>', '正式肖像與來源授權清單（預設 data/portraits）；三人齊全才公開'],
       ],
     },
   ],
@@ -47,8 +50,30 @@ const { values } = parseArgs({
     raw: { type: 'string', default: 'data/raw' },
     out: { type: 'string', default: 'site/data/dataset.json' },
     audio: { type: 'string', default: 'data/audio' },
+    portraits: { type: 'string', default: 'data/portraits' },
   },
 });
+
+// 來源、授權、姓名位置核對與影像全有或全無；先移除舊產物，避免切換資料後留下照片。
+function copyPortraits(dataset, datasetDir) {
+  const outDir = join(datasetDir, PORTRAIT_DIR);
+  rmSync(outDir, { recursive: true, force: true });
+  for (const candidate of dataset.candidates) delete candidate.portrait;
+  const dir = resolve(values.portraits);
+  const manifestPath = join(dir, PORTRAIT_MANIFEST);
+  if (!existsSync(manifestPath)) return '沒有正式肖像清單，三人均不公開照片';
+  let manifest;
+  try { manifest = readJson(manifestPath); }
+  catch { return '正式肖像清單無法讀取，三人均不公開照片'; }
+  const readImage = (file) => existsSync(join(dir, file)) ? readFileSync(join(dir, file)) : null;
+  const problems = portraitProblems(dataset, manifest, readImage);
+  if (problems.length) return `正式肖像不齊全，三人均不公開照片：\n${problems.join('\n')}`;
+  mkdirSync(outDir, { recursive: true });
+  for (const item of manifest.items) copyFileSync(join(dir, item.file), join(outDir, item.file));
+  copyFileSync(manifestPath, join(outDir, PORTRAIT_MANIFEST));
+  attachPortraits(dataset, manifest);
+  return '三位候選人正式肖像與來源授權紀錄齊全，已全部加入';
+}
 
 // 政見語音全有或全無。齊全時把音檔與清單複製到公開資料集旁的 audio/，並給每條政見加 audioUrl；
 // 否則不複製任何音檔、不加 audioUrl。上一次建置留下的音檔一律先清掉。回傳要印的說明。
@@ -104,8 +129,10 @@ try {
   for (const { source, from } of snapshots) copyFileSync(from, join(snapshotDir, snapshotFileName(source)));
   copyRepoDocuments(dirname(out));
   const audioNotes = attachAudio(dataset, dirname(out));
+  const portraitNote = copyPortraits(dataset, dirname(out));
   writeFileSync(out, `${JSON.stringify(dataset, null, 2)}\n`);
   for (const note of audioNotes) console.log(note);
+  console.log(portraitNote);
   const excluded = raw.policies.length - dataset.policies.length;
   console.log(`公開資料集已寫入 ${values.out}：候選人 ${dataset.candidates.length} 位、議題區 ${dataset.issueAreas.length} 個、公開政見 ${dataset.policies.length} 筆（未通過核對排除 ${excluded} 筆）`);
 } catch (error) {

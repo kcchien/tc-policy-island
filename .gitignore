@@ -3,6 +3,7 @@ site/data/dataset.json
 site/data/snapshots/
 site/data/repo-files/
 site/data/repo-files.json
+site/data/portraits/
 
 # 政見音檔：由維護者在部署機器用 node scripts/speak.js 生成，清單 manifest.json 進版控
 data/audio/*.mp3
