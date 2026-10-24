@@ -1940,8 +1940,15 @@ body[data-view="island"] .card-height {
     margin: 12mm;
   }
 
-  body > :not(.shortlist-dialog) {
+  /* 只在對照單開著時改成只印對照單，平常直接列印照原樣 */
+  body:has(> .shortlist-dialog[open]) > :not(.shortlist-dialog) {
     display: none !important;
+  }
+
+  /* 紙本看不到連結，出處網址印在連結文字後面 */
+  .shortlist-meta a[href]::after {
+    content: " " attr(href);
+    overflow-wrap: anywhere;
   }
 
   .shortlist-dialog {
