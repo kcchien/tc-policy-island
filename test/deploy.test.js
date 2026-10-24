@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { deploy, checkStatsDataset, accountIdFrom } from '../scripts/lib/deploy.js';
+import { deploy, checkStatsDataset, statsDatasetVerdict, accountIdFrom } from '../scripts/lib/deploy.js';
 
 // 假執行器：記下每個指令，依 results 回傳結束碼與輸出（沒指定就成功、無輸出）。
 function fakeRunner(results = {}) {
@@ -151,13 +151,30 @@ test('統計資料集查詢遇到網路錯誤時失敗，不放行', async () =>
   assert.match(result.reason, /fetch failed/);
 });
 
+test('查詢結果判定：200 通過，403、其他狀態碼與連不上都失敗', () => {
+  assert.deepEqual(statsDatasetVerdict({ accountId: ACCOUNT_ID, status: 200 }), { ok: true });
+  assert.match(statsDatasetVerdict({ accountId: ACCOUNT_ID, status: 403 }).reason, /啟用 Analytics Engine/);
+  assert.match(statsDatasetVerdict({ accountId: ACCOUNT_ID, status: 500, body: '內部錯誤' }).reason, /HTTP 500：內部錯誤/);
+  assert.equal(statsDatasetVerdict({ accountId: ACCOUNT_ID, error: new TypeError('fetch failed') }).ok, false);
+});
+
+test('讀取非 200 回應內容時連線中斷，一樣失敗並附狀態碼', async () => {
+  const fetch = async () => ({ status: 502, text: async () => { throw new TypeError('terminated'); } });
+
+  const result = await checkStatsDataset({ accountId: ACCOUNT_ID, token: 'tok', fetch });
+
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /502/);
+});
+
 test('找不到 CLOUDFLARE_API_TOKEN 時略過檢查、不送查詢，部署流程照走', async () => {
   const { fetch, requests } = fakeFetch();
 
   const result = await checkStatsDataset({ accountId: ACCOUNT_ID, token: undefined, fetch });
 
   assert.equal(result.ok, true);
-  assert.equal(result.skipped, '略過統計資料集檢查：找不到 CLOUDFLARE_API_TOKEN');
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, '略過統計資料集檢查：找不到 CLOUDFLARE_API_TOKEN');
   assert.equal(requests.length, 0);
 });
 
@@ -167,7 +184,8 @@ test('找不到帳號識別碼時略過檢查、不送查詢，部署流程照�
   const result = await checkStatsDataset({ accountId: null, token: 'tok', fetch });
 
   assert.equal(result.ok, true);
-  assert.equal(result.skipped, '略過統計資料集檢查：找不到帳號識別碼');
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, '略過統計資料集檢查：找不到帳號識別碼');
   assert.equal(requests.length, 0);
 });
 
