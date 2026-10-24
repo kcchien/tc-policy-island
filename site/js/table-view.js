@@ -2,7 +2,7 @@
 // 800px 以下由 CSS 改為單欄，所以每個元素明確標上 ARIA 表格角色，避免 display 改變後失去表格語意。
 // 每格的候選人名稱只在單欄時顯示，對螢幕閱讀器隱藏（欄標題已提供）。
 // 定位議題列時量測實際固定欄頭，換行與文字縮放後也保留足夠空間；窄版不計隱藏欄頭。
-// 收錄筆數與原始條目由 collection-note.js 放在三人相同的可展開說明，不在姓名旁常駐。
+// 來源狀態、收錄筆數與原始條目由 collection-note.js 放在三人相同的可展開說明，不在姓名旁常駐。
 
 import { el } from './dom.js';
 import { NO_MATCH_TEXT, TABLE_TEXT as T } from './ui-text.js';
@@ -39,10 +39,9 @@ function candidateHeader(candidate, onOpenCandidate, cutoffDate) {
     { scope: 'col', role: 'columnheader', class: 'candidate-col' },
     el('span', { class: 'candidate-name' }, candidate.name),
     ...meta.map((text) => el('span', { class: 'candidate-meta' }, text)),
-    // 按鈕放在資料狀態說明之前，三欄的按鈕才會在同一高度。
+    // 按鈕放在收錄說明之前，三欄的按鈕才會在同一高度。
     button,
     collectionNote(candidate, { cutoffDate }),
-    el('span', { class: 'data-status' }, candidate.sourceStatusText),
   );
 }
 
@@ -51,7 +50,6 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
     'span',
     { class: 'cell-candidate', 'aria-hidden': 'true' },
     candidate.name,
-    el('span', { class: 'data-status' }, candidate.sourceStatusText),
   );
   if (cell.policies.length === 0) {
     const text = cell.status === 'no-matches' ? NO_MATCH_TEXT : noPolicyText;
@@ -91,19 +89,20 @@ function areaHeader(row, onOpenCard, seen) {
 }
 
 // 800px 以下欄標題隱藏，改由表格上方這排同尺寸按鈕開候選人資料卡；桌面由 CSS 隱藏。
-function candidateStrip(candidates, onOpenCandidate) {
+function candidateStrip(candidates, onOpenCandidate, cutoffDate) {
   return el(
     'nav',
     { class: 'candidate-strip', 'aria-label': T.openProfile },
     el('span', { class: 'candidate-strip-label' }, T.openProfile),
-    el('span', { class: 'candidate-strip-buttons' }, candidates.map((candidate) => candidateButton(candidate, candidate.name, onOpenCandidate))),
+    el('div', { class: 'candidate-strip-buttons' }, candidates.map((candidate) =>
+      el('div', { class: 'candidate-strip-item' }, candidateButton(candidate, candidate.name, onOpenCandidate), collectionNote(candidate, { cutoffDate })))),
   );
 }
 
 // onOpenCard(areaId, policyId) 開政見卡片；onOpenCandidate(candidateId) 開候選人資料卡。
 // seen 是讀者看過的議題區識別碼集合（閱讀進度），議題區名稱旁打淡勾。
 export function renderTable(container, vm, { onOpenCard, onOpenCandidate, seen = new Set() }) {
-  const strip = candidateStrip(vm.candidates, onOpenCandidate);
+  const strip = candidateStrip(vm.candidates, onOpenCandidate, vm.meta.dataCutoffDate);
   if (vm.rows.length === 0) {
     container.replaceChildren(strip, el('p', { class: 'empty-result' }, NO_MATCH_TEXT));
     return;

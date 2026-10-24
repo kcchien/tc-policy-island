@@ -620,6 +620,7 @@ body:has(> .policy-card[open]) :is(#index-panel, #controls, .scene-controls) {
 .card-close,
 .card-height,
 .card-expand,
+.card-clear-filter,
 .card-step,
 .reading-clear,
 .shortlist-action,
@@ -640,6 +641,7 @@ body:has(> .policy-card[open]) :is(#index-panel, #controls, .scene-controls) {
 .card-close:hover,
 .card-height:hover,
 .card-expand:hover,
+.card-clear-filter:hover,
 .card-step:hover,
 .reading-clear:hover,
 .shortlist-action:hover,
@@ -655,6 +657,7 @@ body:has(> .policy-card[open]) :is(#index-panel, #controls, .scene-controls) {
 .card-close:active,
 .card-height:active,
 .card-expand:active,
+.card-clear-filter:active,
 .card-step:active,
 .reading-clear:active,
 .shortlist-action:active,
@@ -898,11 +901,6 @@ body[data-view="island"] .view-note {
 
   body[data-view="island"] .policy-card[data-height="tall"] {
     height: calc(100dvh - 2 * var(--hud-gap));
-  }
-
-  /* 全高時說明不截斷 */
-  body[data-view="island"] .policy-card[data-height="tall"] .card-heading .card-description {
-    display: block;
   }
 
   body[data-view="island"] .policy-card .card-inner {
@@ -1474,6 +1472,17 @@ body[data-view="island"] .policy-card::backdrop {
   gap: 8px;
 }
 
+.policy-card .card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+}
+
+.policy-card .card-head > .card-description {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+}
+
 .card-close,
 .card-height {
   flex: none;
@@ -1493,17 +1502,25 @@ body[data-view="island"] .card-height {
 .card-heading {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 2px 12px;
   min-width: 0;
 }
 
+.card-heading-text {
+  display: contents;
+}
+
 .card-eyebrow {
+  grid-column: 2;
+  grid-row: 1;
   color: var(--laterite);
 }
 
 /* 議題區編號：大號斜體襯線 */
 .card-number {
+  grid-column: 1;
+  grid-row: 2;
   color: var(--laterite);
   font-family: var(--font-serif);
   font-size: 2.75rem;
@@ -1512,6 +1529,8 @@ body[data-view="island"] .card-height {
 }
 
 .card-title {
+  grid-column: 2;
+  grid-row: 2;
   margin: 0;
   color: var(--charcoal);
   font-size: 1.5rem;
@@ -1524,26 +1543,11 @@ body[data-view="island"] .card-height {
   font-size: 0.875rem;
 }
 
-.card-heading .card-description {
-  display: -webkit-box;
-  grid-column: 1 / -1;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-}
-
 .card-actions {
   align-items: center;
 }
 
-.card-share {
-  margin-right: 4px;
-  font-size: 0.8125rem;
-  white-space: nowrap;
-}
-
-/* 說明與篩選按需展開；收合時保留條件與清除入口。 */
+/* 篩選直接可見；清除與全部展開留在同一工具區。 */
 .card-tools {
   display: flex;
   flex: none;
@@ -1553,54 +1557,32 @@ body[data-view="island"] .card-height {
   padding: 0 20px;
 }
 
-.card-tools summary {
-  padding: 8px 0;
-  cursor: pointer;
-  color: var(--laterite);
-  font-size: 0.875rem;
-  overflow-wrap: anywhere;
-}
-
-.card-context,
-.card-filter-tools {
-  min-width: 0;
-}
-
-.card-context[open],
-.card-filter-tools[open] {
-  flex-basis: 100%;
-}
-
-.card-context .card-description {
-  margin: 0 0 8px;
-}
-
 .card-tools .card-filters {
+  flex: 1;
   margin: 0;
 }
 
-/* 欄內篩選：關鍵字、行政區與「全部展開」排成一列 */
+/* 欄內篩選：寬版一列，手機換行；不加背景盒或額外操作列。 */
 .card-filters {
   display: flex;
   flex: none;
   flex-wrap: wrap;
-  align-items: end;
-  gap: 8px 12px;
+  align-items: center;
+  gap: 6px 8px;
   margin: 0 20px;
-  padding: 10px 12px;
-  background: var(--rice-deep);
-  border-radius: var(--radius);
+  padding: 0;
 }
 
 .card-field {
   display: flex;
-  flex: 0 1 11rem;
+  flex: 0 1 9rem;
   flex-direction: column;
+  min-width: 0;
   gap: 2px;
 }
 
 .card-field-search {
-  flex: 1 1 14rem;
+  flex: 1 1 12rem;
 }
 
 /* 只看出處說法不一：與全站篩選同一個條件，開卡片時帶入 */
@@ -1620,8 +1602,10 @@ body[data-view="island"] .card-height {
   accent-color: var(--laterite);
 }
 
-.card-filters input,
+.card-filters input:not([type="checkbox"]),
 .card-filters select {
+  width: 100%;
+  min-width: 0;
   min-height: var(--button-height);
   padding: 6px 12px;
   border: 1px solid var(--laterite-soft);
@@ -1633,6 +1617,21 @@ body[data-view="island"] .card-height {
 /* 「全部展開」靠右 */
 .card-expand {
   margin-left: auto;
+}
+
+.card-clear-filter,
+.card-expand {
+  flex: none;
+  padding-inline: 10px;
+  font-size: 0.875rem;
+}
+
+.card-clear-filter:disabled {
+  border-color: var(--laterite-soft);
+  background: var(--rice);
+  color: var(--charcoal-soft);
+  cursor: default;
+  transform: none;
 }
 
 .card-filter-status {
@@ -1669,8 +1668,16 @@ body[data-view="island"] .card-height {
   flex: none;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: -8px;
   padding: 0 20px 16px;
+}
+
+.policy-card .verification-scope {
+  flex: none;
+  margin: 0;
+  padding: 0 20px 12px;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+  line-height: 1.5;
 }
 
 .card-column {
@@ -1729,7 +1736,7 @@ body[data-view="island"] .card-height {
 /* 每筆政見預設只有摘要列；點開（或「全部展開」）才顯示原文、出處與核對紀錄 */
 .policy-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 4px 8px;
   min-height: var(--button-height);
   padding: 10px 12px;
@@ -1745,7 +1752,7 @@ body[data-view="island"] .card-height {
 /* 展開箭頭 */
 .policy-head::after {
   content: "";
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   width: 8px;
   height: 8px;
@@ -1765,10 +1772,25 @@ body[data-view="island"] .card-height {
 }
 
 .policy-summary {
-  grid-column: 1;
+  grid-column: 2;
   margin: 0;
   font-size: 0.9375rem;
   line-height: 1.55;
+}
+
+/* 政見序號只作閱讀定位；寬度隨位數成長，不擠壓摘要或顯示總數。 */
+.policy-number {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  min-width: 2ch;
+  padding-top: 0.18em;
+  border-top: 1px solid var(--laterite-soft);
+  color: var(--laterite);
+  font-family: var(--font-serif);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
 }
 
 .policy-tags {
@@ -2226,6 +2248,15 @@ body[data-view="island"] .card-height {
   display: flex;
   flex: 1 1 100%;
   gap: 8px;
+}
+
+.candidate-strip-item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.candidate-strip-item .candidate-open {
+  width: 100%;
 }
 
 .candidate-strip .candidate-open {
@@ -2761,10 +2792,6 @@ body[data-view="island"] .card-height {
     font-weight: bold;
   }
 
-  .cell-candidate .data-status {
-    font-weight: normal;
-  }
-
   .policy-chip {
     background: var(--rice-deep);
     box-shadow: none;
@@ -2853,6 +2880,10 @@ body[data-view="island"] .card-height {
     margin-top: auto;
   }
 
+  .policy-card .verification-scope {
+    padding: 0 var(--gap) 10px;
+  }
+
   body[data-view="island"] .card-height {
     display: none;
   }
@@ -2868,7 +2899,7 @@ body[data-view="island"] .card-height {
   .card-filters {
     gap: 6px 8px;
     margin: 0 var(--gap);
-    padding: 8px;
+    padding: 0;
   }
 
   .card-field,
