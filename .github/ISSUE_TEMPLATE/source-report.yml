@@ -1,0 +1,51 @@
+name: 市民補件：提供一手來源
+description: 政見卡片上某位候選人在某個議題區沒有政見，而你找到這位候選人的公開說法。只收出處連結，不收意見。
+title: "補件："
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        謝謝你幫忙補上出處。這裡只收**候選人本人或中選會發布的來源**：候選人官網、候選人官方臉書、政見發表會、選舉公報。媒體報導、評論與轉述不收。
+
+        請只貼連結與原文，不寫對候選人的看法。處理過程公開在這裡；補上的政見一樣要通過原文逐字比對與 AI 依公開檢核表檢查，才會出現在網站上。
+  - type: input
+    id: area
+    attributes:
+      label: 議題區
+      description: 從政見卡片開啟時已自動填好。
+    validations:
+      required: false
+  - type: input
+    id: candidate
+    attributes:
+      label: 候選人
+      description: 從政見卡片開啟時已自動填好。
+    validations:
+      required: false
+  - type: input
+    id: source-url
+    attributes:
+      label: 來源連結
+      description: 候選人本人或中選會發布的網頁、貼文或文件連結。
+      placeholder: https://
+    validations:
+      required: true
+  - type: dropdown
+    id: source-type
+    attributes:
+      label: 來源類型
+      options:
+        - 候選人官網
+        - 官方臉書
+        - 政見發表會
+        - 選舉公報
+    validations:
+      required: false
+  - type: textarea
+    id: quote
+    attributes:
+      label: 該說法的原文片段（選填）
+      description: 從來源照抄相關的那一段，方便我們找到位置。請不要改寫或加上評論。
+    validations:
+      required: false
