@@ -8,7 +8,7 @@ import {
   ACCESSORY_CROWN, ACCESSORY_LOW, ACCESSORY_REACH, ACCESSORY_TOP, CITIZEN_BOB, CITIZEN_CROWN, CITIZEN_FIGURE, CITIZEN_HEIGHT, CITIZEN_RADIUS,
   CITIZEN_REACH, CITIZEN_REACH_HEIGHT, CITIZEN_ROLES, CITIZEN_SCALE,
   CITIZEN_ZOOM, citizenZoom, citizenPose, LOOP_CORE, LOOP_HEIGHT, LOOP_REACH, LOOP_REACH_FROM, LOOP_SCALE, LOOP_SECONDS, loopPose,
-  LOOP_SPOTS, MOTION_LEVELS, MOTION_THEMES, motionPlan, motionSignature, pointAlong, RING_LANES, VEHICLE_HALF_WIDTH, vehiclePose,
+  LOOP_FOLD_SECONDS, loopFolds, loopFoldScale, LOOP_SPOTS, MOTION_LEVELS, stepLoopFolds, MOTION_THEMES, motionPlan, motionSignature, pointAlong, RING_LANES, VEHICLE_HALF_WIDTH, vehiclePose,
 } from '../site/js/island-motion.js';
 import { BRIDGE, islandBody, tileAt, TILE_SLOTS } from '../site/js/island-body.js';
 import { heroPlan, heroSceneFor, partBounds } from '../site/js/island-heroes.js';
@@ -341,7 +341,7 @@ test('市民路線與候選人人物不和靜態裝飾重疊：正式資料的�
   }
 });
 
-test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺到最遠也不伸進元素區', () => {
+test('道具底座不進元素區、不碰市民路線，吊臂擺到最遠也不伸進元素區', () => {
   const tile = areaPlans(motionPlan(layoutOf(rawWith(FEW))))[0];
   // 市民路線上最靠近道具軸心的距離（每 0.01 取一點）。
   const steps = Math.ceil(tile.pathLength / 0.01);
@@ -356,6 +356,31 @@ test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺�
   // 吊臂（原尺寸伸出 0.14）往格心擺動時離元素區最近。
   const swings = Array.from({ length: 60 }, (_, i) => Math.abs(loopPose('crane', (i / 60) * LOOP_SECONDS).swing));
   assert.ok(LOOP_SPOTS[0].z - 0.14 * LOOP_SCALE * Math.sin(Math.max(...swings)) >= ELEMENT_MAX_Z, '吊臂伸進元素區');
+});
+
+test('正式資料每格的循環道具（含會動零件掃過的範圍）不穿進主題場景的零件，也不進在地感元素區', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  const plan = motionPlan(layout);
+  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
+  // 圓柱與外框在俯視平面相交、高度也重疊才算碰到。
+  const hits = ({ x, z, radius, bottom = 0, height }, box) => {
+    const dx = Math.max(box.min[0] - x, 0, x - box.max[0]);
+    const dz = Math.max(box.min[2] - z, 0, z - box.max[2]);
+    return Math.hypot(dx, dz) < radius && bottom < box.max[1] && box.min[1] < height;
+  };
+  const failures = [];
+  for (const tile of areaPlans(plan)) {
+    const e = layout.tiles.find((t) => t.id === tile.id).elementSlot;
+    const [cx, cz] = [tile.center.x, tile.center.z];
+    const boxes = [
+      ...heroBoxes(heroes.get(tile.id)).map((b) => ({ ...b, name: `主題場景零件 ${b.name}` })),
+      { name: '在地感元素區', min: [cx + e.minX, 0, cz + e.minZ], max: [cx + e.maxX, e.maxY, cz + e.maxZ] },
+    ];
+    for (const cyl of loopCylinders(tile)) {
+      for (const box of boxes.filter((b) => hits(cyl, b))) failures.push(`${tile.id} 的 ${tile.theme} 道具（${cyl.x}, ${cyl.z}）${cyl.name}碰到${box.name}`);
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 // 標記離鏡頭的視線有沒有被擋：從標記頂面中心往鏡頭取樣，碰到直立圓柱（離格子頂面 bottom 到 height）就算擋住。
@@ -381,29 +406,50 @@ function blocked(from, camera, obstacle) {
   return false;
 }
 
-test('放大後的道具、市民、主題場景、在地感元素與靜態裝飾都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
+// 一格的循環道具，每個道具是兩段直立圓柱：柱子（地面到 LOOP_HEIGHT、半徑 LOOP_CORE）與會動零件掃過的範圍
+// （LOOP_REACH_FROM 到 LOOP_HEIGHT、半徑 LOOP_REACH）。格式同 blocked 的圓柱，x、z 是場景座標。
+// fold 是收起時的縮放比例（loopFoldScale），收到 0 時沒有道具。
+function loopCylinders(tile, fold = 1) {
+  if (fold === 0) return [];
+  return tile.loops.flatMap((loop) => {
+    const at = { x: tile.center.x + loop.x, z: tile.center.z + loop.z, height: LOOP_HEIGHT * fold };
+    return [
+      { name: '柱子', ...at, radius: LOOP_CORE * fold },
+      { name: '會動零件', ...at, radius: LOOP_REACH * fold, bottom: LOOP_REACH_FROM * fold },
+    ];
+  });
+}
+
+// 主題場景每個零件的外框 { name, min: [x, y, z], max }：照擺放（每座同倍率，朝向不轉）放大平移，y 從格子頂面量起。
+function heroBoxes(hero) {
+  const { x, z, scale } = hero.transform;
+  const offset = [x, 0, z];
+  return heroSceneFor(hero.areaId).parts.map((part, i) => {
+    const b = partBounds(part);
+    return { name: `${i}（${part.shape}）`, min: b.min.map((v, k) => offset[k] + v * scale), max: b.max.map((v, k) => offset[k] + v * scale) };
+  });
+}
+
+// 鏡頭位置：從 target（場景座標，y 是高度）沿 view 的俯角與方位角退 distance。
+const cameraAt = ({ x, y, z }, { polar, azimuth }, distance) => [
+  x + distance * Math.sin(polar) * Math.sin(azimuth),
+  y + distance * Math.cos(polar),
+  z + distance * Math.sin(polar) * Math.cos(azimuth),
+];
+
+test('道具、市民、主題場景、在地感元素與靜態裝飾都不擋住正式資料任何標記：桌面與手機的預設視角', () => {
   const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
   const plan = motionPlan(layout);
   const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
   // 道具是一根柱子加上方會動零件掃過的範圍；市民沿路線每 0.05 取一個位置。
   const obstacles = plan.tiles.flatMap((tile) => [
-    ...tile.loops.flatMap((loop) => {
-      const at = { x: tile.center.x + loop.x, z: tile.center.z + loop.z, height: LOOP_HEIGHT };
-      return [{ ...at, radius: LOOP_CORE }, { ...at, radius: LOOP_REACH, bottom: LOOP_REACH_FROM }];
-    }),
+    ...loopCylinders(tile),
     ...Array.from({ length: Math.ceil(tile.pathLength / 0.05) }, (_, i) => pointAlong(tile.path, i * 0.05, { total: tile.pathLength }))
       .filter(() => tile.citizens.length > 0)
       .flatMap(({ x, z }) => [{ x, z, radius: CITIZEN_CROWN, height: CITIZEN_HEIGHT }, { x, z, radius: CITIZEN_REACH, height: CITIZEN_REACH_HEIGHT }]),
   ]);
-  // 主題場景：每個零件的外框照擺放（每座同倍率，朝向不轉）放大平移。在地感元素以外接元素區的圓柱近似。
-  for (const hero of heroPlan(layout)) {
-    const { x, z, scale } = hero.transform;
-    for (const part of heroSceneFor(hero.areaId).parts) {
-      const b = partBounds(part);
-      const offset = [x, 0, z];
-      obstacles.push({ min: b.min.map((v, i) => offset[i] + v * scale), max: b.max.map((v, i) => offset[i] + v * scale) });
-    }
-  }
+  // 主題場景以每個零件的外框檢查。在地感元素以外接元素區的圓柱近似。
+  for (const hero of heroPlan(layout)) obstacles.push(...heroBoxes(hero));
   // 靜態裝飾：每件以最寬處為半徑、最高處為高的圓柱近似。
   for (const tile of decorPlan(layout).tiles) {
     for (const item of tile.items) obstacles.push({ x: tile.center.x + item.x, z: tile.center.z + item.z, radius: item.reach, height: item.height });
@@ -419,16 +465,84 @@ test('放大後的道具、市民、主題場景、在地感元素與靜態裝�
   // 橫式桌面與直式手機（扣掉浮動元件後的可見範圍長寬比）。
   for (const aspect of [2.6, 2.2, 2.0, 1.9, 1.8, 1.6, 1.4, 1.2, 1.0, 0.9, 0.6, 0.5, 0.46]) {
     const view = homeView(outline, { fov: 32, aspect });
-    const camera = [
-      view.target.x + view.distance * Math.sin(view.polar) * Math.sin(view.azimuth),
-      view.distance * Math.cos(view.polar),
-      view.target.z + view.distance * Math.sin(view.polar) * Math.cos(view.azimuth),
-    ];
+    const camera = cameraAt({ x: view.target.x, y: 0, z: view.target.z }, view, view.distance);
     const hidden = layout.tiles.flatMap((tile) => tile.markers
       .filter((m) => obstacles.some((o) => blocked([tile.position.x + m.offset.x, MARKER_TOP, tile.position.z + m.offset.z], camera, o)))
       .map((m) => `${tile.id}/${m.candidateId}`));
     assert.deepEqual(hidden, [], `長寬比 ${aspect}`);
   }
+});
+
+test('選中議題區時只收起該格的循環道具：0.3 秒內縮到 0，取消選取或改選他格時恢復，減少動態時直接切換', () => {
+  const plan = motionPlan(layoutOf(rawWith(FEW)));
+  const ids = areaPlans(plan).map((t) => t.id);
+  const scaleOf = (folds, id) => LOOP_SCALE * loopFoldScale(folds.get(id));
+  const signatures = areaPlans(plan).map(motionSignature);
+
+  let folds = loopFolds(plan);
+  assert.deepEqual([...folds.keys()], ids);
+  for (const id of ids) assert.equal(scaleOf(folds, id), LOOP_SCALE, `${id} 未選取時要是原倍率`);
+
+  // 選中 area-b：半途在 0 與原倍率之間，0.3 秒後收到 0；其他格一直是原倍率。
+  let step = stepLoopFolds(folds, 'area-b', LOOP_FOLD_SECONDS / 2);
+  assert.ok(step.moving);
+  assert.ok(scaleOf(step.folds, 'area-b') > 0 && scaleOf(step.folds, 'area-b') < LOOP_SCALE);
+  step = stepLoopFolds(step.folds, 'area-b', LOOP_FOLD_SECONDS / 2);
+  assert.equal(step.moving, false);
+  assert.equal(scaleOf(step.folds, 'area-b'), 0);
+  for (const id of ids.filter((id) => id !== 'area-b')) assert.equal(scaleOf(step.folds, id), LOOP_SCALE, id);
+
+  // 改選 area-c：area-b 展開回原倍率，area-c 收起。
+  step = stepLoopFolds(step.folds, 'area-c', LOOP_FOLD_SECONDS);
+  assert.equal(scaleOf(step.folds, 'area-b'), LOOP_SCALE);
+  assert.equal(scaleOf(step.folds, 'area-c'), 0);
+
+  // 取消選取且減少動態：不經過補間，一步回到原倍率。
+  step = stepLoopFolds(step.folds, null, 0, { reducedMotion: true });
+  assert.equal(step.moving, false);
+  for (const id of ids) assert.equal(scaleOf(step.folds, id), LOOP_SCALE, id);
+  // 減少動態時選中也是一步收起。
+  step = stepLoopFolds(step.folds, 'area-d', 0, { reducedMotion: true });
+  assert.equal(scaleOf(step.folds, 'area-d'), 0);
+
+  // 每一格的收起行為相同：任一格被選中都在同樣時間收到 0。
+  for (const id of ids) {
+    const { folds: done } = stepLoopFolds(loopFolds(plan), id, LOOP_FOLD_SECONDS);
+    assert.deepEqual([...done].filter(([, v]) => v !== 1), [[id, 0]]);
+  }
+  // 收起只在畫面上縮放，動態配置與簽章不變。
+  assert.deepEqual(areaPlans(plan).map(motionSignature), signatures);
+  assert.ok(areaPlans(plan).every((t) => t.loops.every((loop) => loop.scale === LOOP_SCALE)));
+});
+
+test('選中議題區時（該格道具已收起），循環道具不擋住正式資料任何主題場景的零件：桌面與手機的預設視角', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  const plan = motionPlan(layout);
+  const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
+  // 選中後收起動畫跑完：選中格的道具縮到 0，其他格維持原大小。
+  const propsWhenSelected = (id) => {
+    const { folds } = stepLoopFolds(loopFolds(plan), id, LOOP_FOLD_SECONDS);
+    return plan.tiles.flatMap((tile) => loopCylinders(tile, loopFoldScale(folds.get(tile.id) ?? 1)));
+  };
+  // 每個零件取外框頂面中心。只保證每個零件的頂面看得到，側面下半部仍可能被擋。
+  const tops = heroPlan(layout).flatMap((hero) => heroBoxes(hero).map(({ name, min, max }) => (
+    { areaId: hero.areaId, name, at: [(min[0] + max[0]) / 2, SURFACE + max[1], (min[2] + max[2]) / 2] })));
+  // 選中議題區時鏡頭保持預設視角的俯角與方位角，對準格心，距離取 FOCUS_DISTANCE 與預設距離較近者。
+  // FOCUS_DISTANCE 抄自 island-view.js（focusArea，該模組載入 three.js，Node 不載）。
+  const FOCUS_DISTANCE = 14;
+  const failures = [];
+  for (const aspect of [2.6, 2.0, 1.6, 1.2, 0.9, 0.6, 0.46]) {
+    const view = homeView(outline, { fov: 32, aspect });
+    const distance = Math.min(FOCUS_DISTANCE, view.distance);
+    for (const tile of layout.tiles.filter((t) => t.heroSlot)) {
+      const camera = cameraAt({ x: tile.position.x, y: SURFACE, z: tile.position.z }, view, distance);
+      const props = propsWhenSelected(tile.id);
+      for (const top of tops.filter((t) => t.areaId === tile.id)) {
+        if (props.some((o) => blocked(top.at, camera, o))) failures.push(`長寬比 ${aspect}：${tile.id} 零件 ${top.name}`);
+      }
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 // 封閉折線繞 point 的圈數（俯視平面上）。

@@ -249,6 +249,8 @@ export function createIslandView(stage, {
     const cameraDistance = camera.position.distanceTo(controls.target);
     const showSmall = cameraDistance < LOD_DISTANCE;
     for (const mesh of smallDecor) mesh.visible = showSmall;
+    // 選中格的循環道具收起（用實際時間，暫停動畫時也收起），要在動畫更新矩陣之前。
+    const folding = motion.fold(dt, { reducedMotion: reducedMotion() });
     animator.tick(now, { night: lighting.night, fog: lighting.fog, skyHorizon: lighting.skyHorizon, lighting, cameraDistance });
     // 有裝飾動畫在走時每幀重畫，陰影每 shadowEvery 幀更新；畫面靜止時只在有變化才重畫，每次都更新陰影。
     const animating = animator.running;
@@ -261,7 +263,7 @@ export function createIslandView(stage, {
     labelRenderer.render(scene, camera);
     layoutLabels();
     // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
-    const continuous = moving || flight.active || shifting || !settled || animating;
+    const continuous = moving || flight.active || shifting || !settled || animating || folding;
     if (continuous) {
       const next = governor.frame(now);
       if (next) applyQuality(next);
@@ -441,6 +443,7 @@ export function createIslandView(stage, {
     selectedId = tiles.has(areaId) ? areaId : null;
     if (previous) paintTile(previous);
     if (selectedId) paintTile(selectedId);
+    motion.setSelected(selectedId);
     selection.select(selectedId && tileCenter(selectedId));
     selection.hover(hoveredId && tileCenter(hoveredId));
     // 有選中的議題區時，其他名牌變淡。

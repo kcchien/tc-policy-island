@@ -1,11 +1,13 @@
 // 島嶼的動態：每格的循環道具、市民（零件、配件、假影子）、沿步道環與橋繞行的公車與火車。步道與橋本身是島體（island-body-view.js）。
 // 配置一律來自 island-motion.js 的 motionPlan（只讀格子，不讀政見）；這裡只把配置畫成 3D。
-// 靜態零件（道具底座）用零件庫的共用幾何，之後由 instancify 合批；
-// 會動的零件每種一個 InstancedMesh，每幀由動畫迴圈更新矩陣，繪製呼叫數不隨格子數增加。
+// 靜態零件（道具周圍的鋪面與灌木）用零件庫的共用幾何，之後由 instancify 合批；
+// 道具與會動的零件每種一個 InstancedMesh，每幀由動畫迴圈更新矩陣，繪製呼叫數不隨格子數增加。
+// 選中議題區時該格道具收起（setSelected、fold），不擋住主題場景。
 
 import * as THREE from 'three';
 import {
-  CITIZEN_FIGURE, CITIZEN_ROLES, citizenPose, citizenZoom, loopPose, motionPlan, RIDE_LIFT, VEHICLE_HALF_WIDTH, vehiclePose,
+  CITIZEN_FIGURE, CITIZEN_ROLES, citizenPose, citizenZoom, loopFolds, loopFoldScale, loopPose, motionPlan, RIDE_LIFT,
+  stepLoopFolds, VEHICLE_HALF_WIDTH, vehiclePose,
 } from './island-motion.js';
 import { tileAt } from './island-body.js';
 import { material, PALETTE, PARTS, TILE_SURFACE } from './island-models.js';
@@ -327,7 +329,8 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
   const areas = plan.tiles.filter((t) => t.kind === 'area');
   const liftOf = (id) => groupOf(id)?.position.y ?? 0;
 
-  // 循環道具的底座放進格子群組（相對格心），零件庫合批時記得是哪一格。
+  // 道具周圍的鋪面與灌木放進格子群組（相對格心），零件庫合批時記得是哪一格。
+  // 道具本身（底座與會動零件）在下面另成 InstancedMesh，選中時要逐格收起。
   for (const tile of areas) {
     const group = groupOf(tile.id);
     for (const loop of tile.loops) {
@@ -346,16 +349,20 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
         part(unitIco(), PALETTE.foliage, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: -0.035 }),
         part(unitIco(), PALETTE.foliageDark, { scale: [0.022, 0.02, 0.022], x: 0.08, y: 0.016, z: 0.035 }),
       );
-      at(loop.scale).add(...LOOP_PROPS[tile.theme].base());
     }
   }
 
-  // 會動的道具零件：每個題材的每種零件一個 InstancedMesh，實例是用到該題材的每個道具。
+  // 道具零件：每個題材的每種零件一個 InstancedMesh，實例是用到該題材的每個道具，每幀依姿勢與收起比例更新。
+  // 底座零件不動，transform 固定是零件自己的位置與縮放。
   const movers = [];
   for (const [theme, prop] of Object.entries(LOOP_PROPS)) {
     const spots = areas.filter((t) => t.theme === theme).flatMap((tile) => tile.loops.map((loop) => ({ tile, loop })));
     if (spots.length === 0) continue;
-    for (const piece of prop.moving) {
+    const base = prop.base().map((p) => {
+      p.updateMatrix();
+      return { geometry: () => p.geometry, color: p.material.color.getHex(), transform: (pose, m) => m.copy(p.matrix) };
+    });
+    for (const piece of [...base, ...prop.moving]) {
       const mesh = movingMesh(piece.geometry(), piece.color, spots.length);
       scene.add(mesh);
       movers.push({ theme, piece, mesh, spots });
@@ -422,7 +429,8 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     for (const theme in LOOP_PROPS) poses[theme] = loopPose(theme, t);
     for (const { theme, piece, mesh, spots } of movers) {
       spots.forEach(({ tile, loop }, i) => {
-        placeAt(tile.center.x + loop.x, TILE_SURFACE + liftOf(tile.id), tile.center.z + loop.z, loop.mirror ? Math.PI : 0, loop.scale);
+        const scale = loop.scale * loopFoldScale(folds.get(tile.id));
+        placeAt(tile.center.x + loop.x, TILE_SURFACE + liftOf(tile.id), tile.center.z + loop.z, loop.mirror ? Math.PI : 0, scale);
         piece.transform(poses[theme], local);
         mesh.setMatrixAt(i, m.multiplyMatrices(place, local));
       });
@@ -484,6 +492,24 @@ export function createMotion(scene, layout, { level, groupOf, glowMaterial }) {
     for (const mesh of carMeshes) mesh.instanceMatrix.needsUpdate = true;
   }
 
+  // 選中的議題區與每格道具的收起進度（island-motion.js 的 stepLoopFolds）。
+  let selectedId = null;
+  let folds = loopFolds(plan);
+
   update(0);
-  return { plan, update };
+  return {
+    plan,
+    update,
+    // 選中或取消選取議題區（null）：該格道具開始收起，其他格展開。
+    setSelected(id) {
+      selectedId = id;
+    },
+    // 收起進度往前走 dt 秒（實際時間，暫停動畫時也走），回傳是否還在變化；畫面每幀在 update 之前呼叫。
+    fold(dt, { reducedMotion = false } = {}) {
+      const step = stepLoopFolds(folds, selectedId, dt, { reducedMotion });
+      const changed = [...step.folds].some(([id, v]) => v !== folds.get(id));
+      folds = step.folds;
+      return step.moving || changed;
+    },
+  };
 }
