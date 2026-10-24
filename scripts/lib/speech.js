@@ -1,7 +1,7 @@
 // 朗讀（GLOSSARY）：政見語音的固定設定與文字樣板。只給 Node 用。
 // speechScript 把一條政見組成送語音合成服務的文字，三位候選人同一樣板、不帶候選人資訊；
-// speechParts 把超過單次上限的文字依句子拆段。生成指令是 scripts/speak.js，清單格式見 data/audio/manifest.json。
-// audioProblems 對照公開政見與清單找出缺少的音檔，建置指令與上線關卡「音檔」共用。
+// speechParts 把超過單次上限的文字依句子拆段。生成指令是 scripts/speak.js，清單 data/audio/manifest.json 由它寫出。
+// audioProblems 對照公開政見與清單找出缺少或不符的音檔，生成指令、建置指令與上線關卡「音檔只來自政見語音清單」共用。
 
 import { createHash } from 'node:crypto';
 
@@ -43,16 +43,22 @@ export function speechScript(policy) {
   return `摘要。${speakable(policy.summary)}[:1]${quotes.join('[:0.8]')}`;
 }
 
-// 句子的邊界：句尾標點（可再接引號、括號與停頓標籤）之後。
-const SENTENCE_END = /(?<=[。！？!?][」』）)]*(?:\[:[\d.]+\])?)(?![」』）)[。！？!?])/u;
+// 句子的邊界：句尾標點（可再接引號、括號）與緊接的停頓標籤之後。停頓標籤跟著前一句，不單獨成段。
+const SENTENCE_END = /(?<=[。！？!?…][」』）)]*(?:\[:[\d.]+\])?)(?![」』）)[。！？!?…\[])/u;
 const CLAUSE_END = /(?<=[，、；,;])/u;
+const TRAILING_TAG = /^(.*?)(\[:[\d.]+\])?$/su;
 
+// 句子超過上限時先在逗號處切，仍超過才硬切；句尾的停頓標籤先拿開，切完再接回最後一段，不會被切斷。
 function splitLong(unit, limit) {
   if (charCount(unit) <= limit) return [unit];
-  const clauses = unit.split(CLAUSE_END);
-  if (clauses.length > 1) return pack(clauses, limit);
-  const chars = [...unit];
-  return Array.from({ length: Math.ceil(chars.length / limit) }, (_, i) => chars.slice(i * limit, (i + 1) * limit).join(''));
+  const [, body, tag = ''] = unit.match(TRAILING_TAG);
+  const room = limit - charCount(tag);
+  const clauses = body.split(CLAUSE_END);
+  const pieces = clauses.length > 1
+    ? pack(clauses, room)
+    : Array.from({ length: Math.ceil(charCount(body) / room) }, (_, i) => [...body].slice(i * room, (i + 1) * room).join(''));
+  pieces[pieces.length - 1] += tag;
+  return pieces;
 }
 
 // 依序把片段塞進不超過上限的段落。

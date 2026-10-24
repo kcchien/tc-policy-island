@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { buildPublicDataset, DatasetValidationError } from '../site/js/dataset.js';
 import { loadRawData, readJson } from './lib/raw-data.js';
-import { charCount, sha256, SPEECH_VOICE, speechParts, speechScript } from './lib/speech.js';
+import { AUDIO_MANIFEST, audioProblems, charCount, sha256, SPEECH_VOICE, speechParts, speechScript } from './lib/speech.js';
 import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
 
 const USAGE = formatUsage({
@@ -91,7 +91,9 @@ async function requestSpeech(text, key) {
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new ServiceError(response.status, (await response.text()).slice(0, 200));
-  return { bytes: Buffer.from(await response.arrayBuffer()), quota: Number(response.headers.get('x-used-quota')) };
+  // 沒有點數標頭時記 null（點數不明），不當成 0 點。
+  const quota = response.headers.get('x-used-quota');
+  return { bytes: Buffer.from(await response.arrayBuffer()), quota: quota === null || quota.trim() === '' ? NaN : Number(quota) };
 }
 
 async function requestWithRetry(text, key, delays) {
@@ -129,12 +131,6 @@ function writeManifest(path, manifest) {
   writeFileSync(path, `${JSON.stringify({ voice: manifest.voice, items }, null, 2)}\n`);
 }
 
-// 清單項目與現在的文字相符、音檔存在且雜湊相符，才不必重生成。
-function isCurrent(item, text, audioDir) {
-  if (!item || item.textSha256 !== sha256(text)) return false;
-  const path = join(audioDir, item.file);
-  return existsSync(path) && sha256(readFileSync(path)) === item.fileSha256;
-}
 
 // 估計點數：清單已有紀錄時用實際每字點數，否則以一字一點估。
 function quotaRate(manifest) {
@@ -159,8 +155,8 @@ function prune(manifest, audioDir, publicIds, dryRun) {
 
 async function main() {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(values.date)) throw new Error(`--date 應為 YYYY-MM-DD，實際為 ${values.date}`);
-  const delays = values['retry-delays'].split(',').map(Number);
-  if (delays.length === 0 || delays.some((d) => !Number.isFinite(d) || d < 0)) throw new Error(`--retry-delays 應為逗號分隔的秒數，實際為 ${values['retry-delays']}`);
+  const delays = values['retry-delays'].split(',').map((d) => (d.trim() === '' ? NaN : Number(d)));
+  if (delays.some((d) => !Number.isFinite(d) || d < 0)) throw new Error(`--retry-delays 應為逗號分隔的秒數，實際為 ${values['retry-delays']}`);
   const limit = values.limit === undefined ? Infinity : Number(values.limit);
   if (limit !== Infinity && (!Number.isInteger(limit) || limit < 1)) throw new Error(`--limit 應為正整數，實際為 ${values.limit}`);
 
@@ -170,13 +166,15 @@ async function main() {
     if (!candidateIds.has(id)) throw new Error(`--candidate ${id} 不是原始資料中的候選人`);
   }
   const audioDir = resolve(values.audio);
-  const manifestPath = join(audioDir, 'manifest.json');
+  const manifestPath = join(audioDir, AUDIO_MANIFEST);
   const manifest = readManifest(manifestPath);
 
+  // 清單項目與現在的文字相符、音檔存在且雜湊相符（與建置的判準相同），才不必重生成。
+  const fileSha256Of = (file) => (existsSync(join(audioDir, file)) ? sha256(readFileSync(join(audioDir, file))) : null);
   const scoped = dataset.policies
     .filter((p) => !values.candidate || values.candidate.includes(p.candidateId))
     .map((policy) => ({ policy, text: speechScript(policy) }));
-  const stale = scoped.filter(({ policy, text }) => !isCurrent(manifest.items[policy.id], text, audioDir));
+  const stale = scoped.filter(({ policy }) => audioProblems([policy], manifest, fileSha256Of).length > 0);
   const targets = stale.slice(0, limit);
   const totalChars = targets.reduce((sum, { text }) => sum + charCount(text), 0);
 

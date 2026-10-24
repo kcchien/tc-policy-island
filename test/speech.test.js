@@ -64,6 +64,19 @@ test('不超過上限時整段一份；超過時依句子拆成多段，每段�
   }
 });
 
+test('拆段時停頓標籤跟著前一句，不會落到下一段開頭或被切開', () => {
+  const script = speechScript(withText('甲'.repeat(20) + '。', ['乙'.repeat(20) + '…', '丙'.repeat(45)]));
+
+  for (const limit of [24, 30, 40]) {
+    const parts = speechParts(script, limit);
+    assert.equal(parts.join(''), script);
+    for (const part of parts) {
+      assert.ok([...part].length <= limit, part);
+      assert.doesNotMatch(part, /^\[|\[:[\d.]*$|^[\d.]*\]/, part);
+    }
+  }
+});
+
 test('單一句子就超過上限時，退到逗號處切開，仍不超過上限', () => {
   const sentence = `${'丁'.repeat(30)}，${'戊'.repeat(30)}。`;
 
