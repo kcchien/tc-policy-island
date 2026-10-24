@@ -1508,6 +1508,23 @@ body[data-view="island"] .card-height {
   flex: 1 1 14rem;
 }
 
+/* 只看出處說法不一：與全站篩選同一個條件，開卡片時帶入 */
+.card-conflict {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--button-height);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.card-conflict input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--laterite);
+}
+
 .card-filters input,
 .card-filters select {
   min-height: var(--button-height);
@@ -2680,6 +2697,10 @@ body[data-view="island"] .card-height {
   .card-expand {
     flex: 1 1 40%;
     margin-left: 0;
+  }
+
+  .card-conflict {
+    flex: 1 1 100%;
   }
 
   .card-filter-status {

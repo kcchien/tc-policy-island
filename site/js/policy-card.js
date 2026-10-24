@@ -17,7 +17,7 @@ import { policySpeech, policyText } from './policy-text.js';
 import { sourceReportHref } from './report-link.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 import {
-  candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
+  candidateCountText, DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
 } from './ui-text.js';
 
 // 桌面島嶼檢視的卡片高度偏好：預設接近全高，使用者按「縮小卡片」改停靠在下方後記住。
@@ -200,6 +200,8 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
     el('option', { value: '' }, T.allDistricts),
     TAICHUNG_DISTRICTS.map((name) => el('option', { value: name }, name)),
   );
+  // 只看出處說法不一：與全站篩選同一個條件，開卡片時帶入，讀者可在卡片內取消。
+  const conflict = el('input', { id: 'card-conflict', type: 'checkbox' });
   const filterStatus = el('p', { class: 'card-filter-status', role: 'status' });
   const filters = el(
     'form',
@@ -207,6 +209,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
     // 欄位名稱只給輔助科技讀，畫面上用提示文字與預設選項說明，省下卡片高度。
     el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, T.searchLabel), search),
     el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, T.districts), district),
+    el('label', { class: 'card-conflict', for: 'card-conflict' }, conflict, el('span', {}, FILTER_TEXT.conflictOnly)),
     blindButton,
     expandButton,
   );
@@ -352,7 +355,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
 
   const render = ({ focusPolicyId = null } = {}) => {
     const { row, vm } = current;
-    const matcher = policyMatcher({ query: search.value, district: district.value });
+    const matcher = policyMatcher({ query: search.value, district: district.value, conflictOnly: conflict.checked });
     // 重畫前讀者自己點開的政見，重畫後照樣展開。
     const openIds = new Set([...body.querySelectorAll('.policy-details[open]')].map((d) => d.closest('.policy').id.slice('card-policy-'.length)));
     const tabbed = tabbedQuery.matches;
@@ -431,7 +434,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
 
   return {
     element: dialog,
-    // filter 是全站的篩選條件 { query, district }，開卡片時帶進欄內篩選；指定政見時清空，那筆政見才一定看得到。
+    // filter 是全站的篩選條件 { query, district, conflictOnly }，開卡片時帶進欄內篩選；指定政見時清空，那筆政見才一定看得到。
     open(row, vm, { focusPolicyId = null, filter = {} } = {}) {
       const { issueArea } = row;
       const sameArea = current?.row.issueArea.id === issueArea.id && dialog.open;
@@ -447,6 +450,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
         stopSpeaking();
         search.value = filter.query ?? '';
         district.value = TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
+        conflict.checked = Boolean(filter.conflictOnly);
         // 換議題區時清掉上一區的展開狀態。
         body.replaceChildren();
         setExpanded(false);
@@ -455,6 +459,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
       if (focusPolicyId) {
         search.value = '';
         district.value = '';
+        conflict.checked = false;
       }
       // 指定政見時分頁切到那位候選人。
       const focusIndex = focusPolicyId

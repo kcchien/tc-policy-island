@@ -382,7 +382,7 @@ function startApp(vm, state, initialView) {
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const filter = unfiltered ? {} : { query: state.query, district: state.district };
+    const filter = unfiltered ? {} : { query: state.query, district: state.district, conflictOnly: state.conflict };
     const show = () => card.open(row, vm, { focusPolicyId: policyId, filter });
     if (view === 'island') {
       setPanelOpen(false);
