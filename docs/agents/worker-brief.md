@@ -29,8 +29,7 @@
 
 ## 分支與權限
 
-- 你在自己的 git worktree 裡，分支已建好，只在這個分支 commit。commit 訊息結尾加：
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- 你在自己的 git worktree 裡，分支已建好，只在這個分支 commit。commit 訊息結尾加 `Co-Authored-By: <模型與版本> <noreply@anthropic.com>`。Co-Authored-By 用你實際執行的模型與版本（例如 Claude Opus 5.5），不確定就看畫面底部的模型名稱。
 - 開工前 `git merge integration`；完成回報前再 merge 一次並解衝突、跑 `npm run check`。
 - push、合併到 integration、關票、在 GitHub 留言、部署、改 repo 可見度，一律留給管理者，除非派工訊息明確授權。
 

@@ -28,5 +28,6 @@
 
 - 本站不再是「只有靜態檔」：`functions/` 只放這一個統計端點，不得放其他後端邏輯（`AGENTS.md`「技術限制」）。`test/repo.test.js` 檢查 `functions/` 只有這一個檔案。
 - 部署指令在 repo 根目錄執行 `wrangler pages deploy site`，會一併上傳 `functions/`。
+- Cloudflare 帳號須啟用 Analytics Engine，否則部署會在上傳後回錯誤碼 10089。`scripts/deploy.js` 在上傳前先對資料集查詢一次，未啟用就停下並印出後台啟用網址。
 - 寫入靠綁定，不需要權杖。讀取統計要用 Analytics Engine SQL API 與帶「Account Analytics 讀取」權限的權杖，由維護者另行處理。
 - 本機預覽（`scripts/preview.js`）沒有這個端點，送出會失敗並被忽略，不影響畫面。
