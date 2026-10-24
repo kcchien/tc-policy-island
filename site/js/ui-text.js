@@ -139,6 +139,12 @@ export const ISLAND_TEXT = {
   noWebgl: '此裝置無法顯示島嶼檢視，已改用表格檢視。',
 };
 
+// 頁首的隨機一題按鈕：只以議題區為單位，不提任何候選人。
+export const RANDOM_AREA_TEXT = {
+  button: '隨機看一題',
+  hint: '隨機選一個議題區，三位候選人的政見並排',
+};
+
 // 工具列的背景音樂開關（用按下與否表示開或關，名稱固定）與音量滑桿。
 export const MUSIC_TEXT = {
   button: '背景音樂',

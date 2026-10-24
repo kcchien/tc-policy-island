@@ -39,7 +39,7 @@ site/
 ## site/js：資料、進站流程與共用介面
 
 ```
-js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js
+js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js
 js/table-view.js  js/policy-card.js  js/candidate-card.js  js/sheet.js
 js/island-list.js  js/ui-text.js  js/dom.js
 ```
@@ -55,6 +55,10 @@ js/island-list.js  js/ui-text.js  js/dom.js
 ### 開啟候選人資料卡
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
+
+### 隨機一題
+
+`main.js` 的 `openRandomArea()`，`startApp` 內的函式（`main.js` 是入口，沒有 export），頁首按鈕呼叫，其他流程在 `startApp` 內直接呼叫或以回呼傳入：以 `random-area.js` 的 `pickRandomArea(vm.rows, random, previousId)` 從未篩選的全部議題區均勻選一個（排除目前選中的議題區），再走 `openCard(areaId, null, { unfiltered: true })`，卡片不帶入全站篩選。表格檢視先捲到該列；島嶼檢視等載入完成、飛到該區再開卡。
 
 ## site/js：島嶼檢視
 

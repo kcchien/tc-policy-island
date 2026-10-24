@@ -160,12 +160,37 @@ select {
   font-size: 0.75rem;
 }
 
-.title-links a {
+.title-links :is(a, .random-area-button) {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
   font-size: 0.875rem;
   font-weight: bold;
+}
+
+/* 隨機一題：頁首連結列的第一顆，尺寸同頁首連結，填色同工具列按下的按鈕 */
+.random-area-button {
+  gap: 4px;
+  padding: 2px 12px 2px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--laterite);
+  color: var(--rice);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.random-area-button:hover {
+  background: var(--pressed);
+}
+
+.random-area-button:active {
+  transform: translateY(1px);
+}
+
+.random-area-button .tool-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .hud-toolbar {
@@ -1891,7 +1916,7 @@ body[data-view="island"] .card-height {
     line-height: 1.4;
   }
 
-  body[data-view="island"] .title-links a {
+  body[data-view="island"] .title-links :is(a, .random-area-button) {
     min-height: 28px;
     font-size: 0.8125rem;
   }
