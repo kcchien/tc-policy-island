@@ -1,4 +1,5 @@
-// 生成政見語音：每條公開政見組成朗讀文字，送語音合成服務生成 mp3，存進 data/audio/ 並維護清單 manifest.json。
+// 生成政見語音：每條公開政見組成朗讀文字，送語音合成服務生成 mp3，用 ffmpeg 轉成清單設定的位元率，存進 data/audio/ 並維護清單 manifest.json。
+// --reencode 不呼叫服務，只把既有音檔轉成現行位元率。
 // 三位候選人同一組設定與文字樣板，見 scripts/lib/speech.js 與 GLOSSARY「朗讀」。參數與注意事項見 USAGE（--help）。
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -121,17 +122,18 @@ function stripId3(bytes) {
 }
 
 // 語音設定去掉位元率：只有位元率不同時可以轉碼既有音檔，不必重生成。
-const voiceWithoutBitrate = ({ bitrate: _, ...voice } = {}) => JSON.stringify(voice);
+const voiceKeyWithoutBitrate = ({ bitrate: _, ...voice } = {}) => JSON.stringify(voice);
+const isCurrentVoice = (voice) => JSON.stringify(voice) === JSON.stringify(SPEECH_VOICE);
 
-// otherBitrate 為 true 時（--reencode）接受只有位元率與現行設定不同的清單，舊清單沒有 bitrate 也算。
-function readManifest(path, { otherBitrate = false } = {}) {
+// allowBitrateMismatch 為 true 時（--reencode）接受只有位元率與現行設定不同的清單，舊清單沒有 bitrate 也算。
+function readManifest(path, { allowBitrateMismatch = false } = {}) {
   if (!existsSync(path)) return { voice: { ...SPEECH_VOICE }, items: {} };
   const manifest = readJson(path);
-  if (JSON.stringify(manifest.voice) === JSON.stringify(SPEECH_VOICE)) return manifest;
-  if (voiceWithoutBitrate(manifest.voice) !== voiceWithoutBitrate(SPEECH_VOICE)) {
+  if (isCurrentVoice(manifest.voice)) return manifest;
+  if (voiceKeyWithoutBitrate(manifest.voice) !== voiceKeyWithoutBitrate(SPEECH_VOICE)) {
     throw new Error(`清單 ${path} 的語音設定 ${JSON.stringify(manifest.voice)} 與現行設定 ${JSON.stringify(SPEECH_VOICE)} 不同；刪掉清單與音檔後重新生成全部，三人才會是同一聲線`);
   }
-  if (otherBitrate) return manifest;
+  if (allowBitrateMismatch) return manifest;
   throw new Error(`清單 ${path} 的位元率 ${manifest.voice.bitrate ?? '（未記錄）'} 與現行設定 ${SPEECH_VOICE.bitrate} 不同；先跑 node scripts/speak.js --reencode 把既有音檔轉成現行設定`);
 }
 
@@ -164,40 +166,43 @@ function prune(manifest, audioDir, publicIds, dryRun) {
 }
 
 // --reencode：清單只有位元率與現行設定不同時，把既有音檔重新轉碼，更新 fileSha256 並把 voice 改成現行設定。
-// 不呼叫服務。音檔不存在或雜湊與清單不符的項目跳過，留給下次生成。全部轉完才寫回，中途失敗時音檔與清單維持原樣。
+// 不呼叫服務。音檔不存在或雜湊與清單不符的項目跳過，留給下次生成。
+// 每轉完一個檔就寫回清單，項目暫記 bitrate 表示已轉過；中途中斷後重跑會跳過這些，不重複轉碼。全部轉完才改 voice、拿掉暫記。
 async function reencode(audioDir, manifestPath, dryRun) {
   if (!existsSync(manifestPath)) throw new Error(`找不到清單 ${manifestPath}，沒有可轉碼的音檔`);
-  const manifest = readManifest(manifestPath, { otherBitrate: true });
-  if (JSON.stringify(manifest.voice) === JSON.stringify(SPEECH_VOICE)) {
+  const manifest = readManifest(manifestPath, { allowBitrateMismatch: true });
+  if (isCurrentVoice(manifest.voice)) {
     console.log(`清單已是現行設定（位元率 ${SPEECH_VOICE.bitrate}），不用轉碼`);
     return;
   }
   const from = manifest.voice.bitrate ?? '（未記錄）';
-  const targets = [];
+  // 文字相同的政見共用一個音檔，同一個檔只轉一次。
+  const targets = new Map();
   const skipped = [];
   for (const [id, item] of Object.entries(manifest.items)) {
     const path = join(audioDir, item.file);
     if (!existsSync(path)) skipped.push(`${id}：音檔 ${item.file} 不存在`);
     else if (sha256(readFileSync(path)) !== item.fileSha256) skipped.push(`${id}：音檔與清單的雜湊不符`);
-    else targets.push(item);
+    else if (item.bitrate !== SPEECH_VOICE.bitrate) targets.set(item.file, [...(targets.get(item.file) ?? []), item]);
   }
+  const count = [...targets.values()].flat().length;
   for (const line of skipped) console.log(`跳過 ${line}，下次生成時重生成`);
   if (dryRun) {
-    console.log(`要轉碼 ${targets.length} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
+    console.log(`要轉碼 ${count} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
     return;
   }
 
-  const ffmpeg = findFfmpeg();
-  // 文字相同的政見共用一個音檔，同一個檔只轉一次。
-  const converted = new Map();
-  for (const item of targets) {
-    if (!converted.has(item.file)) converted.set(item.file, await transcodeSpeech(readFileSync(join(audioDir, item.file)), ffmpeg));
+  const ffmpeg = targets.size > 0 ? findFfmpeg() : null;
+  for (const [file, items] of targets) {
+    const bytes = await transcodeSpeech(readFileSync(join(audioDir, file)), ffmpeg);
+    writeFileSync(join(audioDir, file), bytes);
+    for (const item of items) Object.assign(item, { fileSha256: sha256(bytes), bitrate: SPEECH_VOICE.bitrate });
+    writeManifest(manifestPath, manifest);
   }
-  for (const [file, bytes] of converted) writeFileSync(join(audioDir, file), bytes);
-  for (const item of targets) item.fileSha256 = sha256(converted.get(item.file));
+  for (const item of Object.values(manifest.items)) delete item.bitrate;
   manifest.voice = { ...SPEECH_VOICE };
   writeManifest(manifestPath, manifest);
-  console.log(`轉碼 ${targets.length} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
+  console.log(`轉碼 ${count} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
 }
 
 async function main() {

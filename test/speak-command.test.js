@@ -22,6 +22,8 @@ const YI_TEXT = '摘要。每區至少設一所托育中心，收托名額增加
 const FAKE_FFMPEG = repoPath('test/fixtures/fake-ffmpeg');
 const transcoded = (bytes) => Buffer.concat([Buffer.from('TRANSCODED-48k:'), Buffer.from(bytes)]);
 const VOICE = { provider: 'voai', name: '國賢', style: '預設', model: 'Neo', speed: 1, bitrate: '48k' };
+// 加位元率之前的語音設定。
+const { bitrate: _, ...OLD_VOICE } = VOICE;
 
 // 非同步執行，假伺服器才能在同一個行程裡回應。環境變數不繼承外面的金鑰；ffmpeg 預設用假的。
 function speak(args, { key = 'test-key', ffmpeg = FAKE_FFMPEG } = {}) {
@@ -160,11 +162,11 @@ test('清單的語音設定與現行設定不同時直接失敗，不呼叫服�
   assert.equal(service.requests.length, 0);
 });
 
-// 轉碼前的舊清單：voice 沒有 bitrate，音檔是服務原樣回傳的位元組。
-function writeOldManifest(audioDir, voice = { provider: 'voai', name: '國賢', style: '預設', model: 'Neo', speed: 1 }) {
+// 轉碼前的舊清單：voice 沒有 bitrate，音檔是服務原樣回傳的位元組（預設是假服務的「FAKE-MP3:<文字>」）。
+function writeOldManifest(audioDir, { voice = OLD_VOICE, bytesOf = (text) => Buffer.from(`FAKE-MP3:${text}`) } = {}) {
   const items = {};
   for (const [id, text] of [['sample-jia-001', JIA_TEXT], ['sample-yi-001', YI_TEXT]]) {
-    const bytes = Buffer.from(`FAKE-MP3:${text}`);
+    const bytes = bytesOf(text);
     items[id] = { textSha256: sha256(text), file: `${sha256(text)}.mp3`, fileSha256: sha256(bytes), chars: [...text].length, quota: 7, generatedAt: '2026-10-20' };
     writeFileSync(join(audioDir, items[id].file), bytes);
   }
@@ -197,6 +199,27 @@ test('--reencode 把舊清單（沒有位元率）的既有音檔轉成現行設
   assert.equal(service.requests.length, 0);
 });
 
+test('--reencode 中途中斷後重跑，已轉過的音檔不再重轉，轉完拿掉項目上的暫時標記', async () => {
+  const audioDir = tempDir('speak-audio-');
+  const old = writeOldManifest(audioDir);
+  // 模擬上次只轉完甲：音檔已是轉碼後的位元組，項目記著轉成的位元率，voice 還是舊的。
+  const jiaBytes = transcoded(`FAKE-MP3:${JIA_TEXT}`);
+  writeFileSync(join(audioDir, old['sample-jia-001'].file), jiaBytes);
+  const interrupted = { ...old, 'sample-jia-001': { ...old['sample-jia-001'], fileSha256: sha256(jiaBytes), bitrate: '48k' } };
+  writeFileSync(join(audioDir, 'manifest.json'), JSON.stringify({ voice: OLD_VOICE, items: interrupted }));
+
+  const { code, output } = await speak(['--audio', audioDir, '--reencode'], { key: null });
+
+  assert.equal(code, 0, output);
+  const manifest = readManifest(audioDir);
+  assert.deepEqual(manifest.voice, VOICE);
+  assert.deepEqual(readFileSync(join(audioDir, old['sample-jia-001'].file)), jiaBytes);
+  assert.deepEqual(manifest.items['sample-jia-001'], { ...old['sample-jia-001'], fileSha256: sha256(jiaBytes) });
+  const yiBytes = transcoded(`FAKE-MP3:${YI_TEXT}`);
+  assert.deepEqual(manifest.items['sample-yi-001'], { ...old['sample-yi-001'], fileSha256: sha256(yiBytes) });
+  assert.match(output, /轉碼 1 條/);
+});
+
 test('--reencode 跳過不存在或雜湊與清單不符的音檔並列出，留給下次生成', async () => {
   const audioDir = tempDir('speak-audio-');
   const old = writeOldManifest(audioDir);
@@ -215,7 +238,7 @@ test('--reencode 跳過不存在或雜湊與清單不符的音檔並列出，留
 
 test('--reencode 遇到清單已是現行設定時不重轉；聲線等其他設定不同時直接失敗', async () => {
   const current = tempDir('speak-audio-');
-  writeOldManifest(current, VOICE);
+  writeOldManifest(current, { voice: VOICE });
   const before = readFileSync(join(current, 'manifest.json'), 'utf8');
   const same = await speak(['--audio', current, '--reencode'], { key: null });
   assert.equal(same.code, 0, same.output);
@@ -223,7 +246,7 @@ test('--reencode 遇到清單已是現行設定時不重轉；聲線等其他設
   assert.match(same.output, /已是現行設定/);
 
   const other = tempDir('speak-audio-');
-  const old = writeOldManifest(other, { provider: 'voai', name: '別的聲音', style: '預設', model: 'Neo', speed: 1 });
+  const old = writeOldManifest(other, { voice: { ...OLD_VOICE, name: '別的聲音' } });
   const failed = await speak(['--audio', other, '--reencode'], { key: null });
   assert.notEqual(failed.code, 0);
   assert.match(failed.output, /語音設定/);
@@ -390,12 +413,7 @@ test('真 ffmpeg：--reencode 把舊清單的 128 kbps 音檔轉成 48 kbps，�
   const service = await startFakeSpeechService({ audio: SILENCE_128K });
   t.after(service.close);
   const audioDir = tempDir('speak-audio-');
-  const old = writeOldManifest(audioDir);
-  for (const item of Object.values(old)) {
-    writeFileSync(join(audioDir, item.file), SILENCE_128K);
-    item.fileSha256 = sha256(SILENCE_128K);
-  }
-  writeFileSync(join(audioDir, 'manifest.json'), JSON.stringify({ voice: { provider: 'voai', name: '國賢', style: '預設', model: 'Neo', speed: 1 }, items: old }));
+  writeOldManifest(audioDir, { bytesOf: () => SILENCE_128K });
 
   const { code, output } = await speak(['--audio', audioDir, '--reencode'], { key: null, ffmpeg: realFfmpeg?.ffmpeg });
 
