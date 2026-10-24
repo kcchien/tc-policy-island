@@ -2,7 +2,7 @@
 // 動態數量固定（ADR 0001）：每個議題區格子的動態元素數量與強度相同，配置只讀格子的種類、順序與位置，
 // 不讀標記亮暗與政見。上線關卡「動態數量固定」會換一份政見資料重算，結果必須相同，關卡也要載入這裡 import 的 island-body.js。
 // 市民是 Q 版零件比例與臉，角色配件三類每格同組成，繞自己島的步道環並走上一座橋到拱頂折返；拉遠時依 citizenZoom 放大。
-// 環線沿步道環與橋的外圈；循環動畫、市民與車輛各自隨時間的姿勢也在這裡算。
+// 環線沿步道環與橋的外圈；循環動畫、市民與車輛各自隨時間的姿勢，以及選中議題區時道具的收起進度也在這裡算。
 
 import { bridgeLift, islandBody, outerLoop, WALKWAY_APOTHEM } from './island-body.js';
 
@@ -31,23 +31,20 @@ export const MOTION_LEVELS = {
   low: { citizensPerTile: 1, buses: 1, trains: 1 },
 };
 
-// 循環道具的位置（相對格心）：格子東西兩側、外側標記的西邊與東邊，左右對稱，與三個標記的距離對稱。
-// 放在主題場景南邊偏外，手機預設視角（鏡頭轉到西南或東南）看過去也不擋主題場景；
-// 乘倍率後底座不進北側的主題場景與元素區（見 island-body.js 的 TILE_SLOTS）、不碰標記與市民路線，測試會檢查。
-export const LOOP_SPOTS = [{ x: -0.62, z: 0.46 }, { x: 0.62, z: 0.46 }];
+// 循環道具的位置（相對格心）：格子東西兩側、標記列北邊，左右對稱，與三個標記的距離對稱。
+// 放大後底座仍不進北側的主題場景與元素區（z ≤ 0.24，見 island-body.js 的 TILE_SLOTS）、不碰標記與市民路線，測試會檢查。
+export const LOOP_SPOTS = [{ x: -0.7, z: 0.34 }, { x: 0.7, z: 0.34 }];
 // 市民走的路線：沿自己那座島的步道環，走在中線內側 CITIZEN_INSET（車輛走外側車道）。值是格心到邊的距離。
 const CITIZEN_INSET = 0.075;
 export const CITIZEN_APOTHEM = WALKWAY_APOTHEM - CITIZEN_INSET;
 
-// 道具與市民的倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率。
+// 道具與市民的放大倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率，讓全景第一眼就看得到動態。
 // 倍率是動態強度的一部分，每格相同（motionSignature 會比對）。
-// 道具再高或會動零件再寬，選中議題區時就會在手機的預設視角擋住主題場景，所以道具比原尺寸略小。
-// 市民放大，讓全景第一眼就看得到動態。
 // 市民沿格子南緣走過外側標記前方，再高就會在手機的預設視角擋住標記；身寬受步道上的車道限制（市民走內側，公車靠中線）。
 // 市民另隨鏡頭距離放大（citizenZoom），放大到上限時仍要守住這兩個限制。
-export const LOOP_SCALE = 0.9;
+export const LOOP_SCALE = 2;
 export const CITIZEN_SCALE = 1.05;
-// 乘倍率後的外形（場景單位），測試用來確認不擋住標記與主題場景、不進元素區、不碰市民。道具：半徑 LOOP_CORE 的柱子高到 LOOP_HEIGHT，
+// 放大後的外形（場景單位），測試用來確認不擋住標記、不進元素區、不碰市民。道具：半徑 LOOP_CORE 的柱子高到 LOOP_HEIGHT，
 // 會動零件（風車葉、旗、吊臂）只在 LOOP_REACH_FROM 以上，掃過半徑 LOOP_REACH。
 // 原尺寸見 island-motion-view.js 的 LOOP_PROPS，改形狀時要守住這些範圍。市民的外形範圍在 CITIZEN_FIGURE 之後。
 export const LOOP_HEIGHT = 0.45 * LOOP_SCALE;
@@ -308,6 +305,31 @@ export function loopPose(theme, t) {
       return {};
   }
 }
+
+// 循環道具收起：選中議題區時，該格的兩個道具在 LOOP_FOLD_SECONDS 內縮到 0，不擋住主題場景（手機的預設視角斜看過去，
+// 道具正好站在主題場景前方）；取消選取或改選他格時恢復。只是畫面上的縮放，不改動態配置，每格行為相同。
+export const LOOP_FOLD_SECONDS = 0.3;
+
+// 每格的收起進度，Map 從議題區識別碼到 0~1（1 是展開、0 是收起），一開始全部展開。
+export const loopFolds = (plan) => new Map(plan.tiles.filter((t) => t.kind === 'area').map((t) => [t.id, 1]));
+
+// 收起進度往目標走 dt 秒：選中的格子往 0，其他往 1，等速走完 LOOP_FOLD_SECONDS。減少動態時直接到位。
+// 回傳新的 Map 與是否還在變化（moving），畫面據此決定要不要繼續重畫。
+export function stepLoopFolds(folds, selectedId, dt, { reducedMotion = false } = {}) {
+  let moving = false;
+  const next = new Map();
+  for (const [id, value] of folds) {
+    const target = id === selectedId ? 0 : 1;
+    const step = reducedMotion ? 1 : dt / LOOP_FOLD_SECONDS;
+    const stepped = value < target ? Math.min(target, value + step) : Math.max(target, value - step);
+    if (stepped !== target) moving = true;
+    next.set(id, stepped);
+  }
+  return { folds: next, moving };
+}
+
+// 收起進度換成道具的縮放比例（乘在 LOOP_SCALE 上）：頭尾放慢的平滑曲線。
+export const loopFoldScale = (value) => value * value * (3 - 2 * value);
 
 // 一格動態的數量與強度，不含格子識別碼、位置、題材與市民的角色。議題區格子之間必須完全相同。
 // 市民路線轉回過橋方向朝東再比對：每格過的橋方向不同，但路線的形狀與長度必須相同。
