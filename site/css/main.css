@@ -1617,14 +1617,14 @@ body[data-view="island"] .card-height {
   font-size: 0.75rem;
 }
 
-/* 出處說法不一（兩說並列）：實心主色膠囊加左右箭頭，一眼可辨；三人同樣式，仍是中性的主色 */
+/* 出處說法不一（兩說並列）：實心炭灰膠囊加左右箭頭，一眼可辨；不用主色紅土，避免讀成警示或扣分；三人同樣式 */
 .policy-flag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 1px 10px 1px 8px;
   border-radius: 999px;
-  background: var(--laterite);
+  background: var(--charcoal-soft);
   color: var(--rice);
   font-weight: bold;
 }
