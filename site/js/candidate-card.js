@@ -119,7 +119,6 @@ function profileCard(content, { idPrefix, focused, symbol }) {
         ]),
       ),
     content.source && sourceBlock(content.source),
-    el('a', { class: 'policy-link', href: candidateHref(content.candidateId) }, T.cardLink),
   );
 }
 
