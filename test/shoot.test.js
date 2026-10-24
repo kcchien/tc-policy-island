@@ -92,6 +92,17 @@ test('場景：網址帶上檢視參數，步驟依序為就緒、時段、點�
   assert.equal(scenario.steps[4].selector, '#tool-index');
 });
 
+test('媒體類型：預設 screen 不切換；--media print 在點擊與等待之後才切到列印樣式；其他值擋下', () => {
+  assert.equal(parseShootArgs(['shot']).media, 'screen');
+  assert.ok(!buildScenario(parseShootArgs(['shot']), 'http://localhost:8123/').steps.some((s) => s.type === 'media'));
+  const options = parseShootArgs(['--media', 'print', '--click', '.shortlist-open', '--wait', '100']);
+  assert.equal(options.media, 'print');
+  const { steps } = buildScenario(options, 'http://localhost:8123/');
+  assert.deepEqual(steps.map((s) => s.type), ['ready', 'settle', 'time', 'settle', 'click', 'settle', 'wait', 'media', 'settle']);
+  assert.equal(steps[7].media, 'print');
+  assert.throws(() => parseShootArgs(['--media', 'paper']), /--media/);
+});
+
 test('場景：完整動態時等到鏡頭飛行與時段補間都跑完；--time auto 不切時段；--path 換頁面', () => {
   const options = parseShootArgs(['--motion', 'full', '--time', 'auto', '--path', '/method.html']);
 

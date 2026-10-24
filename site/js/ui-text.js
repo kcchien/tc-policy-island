@@ -97,8 +97,8 @@ export const POLICY_CARD_TEXT = {
   copied: '已複製',
   copyFailed: '無法自動複製，已選取文字，請自行複製',
   speak: '朗讀',
-  speakHint: '用瀏覽器內建語音唸出摘要與原文',
-  stopSpeaking: '停止朗讀',
+  // 朗讀鈕名稱固定，播放中以按下狀態表示，再按一次停止。
+  speakHint: '朗讀這筆政見的摘要與原文，再按一次停止',
   // 複製成一段話的各行。
   copyLines: {
     heading: (areaName, candidateName) => `【${areaName}】${candidateName}`,
@@ -117,6 +117,12 @@ export const POLICY_CARD_TEXT = {
   report: '你找到這位候選人在這題的公開說法？把連結給我們。',
   reportHint: '開啟 GitHub 回報頁，已填好議題區與候選人，只需貼上候選人本人或中選會發布的連結',
   reportTitle: (areaName, candidateName) => `補件：${areaName}／${candidateName}`,
+  // 下一題：只依議題區編號，最後一題接回第一題。
+  // 我的對照單：每筆政見標題列的勾選框，三欄同一位置。
+  pick: '加入對照單',
+  stepsLabel: '換議題區',
+  previous: '← 上一題',
+  next: '下一題 →',
   // 卡片內的篩選，三欄一起套用。
   filtersLabel: '在這個議題區篩選政見',
   searchLabel: '在這個議題區找政見的關鍵字',
@@ -129,6 +135,31 @@ export const POLICY_CARD_TEXT = {
     if (matchCount === 0) return '這個議題區沒有符合篩選條件的政見。';
     return `這個議題區符合篩選條件的政見共 ${matchCount} 筆。`;
   },
+};
+
+// 閱讀進度：看過的議題區在索引與表格打淡勾。只記在讀者的瀏覽器，沒有獎勵與完成訊息。
+export const READING_TEXT = {
+  mark: '✓',
+  seen: '已看過',
+  note: '看過的議題區會打淡勾，只記在這台裝置的瀏覽器。',
+  clear: '清除紀錄',
+};
+
+// 我的對照單：只列出勾選政見所在的議題區，三欄並排。只顯示勾選總數，不依候選人分。
+export const SHORTLIST_TEXT = {
+  button: (count) => `我的對照單（${count} 條）`,
+  buttonHint: '只列出你勾選的政見所在的議題區，可列印或把網址傳給別人',
+  title: '我的對照單',
+  note: '只列出你勾選的政見所在的議題區；三位候選人照排序並排，沒有政見的欄位照常列出。勾選只記在這台裝置的瀏覽器。',
+  picked: '已勾選',
+  // 一條政見有多個出處時依序編號。
+  sourceLink: (index, total) => (total > 1 ? `出處 ${index + 1}` : '出處'),
+  print: '列印',
+  copyLink: '複製網址',
+  copied: '網址已複製',
+  copyFailed: '無法自動複製，已選取網址，請自行複製',
+  empty: '還沒有勾選任何政見。在政見卡片上勾選「加入對照單」，就會出現在這裡。',
+  footer: (cutoffDate, url) => `資料截止 ${cutoffDate}，整理自台中政見島 ${url}`,
 };
 
 // 候選人資料卡。

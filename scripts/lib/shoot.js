@@ -14,6 +14,8 @@ export const DEVICES = {
 
 export const TIMES = ['auto', ...TIMES_OF_DAY.map((t) => t.id)];
 export const MOTIONS = ['reduce', 'full'];
+// 媒體類型：print 時套用頁面的列印樣式（例如我的對照單的列印版面）。
+export const MEDIA_TYPES = ['screen', 'print'];
 export const COMMANDS = ['shot', 'measure'];
 
 // 完整動態時，每一步之後至少等鏡頭飛完與時段補間跑完再截圖，避免截到半途。減少動態時鏡頭與時段直接到位。
@@ -24,6 +26,7 @@ export const SETTLE_FRAMES = 8;
 const OPTIONS = {
   device: { type: 'string', default: 'desktop' },
   motion: { type: 'string', default: 'reduce' },
+  media: { type: 'string', default: 'screen' },
   time: { type: 'string', default: 'day' },
   path: { type: 'string', default: '/' },
   view: { type: 'string' },
@@ -77,6 +80,7 @@ export const USAGE = formatUsage({
         ['--device desktop|laptop|phone', '裝置：desktop 1440x900、laptop 1024x768、phone 390x844 三倍像素加觸控（預設 desktop）'],
         ['--motion reduce|full', '減少動態（鏡頭與時段直接到位）或完整動態（每步後等動畫跑完）（預設 reduce）'],
         ['--time auto|dawn|day|dusk|night', '時段；auto 依台灣時間（預設 day）'],
+        ['--media screen|print', '媒體類型；print 套用頁面的列印樣式（預設 screen）'],
       ],
     },
     {
@@ -132,6 +136,7 @@ export function parseShootArgs(argv) {
     command,
     device: oneOf('device', values.device, Object.keys(DEVICES)),
     motion: oneOf('motion', values.motion, MOTIONS),
+    media: oneOf('media', values.media, MEDIA_TYPES),
     time: oneOf('time', values.time, TIMES),
     path: values.path,
     params: {
@@ -164,6 +169,8 @@ export function buildScenario(options, baseUrl) {
   if (options.time !== 'auto') steps.push({ type: 'time', time: options.time }, settle);
   for (const click of options.clicks) steps.push({ type: 'click', ...click }, settle);
   if (options.waitMs > 0) steps.push({ type: 'wait', ms: options.waitMs });
+  // 列印樣式在點擊與等待之後才套用（列印樣式常把按鈕藏起來，先套用就點不到）。
+  if (options.media !== 'screen') steps.push({ type: 'media', media: options.media }, settle);
   return {
     url: url.href,
     metrics: DEVICES[options.device],

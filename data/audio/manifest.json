@@ -1,0 +1,2715 @@
+{
+  "voice": {
+    "provider": "voai",
+    "name": "國賢",
+    "style": "預設",
+    "model": "Neo",
+    "speed": 1
+  },
+  "items": {
+    "chiang-chi-chen-001": {
+      "textSha256": "4d3d10259ba7aa041303b872b502a682177cf853232f1d3a4e1567360352cc16",
+      "file": "4d3d10259ba7aa041303b872b502a682177cf853232f1d3a4e1567360352cc16.mp3",
+      "fileSha256": "694d20d76df9d62629dff6065269e8013505a0a309747b6879f2409637275f1c",
+      "chars": 150,
+      "quota": 134,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-002": {
+      "textSha256": "3d2c197b1947986cd57a229a31d52626bf4a79984262bcfde2809d94fbe3a609",
+      "file": "3d2c197b1947986cd57a229a31d52626bf4a79984262bcfde2809d94fbe3a609.mp3",
+      "fileSha256": "a152f2539905fa881dd38a91fd2477175ec3050eb02002bb8aacd39152a51918",
+      "chars": 82,
+      "quota": 72,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-003": {
+      "textSha256": "4d402ac440cb731a2513cd98882156bb171777038f42ac8e34f149a3aa26bb3a",
+      "file": "4d402ac440cb731a2513cd98882156bb171777038f42ac8e34f149a3aa26bb3a.mp3",
+      "fileSha256": "3de07e6b2643a9534a844a64c2bed070a10d9167c6baf72893d9a8c165aca0fa",
+      "chars": 58,
+      "quota": 54,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-004": {
+      "textSha256": "ccdf2b9bdb73f969c6fe3e5d25273c8419512c873a6b32cf9cbe3f4e49cf7feb",
+      "file": "ccdf2b9bdb73f969c6fe3e5d25273c8419512c873a6b32cf9cbe3f4e49cf7feb.mp3",
+      "fileSha256": "97bed500369131a70eae5456a15ea5e981664e101e517bd019bd27b98c42b5e7",
+      "chars": 63,
+      "quota": 59,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-005": {
+      "textSha256": "e22638dd9b349b76c36c45cc8898a0ec44c5d5ccbcabe931f0decfd825a0c5b8",
+      "file": "e22638dd9b349b76c36c45cc8898a0ec44c5d5ccbcabe931f0decfd825a0c5b8.mp3",
+      "fileSha256": "8622df0fc286b4ea514a7bdffa1b1d3142fb4d3084911038b848274d1ab3c5d1",
+      "chars": 103,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-006": {
+      "textSha256": "d6d7521058fd8c32cae1a24e95528808fc49405d5114d9fb9915ff44ba3eb96a",
+      "file": "d6d7521058fd8c32cae1a24e95528808fc49405d5114d9fb9915ff44ba3eb96a.mp3",
+      "fileSha256": "2211c34fefa8739d44e88cdca8e6d5ca33cedbd7ab9d1c3a6c0584528fe1012d",
+      "chars": 91,
+      "quota": 81,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-007": {
+      "textSha256": "5e4843112d26599e57b82b183f5e7456b7c71c9efeb32028e72823cdc44a5d00",
+      "file": "5e4843112d26599e57b82b183f5e7456b7c71c9efeb32028e72823cdc44a5d00.mp3",
+      "fileSha256": "56964de136adf2ea5e5f45edeed21cbe3974f665aef5e9ea2e31c55304a71ce8",
+      "chars": 195,
+      "quota": 179,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-008": {
+      "textSha256": "cfbb24a5b8e7bfefc675e88a1e4dd5ca7350e684562232a2e311ee58059386e6",
+      "file": "cfbb24a5b8e7bfefc675e88a1e4dd5ca7350e684562232a2e311ee58059386e6.mp3",
+      "fileSha256": "974e9202a59e57038569e3a6df61953e186a0c9b5a928a3fac5d5d425185827e",
+      "chars": 110,
+      "quota": 100,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-009": {
+      "textSha256": "704a391e661d9d9030305f4787dbf221abc3a7c94348087927e947ae43542c33",
+      "file": "704a391e661d9d9030305f4787dbf221abc3a7c94348087927e947ae43542c33.mp3",
+      "fileSha256": "6d7da4139a9288f756560bc93ff483a7c5c8a20174f31403356d2a42e5eca12c",
+      "chars": 42,
+      "quota": 38,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-010": {
+      "textSha256": "9cf6a3fa392fd3f463f707b8bc7d8014452796691c6079d68165c52f2d1aef12",
+      "file": "9cf6a3fa392fd3f463f707b8bc7d8014452796691c6079d68165c52f2d1aef12.mp3",
+      "fileSha256": "27e7c7f3d9433a0a54208e483265a799b1e08c1cc394d9dfc6946390ea29db56",
+      "chars": 35,
+      "quota": 31,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-011": {
+      "textSha256": "446b126046720bf3fe93eba50842a1136345f8bf39201d0f9081e6a285dca39a",
+      "file": "446b126046720bf3fe93eba50842a1136345f8bf39201d0f9081e6a285dca39a.mp3",
+      "fileSha256": "f2b16326b5f1e5b29563c9fcb6be088db2b3426a967d9e666e744dffa822ce9d",
+      "chars": 108,
+      "quota": 98,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-012": {
+      "textSha256": "26db9eebf13b55a76c8aba7b23f978ecaf1aec300f68c2bcb56521bc328a124c",
+      "file": "26db9eebf13b55a76c8aba7b23f978ecaf1aec300f68c2bcb56521bc328a124c.mp3",
+      "fileSha256": "5378e2c6f2961cb41c8149d06b037fcad03e8bc259af8f9cd2e5af3f1a982a8a",
+      "chars": 398,
+      "quota": 358,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-013": {
+      "textSha256": "e390db3589cd3c1753e4a7b76b4f9498cc0643275afb9d19a86796262ab6b560",
+      "file": "e390db3589cd3c1753e4a7b76b4f9498cc0643275afb9d19a86796262ab6b560.mp3",
+      "fileSha256": "a08396e6f5c3c6669e781c364acb1ba06a9ba85de3f084a226f0503c3a4dab30",
+      "chars": 74,
+      "quota": 64,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-014": {
+      "textSha256": "e8f67bc37b50a01b6f08070792b11439d5476e0815ac2f88f9302ecf3c463ebc",
+      "file": "e8f67bc37b50a01b6f08070792b11439d5476e0815ac2f88f9302ecf3c463ebc.mp3",
+      "fileSha256": "a5feae0827c920aa3a535be791fb1f07077a117855f0fbbd7cf298edab235905",
+      "chars": 81,
+      "quota": 71,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-015": {
+      "textSha256": "2715431e41ed239094ad2419a245b7fa464034c062c86af3352e106e28349035",
+      "file": "2715431e41ed239094ad2419a245b7fa464034c062c86af3352e106e28349035.mp3",
+      "fileSha256": "b930be122ee13385b3911c8a13ffdcca3d4265799acf1bdefe80ef125d5d740f",
+      "chars": 165,
+      "quota": 149,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-016": {
+      "textSha256": "ff5d7cc94f42950a89b416751d99efe70f4d2ebbb0dc40b858c263698087d078",
+      "file": "ff5d7cc94f42950a89b416751d99efe70f4d2ebbb0dc40b858c263698087d078.mp3",
+      "fileSha256": "267ec16bd24b55b837a75047e7d99647cf81c1939ca69e5f9469fbd2bcaff9f9",
+      "chars": 151,
+      "quota": 135,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-017": {
+      "textSha256": "1f78f176b26370bb4d13dba0e21b7e2285df7c9f601596af47d11745c00ede0a",
+      "file": "1f78f176b26370bb4d13dba0e21b7e2285df7c9f601596af47d11745c00ede0a.mp3",
+      "fileSha256": "22e4118f5bb9339a9f2f753d0a50359cca534102a4cc13f3bed087e63114db45",
+      "chars": 194,
+      "quota": 178,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-018": {
+      "textSha256": "6c8bdbb8490d7d90b8328809664fd6dfe569512d30f6191bc20feb265a7bac79",
+      "file": "6c8bdbb8490d7d90b8328809664fd6dfe569512d30f6191bc20feb265a7bac79.mp3",
+      "fileSha256": "d2ad68a0cafdc3729c52eb09ed52db44efd926c10cde45134245d2926037642a",
+      "chars": 29,
+      "quota": 25,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-019": {
+      "textSha256": "8794e35cc9211af6e0d0eaa404e230890cfc8a18c4c5edf42b15a4b400ef8275",
+      "file": "8794e35cc9211af6e0d0eaa404e230890cfc8a18c4c5edf42b15a4b400ef8275.mp3",
+      "fileSha256": "926ca0356c394a5f603f21bf38ad64e56b0d9a924d12d8d5c4aff8e9b30ba487",
+      "chars": 248,
+      "quota": 226,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-020": {
+      "textSha256": "a2bcb09f9362b1b857ae99ed1651a276288d8f81b2bad84f2497454829d60252",
+      "file": "a2bcb09f9362b1b857ae99ed1651a276288d8f81b2bad84f2497454829d60252.mp3",
+      "fileSha256": "616b983c820a1e7742cca68bf13ddd779a6f415162a5a61adab1afd62e64869f",
+      "chars": 91,
+      "quota": 81,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-021": {
+      "textSha256": "359cc236c7535b1a3298f364aae70b67d6ffd97eda250d0854351cda9a6c7b20",
+      "file": "359cc236c7535b1a3298f364aae70b67d6ffd97eda250d0854351cda9a6c7b20.mp3",
+      "fileSha256": "33c21d3ca1382e0362716deb0ae6efab1ab32c29dff92bfc4c17a83a4f8bf7b7",
+      "chars": 138,
+      "quota": 128,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-022": {
+      "textSha256": "2a90bf518e0d0be3bf72e8b9f8c563540adf5d667dd5586be2415debe1dce4f6",
+      "file": "2a90bf518e0d0be3bf72e8b9f8c563540adf5d667dd5586be2415debe1dce4f6.mp3",
+      "fileSha256": "74111fdc358a5af1baf0fff767ddf8dd094bd47267bd8532dd9a6da62f4ea51d",
+      "chars": 109,
+      "quota": 99,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-023": {
+      "textSha256": "75f9a5ec8a36502e453fb37e67c0626a11a2d6764052d3b83a4453df258d2881",
+      "file": "75f9a5ec8a36502e453fb37e67c0626a11a2d6764052d3b83a4453df258d2881.mp3",
+      "fileSha256": "6b0bdd588293512b76bb34ed25f8feff36c373155dd2aa19efbfa9ba8597af8b",
+      "chars": 203,
+      "quota": 187,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-024": {
+      "textSha256": "ab61ec2224417274b8140fd833ab83c8189003b123e6792308760b5c8b9c9233",
+      "file": "ab61ec2224417274b8140fd833ab83c8189003b123e6792308760b5c8b9c9233.mp3",
+      "fileSha256": "d5670f3523574d4ba98df6a376310df28cade4ede519a3dc3a846c01f3292c5d",
+      "chars": 115,
+      "quota": 99,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-025": {
+      "textSha256": "6916c7be53455a785f1ae1059c9d42b0d1ecb72d94cd8a857cf79c10c54ca425",
+      "file": "6916c7be53455a785f1ae1059c9d42b0d1ecb72d94cd8a857cf79c10c54ca425.mp3",
+      "fileSha256": "e2aa464f44211fe6c45a01b4ded68eb6dac65c359a4d95987b06d7505e5444ac",
+      "chars": 44,
+      "quota": 40,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-026": {
+      "textSha256": "685e2058ce47e850063b5e5acb9da5a71b69987610074d57557595621b189fe7",
+      "file": "685e2058ce47e850063b5e5acb9da5a71b69987610074d57557595621b189fe7.mp3",
+      "fileSha256": "86678793a20d061e4e494d846e60252a994519dcacd7ee8c9afb645563132187",
+      "chars": 235,
+      "quota": 213,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-027": {
+      "textSha256": "30bea96f037da73c6b36d70e5c6f607c3479e02b3c12010b61105135f1a56434",
+      "file": "30bea96f037da73c6b36d70e5c6f607c3479e02b3c12010b61105135f1a56434.mp3",
+      "fileSha256": "45158c35d3740bd19a10445869adf2f8554b9fef144ce2c26773e0bcdd3ef8cf",
+      "chars": 45,
+      "quota": 41,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-028": {
+      "textSha256": "7a4a3aa2a625cbf4ae27237177ab9f64fb72a8c5db6933a198ffc77276adeb0e",
+      "file": "7a4a3aa2a625cbf4ae27237177ab9f64fb72a8c5db6933a198ffc77276adeb0e.mp3",
+      "fileSha256": "cb0df273ea0cb9a76f0f23cb1b19d15f3950c2f12d68c6874cb2d1d3fa653e7a",
+      "chars": 427,
+      "quota": 393,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-029": {
+      "textSha256": "e1186c8fc17107dd00150df93d9df7db0f650808abedd690090af7e886f60f84",
+      "file": "e1186c8fc17107dd00150df93d9df7db0f650808abedd690090af7e886f60f84.mp3",
+      "fileSha256": "bafbee2da8ccb7769c9a702ce525a5b21759653d6761d6f9948890ef83c83393",
+      "chars": 152,
+      "quota": 136,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-030": {
+      "textSha256": "482314f18caacdf39ba25147c914412853959acb4691a60708b564ad77c7ad45",
+      "file": "482314f18caacdf39ba25147c914412853959acb4691a60708b564ad77c7ad45.mp3",
+      "fileSha256": "8a655ae191c6969f6090be61aa4c69ce6b1fc7644163521021622a0655fe486a",
+      "chars": 34,
+      "quota": 30,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-031": {
+      "textSha256": "886da295110ff34a570a6bebfe4ed61029a9b82acbac02ba0359a116887d3411",
+      "file": "886da295110ff34a570a6bebfe4ed61029a9b82acbac02ba0359a116887d3411.mp3",
+      "fileSha256": "716102f51c395b1f41f96a632dbe0816a4028f48d9ffcda47ecf008e23d4ab59",
+      "chars": 37,
+      "quota": 33,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-032": {
+      "textSha256": "c5efc60288ecc4777cca51a1a5aee0911a473e38188b9150809a4b414396d626",
+      "file": "c5efc60288ecc4777cca51a1a5aee0911a473e38188b9150809a4b414396d626.mp3",
+      "fileSha256": "d0ea92ca7c97b8e3ae305b5c7449f8253034e0041d12231fac465bc1129a738d",
+      "chars": 102,
+      "quota": 92,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-033": {
+      "textSha256": "6b8f19327b6a2bdbad49931eeb6e039c53c900b1442ebd649b24697832ccf64a",
+      "file": "6b8f19327b6a2bdbad49931eeb6e039c53c900b1442ebd649b24697832ccf64a.mp3",
+      "fileSha256": "b7ca93e5abd2bee40eb5dedca4e82454d4177eab29ee040974cf0aed7a997113",
+      "chars": 547,
+      "quota": 495,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-034": {
+      "textSha256": "dd221b20416fb0bb7c559b5c4107326ed79664005e6b2d02ded234a800d66733",
+      "file": "dd221b20416fb0bb7c559b5c4107326ed79664005e6b2d02ded234a800d66733.mp3",
+      "fileSha256": "04499253878240465d02814bb6efb69bbd79bdadb1a0f66d8480a92980753454",
+      "chars": 191,
+      "quota": 175,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-035": {
+      "textSha256": "45704ee44bd7e5779962d3cf306467b8f8fb283709c4fce2778c1e45a174e734",
+      "file": "45704ee44bd7e5779962d3cf306467b8f8fb283709c4fce2778c1e45a174e734.mp3",
+      "fileSha256": "84af8823b42c13ca9cbf8497d9bf3ab3040b4df80dd68540d948f98656d4b8b5",
+      "chars": 399,
+      "quota": 365,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-036": {
+      "textSha256": "4def96fe4d0ac1b5132c202e44be7f9af6d4080424f9c78b574d6b5525dc52ae",
+      "file": "4def96fe4d0ac1b5132c202e44be7f9af6d4080424f9c78b574d6b5525dc52ae.mp3",
+      "fileSha256": "8d513c0ef55bc82ec1abe44c381ec6e72d8421c8ebf3322dc0f78ab22f30fc6d",
+      "chars": 323,
+      "quota": 295,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-037": {
+      "textSha256": "2d4676aa17d0dfc0fddabd2db26eae1d5f29c394ab8a5b3681d8dec769e5909e",
+      "file": "2d4676aa17d0dfc0fddabd2db26eae1d5f29c394ab8a5b3681d8dec769e5909e.mp3",
+      "fileSha256": "57280472d976d243bbbcff51609b6b98a817ee4722d9b44b5723b3701845f664",
+      "chars": 232,
+      "quota": 210,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-038": {
+      "textSha256": "3b6dd43d165fca706f99767b0d74bb6b881c75fda1478e194dc2c26bb3590b5b",
+      "file": "3b6dd43d165fca706f99767b0d74bb6b881c75fda1478e194dc2c26bb3590b5b.mp3",
+      "fileSha256": "4fe5229e3fdea66421b84d6ed1ee4be49680ea3f1c31f835766328fbd24c7a6f",
+      "chars": 36,
+      "quota": 32,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-039": {
+      "textSha256": "458056c7951ab24e27b0bbc04a0c465f565e7551d6d236335e7712628d4fa702",
+      "file": "458056c7951ab24e27b0bbc04a0c465f565e7551d6d236335e7712628d4fa702.mp3",
+      "fileSha256": "71dd70be65f5947aa2b14985d0f27994931b28402566f848065b648e69bffbb0",
+      "chars": 46,
+      "quota": 42,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-040": {
+      "textSha256": "c63dbedc5e5f28267505d8fc349ec73e33296b83b6f4c92f5a74a61088c0776b",
+      "file": "c63dbedc5e5f28267505d8fc349ec73e33296b83b6f4c92f5a74a61088c0776b.mp3",
+      "fileSha256": "41f2d14aedbe1b0092d9a90b8db47cde6318f43f12fb3cca369a948a0c2092f3",
+      "chars": 34,
+      "quota": 30,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-041": {
+      "textSha256": "120c2ccfe39bd5640d143c89e065e94cdc9a52de6443162d832ec1a1d4adacf4",
+      "file": "120c2ccfe39bd5640d143c89e065e94cdc9a52de6443162d832ec1a1d4adacf4.mp3",
+      "fileSha256": "9a0f8f363488386679db355a164e6813ac3a8d91c0868b126021021ee4bd5c12",
+      "chars": 35,
+      "quota": 31,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-042": {
+      "textSha256": "02bb73498a870772e57669c371343065c7adf9ec2ba043f73b402b296a8d1242",
+      "file": "02bb73498a870772e57669c371343065c7adf9ec2ba043f73b402b296a8d1242.mp3",
+      "fileSha256": "294da63e614515d1dbbb9afc8dd25ac9d21fde753259b5264076c5721cddb5ed",
+      "chars": 309,
+      "quota": 281,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-043": {
+      "textSha256": "a585f1ce28d95e57b0901a953ae643b58c25c5e929e795fa427ecb4bc3a85d60",
+      "file": "a585f1ce28d95e57b0901a953ae643b58c25c5e929e795fa427ecb4bc3a85d60.mp3",
+      "fileSha256": "d9de2dec61a4f54e2eceab9729a57350ec7b843662fe12c3c818b72b0b16f9ac",
+      "chars": 32,
+      "quota": 28,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-044": {
+      "textSha256": "fb5240ffd3f4faea6a92476f9493d693f8050e9b4bfcaa7dd15ec88c229a985a",
+      "file": "fb5240ffd3f4faea6a92476f9493d693f8050e9b4bfcaa7dd15ec88c229a985a.mp3",
+      "fileSha256": "b3fd31ad1eed3da600e611c06e31fa4dd68bd46354efa9b33b702d4e66aaa5a4",
+      "chars": 224,
+      "quota": 202,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-045": {
+      "textSha256": "4da33c5ea9b52243ac2c17727852b729cd38203c64936393bad06bbad2b91e0f",
+      "file": "4da33c5ea9b52243ac2c17727852b729cd38203c64936393bad06bbad2b91e0f.mp3",
+      "fileSha256": "8528d60579f3a5e74eb1cbf3fd6ab576bbd0f16576ed6232134f5ac20bcac7c0",
+      "chars": 133,
+      "quota": 117,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-046": {
+      "textSha256": "d8ae8d1a05af6e85d18f69444a35305428a4752570122512cca5908ffeb1e60b",
+      "file": "d8ae8d1a05af6e85d18f69444a35305428a4752570122512cca5908ffeb1e60b.mp3",
+      "fileSha256": "90064e8f178a09c67f536cd9a25679b765762141fde4f8b0f5729d7ed26f1da9",
+      "chars": 49,
+      "quota": 45,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-047": {
+      "textSha256": "d5c274068f44d70612588b5534c691faa5de302322aaede8933f106c759c6cdb",
+      "file": "d5c274068f44d70612588b5534c691faa5de302322aaede8933f106c759c6cdb.mp3",
+      "fileSha256": "4f4a21f1a0ac2abec5bd9ee123713b664b4935c0c59492f66d622c03a1caa18f",
+      "chars": 171,
+      "quota": 155,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-048": {
+      "textSha256": "13371a25ef2898c505e3cd61a97e044dad32e39df21e84c5063b770dcd4c1209",
+      "file": "13371a25ef2898c505e3cd61a97e044dad32e39df21e84c5063b770dcd4c1209.mp3",
+      "fileSha256": "d5bdf810314cfbef696dfd064217573cd92edbb3ef253617747a408eefd0f6c4",
+      "chars": 111,
+      "quota": 101,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-049": {
+      "textSha256": "564541db9094ad6a88061c8f8eb9146de6f8f2086307d8cb4e4a5b21a95a7a33",
+      "file": "564541db9094ad6a88061c8f8eb9146de6f8f2086307d8cb4e4a5b21a95a7a33.mp3",
+      "fileSha256": "10390dffe5c78ca2c43a59904dd2fd50d261b0ec3b118b82d0608cc7ee6b5024",
+      "chars": 231,
+      "quota": 209,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-050": {
+      "textSha256": "a955e3ef833b6707d890229fb91a35268545d7679c28cfc8a90a2b2d7efe7214",
+      "file": "a955e3ef833b6707d890229fb91a35268545d7679c28cfc8a90a2b2d7efe7214.mp3",
+      "fileSha256": "8084e3a396c57d496e502a286a286acce87702759658afffa6972aa2c9847d07",
+      "chars": 91,
+      "quota": 81,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-051": {
+      "textSha256": "1a8d82fc1a17a95726612d8e759ccc333817809d1ebfb85f9ad9bd16d0f68e11",
+      "file": "1a8d82fc1a17a95726612d8e759ccc333817809d1ebfb85f9ad9bd16d0f68e11.mp3",
+      "fileSha256": "bc72c364882cf879a1c57d4802a7d01efbfda4a9662f92340ed149d06058aad0",
+      "chars": 103,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-052": {
+      "textSha256": "4d82e0d46c431a2deffd2f035f9a69ac9dac60bff59d0ad752b8c8171d195c79",
+      "file": "4d82e0d46c431a2deffd2f035f9a69ac9dac60bff59d0ad752b8c8171d195c79.mp3",
+      "fileSha256": "c055a9261b691cfebca3de5336ca722e4ebc516dd4434e981b5407ef342738ba",
+      "chars": 310,
+      "quota": 288,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-053": {
+      "textSha256": "24902f8a8fde9b44082c3074f6a394b27ae8d69c57c45dcdf84eab51c9bedac9",
+      "file": "24902f8a8fde9b44082c3074f6a394b27ae8d69c57c45dcdf84eab51c9bedac9.mp3",
+      "fileSha256": "dc6f2fae8104e8be96f30ff793dc57ec02993e876e0ea38be101e7eff00d6ea0",
+      "chars": 186,
+      "quota": 170,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-054": {
+      "textSha256": "89a83b253227f67700ac0ed2aef4126dd5f0c59ddf4ac2c83b26e666ef668de2",
+      "file": "89a83b253227f67700ac0ed2aef4126dd5f0c59ddf4ac2c83b26e666ef668de2.mp3",
+      "fileSha256": "e5e42d5a699dd92de600c5f75c686e2b4ef92547f7f57c557b994df893ee78dc",
+      "chars": 201,
+      "quota": 185,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-055": {
+      "textSha256": "2762d176412b7723f8cb1d64e0858449972c8ea7ecfe10afbc79860aa911cde1",
+      "file": "2762d176412b7723f8cb1d64e0858449972c8ea7ecfe10afbc79860aa911cde1.mp3",
+      "fileSha256": "96821ea9053036ecfe76b62d7dbc917a37be2cd4d6d06a75a2040ffb62d08671",
+      "chars": 28,
+      "quota": 24,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-056": {
+      "textSha256": "ea09878964339a414c304903a994b44f55df5c7e3bf6a973f8fb2b4d871ed4c8",
+      "file": "ea09878964339a414c304903a994b44f55df5c7e3bf6a973f8fb2b4d871ed4c8.mp3",
+      "fileSha256": "1ec0bbc97a1b3e0e9af677a57d676cf4d789651602b8ac1332514b77b73a22e5",
+      "chars": 26,
+      "quota": 22,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-057": {
+      "textSha256": "e951195cdc068ad9d42da87aa0a3a5dacb3c6e98b05b3a65883e7f56ceb565cd",
+      "file": "e951195cdc068ad9d42da87aa0a3a5dacb3c6e98b05b3a65883e7f56ceb565cd.mp3",
+      "fileSha256": "a0a20c99b3bc4839525e4001721467d2a50d7177b8a355fd11e1c2b6c62d270a",
+      "chars": 403,
+      "quota": 369,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-058": {
+      "textSha256": "b4d7835a6a9b4e0745caa2d1e4a30d294b3ec49855150cd911e90f281156f5ec",
+      "file": "b4d7835a6a9b4e0745caa2d1e4a30d294b3ec49855150cd911e90f281156f5ec.mp3",
+      "fileSha256": "f700bb95731e281ec44bed1844ec88b0c53d50bd35607adb99a45f270ed44478",
+      "chars": 322,
+      "quota": 294,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-059": {
+      "textSha256": "71dd51f21c75ce0dfafe59f4ffb0726d2fc3f5d6506beffe213b8c673811fbcb",
+      "file": "71dd51f21c75ce0dfafe59f4ffb0726d2fc3f5d6506beffe213b8c673811fbcb.mp3",
+      "fileSha256": "4624ffc6cb2a204351e8b6a41ceb31713697b1451fed4b1c6baf7b09f9030b8d",
+      "chars": 219,
+      "quota": 203,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-060": {
+      "textSha256": "0520a0456af02a8d2612cc0a95a37e06e8eda7a3fcc009c3695e34bbf08c37da",
+      "file": "0520a0456af02a8d2612cc0a95a37e06e8eda7a3fcc009c3695e34bbf08c37da.mp3",
+      "fileSha256": "490e35139214503021f0f4ef47108d5bb8bedf7e27040eb1a6e7959109e0f13b",
+      "chars": 134,
+      "quota": 124,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-061": {
+      "textSha256": "269b0907020e41fae1dab07df8ae9af09a26bcfe766b08a6e1e832d35cf99580",
+      "file": "269b0907020e41fae1dab07df8ae9af09a26bcfe766b08a6e1e832d35cf99580.mp3",
+      "fileSha256": "5d0f702deb5d7f064a59435d8eac0217c1cf62430b9a0acbe6e95862cdf46b78",
+      "chars": 63,
+      "quota": 59,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-062": {
+      "textSha256": "db25664e60e94b6a025a46211efdc3ae6f4fc3e56b54ec99c4696c4d6b92ea9e",
+      "file": "db25664e60e94b6a025a46211efdc3ae6f4fc3e56b54ec99c4696c4d6b92ea9e.mp3",
+      "fileSha256": "2ce391d68fdc5bf11114036eb190ea6e9ac5c42e47c1cc573ef6621f44052996",
+      "chars": 63,
+      "quota": 59,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-063": {
+      "textSha256": "d330ebc230f3c8ccc293264733e67a9bd51037c9cbecb336ac588fbab128dcb8",
+      "file": "d330ebc230f3c8ccc293264733e67a9bd51037c9cbecb336ac588fbab128dcb8.mp3",
+      "fileSha256": "cfee51cb40ee669168c0b28691128c63d495828ed30129a0648b8c294f38736b",
+      "chars": 39,
+      "quota": 35,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-064": {
+      "textSha256": "f84277784acbb47a54bf21bec867d5ab61a08c2d3b10b5952b174a6608df53bb",
+      "file": "f84277784acbb47a54bf21bec867d5ab61a08c2d3b10b5952b174a6608df53bb.mp3",
+      "fileSha256": "d3574cfb4cbed4348803447b2701ca634ce0b1b5331ed3f2dfef9c0247740bb5",
+      "chars": 31,
+      "quota": 27,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-065": {
+      "textSha256": "b3d92acf8d3524bbbbc3b3dda74ecbe2c9540f16f9336580b49c9793cd08d76d",
+      "file": "b3d92acf8d3524bbbbc3b3dda74ecbe2c9540f16f9336580b49c9793cd08d76d.mp3",
+      "fileSha256": "0587f61a744206a294b62f62caf327cda78efdffc4920bae395205b9c6a1f98e",
+      "chars": 146,
+      "quota": 130,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-066": {
+      "textSha256": "1db21b0cd49946e3ce82cb72e4fc6fed7270115045341c76928ca936374066b0",
+      "file": "1db21b0cd49946e3ce82cb72e4fc6fed7270115045341c76928ca936374066b0.mp3",
+      "fileSha256": "abe8c7de55e52cdb7c7a992161bad4d5891bfd299d56476ae8d618875d8cfb08",
+      "chars": 146,
+      "quota": 130,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-067": {
+      "textSha256": "0c1ea3823c016ad10d66027b2968fd5c94a5e119c54d5c54c0d1deeb499b1dc3",
+      "file": "0c1ea3823c016ad10d66027b2968fd5c94a5e119c54d5c54c0d1deeb499b1dc3.mp3",
+      "fileSha256": "87f88615612890411dcff27152cdf0d91f333ec99c3c64b3e91ff3e6c67e6189",
+      "chars": 134,
+      "quota": 118,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-068": {
+      "textSha256": "6e899a2ac996e5f531bd9e54607ec8e3ade2096d5160af9513ccfede2a2984b4",
+      "file": "6e899a2ac996e5f531bd9e54607ec8e3ade2096d5160af9513ccfede2a2984b4.mp3",
+      "fileSha256": "9fed5f11813f0c7c6a0f0c2c89bdf7e2b3b2a23e014da9b2eb35cad6486d3bdc",
+      "chars": 76,
+      "quota": 66,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-069": {
+      "textSha256": "c6b97d1c6665a14415f1991ce9fcbbad8b895a6c7d1b7891345e7541c67cbc11",
+      "file": "c6b97d1c6665a14415f1991ce9fcbbad8b895a6c7d1b7891345e7541c67cbc11.mp3",
+      "fileSha256": "55448555177388610488fd07f0e87eb6f6a50fd3bf3ab5c326d5d0eb076db6fe",
+      "chars": 481,
+      "quota": 447,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-070": {
+      "textSha256": "08066ac168025fd296d56f6d1c366db2ff5da04219ba9210a0af31a331a3390a",
+      "file": "08066ac168025fd296d56f6d1c366db2ff5da04219ba9210a0af31a331a3390a.mp3",
+      "fileSha256": "2179622156dd5a4cfb68a7c3ba836614eda2306e0d0772c50474bc02173fef5d",
+      "chars": 157,
+      "quota": 147,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-071": {
+      "textSha256": "89cd00ad5a26035ae58328d657f6db60a35c26112952b1579e9e780b6a3183ac",
+      "file": "89cd00ad5a26035ae58328d657f6db60a35c26112952b1579e9e780b6a3183ac.mp3",
+      "fileSha256": "15b415c5300e2792fab2ec9406f033b016738675890bbed732e4aea2ad1f0280",
+      "chars": 36,
+      "quota": 32,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-072": {
+      "textSha256": "bdbf9641bfe08209f8cdc431f47006d89b533945065f606f40c2092de55f76c9",
+      "file": "bdbf9641bfe08209f8cdc431f47006d89b533945065f606f40c2092de55f76c9.mp3",
+      "fileSha256": "61900eefb01311e5f241170ed14c2325055af22a8646f833abb33416be3d195e",
+      "chars": 176,
+      "quota": 160,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-073": {
+      "textSha256": "0a38ecaa83ea1fa680415f084e5736c593e22d77a328d08a4129605e163c9ad2",
+      "file": "0a38ecaa83ea1fa680415f084e5736c593e22d77a328d08a4129605e163c9ad2.mp3",
+      "fileSha256": "f00c198bba784e047da73485d0a8ae55e0a13abed94c38f7b122ff74cf242824",
+      "chars": 71,
+      "quota": 61,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-074": {
+      "textSha256": "39cb44b5c680f0b1445cd4f49732940b26655752f01268fc18ec7512398238ed",
+      "file": "39cb44b5c680f0b1445cd4f49732940b26655752f01268fc18ec7512398238ed.mp3",
+      "fileSha256": "114e5c5807f11ddbf5667f3e67aa672915c874e767a2ddb404c265b2383844fb",
+      "chars": 159,
+      "quota": 143,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-075": {
+      "textSha256": "7b13493a5f633a09ec86724869333d53a7c771f9a3ab9ac1a722f2decd2fc7c0",
+      "file": "7b13493a5f633a09ec86724869333d53a7c771f9a3ab9ac1a722f2decd2fc7c0.mp3",
+      "fileSha256": "edfbdc3570931b85e7dc5424d618b22c3dc61c10597cfdecba7e52805882e587",
+      "chars": 123,
+      "quota": 113,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-076": {
+      "textSha256": "22db0921658564028a685b1d39340018cc4886faaae9cbfdad5d0a71f61648ff",
+      "file": "22db0921658564028a685b1d39340018cc4886faaae9cbfdad5d0a71f61648ff.mp3",
+      "fileSha256": "9fd050282a58c81649ac8420ac8f862ea9a8c940b8626848790234b9c9c6ee97",
+      "chars": 36,
+      "quota": 32,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-077": {
+      "textSha256": "636bc0b9a49f448b02b75f0947c609a60b3b384119a7798d3a67204104a25bb2",
+      "file": "636bc0b9a49f448b02b75f0947c609a60b3b384119a7798d3a67204104a25bb2.mp3",
+      "fileSha256": "ca379bbcb5e4eabd3c25993c97c2cdad2258cd314e30085447ec03b66486ec7a",
+      "chars": 41,
+      "quota": 37,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-078": {
+      "textSha256": "95f594a0885ad58865c480a832d2b066f04c05d67a34c48bf30cb3b96922d232",
+      "file": "95f594a0885ad58865c480a832d2b066f04c05d67a34c48bf30cb3b96922d232.mp3",
+      "fileSha256": "9a7718e5920224920a14a7756e3dc4910ebf76508ef6e57f47042f810996898e",
+      "chars": 113,
+      "quota": 103,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-079": {
+      "textSha256": "a6aaa684416e171369cd83669a36e403fd1bc667cdae5c3c9d438f4f47ef0efe",
+      "file": "a6aaa684416e171369cd83669a36e403fd1bc667cdae5c3c9d438f4f47ef0efe.mp3",
+      "fileSha256": "007026e403df24a4648905a988265e276da40bf17cbfc1b8a409a61a6462540a",
+      "chars": 49,
+      "quota": 45,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-080": {
+      "textSha256": "787fa46f258667851e230c2e34de009992a9a10887b4c2b57b2e2b811952b946",
+      "file": "787fa46f258667851e230c2e34de009992a9a10887b4c2b57b2e2b811952b946.mp3",
+      "fileSha256": "bfaf95aa63daa1e9e9350e8d1d4054a4aaaf9ee87acb6a0e4e2fb2cd5ec7e921",
+      "chars": 102,
+      "quota": 92,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-081": {
+      "textSha256": "12f5d88aa2a036168b4fa44183271a361f20a3ec199b35606bcebeafc8edc8e7",
+      "file": "12f5d88aa2a036168b4fa44183271a361f20a3ec199b35606bcebeafc8edc8e7.mp3",
+      "fileSha256": "203507ceb4028d7ea2ab1b9b010122d5e47598811fecdf16e808c56e1ebde7ba",
+      "chars": 159,
+      "quota": 143,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-082": {
+      "textSha256": "63d4f2a268ed5079bcf087ae8905eb52a2eeaceed6bb5da0eaa4f79fac8480c6",
+      "file": "63d4f2a268ed5079bcf087ae8905eb52a2eeaceed6bb5da0eaa4f79fac8480c6.mp3",
+      "fileSha256": "1848a3244e76be2cb7051451437cc63f85012fbd9298cb5fe124d41f95f48707",
+      "chars": 73,
+      "quota": 69,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-083": {
+      "textSha256": "2158f050f9313ee12e55db3e0765db217ce16a489b51e209855e186d29e29a15",
+      "file": "2158f050f9313ee12e55db3e0765db217ce16a489b51e209855e186d29e29a15.mp3",
+      "fileSha256": "c88eaeaf1d8b3e3ca5eb0cdf711a484e97197fc61d9eb600f545ca7b078bff09",
+      "chars": 79,
+      "quota": 69,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-084": {
+      "textSha256": "b38d9426feb11ea8a62969933ec49719ea67ab36e6da946dac8d890bd4c85429",
+      "file": "b38d9426feb11ea8a62969933ec49719ea67ab36e6da946dac8d890bd4c85429.mp3",
+      "fileSha256": "28c37aedd848fec67da33e530dbb15fa4033e71fe040a207ad368587fc55a91f",
+      "chars": 140,
+      "quota": 130,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-085": {
+      "textSha256": "bb7a3ebc0b8893887bd7c127f909e3052402391188d155f3bebf5eebbf3920d7",
+      "file": "bb7a3ebc0b8893887bd7c127f909e3052402391188d155f3bebf5eebbf3920d7.mp3",
+      "fileSha256": "b803c018cef31a3ab3e054e902f575da7755ffce32d019ca07f830c72f1fd3a2",
+      "chars": 135,
+      "quota": 125,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-086": {
+      "textSha256": "dcd3f6331c519b302ed26ddafc0dcb5e6ba7d32493593983ed5bab68e5aa5ee2",
+      "file": "dcd3f6331c519b302ed26ddafc0dcb5e6ba7d32493593983ed5bab68e5aa5ee2.mp3",
+      "fileSha256": "f5d31ac606719eb5b2a0b3e1d49e743b0a91e0236d329f295abf9afeda8e2672",
+      "chars": 84,
+      "quota": 74,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-087": {
+      "textSha256": "bb11cf54862e85e17ef98a43820e53f5b8fcbdf79f12c12ba7f6b2f2ca0cfebb",
+      "file": "bb11cf54862e85e17ef98a43820e53f5b8fcbdf79f12c12ba7f6b2f2ca0cfebb.mp3",
+      "fileSha256": "115b86b494a97f214366327387cbb34372752898015e21e58d54600f8a498b26",
+      "chars": 68,
+      "quota": 58,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-088": {
+      "textSha256": "0c20f4c6e639e395f686c27b67d0eafff758ac35969c2600a272338969b57966",
+      "file": "0c20f4c6e639e395f686c27b67d0eafff758ac35969c2600a272338969b57966.mp3",
+      "fileSha256": "128204505a7628165d6d0f0f71f25a810c614898f0ad12639c4655c198f4d223",
+      "chars": 226,
+      "quota": 204,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-089": {
+      "textSha256": "9137291f74a7267e3882842c002c48f6f1e949958e3c2d7b5edf488b26f96d66",
+      "file": "9137291f74a7267e3882842c002c48f6f1e949958e3c2d7b5edf488b26f96d66.mp3",
+      "fileSha256": "fd0f3b5e1d0a1121f2491d506d34daf0c7be2bdb039758e452add8d0552a0940",
+      "chars": 128,
+      "quota": 118,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-090": {
+      "textSha256": "2b1ba26d63bd91c33693cc577cca8bcacc754b735411ddad71fcb16e133710ec",
+      "file": "2b1ba26d63bd91c33693cc577cca8bcacc754b735411ddad71fcb16e133710ec.mp3",
+      "fileSha256": "1d8fe4f4271165c2d9b8d2f9ab9108bcb0f7aaf644a49ac60eb665868d2060e5",
+      "chars": 144,
+      "quota": 128,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-091": {
+      "textSha256": "a7b24dbbad63a4c98ed792830fe183d308ee1c46859a22dca6e7f551c1d508a9",
+      "file": "a7b24dbbad63a4c98ed792830fe183d308ee1c46859a22dca6e7f551c1d508a9.mp3",
+      "fileSha256": "aac445e6177c2837cb1095e951d3d5e10e8892c785d4891d900ba4e4404af75a",
+      "chars": 62,
+      "quota": 58,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-092": {
+      "textSha256": "5159e38b62536a65c8642c9514bb05a73ec52732cc13a2a6e21fc2166b902332",
+      "file": "5159e38b62536a65c8642c9514bb05a73ec52732cc13a2a6e21fc2166b902332.mp3",
+      "fileSha256": "c6a852b8a823a40e52fb773fa33422ad9659c1d5da57811eed51a65fbeab2b75",
+      "chars": 148,
+      "quota": 132,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-093": {
+      "textSha256": "d4e729f4f02c185e76e0664e4f94273edde9d1c35c3a656caa3f3f3f9cf455aa",
+      "file": "d4e729f4f02c185e76e0664e4f94273edde9d1c35c3a656caa3f3f3f9cf455aa.mp3",
+      "fileSha256": "5942f41b23b7044742b534a2c132be828203514afcf153e055d072a6bc66b029",
+      "chars": 101,
+      "quota": 91,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-094": {
+      "textSha256": "53cc70708cb85af9801a090c834af64c9e40430449a54b1ada2244f903a45078",
+      "file": "53cc70708cb85af9801a090c834af64c9e40430449a54b1ada2244f903a45078.mp3",
+      "fileSha256": "87b17fcd9983fc3b6d0130a16f7e4516870c91beae1ada6fa10e66b77644907c",
+      "chars": 89,
+      "quota": 79,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-095": {
+      "textSha256": "91ff21dfb96a7cdddcc49f0a5265f531b607db3ffc85ed62e1a37edca91a2adc",
+      "file": "91ff21dfb96a7cdddcc49f0a5265f531b607db3ffc85ed62e1a37edca91a2adc.mp3",
+      "fileSha256": "b6ebabe56250d1e1eefebab95e43f461b45c8812d903e9da5df9d7b0f7827b00",
+      "chars": 236,
+      "quota": 214,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-096": {
+      "textSha256": "3241fdab257c0d0d0a8c830992df265d2c20858ad095e8414d99668e415cef7f",
+      "file": "3241fdab257c0d0d0a8c830992df265d2c20858ad095e8414d99668e415cef7f.mp3",
+      "fileSha256": "aa9f5de6c538ce5abd22638c61ebdd438a10eb0f212455a7e680710615c45cb0",
+      "chars": 78,
+      "quota": 68,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-097": {
+      "textSha256": "c4fa0f110b5a3379263d74a1abf660165b86f3f8ee1e27b15aad08a9004a0b3a",
+      "file": "c4fa0f110b5a3379263d74a1abf660165b86f3f8ee1e27b15aad08a9004a0b3a.mp3",
+      "fileSha256": "bd517cb8c04b583b1a51ce081cb710d16033a3f9dd0894cae09e080b6759f4d4",
+      "chars": 196,
+      "quota": 180,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-098": {
+      "textSha256": "8146e6faee115bc7da4a2763448bbaa87ef65959cb50d452bce5871d265bf94f",
+      "file": "8146e6faee115bc7da4a2763448bbaa87ef65959cb50d452bce5871d265bf94f.mp3",
+      "fileSha256": "d9b11ccd7c8b64d8bf7639fca2b6f0b2ae743abb46c7fb448a09496918bd8128",
+      "chars": 116,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-099": {
+      "textSha256": "d08bdcd87a87733ed02e1b51c4e885d53a216d28c1b47ce514605ad7d817444e",
+      "file": "d08bdcd87a87733ed02e1b51c4e885d53a216d28c1b47ce514605ad7d817444e.mp3",
+      "fileSha256": "5fac52aea3135d42bde5c7598a10a1693e32ee36c4e854df8c55b80a1a941e58",
+      "chars": 71,
+      "quota": 61,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-100": {
+      "textSha256": "156131b48cce859a814169855d6d82bbd141787c31e5430da3241b0b2eb61ec8",
+      "file": "156131b48cce859a814169855d6d82bbd141787c31e5430da3241b0b2eb61ec8.mp3",
+      "fileSha256": "fbb7ccbc7ab7f39f01a1e14c17ff994b75230f802845838196985c8f0f8cbd64",
+      "chars": 90,
+      "quota": 80,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-101": {
+      "textSha256": "7d397497661fe3dc3bb849cf9b1d35f577eb329b7188ce95138fd86ae297f995",
+      "file": "7d397497661fe3dc3bb849cf9b1d35f577eb329b7188ce95138fd86ae297f995.mp3",
+      "fileSha256": "95f1311724381c236fde3496241c2ea26dafe990e18adfc1a6c6d79d0ed6830e",
+      "chars": 157,
+      "quota": 141,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-102": {
+      "textSha256": "589bfc2748679ed6980183fa341ff5e8c8e90e80f65d3d780f1b345112ee54bc",
+      "file": "589bfc2748679ed6980183fa341ff5e8c8e90e80f65d3d780f1b345112ee54bc.mp3",
+      "fileSha256": "76f828a228c8f55d321f5d942a4660b87e147ca6585eaf894ffdc40a01ce5f6b",
+      "chars": 44,
+      "quota": 40,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-103": {
+      "textSha256": "d2518891f1560dfb772cf10da4c91d23fcd0cc9da5870834e6b045273ede0ddb",
+      "file": "d2518891f1560dfb772cf10da4c91d23fcd0cc9da5870834e6b045273ede0ddb.mp3",
+      "fileSha256": "51f4fa35f43439e2352e91adc2d28fbd850cfec7f4132d81156eeff980156797",
+      "chars": 49,
+      "quota": 45,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-104": {
+      "textSha256": "28c7b0397c0f4bef0673603c14f8faae278aade242fa1d0ea9b8b7ca67c3bf13",
+      "file": "28c7b0397c0f4bef0673603c14f8faae278aade242fa1d0ea9b8b7ca67c3bf13.mp3",
+      "fileSha256": "23d802c11187a8fbe841e759ffb01423d14cdd34db6a9129c466bcc648973ce8",
+      "chars": 52,
+      "quota": 48,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-105": {
+      "textSha256": "395bfa9c0357193133423b538de33b538b276f3a4a24c0d80ddbd1dd4f5deb74",
+      "file": "395bfa9c0357193133423b538de33b538b276f3a4a24c0d80ddbd1dd4f5deb74.mp3",
+      "fileSha256": "c2e181f1f17bd342d6c599508e0b731450ad188a02f515ee17b7d94bf2d73615",
+      "chars": 64,
+      "quota": 60,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-106": {
+      "textSha256": "c6f8c7b35e7395d813b188db5071adad90e6edf24928ecdc375307fb1861f4d4",
+      "file": "c6f8c7b35e7395d813b188db5071adad90e6edf24928ecdc375307fb1861f4d4.mp3",
+      "fileSha256": "4a38d1764bb84ee82f86912f2c3d41252314d3ccc2d9e65e457bf81c1c3a52a8",
+      "chars": 67,
+      "quota": 57,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-107": {
+      "textSha256": "ca8d4c13664c6d9287e4ec232d0e52ffc5ce37231d11a439dc662b9c25c2a561",
+      "file": "ca8d4c13664c6d9287e4ec232d0e52ffc5ce37231d11a439dc662b9c25c2a561.mp3",
+      "fileSha256": "266df2e709ceb07daf79215e00ae6860ae8a3b5addd8f52b8731f86b8f096945",
+      "chars": 47,
+      "quota": 43,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-108": {
+      "textSha256": "576f882cb34e02624744597c4e89b261ee09e0187dfed1e75629679cd5506481",
+      "file": "576f882cb34e02624744597c4e89b261ee09e0187dfed1e75629679cd5506481.mp3",
+      "fileSha256": "22a14af0b502b0eca069ee7af30529f54fbffd82fb07c91861dcb6e592678098",
+      "chars": 75,
+      "quota": 65,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-109": {
+      "textSha256": "c191e048199da170e5dcb2aef9e9d96179cf38d5aa360c2d541b1b81c0ff5bb4",
+      "file": "c191e048199da170e5dcb2aef9e9d96179cf38d5aa360c2d541b1b81c0ff5bb4.mp3",
+      "fileSha256": "08b8b7a547dc42ea830fab5de07d003ed475658f471bff33bf971a33146f8539",
+      "chars": 121,
+      "quota": 111,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-110": {
+      "textSha256": "479771d1ccb32d45986b2ea243a59fa76007769374ff75084e4b20bf6d628b40",
+      "file": "479771d1ccb32d45986b2ea243a59fa76007769374ff75084e4b20bf6d628b40.mp3",
+      "fileSha256": "aa4e0d717c39906d1a49e63dcc6c0262ce1165bd282557c91d1d41eafffc1f66",
+      "chars": 55,
+      "quota": 51,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-111": {
+      "textSha256": "14c17c41f30c9b821666347ed887aa8fd666be9924d76f79a56960a810061e87",
+      "file": "14c17c41f30c9b821666347ed887aa8fd666be9924d76f79a56960a810061e87.mp3",
+      "fileSha256": "00b22e4fb6f5cbe593b5681786331061b78498570f3dd4cb33ed7fb3cfb12973",
+      "chars": 216,
+      "quota": 200,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-112": {
+      "textSha256": "b796eb595517b6baad5a0971afdd53c61f9a4383b185dc21d992ea2cf807a102",
+      "file": "b796eb595517b6baad5a0971afdd53c61f9a4383b185dc21d992ea2cf807a102.mp3",
+      "fileSha256": "d0a1032a80224f0e8d85f383d4319fab687c3c4fd8c48ebe73f03892da81c97a",
+      "chars": 138,
+      "quota": 122,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-113": {
+      "textSha256": "628ab8a861d61010f34e48e318154b1f59f8b69f3f378b8527334579ffdf8a73",
+      "file": "628ab8a861d61010f34e48e318154b1f59f8b69f3f378b8527334579ffdf8a73.mp3",
+      "fileSha256": "240526b1963ef26768ed07711aec9b5f2b7634d5be0835f3d1fee9bca73aad4e",
+      "chars": 138,
+      "quota": 128,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-114": {
+      "textSha256": "502e2612e77418127f8b1ba808c7e9f0d03b31743135eb6f6d4df8a9b8fb8bc9",
+      "file": "502e2612e77418127f8b1ba808c7e9f0d03b31743135eb6f6d4df8a9b8fb8bc9.mp3",
+      "fileSha256": "6a13d0f9da0d98e1441c01513b7d8fe9d03fbed8c6a2885f40e2e0480b695766",
+      "chars": 210,
+      "quota": 188,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-115": {
+      "textSha256": "ebbb6c6d1aa4dd5d243046ec3ba40dc31271136dc34c2e02fce03e387953f4e2",
+      "file": "ebbb6c6d1aa4dd5d243046ec3ba40dc31271136dc34c2e02fce03e387953f4e2.mp3",
+      "fileSha256": "ac949d5ab8f351d18969690dfc89ebc3023649d7da6f5678c9441dffa0ab75ff",
+      "chars": 113,
+      "quota": 103,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-116": {
+      "textSha256": "340df4b73609ba18da8f9a85d87b64c8cfb781c8ff8857a5d0b4158e2cd04c9e",
+      "file": "340df4b73609ba18da8f9a85d87b64c8cfb781c8ff8857a5d0b4158e2cd04c9e.mp3",
+      "fileSha256": "1f792746704bc380f89ff1ffb1169f163591d991ce1632b52920623f242e2276",
+      "chars": 163,
+      "quota": 153,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-117": {
+      "textSha256": "aa34916751ecf8f0ea6cd002a7ed5ba2ae9ef9df90f7d47bb8174d3197b06dd9",
+      "file": "aa34916751ecf8f0ea6cd002a7ed5ba2ae9ef9df90f7d47bb8174d3197b06dd9.mp3",
+      "fileSha256": "6b078cdad3f399e2664df0c375e818cb33f5581764916db1c5c34c86cfeaf9fb",
+      "chars": 55,
+      "quota": 51,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-118": {
+      "textSha256": "69a5e5a2615e46eb2d1430d5753fafa9aaad04ed87488a5ccc0fc49927026de9",
+      "file": "69a5e5a2615e46eb2d1430d5753fafa9aaad04ed87488a5ccc0fc49927026de9.mp3",
+      "fileSha256": "d824010353c873c177dcd682cb76165d0476b90ed934cbf56b7942ee30aa6319",
+      "chars": 117,
+      "quota": 107,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-119": {
+      "textSha256": "fd14ed9c0bd6727fcc81549a00a367f2dede5ec9ed8ae9d97a8a2260a70d166e",
+      "file": "fd14ed9c0bd6727fcc81549a00a367f2dede5ec9ed8ae9d97a8a2260a70d166e.mp3",
+      "fileSha256": "2f24bb6669f812ff2f202abad75d4efb7e3c895ef51baeff4ef55db9b6ea17c3",
+      "chars": 51,
+      "quota": 47,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-120": {
+      "textSha256": "3c426a9beabb290d4c6548af92183ce654572e7b24add57a27ee18cd4c2c475f",
+      "file": "3c426a9beabb290d4c6548af92183ce654572e7b24add57a27ee18cd4c2c475f.mp3",
+      "fileSha256": "ef40e32c2288417f39076b92812a7f08c4f86aa440c6b583338e6a232b0e638b",
+      "chars": 147,
+      "quota": 137,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-121": {
+      "textSha256": "453791c76e3f4732d28a0710facfd06a0d82c4f36acd066356ab330d8222a612",
+      "file": "453791c76e3f4732d28a0710facfd06a0d82c4f36acd066356ab330d8222a612.mp3",
+      "fileSha256": "27d472c94a74c1788bb5013b4d27b4d6841c2845a66a2645e3fb2a858775c0f2",
+      "chars": 113,
+      "quota": 103,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-122": {
+      "textSha256": "dd133743047f23eb685aba9927860688026337b0dd5dcc597dc14bf0e00c041b",
+      "file": "dd133743047f23eb685aba9927860688026337b0dd5dcc597dc14bf0e00c041b.mp3",
+      "fileSha256": "8624ae6d10dee20f49e701ce1af6ac7f50f48324e00e32e7439596575715487d",
+      "chars": 85,
+      "quota": 75,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-123": {
+      "textSha256": "15533d63c94df54f0b6c76ca97d3c87b863cf3d0ffe036207246572fe0fb9717",
+      "file": "15533d63c94df54f0b6c76ca97d3c87b863cf3d0ffe036207246572fe0fb9717.mp3",
+      "fileSha256": "5dd2c1bf325eb648ef523ce27cdc72b9806f0b59bdc68d071d954f0212a3ca4d",
+      "chars": 67,
+      "quota": 63,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-124": {
+      "textSha256": "4bb82e10ff1410d5f08991c8ef12b6eca62ad21db03e07cfb9638631bc88fde3",
+      "file": "4bb82e10ff1410d5f08991c8ef12b6eca62ad21db03e07cfb9638631bc88fde3.mp3",
+      "fileSha256": "b896f1951c085fbaacb66c2d967dac3e937db31d09eb8460c82e24dd6562a524",
+      "chars": 186,
+      "quota": 176,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-125": {
+      "textSha256": "427cf1cc656de8fa7b5780c0cbb40a397205565e97b7fb3ff7a84e3d8ad06da5",
+      "file": "427cf1cc656de8fa7b5780c0cbb40a397205565e97b7fb3ff7a84e3d8ad06da5.mp3",
+      "fileSha256": "9d6cc125206eb14458a0dd1f51294a4dd9caae768121116fc59f97c311974c82",
+      "chars": 137,
+      "quota": 127,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-126": {
+      "textSha256": "57ede7a0b3aa37c79d6866e84f0a4becc8ff3fd8289a7cf77d570ecd70580990",
+      "file": "57ede7a0b3aa37c79d6866e84f0a4becc8ff3fd8289a7cf77d570ecd70580990.mp3",
+      "fileSha256": "e86f5e4cd5d26f31e6063ae9fd2a951489bad66433358ae750c75b0562842302",
+      "chars": 38,
+      "quota": 34,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-127": {
+      "textSha256": "71f4ca6bad5adcd04552c36cd44ba59ff20c8a1929507d5c7027d4e355949d6d",
+      "file": "71f4ca6bad5adcd04552c36cd44ba59ff20c8a1929507d5c7027d4e355949d6d.mp3",
+      "fileSha256": "4e2b88b7770cf2c234f3def34e8e91f8cf27ff8e973f9fc8644dec28813bc999",
+      "chars": 171,
+      "quota": 155,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-128": {
+      "textSha256": "879b35b1a2625acbb24d1a315e6c4bf842c6f3dccd313cf9bd7b74b486168154",
+      "file": "879b35b1a2625acbb24d1a315e6c4bf842c6f3dccd313cf9bd7b74b486168154.mp3",
+      "fileSha256": "d2c78610e0e556b76c8e1e66b69e53060f95063ec72d5a1232d476a273c92123",
+      "chars": 46,
+      "quota": 42,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-129": {
+      "textSha256": "85fd74e678e9d1d565a5011250184ff2ac5714aca42cf0c08bf2f0636f7a71ba",
+      "file": "85fd74e678e9d1d565a5011250184ff2ac5714aca42cf0c08bf2f0636f7a71ba.mp3",
+      "fileSha256": "88480941644e22af5cf6315a69fde2aa61aa2e21a6f57d8e8b24d9482b5dc3ef",
+      "chars": 236,
+      "quota": 214,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-130": {
+      "textSha256": "269796be28635075674977d9e54df78941d64418f52af656bb1a0d3911c8a999",
+      "file": "269796be28635075674977d9e54df78941d64418f52af656bb1a0d3911c8a999.mp3",
+      "fileSha256": "00a5016491a096c460372593fc448e45be8d5df8a0e6bd77259db41c44709795",
+      "chars": 205,
+      "quota": 189,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-131": {
+      "textSha256": "4421dc26b88f0ba1671d8e62c1faf395357c22030c26774a8ada75083c148de0",
+      "file": "4421dc26b88f0ba1671d8e62c1faf395357c22030c26774a8ada75083c148de0.mp3",
+      "fileSha256": "481a1f687553836b91cdc51f18a8d93ccf329cba1ff089cd405e97abe459c60b",
+      "chars": 41,
+      "quota": 37,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-132": {
+      "textSha256": "6cc512c2b834c37fec38b0190fa6ce08d581797e43de25786d969919dd4e3666",
+      "file": "6cc512c2b834c37fec38b0190fa6ce08d581797e43de25786d969919dd4e3666.mp3",
+      "fileSha256": "1f7e88336a5d2f6605fe270b8d3294e2715d0047a6a0b86f6c56b2768d919b78",
+      "chars": 30,
+      "quota": 26,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-133": {
+      "textSha256": "9a2cd0c37d0bfe11cf676d83577defc36aac245baf30e4c11f71355a15cd1eb9",
+      "file": "9a2cd0c37d0bfe11cf676d83577defc36aac245baf30e4c11f71355a15cd1eb9.mp3",
+      "fileSha256": "131bafd0d12173ed56be08d543ef47c498b3ff0c4488ae1fa10a8b924f7b68b8",
+      "chars": 88,
+      "quota": 78,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-134": {
+      "textSha256": "497ee848290b202cf25f2cdb960cc584a93f1b44b0b10532dfda05bb443fdc32",
+      "file": "497ee848290b202cf25f2cdb960cc584a93f1b44b0b10532dfda05bb443fdc32.mp3",
+      "fileSha256": "0200b0a188504e173d8f12bcc863cb9e8e97bb82d010482fdc9e35d4cb04ed58",
+      "chars": 128,
+      "quota": 118,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-135": {
+      "textSha256": "79b15e1ed44d28ccff16c978670e7d2ee85661b18da18dca37f434c03aae7f30",
+      "file": "79b15e1ed44d28ccff16c978670e7d2ee85661b18da18dca37f434c03aae7f30.mp3",
+      "fileSha256": "9011fc3cda82a045b675657a688cac6e6436dc2bb70e7e4b4eb1980bbd0a7b12",
+      "chars": 95,
+      "quota": 85,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-136": {
+      "textSha256": "cc55f5ac2189fdce35e810babac478d8ff471ddc96d5ad3fdc39ad4c9bf05092",
+      "file": "cc55f5ac2189fdce35e810babac478d8ff471ddc96d5ad3fdc39ad4c9bf05092.mp3",
+      "fileSha256": "f77ceffde3f3b5fdb2c69e66503d3875168e914d9bcb1bdbb76c391f9e7c9863",
+      "chars": 34,
+      "quota": 30,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-137": {
+      "textSha256": "7693b727541011f35d9449101ebc7ce936f1a0c19c8ab523423fde982325e580",
+      "file": "7693b727541011f35d9449101ebc7ce936f1a0c19c8ab523423fde982325e580.mp3",
+      "fileSha256": "b7154ed83f47a7544c3767cf5c002cbccc027e6332b161daa5f425a3650f55dc",
+      "chars": 48,
+      "quota": 44,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-138": {
+      "textSha256": "58c8eae4750f2979c370b5cc12b848563a2e7ec4474b5c6650f8d839d6a415d9",
+      "file": "58c8eae4750f2979c370b5cc12b848563a2e7ec4474b5c6650f8d839d6a415d9.mp3",
+      "fileSha256": "5de631f07d40230beaff0cd67baf1d5d5411a4bc3dd1d0eddc7ef30afe504770",
+      "chars": 32,
+      "quota": 28,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-139": {
+      "textSha256": "f8c3a0657eceef07ec6dcd615a5956f618054232c4be6c18c2a47ca457047e4d",
+      "file": "f8c3a0657eceef07ec6dcd615a5956f618054232c4be6c18c2a47ca457047e4d.mp3",
+      "fileSha256": "b15477150a54489a36d78de1dd83b5b7854f582daed82b521037480fe9742df2",
+      "chars": 41,
+      "quota": 37,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-140": {
+      "textSha256": "53844df3b8dca868fc8e656b32315de3867a52c1ec5c1d3c32182235b1b1da46",
+      "file": "53844df3b8dca868fc8e656b32315de3867a52c1ec5c1d3c32182235b1b1da46.mp3",
+      "fileSha256": "8df9fbbd31db53088f878bc7dffbd869d7686baaad285ddf8faff5043ccce036",
+      "chars": 67,
+      "quota": 63,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-141": {
+      "textSha256": "a852433249fe2bbd8888f20a425c51a7c11844c857d288201a9e9422fb34efd2",
+      "file": "a852433249fe2bbd8888f20a425c51a7c11844c857d288201a9e9422fb34efd2.mp3",
+      "fileSha256": "2236d7116a3eda74f31ce609def247bedf195318f14e306bea575852be2c24ed",
+      "chars": 42,
+      "quota": 38,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-142": {
+      "textSha256": "98e0629b3dc4ca94344e9fb7a334cd5adaaaf3ff600be5d17c078c6db54216fd",
+      "file": "98e0629b3dc4ca94344e9fb7a334cd5adaaaf3ff600be5d17c078c6db54216fd.mp3",
+      "fileSha256": "d2b7c6258b7250f27aa4bc2813932d60aa5e61fb63dc796dca42051b84f3bc89",
+      "chars": 62,
+      "quota": 58,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-143": {
+      "textSha256": "c0126bd214a76406fd5fe224d79bdbf24b744389d56232ebd63b4991b4ce77ec",
+      "file": "c0126bd214a76406fd5fe224d79bdbf24b744389d56232ebd63b4991b4ce77ec.mp3",
+      "fileSha256": "e0a75e4a42411ecb90d97075fdd2e3b71ad9b28f6e639f79262fd70e20a3a7a7",
+      "chars": 73,
+      "quota": 63,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-144": {
+      "textSha256": "0fd0806a51f6d03a01f455dd26b5d17622633eb8ebb0fdd1053cdb4539736053",
+      "file": "0fd0806a51f6d03a01f455dd26b5d17622633eb8ebb0fdd1053cdb4539736053.mp3",
+      "fileSha256": "42b8ac5acb989a2970a6dcc695cccfb2c46e4b99ee527fde7ffb0fb436c806c0",
+      "chars": 192,
+      "quota": 176,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-145": {
+      "textSha256": "f7212559f62846f468d853c058b51a4ba91d031fbf6c8fa100f7681c51bc7f73",
+      "file": "f7212559f62846f468d853c058b51a4ba91d031fbf6c8fa100f7681c51bc7f73.mp3",
+      "fileSha256": "38af002c8dfbae405d552bbed4c30598ab6608a41bc7cda026d2e6688a6386cd",
+      "chars": 121,
+      "quota": 111,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-146": {
+      "textSha256": "0f139503dc6b4e40aba6e83be15fecca8b00fda3633fd8106567cffa94552724",
+      "file": "0f139503dc6b4e40aba6e83be15fecca8b00fda3633fd8106567cffa94552724.mp3",
+      "fileSha256": "46dcb6fa0b37f93cfe99965d3db19bbbc97b7ff3399177c30ca636ed05f31c77",
+      "chars": 60,
+      "quota": 56,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-147": {
+      "textSha256": "993f51ef589dbb705554a7d6e23308427f09e0638884be6505f693d545620fc9",
+      "file": "993f51ef589dbb705554a7d6e23308427f09e0638884be6505f693d545620fc9.mp3",
+      "fileSha256": "8d44d67f0d820e15bd61dd59564ea841a4fa9a93fdf0ed9343bec58a29cdca51",
+      "chars": 58,
+      "quota": 48,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-148": {
+      "textSha256": "2208fcf7712ce860ae182a92e0e1c481073cf4d84c82ab62c49d214025c80c58",
+      "file": "2208fcf7712ce860ae182a92e0e1c481073cf4d84c82ab62c49d214025c80c58.mp3",
+      "fileSha256": "a2ca180161232c41ffe38473f0a46b9b058ac21328a474fc6caa58d4d136cdbc",
+      "chars": 49,
+      "quota": 45,
+      "generatedAt": "2026-10-24"
+    },
+    "chiang-chi-chen-149": {
+      "textSha256": "036bdbd8cedfa98f41653e3fcef07fd2b92e1b7554885aa25b77ac20e70e7461",
+      "file": "036bdbd8cedfa98f41653e3fcef07fd2b92e1b7554885aa25b77ac20e70e7461.mp3",
+      "fileSha256": "56bff95eb27769397406cd69ee177d72dfac728492d0a22af4581d672a19a362",
+      "chars": 30,
+      "quota": 26,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-001": {
+      "textSha256": "a9c08845f8c36bbd3d202fb6944f8ce8217553c1c2fc4afcce30f3ca93016af3",
+      "file": "a9c08845f8c36bbd3d202fb6944f8ce8217553c1c2fc4afcce30f3ca93016af3.mp3",
+      "fileSha256": "60c20bdfe790533c51364f90a3588af1de4a709afc00152ff2bca4205bf26ee4",
+      "chars": 78,
+      "quota": 74,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-002": {
+      "textSha256": "f74ac72f4cdf187aa2f94d2ab00f7c1d4ce262505e22c73b2beb310a62e58c4a",
+      "file": "f74ac72f4cdf187aa2f94d2ab00f7c1d4ce262505e22c73b2beb310a62e58c4a.mp3",
+      "fileSha256": "56451fd60fc9686d74ab2fd638b579aef568996e16e2c050f29967a30ba06dd8",
+      "chars": 174,
+      "quota": 140,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-003": {
+      "textSha256": "04699132b174d9326cee6cf14763f7ec058021f415a0ac69095ffbcae996ad0d",
+      "file": "04699132b174d9326cee6cf14763f7ec058021f415a0ac69095ffbcae996ad0d.mp3",
+      "fileSha256": "6c4fb8d4439cc6d3376f90c963651d219a11127fc47f7104c5daa6b719fb2d6b",
+      "chars": 267,
+      "quota": 227,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-004": {
+      "textSha256": "1b3a7a5b00b3753bb81159e0057b5d4d54425a4e8140f88b8f42c096e4e6141f",
+      "file": "1b3a7a5b00b3753bb81159e0057b5d4d54425a4e8140f88b8f42c096e4e6141f.mp3",
+      "fileSha256": "f90cb2bf45b60f3ceb0bdf804cdc6e977519c708999a9a9fcd87522faf99a20c",
+      "chars": 176,
+      "quota": 154,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-005": {
+      "textSha256": "f265e3917fcc50ad339fd1c3c8fbc10a2013fd22e9fa52fe4d96c146c1820b85",
+      "file": "f265e3917fcc50ad339fd1c3c8fbc10a2013fd22e9fa52fe4d96c146c1820b85.mp3",
+      "fileSha256": "b3e949b9d1aa2c35e7c79aa9de628f2bb91d831b40c5348539d623f69576708d",
+      "chars": 191,
+      "quota": 175,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-006": {
+      "textSha256": "d061dd158c6609971a5ceb9c2ecc329052db34fbcb8f7596a1525d80d00395d3",
+      "file": "d061dd158c6609971a5ceb9c2ecc329052db34fbcb8f7596a1525d80d00395d3.mp3",
+      "fileSha256": "f604ef21d44e188e786899171bcc7fc70f188e86d3680946e59bb76a7f4f2ae2",
+      "chars": 82,
+      "quota": 72,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-007": {
+      "textSha256": "75db268da18001a86c5095b224dce1b77017e98368f52be379d2e8d7a8b14a0a",
+      "file": "75db268da18001a86c5095b224dce1b77017e98368f52be379d2e8d7a8b14a0a.mp3",
+      "fileSha256": "24231ad46207d54746ce301e68e2a90980567ec5af148a8d6d861f8d71775eae",
+      "chars": 132,
+      "quota": 122,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-008": {
+      "textSha256": "e1c90a4a3abddef6d6703c64ac0e284d35553ed697b1b54ba53dca26569e8edc",
+      "file": "e1c90a4a3abddef6d6703c64ac0e284d35553ed697b1b54ba53dca26569e8edc.mp3",
+      "fileSha256": "1c37a2226a2a57834f0e00a83a3b6987980cdb801c6af2cd2a5129c718151a5d",
+      "chars": 69,
+      "quota": 59,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-009": {
+      "textSha256": "a80f20029d283d25eb8cbdbf05b0f8fb31079d46b3304d56fc681aef65e2d7ca",
+      "file": "a80f20029d283d25eb8cbdbf05b0f8fb31079d46b3304d56fc681aef65e2d7ca.mp3",
+      "fileSha256": "6ca84770bd16783a9edfb4b905cfd63fe792b80986c57a29ca82e431cbd81597",
+      "chars": 101,
+      "quota": 91,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-010": {
+      "textSha256": "76aa770c96299172a5cbb83a19f377614fba37615558d058eb6225d3a97a59d5",
+      "file": "76aa770c96299172a5cbb83a19f377614fba37615558d058eb6225d3a97a59d5.mp3",
+      "fileSha256": "f6936f010b370c0e773b35c796f1a314c502dd6729d857a0a0305be11382818f",
+      "chars": 50,
+      "quota": 46,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-011": {
+      "textSha256": "16aa4f42d8d203e45d5f18eb47e131accc95b4622ad2aef663d75d4d4e5c9bed",
+      "file": "16aa4f42d8d203e45d5f18eb47e131accc95b4622ad2aef663d75d4d4e5c9bed.mp3",
+      "fileSha256": "c2f15b9d6b51655ed3da07b0c0117e1c69bae6037665fef538b654d59f83133a",
+      "chars": 128,
+      "quota": 112,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-012": {
+      "textSha256": "117c23fbb0a7d7d946e834578fca3ad8e061444b39a2a9aa45d2934084249647",
+      "file": "117c23fbb0a7d7d946e834578fca3ad8e061444b39a2a9aa45d2934084249647.mp3",
+      "fileSha256": "a0844c20dc4c4ae1dceb15292b2ae0c9fc5b1670bd57d4c776fe274271bf631b",
+      "chars": 188,
+      "quota": 166,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-013": {
+      "textSha256": "b7cfd9cf4b44f781bcf0adaeb28525dd032fcad22d85af3470ced8526910b696",
+      "file": "b7cfd9cf4b44f781bcf0adaeb28525dd032fcad22d85af3470ced8526910b696.mp3",
+      "fileSha256": "561984cddc2daf15aa20de7b0b4b50bf59a04d28a45633ef14caf402199b7f0f",
+      "chars": 90,
+      "quota": 86,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-014": {
+      "textSha256": "ac20aff97787357fe190e48a4241a36c7fa3a39427c109cc5be7f545b434587f",
+      "file": "ac20aff97787357fe190e48a4241a36c7fa3a39427c109cc5be7f545b434587f.mp3",
+      "fileSha256": "f97e0491924bb757341123097ff3c0261df4a94e5b382a462603ccda05d820e8",
+      "chars": 145,
+      "quota": 141,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-015": {
+      "textSha256": "42b647234767eee03015526c207cff927dfca625ea4b74bab9a1b68b143899c8",
+      "file": "42b647234767eee03015526c207cff927dfca625ea4b74bab9a1b68b143899c8.mp3",
+      "fileSha256": "0a0eae4af5d05e525d7bdfb59db1b24e59486d56ad3cfb27437e03edb4612428",
+      "chars": 114,
+      "quota": 104,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-016": {
+      "textSha256": "b093bd6dfbe76ed57beb8013d27fca8a7105b7a78b7736936ff7a2aaac8dc5d6",
+      "file": "b093bd6dfbe76ed57beb8013d27fca8a7105b7a78b7736936ff7a2aaac8dc5d6.mp3",
+      "fileSha256": "27a131e36ad23abd25c93ac5528f0581b62a3f03b9395dd98ba488ecc3405d0c",
+      "chars": 107,
+      "quota": 103,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-017": {
+      "textSha256": "49702531e3bd9ec68109ea3e4ea48adb980f50a88b4e523baa57264fa2b4610d",
+      "file": "49702531e3bd9ec68109ea3e4ea48adb980f50a88b4e523baa57264fa2b4610d.mp3",
+      "fileSha256": "5a9978c61e562fe11c08df322fe6abf5c2615d8f1c68a41d71396bf5a70316f2",
+      "chars": 107,
+      "quota": 97,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-018": {
+      "textSha256": "35dbe0857d5e753a768b672ebb0e1f0c8682ea00bb7d2039ae07b309fe329f9f",
+      "file": "35dbe0857d5e753a768b672ebb0e1f0c8682ea00bb7d2039ae07b309fe329f9f.mp3",
+      "fileSha256": "03cff29705310d8e6a1e0f4201b537b63ba68e8705e3536826014306abf383f6",
+      "chars": 394,
+      "quota": 354,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-019": {
+      "textSha256": "c6155f9a0c2ddc036369671bf1299e9b608de96eb1703e5867da42dbd1798433",
+      "file": "c6155f9a0c2ddc036369671bf1299e9b608de96eb1703e5867da42dbd1798433.mp3",
+      "fileSha256": "92ba5498e29f11fa5b88c0d8a48e593652bd20efa77fcc73f0d72fb57c91010c",
+      "chars": 120,
+      "quota": 110,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-020": {
+      "textSha256": "bb83ffe89d483014809f211167d026ea29f5945155844949fdcb78669ecc9bc6",
+      "file": "bb83ffe89d483014809f211167d026ea29f5945155844949fdcb78669ecc9bc6.mp3",
+      "fileSha256": "c40a6680a051666b1e03a71f0d75e92433f4d9b7d9e0ab5bcb5fb983524708e4",
+      "chars": 342,
+      "quota": 314,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-021": {
+      "textSha256": "f1537a9865afd87197238167936201d68146d92b2657f7f5b929c74ca4a313f1",
+      "file": "f1537a9865afd87197238167936201d68146d92b2657f7f5b929c74ca4a313f1.mp3",
+      "fileSha256": "e518f01568a30e7969cd705eb58564013e8d2a6deb57696cbf91c92b85364801",
+      "chars": 163,
+      "quota": 153,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-022": {
+      "textSha256": "674dc85f6caab3b603a60ee152f3b8c61e5f8c8d38db0bfad7292461cd49afbb",
+      "file": "674dc85f6caab3b603a60ee152f3b8c61e5f8c8d38db0bfad7292461cd49afbb.mp3",
+      "fileSha256": "676105273b84fe81f49731a90219d1ccc8007ea95bba32f69ed9e5381fd9a2eb",
+      "chars": 202,
+      "quota": 180,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-023": {
+      "textSha256": "9e4b4eae5f7a413d7250b2f8943789a76783fa794ddaf5d4665465e504bb0631",
+      "file": "9e4b4eae5f7a413d7250b2f8943789a76783fa794ddaf5d4665465e504bb0631.mp3",
+      "fileSha256": "cb2d958a4b49e1140d7a4c1905b1d7de03de5c0dec960e3b277f2e1bf092a881",
+      "chars": 184,
+      "quota": 168,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-024": {
+      "textSha256": "b8ace002ce126c21a708993d985edc72b824e8643dc79b1f7510706fc69f8524",
+      "file": "b8ace002ce126c21a708993d985edc72b824e8643dc79b1f7510706fc69f8524.mp3",
+      "fileSha256": "59f4fcfb2662745f995d4ee369d8409039d6e452c95523de580b7783fef2fcd8",
+      "chars": 52,
+      "quota": 48,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-025": {
+      "textSha256": "d0ddfd25bf45d16494a067a95489a995d67716d9c0c5256f5860d61ad99f4835",
+      "file": "d0ddfd25bf45d16494a067a95489a995d67716d9c0c5256f5860d61ad99f4835.mp3",
+      "fileSha256": "1076ef7dce678e32a9adb2360225cdb2a12d09bad5ecf103b8add3c299944d27",
+      "chars": 37,
+      "quota": 33,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-026": {
+      "textSha256": "79626f39801480e44ed8515044dd64687a1e6a6b607f13e127902d55a4195b42",
+      "file": "79626f39801480e44ed8515044dd64687a1e6a6b607f13e127902d55a4195b42.mp3",
+      "fileSha256": "78a1de81ae94f80cf82936195dd544dfaae53dc267c53127691ce32432d05fb0",
+      "chars": 142,
+      "quota": 132,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-027": {
+      "textSha256": "aee85202808cc6540de9fe90f735e55a78eb93019d0fc88b32fe245b3d56bdc0",
+      "file": "aee85202808cc6540de9fe90f735e55a78eb93019d0fc88b32fe245b3d56bdc0.mp3",
+      "fileSha256": "16c60dee7654818ee96d194a6721a90dbaad39272596a185d1383fd7c8b2de76",
+      "chars": 46,
+      "quota": 42,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-028": {
+      "textSha256": "f1a5743886c388597d02618659b5e0ff9e0b99b7cf1f50078e3cd720e48d9ae1",
+      "file": "f1a5743886c388597d02618659b5e0ff9e0b99b7cf1f50078e3cd720e48d9ae1.mp3",
+      "fileSha256": "4838c1fff5072efee8dd5cf2d2f20e0fd70f377c2263c180f0e63c42c123c419",
+      "chars": 88,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-029": {
+      "textSha256": "76df59cb74accb4d73be7f141dcbdfa5d025943dfd6ae25bfc6331b8c6f5b45e",
+      "file": "76df59cb74accb4d73be7f141dcbdfa5d025943dfd6ae25bfc6331b8c6f5b45e.mp3",
+      "fileSha256": "8e64ced2e32f6e9e1b031337ff0947382538ee0c10a98c120da46a53bcaf3ee4",
+      "chars": 168,
+      "quota": 158,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-030": {
+      "textSha256": "04581499790690562d7aefc8fce258240d6b2d9d1fad1fc19307b2ba7eca7415",
+      "file": "04581499790690562d7aefc8fce258240d6b2d9d1fad1fc19307b2ba7eca7415.mp3",
+      "fileSha256": "ad3e23f57eaab3b6c8c8ea74f45ff200fb80469b39bb6195cfc50924f4b43ef9",
+      "chars": 100,
+      "quota": 90,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-031": {
+      "textSha256": "5b07448938cadafbed7e1b8d94128ae71251e183d9ca69c29d869b8e9b3cc161",
+      "file": "5b07448938cadafbed7e1b8d94128ae71251e183d9ca69c29d869b8e9b3cc161.mp3",
+      "fileSha256": "8ed02d5c696bce7aad57365db660bfbfbd3e2de85e94c132ee39e0080e4d12f8",
+      "chars": 111,
+      "quota": 101,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-032": {
+      "textSha256": "69235df9ed85fcb728d14982bce0e0cfc4f3943df728305bb98ce2e82e702064",
+      "file": "69235df9ed85fcb728d14982bce0e0cfc4f3943df728305bb98ce2e82e702064.mp3",
+      "fileSha256": "792914725b336916610eae68e69692a36de90849b282346d7e1999152f4d030f",
+      "chars": 78,
+      "quota": 68,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-033": {
+      "textSha256": "2df155434c02f6ef9af85d8fc656dddc9358aad5e9df2c183cb126f6606c4246",
+      "file": "2df155434c02f6ef9af85d8fc656dddc9358aad5e9df2c183cb126f6606c4246.mp3",
+      "fileSha256": "962f94a5642829691112719639753f40708c70e28e808bb596089b83bb78df7f",
+      "chars": 228,
+      "quota": 206,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-034": {
+      "textSha256": "4e403e6ac3d8f57a39446f2c29ceec3ba0be445d0183bed1a15101ec03f8e524",
+      "file": "4e403e6ac3d8f57a39446f2c29ceec3ba0be445d0183bed1a15101ec03f8e524.mp3",
+      "fileSha256": "7f14e2cf942963139c1e71dc83f14945396756b6a6118f27c3590620ff0d2e05",
+      "chars": 72,
+      "quota": 68,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-035": {
+      "textSha256": "709ddd4322135c385c6446904977cb6a8bd108b37e95d7e8219623bd66191e50",
+      "file": "709ddd4322135c385c6446904977cb6a8bd108b37e95d7e8219623bd66191e50.mp3",
+      "fileSha256": "7aad91e4128fc25ed4d981157ee2ed8cad8d643896aac180e7a4aea6cd0b2c79",
+      "chars": 122,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-036": {
+      "textSha256": "6591c494f84d797abd6be2e08921f30351a1f48462f092fe7e27d8d7df653932",
+      "file": "6591c494f84d797abd6be2e08921f30351a1f48462f092fe7e27d8d7df653932.mp3",
+      "fileSha256": "388b5ab6575aa70babd7ae89cca161387955092c4e59ab757c9bb86e46ddc7f7",
+      "chars": 248,
+      "quota": 226,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-037": {
+      "textSha256": "c10ded3887176a52d292426cd52cfd4c83810a26df3fea4c5a2248b94ea348a5",
+      "file": "c10ded3887176a52d292426cd52cfd4c83810a26df3fea4c5a2248b94ea348a5.mp3",
+      "fileSha256": "27a7bff1928e0af00bdc7b118da29ef48fa70fc048c0b83343899e20be4b351c",
+      "chars": 153,
+      "quota": 137,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-038": {
+      "textSha256": "807f1e60239d8cdd3485f54ddd39231a2e6880b8c62c2adaaf3e2554051b509c",
+      "file": "807f1e60239d8cdd3485f54ddd39231a2e6880b8c62c2adaaf3e2554051b509c.mp3",
+      "fileSha256": "5e3d1a81880c6fa4afa1dd3f6f4640e1996a174fa14d88ce757fa3d5032aa871",
+      "chars": 110,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-039": {
+      "textSha256": "0e29f740f94e03b2a4ee734d5513985697de90684f421a00de994c2a6d1d33c0",
+      "file": "0e29f740f94e03b2a4ee734d5513985697de90684f421a00de994c2a6d1d33c0.mp3",
+      "fileSha256": "7b61e93d26903103ae795665d431a0d1b96ad3d85da147bf27b74fe27e8d4cae",
+      "chars": 98,
+      "quota": 94,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-040": {
+      "textSha256": "e7d7e5660c83b3d67010d2a70dca066897954e0b9fd0ff6fdb36796191866c5a",
+      "file": "e7d7e5660c83b3d67010d2a70dca066897954e0b9fd0ff6fdb36796191866c5a.mp3",
+      "fileSha256": "d5bcb6f90d564d909a0b6e628c20e7581696316ca970435e5e5a0d704958abfe",
+      "chars": 115,
+      "quota": 105,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-041": {
+      "textSha256": "4ed1fadcc36d404982572a45700bb2bd90f886c25403c0e34202a06f9c0f8cfe",
+      "file": "4ed1fadcc36d404982572a45700bb2bd90f886c25403c0e34202a06f9c0f8cfe.mp3",
+      "fileSha256": "b0a667b8d2ab2e08c06922231d3983270f8620eeb36abaaedaaa53de4271cc60",
+      "chars": 151,
+      "quota": 141,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-042": {
+      "textSha256": "7086051d70e51d984a2b3ff6967097ba526f6e7ef0c2b2dc583f297a14f12ed9",
+      "file": "7086051d70e51d984a2b3ff6967097ba526f6e7ef0c2b2dc583f297a14f12ed9.mp3",
+      "fileSha256": "f9c4aded1f0126b1dc52e077644448a1b3c3aabd05b6273890a46226fb1267c2",
+      "chars": 58,
+      "quota": 54,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-043": {
+      "textSha256": "2241fd060216d72512abf16d45348d640a2efc73bfb9bda331c302a500247e4a",
+      "file": "2241fd060216d72512abf16d45348d640a2efc73bfb9bda331c302a500247e4a.mp3",
+      "fileSha256": "20929341cd630ebb21f2fede665ef806f1e5c39921665b5bde5b73d556f8de8f",
+      "chars": 84,
+      "quota": 80,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-044": {
+      "textSha256": "5aafe100c9bd0eb09324e8c3e66fe3364093a5194096f22ab8066af74cb2b162",
+      "file": "5aafe100c9bd0eb09324e8c3e66fe3364093a5194096f22ab8066af74cb2b162.mp3",
+      "fileSha256": "c46d93543babd0eee621497bd4746fef48844d3fb19457970d3351cc85072b2c",
+      "chars": 318,
+      "quota": 296,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-045": {
+      "textSha256": "d38eaacf1b2c719b521982294362a6ce69aee45138f48c1228431596b8850b0b",
+      "file": "d38eaacf1b2c719b521982294362a6ce69aee45138f48c1228431596b8850b0b.mp3",
+      "fileSha256": "efd14a91e9eea8a1d16b8a2bd11e411a6d694523c48e47c30f692d995b180e4c",
+      "chars": 108,
+      "quota": 104,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-046": {
+      "textSha256": "83cf3941d7adc725b4f9457dcb8a7d9d1333b0cbfc10e0225027ae61f6a32af7",
+      "file": "83cf3941d7adc725b4f9457dcb8a7d9d1333b0cbfc10e0225027ae61f6a32af7.mp3",
+      "fileSha256": "46b6f35750cafb46abe2746ae85cfca591d38327ab557961a4230ade9f8da7dc",
+      "chars": 80,
+      "quota": 76,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-047": {
+      "textSha256": "75316db7b6129dc2ae1a86be4b44985a488f66cee1c7182a2f96a5c3312a86c5",
+      "file": "75316db7b6129dc2ae1a86be4b44985a488f66cee1c7182a2f96a5c3312a86c5.mp3",
+      "fileSha256": "e5b754d2fb4df6f9ff669ca100ac15a06f7ebe75e81ea9929d0f7ab51a4864c5",
+      "chars": 53,
+      "quota": 49,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-048": {
+      "textSha256": "cf607c6b095526c94c2bbf1c4d61c97be62e610ebbaa39ca5056daab6958ab92",
+      "file": "cf607c6b095526c94c2bbf1c4d61c97be62e610ebbaa39ca5056daab6958ab92.mp3",
+      "fileSha256": "7b5ec56b10a1ca42a97881abdca99423961c93683538670e5abb752e8e4fc4da",
+      "chars": 73,
+      "quota": 69,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-049": {
+      "textSha256": "801ac553068f87b95ca9dc95e4223148434c38ff6398ddd2f3ea3f60ab7f3093",
+      "file": "801ac553068f87b95ca9dc95e4223148434c38ff6398ddd2f3ea3f60ab7f3093.mp3",
+      "fileSha256": "da862bc8bca1407dc938958d37cddb96d5137a9cfd81e08c22a9672835ff4672",
+      "chars": 187,
+      "quota": 171,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-050": {
+      "textSha256": "681846e016c8da2afc28550920d541d977c1531cb6433daf93f60f2dbc96f3bc",
+      "file": "681846e016c8da2afc28550920d541d977c1531cb6433daf93f60f2dbc96f3bc.mp3",
+      "fileSha256": "272082bbe090f21c95a9967bb6152d4890c44f40f2b3cef6aaf7af7a1ab790af",
+      "chars": 102,
+      "quota": 98,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-051": {
+      "textSha256": "6502bc72002f27e5d9d9bd90d20df7f86ad4e6375d001f9d6828306e2ffcfc62",
+      "file": "6502bc72002f27e5d9d9bd90d20df7f86ad4e6375d001f9d6828306e2ffcfc62.mp3",
+      "fileSha256": "c6be0b77ff694a046ba8470a6e69c3b1b73f06a43156f41654cbc1efb50a0aea",
+      "chars": 149,
+      "quota": 139,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-052": {
+      "textSha256": "09b09dd7346539a1f0a3aa67f5208ab8137de628a410bd9e9877cf2c2148b8cc",
+      "file": "09b09dd7346539a1f0a3aa67f5208ab8137de628a410bd9e9877cf2c2148b8cc.mp3",
+      "fileSha256": "9290b8dc38ed8da33a06f86787532b21ced9cb1f42f712ea41917cf9444dd3e2",
+      "chars": 188,
+      "quota": 178,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-053": {
+      "textSha256": "75bc5c1c42ab6726e585960a6add9bc6d080df23d8ee9ec2e90ac47b037dbdce",
+      "file": "75bc5c1c42ab6726e585960a6add9bc6d080df23d8ee9ec2e90ac47b037dbdce.mp3",
+      "fileSha256": "61ac2b4f413039520fcaf4ffdeaf3a60a6f660490b64c5038e3fa83b9eeb4728",
+      "chars": 112,
+      "quota": 102,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-054": {
+      "textSha256": "8dbcf883ef0e6dc93e7dcc34a12a8cd318a6d5abdc151add8e82f33abbcc9508",
+      "file": "8dbcf883ef0e6dc93e7dcc34a12a8cd318a6d5abdc151add8e82f33abbcc9508.mp3",
+      "fileSha256": "f176b382c0407ba78c0064021ded67a3890756453889e27aa91bdd772ef01c20",
+      "chars": 107,
+      "quota": 97,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-055": {
+      "textSha256": "ffcbf2a75974d8eefa35daf9a888165238b1c561cde796f6b230faa91ab3155d",
+      "file": "ffcbf2a75974d8eefa35daf9a888165238b1c561cde796f6b230faa91ab3155d.mp3",
+      "fileSha256": "538bb10d8030c61fef148ad80cf07abda04cf8604af3cb6ea7e3200929992c36",
+      "chars": 168,
+      "quota": 158,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-056": {
+      "textSha256": "5bb04ad75bd2c63c886e7bb1235859c801dab00ec29897f9eb1e5ac7a44f8e8f",
+      "file": "5bb04ad75bd2c63c886e7bb1235859c801dab00ec29897f9eb1e5ac7a44f8e8f.mp3",
+      "fileSha256": "3a892d685fa91e8e8630eb02079e496c946df339486c80aed998fa003ec44308",
+      "chars": 383,
+      "quota": 355,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-057": {
+      "textSha256": "86db0567ed394cd5176f2de3436c5278cf1b262a94728783ddcee48a86a8bc2f",
+      "file": "86db0567ed394cd5176f2de3436c5278cf1b262a94728783ddcee48a86a8bc2f.mp3",
+      "fileSha256": "d170d4243ea88bf428c4f93f3d0085f23f8fab43c26ed46e5278258c9da37f6f",
+      "chars": 134,
+      "quota": 124,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-058": {
+      "textSha256": "1390244646507a7da22b2780664eba6d6cb1eb169f25254e4ef0fc6a801384d2",
+      "file": "1390244646507a7da22b2780664eba6d6cb1eb169f25254e4ef0fc6a801384d2.mp3",
+      "fileSha256": "239d98f89c1ac115bdc0088ec6ede4a0d887e89cae53f3c3d3c83ca95fb73ec1",
+      "chars": 69,
+      "quota": 65,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-059": {
+      "textSha256": "d17303fc6388c7676a75be4885e68efcacc27533893bd47fa301f68b68bd8241",
+      "file": "d17303fc6388c7676a75be4885e68efcacc27533893bd47fa301f68b68bd8241.mp3",
+      "fileSha256": "1ab794743a18ae4a73f8b175245a9c0ec6bf0260cb73e2dc76ff26418c80c751",
+      "chars": 81,
+      "quota": 71,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-060": {
+      "textSha256": "c44e9294c360d41444c10ee80c1fb2fdef4329992f089d46ace7306188fcbe22",
+      "file": "c44e9294c360d41444c10ee80c1fb2fdef4329992f089d46ace7306188fcbe22.mp3",
+      "fileSha256": "62316575a370d2ee903f16e83310ccc19160c50e5b8d0873b7ada5ef92d835a6",
+      "chars": 50,
+      "quota": 46,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-061": {
+      "textSha256": "f4ed0399c9575fac9f0ce2e49bf64ba349e71b18c0dfb87f7bcec5dda1ffa1b9",
+      "file": "f4ed0399c9575fac9f0ce2e49bf64ba349e71b18c0dfb87f7bcec5dda1ffa1b9.mp3",
+      "fileSha256": "eb0099df63364f2b02689607b84980cc1398446c096b602fab06c4d97a051bf1",
+      "chars": 53,
+      "quota": 49,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-062": {
+      "textSha256": "22451641df074e2fa5e3c6d2391c8fd8fa024a773ebf0124d483381382fe607b",
+      "file": "22451641df074e2fa5e3c6d2391c8fd8fa024a773ebf0124d483381382fe607b.mp3",
+      "fileSha256": "be25a64f8a5aedadc524e638ddf3e935c268cba94658ce1a29520a57495619a3",
+      "chars": 212,
+      "quota": 196,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-063": {
+      "textSha256": "008f23ca879281ed2056abeef3b039ad623c2788d3928a837fee7af85271952a",
+      "file": "008f23ca879281ed2056abeef3b039ad623c2788d3928a837fee7af85271952a.mp3",
+      "fileSha256": "b025badba3df3e668c7d016d15acb382e8cb08d7609f5a99b8dd22ff17849b03",
+      "chars": 232,
+      "quota": 222,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-064": {
+      "textSha256": "92e812761ccb3fb9629404233404a43865f343b3a3a81b77f577247f9331f398",
+      "file": "92e812761ccb3fb9629404233404a43865f343b3a3a81b77f577247f9331f398.mp3",
+      "fileSha256": "533f6c7ac1ba7795c79c87d798716ff4c5347d5361ef3013a3a6b49052ad6d3f",
+      "chars": 52,
+      "quota": 48,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-065": {
+      "textSha256": "bad0e0daabdfc77e32ae12ddb56ffac94bae3ee3662def66ccd5ed920c66bfab",
+      "file": "bad0e0daabdfc77e32ae12ddb56ffac94bae3ee3662def66ccd5ed920c66bfab.mp3",
+      "fileSha256": "0a56a0ed31a3a0f575a8aa96a9bdcad0f7130d5f9cf506da55e33025cd32b979",
+      "chars": 86,
+      "quota": 76,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-066": {
+      "textSha256": "66e36961c3d443a8c536b1a00afb6048fee2c8ea5644fdc59d5d4b55896a843f",
+      "file": "66e36961c3d443a8c536b1a00afb6048fee2c8ea5644fdc59d5d4b55896a843f.mp3",
+      "fileSha256": "009215991c84e317ebafa2c5ca0225fa2c5f54009a6cdb840675ab5766f6e5ad",
+      "chars": 232,
+      "quota": 210,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-067": {
+      "textSha256": "861595ab973cbacbb1d405aa5555788f706de559b724cc2a417d6663c9e7582e",
+      "file": "861595ab973cbacbb1d405aa5555788f706de559b724cc2a417d6663c9e7582e.mp3",
+      "fileSha256": "ac036b693c50cd163b8e4829cc7d83437ce9765f18de354062ba7850b89c798e",
+      "chars": 186,
+      "quota": 176,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-068": {
+      "textSha256": "bb1b2a3b6ea6e959fb28f61b607e0c845c0e13c8d3253eda9ed6b8318a3b6b86",
+      "file": "bb1b2a3b6ea6e959fb28f61b607e0c845c0e13c8d3253eda9ed6b8318a3b6b86.mp3",
+      "fileSha256": "08507f7ffc39037fce67abe0f534f0f24c375af4e61b6071272fe1afa8e8bb16",
+      "chars": 153,
+      "quota": 143,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-069": {
+      "textSha256": "726d91f2e96c7ab8fd6b76e9e77b8dac075554b3a4941ea638e3ee821c307c2e",
+      "file": "726d91f2e96c7ab8fd6b76e9e77b8dac075554b3a4941ea638e3ee821c307c2e.mp3",
+      "fileSha256": "bec2428c390a3b2266b9221204bad6614fb48df46f59425c62594abd86f30c36",
+      "chars": 122,
+      "quota": 118,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-070": {
+      "textSha256": "73ed84b5392da3686c2ff676291ec67b74c2824ca8ef24995abae09b838d3aa1",
+      "file": "73ed84b5392da3686c2ff676291ec67b74c2824ca8ef24995abae09b838d3aa1.mp3",
+      "fileSha256": "2cb51dfa073f3ffd68b569741c3e143cd9597a952280a6b39098b8297583cf86",
+      "chars": 136,
+      "quota": 126,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-071": {
+      "textSha256": "e9fe7ab80f2dbe4f7b4d4ed5bc8139a1e9e9e4c4c7825ccdc13b97941995b8ac",
+      "file": "e9fe7ab80f2dbe4f7b4d4ed5bc8139a1e9e9e4c4c7825ccdc13b97941995b8ac.mp3",
+      "fileSha256": "9b6baea41b311da5e3a7496f1863607a7a5972405fb0520526c84c5fd798d63e",
+      "chars": 105,
+      "quota": 95,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-072": {
+      "textSha256": "a8d4c88eb1d96ffea07e330c6b18275e4588c8576af2d3477a04b45d60810fc2",
+      "file": "a8d4c88eb1d96ffea07e330c6b18275e4588c8576af2d3477a04b45d60810fc2.mp3",
+      "fileSha256": "96470cf14861dd4247161dcbcf36d6b670b11b0d9a5e1b37f3845ba5ab5ee8ed",
+      "chars": 193,
+      "quota": 171,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-073": {
+      "textSha256": "c642a7231122d3bd506324dd7244e0b7648c316edc75f90c165c2f44b8b31003",
+      "file": "c642a7231122d3bd506324dd7244e0b7648c316edc75f90c165c2f44b8b31003.mp3",
+      "fileSha256": "83c4fc2463dcec16b8f6032a72e91b46d07e92e7b610ab665caa66acdb47ebeb",
+      "chars": 113,
+      "quota": 97,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-074": {
+      "textSha256": "b8f995c939b0858f8b687b7dbc528269a9892579c8594028a74aba7b7f0944b2",
+      "file": "b8f995c939b0858f8b687b7dbc528269a9892579c8594028a74aba7b7f0944b2.mp3",
+      "fileSha256": "f2a66f09cba496e0967a357298efa385338ccfa62ab12f927a0d659a3e6a9f51",
+      "chars": 34,
+      "quota": 30,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-075": {
+      "textSha256": "601be020b46c0f00410a270939ba96fb392be079da641ec9cb1d277bdc178f1e",
+      "file": "601be020b46c0f00410a270939ba96fb392be079da641ec9cb1d277bdc178f1e.mp3",
+      "fileSha256": "3c47f66771f6828c7747feaac45c73867bb2608166cb1e6640b4d6404359222b",
+      "chars": 105,
+      "quota": 101,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-076": {
+      "textSha256": "a9419d821f74571d33aba1537f7df8ed42356b06e42890da46c1d4cb4b2a8a11",
+      "file": "a9419d821f74571d33aba1537f7df8ed42356b06e42890da46c1d4cb4b2a8a11.mp3",
+      "fileSha256": "3561c5b5aa3446a685fe6b7f99648d2898ce845b8ad672bea154343ee0073f2a",
+      "chars": 112,
+      "quota": 108,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-077": {
+      "textSha256": "39a9139186cca604dffacf2a0776fbca92030fc18f0e54e05cbcd744eb9889f1",
+      "file": "39a9139186cca604dffacf2a0776fbca92030fc18f0e54e05cbcd744eb9889f1.mp3",
+      "fileSha256": "99d0875b642c7d700d2bbdca5cbeeb71df63de3e6bff2d5133eea89b8c029fed",
+      "chars": 69,
+      "quota": 59,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-078": {
+      "textSha256": "35051835feddc2b488a610286d5975370a18e9ddb5ca0061367d0f0aaf3add8c",
+      "file": "35051835feddc2b488a610286d5975370a18e9ddb5ca0061367d0f0aaf3add8c.mp3",
+      "fileSha256": "2a09d91f7ee4c3ff381b51966359f8679acce885a17eb11ceff63f2ed625bd20",
+      "chars": 123,
+      "quota": 113,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-079": {
+      "textSha256": "6000aa16a4eb3f0255397bdfea4b61d3698a19ab7d7a5eb47d1b1256992ebd76",
+      "file": "6000aa16a4eb3f0255397bdfea4b61d3698a19ab7d7a5eb47d1b1256992ebd76.mp3",
+      "fileSha256": "3df63ef5e15f74eec1a81911e8943e17aba4e61d142ce7c69fa7ba06235384ed",
+      "chars": 46,
+      "quota": 42,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-080": {
+      "textSha256": "eafe4acf627e1e39a573d54fa561a353d17c6deb2a10096c916207ec58ca9f0d",
+      "file": "eafe4acf627e1e39a573d54fa561a353d17c6deb2a10096c916207ec58ca9f0d.mp3",
+      "fileSha256": "cab23681b4ad03690af4ca35c0d9b3339eb42dfd4a1d61bcc52207c6cc6e025f",
+      "chars": 342,
+      "quota": 320,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-081": {
+      "textSha256": "8907e5088386ef783398324890c12825d63eeca11a4f523a06719b8b89d4d2ec",
+      "file": "8907e5088386ef783398324890c12825d63eeca11a4f523a06719b8b89d4d2ec.mp3",
+      "fileSha256": "6db9eca7d57cbb476af6f2c8187c0c74eae5ffa573d01d68d94c95257b3def64",
+      "chars": 90,
+      "quota": 86,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-082": {
+      "textSha256": "92ae602f85889481acb365aacaf6505b24fb78da25282382d38a490741bf12ae",
+      "file": "92ae602f85889481acb365aacaf6505b24fb78da25282382d38a490741bf12ae.mp3",
+      "fileSha256": "f380a317639d85c77e0456b64e89743084dd69cdd025624196dccc8cb669bad2",
+      "chars": 199,
+      "quota": 183,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-083": {
+      "textSha256": "2474c13aeb8067e2ea8b29a158a6115894f53555d44f83ba307f47961e420fbf",
+      "file": "2474c13aeb8067e2ea8b29a158a6115894f53555d44f83ba307f47961e420fbf.mp3",
+      "fileSha256": "793fb9593e921d6bca7e934d6534f7fafde27a41c29b85daae8b345f7913456f",
+      "chars": 120,
+      "quota": 116,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-084": {
+      "textSha256": "a83fdc9388076053c0491962800d121f524a22fde723ed14931b9a82e307a7d9",
+      "file": "a83fdc9388076053c0491962800d121f524a22fde723ed14931b9a82e307a7d9.mp3",
+      "fileSha256": "872643970f78dbb2c6b30f8832138d596b2faf704b8958f81a5975409229c180",
+      "chars": 122,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-085": {
+      "textSha256": "cfd189d3c658fa788a083863b630539941dfa4afe5084957bc38de41ce8621f1",
+      "file": "cfd189d3c658fa788a083863b630539941dfa4afe5084957bc38de41ce8621f1.mp3",
+      "fileSha256": "06e14fb3ce752dbe74c445aab2e2a0fd6f47047bd3eaca0cf48cbbdf4ac60dd6",
+      "chars": 65,
+      "quota": 55,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-086": {
+      "textSha256": "8a37218746799c67b2064318f63c6bb24259023ea5a44826c6ef7eff70b54e37",
+      "file": "8a37218746799c67b2064318f63c6bb24259023ea5a44826c6ef7eff70b54e37.mp3",
+      "fileSha256": "4078c0d33e5f4ce7ebdafc26241d4e9540f4bd5c5f0b71c1262676613443fb58",
+      "chars": 57,
+      "quota": 53,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-087": {
+      "textSha256": "3ab0033b0196cd6706027c519cd79da5aaa60b2f8e46d1dd203f027c88f3624a",
+      "file": "3ab0033b0196cd6706027c519cd79da5aaa60b2f8e46d1dd203f027c88f3624a.mp3",
+      "fileSha256": "aff6c2cbb17c1a1bc00b82b6a5f1efdb9104722ebd98cec55ddff90aad48f426",
+      "chars": 176,
+      "quota": 160,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-088": {
+      "textSha256": "ab068c2dabfdce9ba2ea20137c2ccdd7c971631a9afa9f278dffa1d7b543fb94",
+      "file": "ab068c2dabfdce9ba2ea20137c2ccdd7c971631a9afa9f278dffa1d7b543fb94.mp3",
+      "fileSha256": "74dbfb52c99a7f40a0aeea6268cf433a645212967c223f1925776f6ca626182e",
+      "chars": 183,
+      "quota": 167,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-089": {
+      "textSha256": "ad2f0a09d6a8ed97341f5ee7a4b2cbaae8c504b119402d380b66e30d4f651851",
+      "file": "ad2f0a09d6a8ed97341f5ee7a4b2cbaae8c504b119402d380b66e30d4f651851.mp3",
+      "fileSha256": "991ea97a7e16967871b951deab8d27ddf460f911203e4ae98d0e98547b5338f7",
+      "chars": 105,
+      "quota": 95,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-090": {
+      "textSha256": "5da8d87f0cc1c377160ab77e3e291d88583a785f36c5b14daa8e11ef15e66b15",
+      "file": "5da8d87f0cc1c377160ab77e3e291d88583a785f36c5b14daa8e11ef15e66b15.mp3",
+      "fileSha256": "af783530355d6c8ebf75ce82954f7a5c6e0f0aab6d65fd567b48d476eb0eca08",
+      "chars": 84,
+      "quota": 80,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-091": {
+      "textSha256": "b20d625e0852972a92cca7d7ccbd25e4b571107be58dc404fd8c011feb5f75fc",
+      "file": "b20d625e0852972a92cca7d7ccbd25e4b571107be58dc404fd8c011feb5f75fc.mp3",
+      "fileSha256": "95280a061599aa2acce88312d31c537556d7daac0cf9e6d16bebb7340dd417a0",
+      "chars": 103,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-092": {
+      "textSha256": "deef2b131431adc78f96798f42fa8d66e89f262757366ae0fb510881c494a888",
+      "file": "deef2b131431adc78f96798f42fa8d66e89f262757366ae0fb510881c494a888.mp3",
+      "fileSha256": "e4468c7c80eef5d2d13bf7890ceb6370cfd3d4a9045ac9f73cc89beed91dd8e2",
+      "chars": 96,
+      "quota": 86,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-093": {
+      "textSha256": "0ab2b7ae130c9cf44f65013648c02646b6f4e6c74506a89cc3a132f65ad2818f",
+      "file": "0ab2b7ae130c9cf44f65013648c02646b6f4e6c74506a89cc3a132f65ad2818f.mp3",
+      "fileSha256": "d768b233790a52cf5368de4b24c4f37e27fe0f7f5826a04c2861cb1a25b92b30",
+      "chars": 48,
+      "quota": 44,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-094": {
+      "textSha256": "2b7c27fa059b26655e9b775f846c1c35f3888ab6ced191954d04bdbdb45aef87",
+      "file": "2b7c27fa059b26655e9b775f846c1c35f3888ab6ced191954d04bdbdb45aef87.mp3",
+      "fileSha256": "6ed612cc37031eb1beab3a39304d2600e4f6c91387e58c4b6d3f57b1388146e0",
+      "chars": 77,
+      "quota": 73,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-095": {
+      "textSha256": "0a27843af3e5764a695316cdd4cafa52fb293416f7fea598b7fc79b500c926d1",
+      "file": "0a27843af3e5764a695316cdd4cafa52fb293416f7fea598b7fc79b500c926d1.mp3",
+      "fileSha256": "2faa5d6cb64a27d1192c06733c2f1e8fe3ca8f4f5022d8e6c38b1c827fd52347",
+      "chars": 59,
+      "quota": 55,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-096": {
+      "textSha256": "3fc05f9e324e3a6ef1af2ff4629ea4e49bef01654e52487621cb77559903eb9b",
+      "file": "3fc05f9e324e3a6ef1af2ff4629ea4e49bef01654e52487621cb77559903eb9b.mp3",
+      "fileSha256": "e083b843f1871410f4cb2d6bf2a71e0e1d40f24e12e57de61db4ae043c9e9341",
+      "chars": 86,
+      "quota": 76,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-097": {
+      "textSha256": "ca83f884f0462abdd84d8b7aa0334ec5e2a07c291541d2f9218a1e5b920d9553",
+      "file": "ca83f884f0462abdd84d8b7aa0334ec5e2a07c291541d2f9218a1e5b920d9553.mp3",
+      "fileSha256": "de58d53398b474ae8935be0c9bbe9ec1c3895d565d88a2a8c95027f723cb1b42",
+      "chars": 68,
+      "quota": 64,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-098": {
+      "textSha256": "bfc3850719732a8dd6addc8e00ccc16f2a2c015afccba02c36dc34e9f014cb1b",
+      "file": "bfc3850719732a8dd6addc8e00ccc16f2a2c015afccba02c36dc34e9f014cb1b.mp3",
+      "fileSha256": "9a9a9736b5e01b43f0f47189c773058259ff9b041affcf5dcda2d7af0cd3fbda",
+      "chars": 127,
+      "quota": 117,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-099": {
+      "textSha256": "ebbb81c7876b16dd252bfe1c3958d135c680c4c5d8e7d2a94383a83bfc346fe7",
+      "file": "ebbb81c7876b16dd252bfe1c3958d135c680c4c5d8e7d2a94383a83bfc346fe7.mp3",
+      "fileSha256": "5edb7552e7f02849d1bf4936bf28695dd026d3f7703af6e3eb759ca274523281",
+      "chars": 139,
+      "quota": 135,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-100": {
+      "textSha256": "535428f75b27fb5b695ffd34a9413a8839366dabf8e5961935a21e572b4847d1",
+      "file": "535428f75b27fb5b695ffd34a9413a8839366dabf8e5961935a21e572b4847d1.mp3",
+      "fileSha256": "0d9298830e98e6dc96c4df6e7189df413454fb1db658bd6734ecae3376450eb9",
+      "chars": 59,
+      "quota": 55,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-101": {
+      "textSha256": "619e4bbd3d40dc65f7e219e3e236cbe4d7ecfae9b71bab879f6f9fe33a704ec1",
+      "file": "619e4bbd3d40dc65f7e219e3e236cbe4d7ecfae9b71bab879f6f9fe33a704ec1.mp3",
+      "fileSha256": "a2c2d1c22feb92416908da91989905795bb36ad71e15690aa3dae5a8ffca36a1",
+      "chars": 101,
+      "quota": 97,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-102": {
+      "textSha256": "5e3c762257a71eb10530f6f93dc12573c17cf58b5a1a9ed060f4b2c4f4473f68",
+      "file": "5e3c762257a71eb10530f6f93dc12573c17cf58b5a1a9ed060f4b2c4f4473f68.mp3",
+      "fileSha256": "101090c267c266e99b6b0ccfd4ab0f895016a8ef7689659417583e72806cb670",
+      "chars": 108,
+      "quota": 104,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-103": {
+      "textSha256": "c129439c179164854217a5954cfd4a380cb0167801fcadb756c5e9b27d1b0ac8",
+      "file": "c129439c179164854217a5954cfd4a380cb0167801fcadb756c5e9b27d1b0ac8.mp3",
+      "fileSha256": "b1efc7b3adef6421b71e8c8511184eae360a533ee274c83beb207568f739039c",
+      "chars": 93,
+      "quota": 89,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-104": {
+      "textSha256": "7b3ad9ff862c617fa8c46d910ed9b24847447c10b602255d05049ece75c0550a",
+      "file": "7b3ad9ff862c617fa8c46d910ed9b24847447c10b602255d05049ece75c0550a.mp3",
+      "fileSha256": "5e8a5750c3282e65e29d4cdf8c80c4b963eadbb9a5ceb2ce2128ba943fe93112",
+      "chars": 120,
+      "quota": 116,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-105": {
+      "textSha256": "e5f174c384a42a8f04ec2b4d19f6f2d6234d393b2c159797e0e48eef33c56592",
+      "file": "e5f174c384a42a8f04ec2b4d19f6f2d6234d393b2c159797e0e48eef33c56592.mp3",
+      "fileSha256": "fb6e68bfd9ecb049212b65d9bb03e35b3f441d3f12e22cbb0fd0334d090c6b47",
+      "chars": 162,
+      "quota": 152,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-106": {
+      "textSha256": "acab292914b9309783df38b78f47198c84397ebebf786d9e006f92c1c8afc243",
+      "file": "acab292914b9309783df38b78f47198c84397ebebf786d9e006f92c1c8afc243.mp3",
+      "fileSha256": "0fb8e843aeb6d14e5d1372673f0e4f03d9edf1525053703e802d5136d22e3615",
+      "chars": 81,
+      "quota": 71,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-107": {
+      "textSha256": "b7579130daa8995dc7c7ca391941b2f38201310eb86d20a493550561a851f693",
+      "file": "b7579130daa8995dc7c7ca391941b2f38201310eb86d20a493550561a851f693.mp3",
+      "fileSha256": "ea7f55616ae2d23144928574391694ed1ad55bf49d0b3eca4566ff6442f76de1",
+      "chars": 105,
+      "quota": 101,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-108": {
+      "textSha256": "e2bfefe965e7e500d3248da5b1c154148f7390240a9b4597a9ae537b8eb3be86",
+      "file": "e2bfefe965e7e500d3248da5b1c154148f7390240a9b4597a9ae537b8eb3be86.mp3",
+      "fileSha256": "fea3d609e94ad18f07a5ce7e1b7998b047c8c2be7a8e5f81e3f991a118352d0e",
+      "chars": 64,
+      "quota": 60,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-109": {
+      "textSha256": "f12e862818dcdaa715f4a439119b9338e494dfec69ccbe274088dc6a60863c64",
+      "file": "f12e862818dcdaa715f4a439119b9338e494dfec69ccbe274088dc6a60863c64.mp3",
+      "fileSha256": "dc911b7549ac5ef7c06409f053ad97cc5940f29c6ca9ee1ff833002ec8db9be6",
+      "chars": 160,
+      "quota": 144,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-110": {
+      "textSha256": "5a411972060e6b2d5e66e1ece0f62b7cd3843f6f702b171a0cc9fcc763b5fcf0",
+      "file": "5a411972060e6b2d5e66e1ece0f62b7cd3843f6f702b171a0cc9fcc763b5fcf0.mp3",
+      "fileSha256": "3c3e613529c105215a970de7cc4047feb47ddfb2a0cedcb7240abe3242bbfe9e",
+      "chars": 61,
+      "quota": 57,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-111": {
+      "textSha256": "591f4dd6ea2e953821d7d4417e69c27715d7aabd244e7d9388ba68aa2c9964a7",
+      "file": "591f4dd6ea2e953821d7d4417e69c27715d7aabd244e7d9388ba68aa2c9964a7.mp3",
+      "fileSha256": "1e5e5b742eb5cc2b069190b3ff4e0167c06aa283d581a6b0210792546822d7d4",
+      "chars": 194,
+      "quota": 178,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-112": {
+      "textSha256": "8d3cddec3b0874233144524cb7bb468e5417c0945c77748188aafe1c68f983a0",
+      "file": "8d3cddec3b0874233144524cb7bb468e5417c0945c77748188aafe1c68f983a0.mp3",
+      "fileSha256": "de54a502e361ab203a19d8b0ce3be321ec73f8dad08e5505e1bbbe99926c5f91",
+      "chars": 72,
+      "quota": 68,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-113": {
+      "textSha256": "a7e7d039a88c72480d7ca04c8fb6014ab4947036015105b09b218116ef4d16bd",
+      "file": "a7e7d039a88c72480d7ca04c8fb6014ab4947036015105b09b218116ef4d16bd.mp3",
+      "fileSha256": "ef512c9bbd2e2ebc0f47fd7a04548b463898ecd766eed1b8a7094d7787ca85d4",
+      "chars": 177,
+      "quota": 155,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-114": {
+      "textSha256": "4d4eb1e260d18f4ebbbc3e00900cb50c5e6230539a2866e2d6de3f80c97ead94",
+      "file": "4d4eb1e260d18f4ebbbc3e00900cb50c5e6230539a2866e2d6de3f80c97ead94.mp3",
+      "fileSha256": "1e3a569852cdc5de4882f7af507295c7595f8a39446c8adc96ced64f64584a54",
+      "chars": 56,
+      "quota": 52,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-115": {
+      "textSha256": "55adbe6fd85bd241d4295835edfdc9ef08b445935570e61e8546854cc9910451",
+      "file": "55adbe6fd85bd241d4295835edfdc9ef08b445935570e61e8546854cc9910451.mp3",
+      "fileSha256": "9d0eaa28cc7dc3da0031e89ae0a1179edacca5152e11901d7dfe11f32bc2d8e2",
+      "chars": 54,
+      "quota": 50,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-116": {
+      "textSha256": "4fc94d6c2dd16da1553df15dcfb57769cff94da70f803d264124e24d88f642ba",
+      "file": "4fc94d6c2dd16da1553df15dcfb57769cff94da70f803d264124e24d88f642ba.mp3",
+      "fileSha256": "59606f41698f6f76ad39eba912f3858121090b8f7e4242b96fc149f4182f9f24",
+      "chars": 110,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-117": {
+      "textSha256": "ca1d44e238d3888570e40d08654da7a443b4e834094553c64ab2f25704fdde10",
+      "file": "ca1d44e238d3888570e40d08654da7a443b4e834094553c64ab2f25704fdde10.mp3",
+      "fileSha256": "00b557394210a39f891e977331281d850d9606b06ec6e90f1314e6ae3ac3c42f",
+      "chars": 88,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-118": {
+      "textSha256": "c9646d937eda1cb3ab08ff4aeb8f336ae4ab49d0177622a948ec34768cf83447",
+      "file": "c9646d937eda1cb3ab08ff4aeb8f336ae4ab49d0177622a948ec34768cf83447.mp3",
+      "fileSha256": "724f8f5986f704de73aca7b10fb24eae342111b2cb01755d5da126fd622a3c04",
+      "chars": 84,
+      "quota": 80,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-119": {
+      "textSha256": "b031d4d14bfd858a9b22f79f55e10ca15d227080d1c005c5178065b06bcae7a6",
+      "file": "b031d4d14bfd858a9b22f79f55e10ca15d227080d1c005c5178065b06bcae7a6.mp3",
+      "fileSha256": "60e648d02585fe1a3d027ad3e0c8e181f01f1b41a442143f36e10a1b4c64a917",
+      "chars": 94,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-120": {
+      "textSha256": "885e4fc52590e34a94045d582a226af5c00fea5147441ffbeac97110fe566584",
+      "file": "885e4fc52590e34a94045d582a226af5c00fea5147441ffbeac97110fe566584.mp3",
+      "fileSha256": "fb4558bf6fef0efbd478b8a0db80fe37b2aa6b1fb28ca3f0261163734fa5cee0",
+      "chars": 94,
+      "quota": 90,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-121": {
+      "textSha256": "8f94f302baf0d6a157a2b0c70a2ee68ac8162ed3e9eaf121ffe9398dc348674e",
+      "file": "8f94f302baf0d6a157a2b0c70a2ee68ac8162ed3e9eaf121ffe9398dc348674e.mp3",
+      "fileSha256": "328fd34577208a27e2dfa76f6878b9f142b9d92b270e05b47cc18db27826019c",
+      "chars": 56,
+      "quota": 52,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-122": {
+      "textSha256": "d5e9dc3b67b4132c2b4c5c1a39e1c34e7db614e714cd8d2ca8728e3f6f75db78",
+      "file": "d5e9dc3b67b4132c2b4c5c1a39e1c34e7db614e714cd8d2ca8728e3f6f75db78.mp3",
+      "fileSha256": "d5d2b5d840ef3e685ff1ad60237308f1ee90d27035b8107609c94cf2d3e1b15d",
+      "chars": 167,
+      "quota": 163,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-123": {
+      "textSha256": "22e48f0e18aecb99dcef87f24111a6838e5864ee1659752eeb81e83dd58b3210",
+      "file": "22e48f0e18aecb99dcef87f24111a6838e5864ee1659752eeb81e83dd58b3210.mp3",
+      "fileSha256": "f09464cbc3a208164aa398f8c59874076b021e7909d5637241899e06038103d4",
+      "chars": 256,
+      "quota": 240,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-124": {
+      "textSha256": "5681c428b78ff094d9c88bee575d5006a73b5077e44d9e611bcfa4b5d36d8c66",
+      "file": "5681c428b78ff094d9c88bee575d5006a73b5077e44d9e611bcfa4b5d36d8c66.mp3",
+      "fileSha256": "03c4efc11c48aa3d1a682b6b9e6aea00ffdca18ca0b30c25fbe9f7c9d229a1e3",
+      "chars": 113,
+      "quota": 103,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-125": {
+      "textSha256": "ae263b749fa876050659360ba062209716f44882f3d30db19f840c9812bb97b2",
+      "file": "ae263b749fa876050659360ba062209716f44882f3d30db19f840c9812bb97b2.mp3",
+      "fileSha256": "a458b43156dcfcb6a3b5a1cc6f91a894799212cad80e4cb26a1bbdf26f6747d5",
+      "chars": 221,
+      "quota": 211,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-126": {
+      "textSha256": "9cad4f23d045481bc424068c2b1b6bf5285b02661b5ad40085b21341de00e005",
+      "file": "9cad4f23d045481bc424068c2b1b6bf5285b02661b5ad40085b21341de00e005.mp3",
+      "fileSha256": "0754820253daa6343ee710e44c9cc6e18605fc2e5753c9996d106141c86db373",
+      "chars": 53,
+      "quota": 49,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-127": {
+      "textSha256": "5d51373c1da407e311a991fefdf2c5c2057cab92345432681a569b5f89da3183",
+      "file": "5d51373c1da407e311a991fefdf2c5c2057cab92345432681a569b5f89da3183.mp3",
+      "fileSha256": "e0d09d2b8f9990228cb960a256581a947ffac6e9c3cb62ced205a024e187aba8",
+      "chars": 93,
+      "quota": 83,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-128": {
+      "textSha256": "408557a7d9a0ed124f272442258c10b3bd4fa20dfba5ba50128e2ff9be4f3b7b",
+      "file": "408557a7d9a0ed124f272442258c10b3bd4fa20dfba5ba50128e2ff9be4f3b7b.mp3",
+      "fileSha256": "ef72ab71e8649e4206598d5779910e11e6eebf7be83119dbbcd417bd856c18c6",
+      "chars": 418,
+      "quota": 390,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-129": {
+      "textSha256": "b0170ecdd42ad2d7acc70d40ff2592552e8708076bf753d181b88c2c66a78cb5",
+      "file": "b0170ecdd42ad2d7acc70d40ff2592552e8708076bf753d181b88c2c66a78cb5.mp3",
+      "fileSha256": "54c26667d80eebff8bbfb94c260ef9006db9e6c2d0cf017f05d75f258e1ef73e",
+      "chars": 87,
+      "quota": 77,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-130": {
+      "textSha256": "9403d550064e1b28a9dba8c6cfccdd61db0426939e5fa452753a6562e8c0081c",
+      "file": "9403d550064e1b28a9dba8c6cfccdd61db0426939e5fa452753a6562e8c0081c.mp3",
+      "fileSha256": "d0f0175b18c11dd75bdc6572301b7ff7e81197c6d3fd8637dcda92bca2269571",
+      "chars": 138,
+      "quota": 128,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-131": {
+      "textSha256": "b3f030dbf14883cd12a6f5db8a98134fd70e09204e00c2f7f03674e8ac69d31c",
+      "file": "b3f030dbf14883cd12a6f5db8a98134fd70e09204e00c2f7f03674e8ac69d31c.mp3",
+      "fileSha256": "9684f5d5d2bcc1960feb9502a7a79e3f0c12c22243e9c2788917f951acef8245",
+      "chars": 210,
+      "quota": 194,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-132": {
+      "textSha256": "d4958e717fefb5154e3c0aff2c19d82a69cafcf97fbb5284771550ac639a9eeb",
+      "file": "d4958e717fefb5154e3c0aff2c19d82a69cafcf97fbb5284771550ac639a9eeb.mp3",
+      "fileSha256": "d2ec9467e22f9970bc6587480d2fe1de83d32bd0fb0ff6c8e6fa320814706ab0",
+      "chars": 140,
+      "quota": 130,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-133": {
+      "textSha256": "784c9bd398ff12b09efa41f2364e4a452c23383f1172fed196e196ca6a2dea04",
+      "file": "784c9bd398ff12b09efa41f2364e4a452c23383f1172fed196e196ca6a2dea04.mp3",
+      "fileSha256": "e7835657a2eee192f9793e9ef73958d3e52f9a2f8f278507707f8709a8fae9b1",
+      "chars": 87,
+      "quota": 77,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-134": {
+      "textSha256": "4d972687bd191cfc664373fb59d01760ff3810e24b61c5236f083af1ddaccec7",
+      "file": "4d972687bd191cfc664373fb59d01760ff3810e24b61c5236f083af1ddaccec7.mp3",
+      "fileSha256": "a3673f8f0f8231389729973a7166d6f63bab9cdb55e3601ebe13024278cea1c4",
+      "chars": 80,
+      "quota": 76,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-135": {
+      "textSha256": "131ed2ff3dfe760e65702b9facb9430679966b2aa00fecf5db1361170e2605f2",
+      "file": "131ed2ff3dfe760e65702b9facb9430679966b2aa00fecf5db1361170e2605f2.mp3",
+      "fileSha256": "efd6ff9feac8ce373c76fcd00ca3365ac819219ea83aa0e389270aa1c95c2450",
+      "chars": 163,
+      "quota": 153,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-136": {
+      "textSha256": "4a7721e5a2fe19e841fdfcda1694e957d72e90e8caf6ede6e4062c5dc677d213",
+      "file": "4a7721e5a2fe19e841fdfcda1694e957d72e90e8caf6ede6e4062c5dc677d213.mp3",
+      "fileSha256": "0aa659d98a64179624113ebf77ea6978d36c2480eb64ed467241d1832f8c9839",
+      "chars": 121,
+      "quota": 111,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-137": {
+      "textSha256": "4ed8e9d36977efc3939bcd8596daf4d95fd8df459ff579278c9550a7544dc788",
+      "file": "4ed8e9d36977efc3939bcd8596daf4d95fd8df459ff579278c9550a7544dc788.mp3",
+      "fileSha256": "d58a5d192e852832e09b0e68dd7d6dc0039a2b9d568d304d823c808eb93c36e3",
+      "chars": 224,
+      "quota": 208,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-138": {
+      "textSha256": "a137e32749eaac42a7e1d577bdaa05ca681975b24d407394e0b875ef960f7a4e",
+      "file": "a137e32749eaac42a7e1d577bdaa05ca681975b24d407394e0b875ef960f7a4e.mp3",
+      "fileSha256": "fbd3fcab572c99b9a47f7436f83702da88abfc5fc5e1541223e8c88cb9065516",
+      "chars": 60,
+      "quota": 56,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-139": {
+      "textSha256": "348bf82d0ca464baa9b8d619de5a77d1847dec540dee9cdddd35b72fb0c58e1f",
+      "file": "348bf82d0ca464baa9b8d619de5a77d1847dec540dee9cdddd35b72fb0c58e1f.mp3",
+      "fileSha256": "e8dcb1dd7a32cb0373ad0b9ef179f9d0b9c440e11824e8c8011d3478c79026f7",
+      "chars": 148,
+      "quota": 138,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-140": {
+      "textSha256": "dd8f2543b2d6dd84ddeee88c35f28be5761ddce3eb106ba63902eedd425d1243",
+      "file": "dd8f2543b2d6dd84ddeee88c35f28be5761ddce3eb106ba63902eedd425d1243.mp3",
+      "fileSha256": "5ab87ad0766e1c7faf1a599d5d309238a044995807aaded8ed03c440f7a17e5d",
+      "chars": 135,
+      "quota": 131,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-141": {
+      "textSha256": "d3908998979a3b9b4221ea32907119838118006b65fd462f113ccb0a88e9b947",
+      "file": "d3908998979a3b9b4221ea32907119838118006b65fd462f113ccb0a88e9b947.mp3",
+      "fileSha256": "f82038e4fca9541ea5e67145e8ad8e935b10e019c5535ee1e0acb0ef409e1ab6",
+      "chars": 57,
+      "quota": 53,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-142": {
+      "textSha256": "d5a44235d218ad3f67edff7e6033cae7fa0b1f9fb699ac5edfd70b3e0cee078d",
+      "file": "d5a44235d218ad3f67edff7e6033cae7fa0b1f9fb699ac5edfd70b3e0cee078d.mp3",
+      "fileSha256": "8779a2ba7f32d011106dfc2f88d14b5606976a0b2056ec9d04273eb009941750",
+      "chars": 94,
+      "quota": 90,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-143": {
+      "textSha256": "279c7c239d1c638e22ca71d85ceafa66467246f0c051e935a356f8f522046e5e",
+      "file": "279c7c239d1c638e22ca71d85ceafa66467246f0c051e935a356f8f522046e5e.mp3",
+      "fileSha256": "e34d92b82f03c873f6eb2b39e7e253aac7efb50c3fc5dbb5c4dde1770e16b789",
+      "chars": 101,
+      "quota": 97,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-144": {
+      "textSha256": "f3f42441cf552db49098ca36abff9e73ef9d6fabb311bb0cef63d48b0bc97138",
+      "file": "f3f42441cf552db49098ca36abff9e73ef9d6fabb311bb0cef63d48b0bc97138.mp3",
+      "fileSha256": "70fa86549f265924418b21ef4edd8e77c61bbcdf86935893f93f7d70b675602b",
+      "chars": 103,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-145": {
+      "textSha256": "85382bd91c802ef9d616bf47dccffaa57c3a98a31798d9e52db37f28235e3a2c",
+      "file": "85382bd91c802ef9d616bf47dccffaa57c3a98a31798d9e52db37f28235e3a2c.mp3",
+      "fileSha256": "a0c6073918754a9bff16e161d01cba83a3cdfbfac2e73c3ebb14a13e74abd7ad",
+      "chars": 70,
+      "quota": 66,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-146": {
+      "textSha256": "b239d1a18bff68e6162e1c9d24246e1fbef6022b5883dbbb5197437bf2deef17",
+      "file": "b239d1a18bff68e6162e1c9d24246e1fbef6022b5883dbbb5197437bf2deef17.mp3",
+      "fileSha256": "e99bf4afd63fba875d89f76a422914543dd5ea4016627070f1008c71461a46e2",
+      "chars": 37,
+      "quota": 33,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-147": {
+      "textSha256": "116367e8a3943ab789932a2e4ef1cba0565459977a5605e8d7c7ff6c5f94d176",
+      "file": "116367e8a3943ab789932a2e4ef1cba0565459977a5605e8d7c7ff6c5f94d176.mp3",
+      "fileSha256": "6a5f8c56732e252fdcd3334e94a5bcebddcae99b3471d032fd095ca364862f5c",
+      "chars": 97,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-148": {
+      "textSha256": "4e63ac23f32a9eb08bc4728ee40ea7effdd41754de242e202c409f9ed1ea3af1",
+      "file": "4e63ac23f32a9eb08bc4728ee40ea7effdd41754de242e202c409f9ed1ea3af1.mp3",
+      "fileSha256": "0c08349ee8a9c360ab566dbd6c307eb3d13bdea8715877cb6428985b2b2308df",
+      "chars": 72,
+      "quota": 68,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-149": {
+      "textSha256": "acfa5d218683735c654b78deb9c54d702b471b96bdbcdfbd75814b9f358d2a91",
+      "file": "acfa5d218683735c654b78deb9c54d702b471b96bdbcdfbd75814b9f358d2a91.mp3",
+      "fileSha256": "91b9907093107b238d35bd1f3ebc7679276b6f72bbe3d45edd509fc149dc6be2",
+      "chars": 57,
+      "quota": 53,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-150": {
+      "textSha256": "f73f658790f83c5eb4074a05de02b64703ca385aa7172f0ac0857f13e24265b6",
+      "file": "f73f658790f83c5eb4074a05de02b64703ca385aa7172f0ac0857f13e24265b6.mp3",
+      "fileSha256": "7371630ddb1ac39c39a5269df672e26de75524182b52fd729cebe52b0af0c4ea",
+      "chars": 81,
+      "quota": 77,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-151": {
+      "textSha256": "97c3262c4fc6baa08c82c753a72a944a5737797e7986c6bccf816126831c68c4",
+      "file": "97c3262c4fc6baa08c82c753a72a944a5737797e7986c6bccf816126831c68c4.mp3",
+      "fileSha256": "70239415dbf1e2258c9ec45052e7cc788d223a7c0646883dfb36db9c872f02be",
+      "chars": 79,
+      "quota": 69,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-152": {
+      "textSha256": "c9e89b36d9ba26a9baaa66732dd313549df6ec1148eb7f80cbe0254769fefef9",
+      "file": "c9e89b36d9ba26a9baaa66732dd313549df6ec1148eb7f80cbe0254769fefef9.mp3",
+      "fileSha256": "d5b23b85a5ef095dea12b6850bf6941f86426c167b80436541e9c97a357002b0",
+      "chars": 61,
+      "quota": 57,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-153": {
+      "textSha256": "329cd3f5ae25517357a3587fb18a4bfb514527ae447ae2d43f06e09b636e1ec8",
+      "file": "329cd3f5ae25517357a3587fb18a4bfb514527ae447ae2d43f06e09b636e1ec8.mp3",
+      "fileSha256": "2520bd9d3c823e9d02493558c35f3a2373593368d5075888ec353ff64e6caef7",
+      "chars": 82,
+      "quota": 72,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-154": {
+      "textSha256": "33a7fb7fa2bb12f1264e1f4d04579929d2a171b7ddbd267a7a1aeb6b30137374",
+      "file": "33a7fb7fa2bb12f1264e1f4d04579929d2a171b7ddbd267a7a1aeb6b30137374.mp3",
+      "fileSha256": "9545cd9b352c4ee7a8e94d92ee339adf88f24dd6b5b2889874fdb49335a56557",
+      "chars": 100,
+      "quota": 96,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-155": {
+      "textSha256": "76cbd795657fa0dab5050f3d43afad951a884252c49b83f6e76c1a9fee9ab23c",
+      "file": "76cbd795657fa0dab5050f3d43afad951a884252c49b83f6e76c1a9fee9ab23c.mp3",
+      "fileSha256": "717a8672e92819a0ff1d57f7118bdbe72b0eefc886bd1e38fb558815a98a6522",
+      "chars": 70,
+      "quota": 66,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-156": {
+      "textSha256": "08c320865217d947ab89669b9894b4cb54a82c54397f3d7f86a0100ff125d11c",
+      "file": "08c320865217d947ab89669b9894b4cb54a82c54397f3d7f86a0100ff125d11c.mp3",
+      "fileSha256": "010c66c696284f61820094e67c7f7f0e05b54a2e4b851c648be4576177872cfb",
+      "chars": 53,
+      "quota": 49,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-157": {
+      "textSha256": "48a18d147efaef4439ee0ce3b869943401f3e185a07b13a91f7d068d00ad979f",
+      "file": "48a18d147efaef4439ee0ce3b869943401f3e185a07b13a91f7d068d00ad979f.mp3",
+      "fileSha256": "42f49bc735c67b7c520c54786f6cab17815c335d26a39590def4bb0cbe1fe771",
+      "chars": 121,
+      "quota": 111,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-158": {
+      "textSha256": "5326f7852f085dd89a78614cf8dbdb13f7264cb978801962b8d2e850bbe36dad",
+      "file": "5326f7852f085dd89a78614cf8dbdb13f7264cb978801962b8d2e850bbe36dad.mp3",
+      "fileSha256": "ffe51bbc8617c898e7bf0d2e26ccc9be9fda41075c39d9347732e7ce5885846d",
+      "chars": 126,
+      "quota": 122,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-159": {
+      "textSha256": "1ceaf98beb69443973eb758a95c116d44361ae3be7027bb8af0231879c652e3a",
+      "file": "1ceaf98beb69443973eb758a95c116d44361ae3be7027bb8af0231879c652e3a.mp3",
+      "fileSha256": "2381fae393b7746c7ce7992dd025ee33d20be460a83471db6f04aec7e557ab2c",
+      "chars": 153,
+      "quota": 143,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-160": {
+      "textSha256": "8b8b24c45bfc611ce6ffb215cbfac432611f140e4fbc8d8de689059ae149cc38",
+      "file": "8b8b24c45bfc611ce6ffb215cbfac432611f140e4fbc8d8de689059ae149cc38.mp3",
+      "fileSha256": "114d4b4845b22aae3e269e4c2d33e589cc4466774ae4aa29184fef365382ab6f",
+      "chars": 243,
+      "quota": 227,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-161": {
+      "textSha256": "d0fc0a77cef158d00a82e3e75c1ddf1e98e80c91e101b9bceb9b19a0375488de",
+      "file": "d0fc0a77cef158d00a82e3e75c1ddf1e98e80c91e101b9bceb9b19a0375488de.mp3",
+      "fileSha256": "cfea9de6f7aec52b58e5db0514ceb85d127fb1000218f0deba1469b416711f46",
+      "chars": 74,
+      "quota": 70,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-162": {
+      "textSha256": "45f6a856d57b0da4a6ca9ec6c6a341cce58c4f94f50def2d117e3ad3220b5e09",
+      "file": "45f6a856d57b0da4a6ca9ec6c6a341cce58c4f94f50def2d117e3ad3220b5e09.mp3",
+      "fileSha256": "0ec6a603a7d49dc57c9751b550c3b9ec476d4765f875d1d0ad783287ab0fbe77",
+      "chars": 106,
+      "quota": 102,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-163": {
+      "textSha256": "c82ec2c37fbf7ca173db20c6cd25a0fe5aefccecb2872fa174872fed0f8306f9",
+      "file": "c82ec2c37fbf7ca173db20c6cd25a0fe5aefccecb2872fa174872fed0f8306f9.mp3",
+      "fileSha256": "32b04e847fbe685843ca68e213da7958c46770a43a15ddd3c31270264aa55048",
+      "chars": 131,
+      "quota": 127,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-164": {
+      "textSha256": "75e31bff0cf94c61c40929e3bca405d73783c4cfd4bd4192d31f689bc12eff35",
+      "file": "75e31bff0cf94c61c40929e3bca405d73783c4cfd4bd4192d31f689bc12eff35.mp3",
+      "fileSha256": "47d68572a73bfbaa8529cf68a7df1397dc457a7c40b7122fafc337ecc2fb1d53",
+      "chars": 113,
+      "quota": 109,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-165": {
+      "textSha256": "1d55008d05b5a956356c4a5b192e769f9afd2acbef1d11906b3548a7d43ef207",
+      "file": "1d55008d05b5a956356c4a5b192e769f9afd2acbef1d11906b3548a7d43ef207.mp3",
+      "fileSha256": "2beabeb679b3d42777fe83fcf8f2000cc2e2d80a0343cca462040323627fe7bf",
+      "chars": 81,
+      "quota": 77,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-166": {
+      "textSha256": "2efddc508ac7dd06f6fefacd4db5fb034cc14b43fe602315ee5524993b5e04ce",
+      "file": "2efddc508ac7dd06f6fefacd4db5fb034cc14b43fe602315ee5524993b5e04ce.mp3",
+      "fileSha256": "4ebd008660728eba3a91d6bf52ee618ecae91fbfd5482893e8bc35b366b389ff",
+      "chars": 116,
+      "quota": 106,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-167": {
+      "textSha256": "d6db7d2477266e40a00a8bb406581b03ffb7c9c7dbf042bfc15d287edf15fb37",
+      "file": "d6db7d2477266e40a00a8bb406581b03ffb7c9c7dbf042bfc15d287edf15fb37.mp3",
+      "fileSha256": "bb1ea5b0cf20ffd122c592ac30c17c886814a3b4e6d385090931981d87cf9995",
+      "chars": 61,
+      "quota": 57,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-169": {
+      "textSha256": "ff20f641c67def3442d308cce88a6997cf3e0d6588e0aaaaa003d569e0352d09",
+      "file": "ff20f641c67def3442d308cce88a6997cf3e0d6588e0aaaaa003d569e0352d09.mp3",
+      "fileSha256": "0e4cca3fb2b5017c2ae56f761a6888be136ec01e875dfdfc037d9a3b58efba2a",
+      "chars": 70,
+      "quota": 66,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-170": {
+      "textSha256": "254eefebd382ab319ecd017972934cbdf88e0f5d97c8e8fb9dcc813f3f429741",
+      "file": "254eefebd382ab319ecd017972934cbdf88e0f5d97c8e8fb9dcc813f3f429741.mp3",
+      "fileSha256": "67d5c318adaad0a9b14a367ad98bc739e6d36b264031a1b06f5870acfa736df9",
+      "chars": 94,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-171": {
+      "textSha256": "d42f0e4e355a34be4138b603e88cd5c63cb2bf29720c0a7389ec5f1dca8e2235",
+      "file": "d42f0e4e355a34be4138b603e88cd5c63cb2bf29720c0a7389ec5f1dca8e2235.mp3",
+      "fileSha256": "4560c45d4ef7a50b43550cfcbfa5a3fd17f92d299a21aae3066fffea26742c9d",
+      "chars": 42,
+      "quota": 38,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-172": {
+      "textSha256": "642f8f69c8b41c10bbf7ccb963ba3dac7608e615547f5180ab81a51418f642a7",
+      "file": "642f8f69c8b41c10bbf7ccb963ba3dac7608e615547f5180ab81a51418f642a7.mp3",
+      "fileSha256": "15e4b55e27e3b343c1e711a0aaae2f06cec4fecd8ea5c532b4abd1537c44f220",
+      "chars": 125,
+      "quota": 115,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-173": {
+      "textSha256": "981dbc45763df0cfeae4004e21649123176401a02f7f69e0f2753fe3bfbb2f5d",
+      "file": "981dbc45763df0cfeae4004e21649123176401a02f7f69e0f2753fe3bfbb2f5d.mp3",
+      "fileSha256": "e6f4e520002a84d8c258fccc3a59a50fc8c4005b2c233352ca74432c1c0b84f2",
+      "chars": 67,
+      "quota": 63,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-174": {
+      "textSha256": "c1a6bd9d9b68d539fd9bc85fdd1fb9f254c422f69211baa3ca34025a8bdc5f74",
+      "file": "c1a6bd9d9b68d539fd9bc85fdd1fb9f254c422f69211baa3ca34025a8bdc5f74.mp3",
+      "fileSha256": "d744d4e5c739dba8be85701343a65dc8beaa8d34aec0ca3ebe59ab8c2f833fea",
+      "chars": 88,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-175": {
+      "textSha256": "7242618cb6cf87045a271da00ea0b9c8491b2459a97d76e9cbf45e9900f5cf20",
+      "file": "7242618cb6cf87045a271da00ea0b9c8491b2459a97d76e9cbf45e9900f5cf20.mp3",
+      "fileSha256": "a37999b2798984f353d8b88b5daf2a642f1ec574532534f9cc67d8290789701c",
+      "chars": 65,
+      "quota": 61,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-176": {
+      "textSha256": "e2d0651c7385cfa1cfca451d5158409e57d21cd9f9927b753bed012184511a41",
+      "file": "e2d0651c7385cfa1cfca451d5158409e57d21cd9f9927b753bed012184511a41.mp3",
+      "fileSha256": "c134841f024d922574b5817907c2a137f4f4ae49e34db279935d7fea6166da66",
+      "chars": 62,
+      "quota": 58,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-177": {
+      "textSha256": "32bdff9481f3525b059cf79790bfcf90e0ff857b503f1caba46fcbe19e61fa79",
+      "file": "32bdff9481f3525b059cf79790bfcf90e0ff857b503f1caba46fcbe19e61fa79.mp3",
+      "fileSha256": "f542db2bba1871e02090d55ec3cce5082cfac22176cd6eedd78cdd87c056f258",
+      "chars": 149,
+      "quota": 139,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-178": {
+      "textSha256": "0db785014de67e6f51924e47db0cfd91277ff1f3de5cc99285c3db20d90ea196",
+      "file": "0db785014de67e6f51924e47db0cfd91277ff1f3de5cc99285c3db20d90ea196.mp3",
+      "fileSha256": "087e4136bb304603ccf177fdec04e695aafd7d38c9fc8ba448b626cb3c3400a2",
+      "chars": 324,
+      "quota": 302,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-179": {
+      "textSha256": "7ef1a2f2b435a1122717b77f3d927e463ac089f541e31d9b8d68b9fed320fc6d",
+      "file": "7ef1a2f2b435a1122717b77f3d927e463ac089f541e31d9b8d68b9fed320fc6d.mp3",
+      "fileSha256": "0cf570c845a67839d967fadc3c7e58b4b706bde985827fd661f79002e6e69bd0",
+      "chars": 73,
+      "quota": 63,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-180": {
+      "textSha256": "8ebeb6dc0aa266188e2c3eb3cea62bf01c25f7f737c29aa30098b7e6ec65049a",
+      "file": "8ebeb6dc0aa266188e2c3eb3cea62bf01c25f7f737c29aa30098b7e6ec65049a.mp3",
+      "fileSha256": "43063f6fd0029852b143b0ba9d2273092d4a54eee61344e833b08079d05544c1",
+      "chars": 40,
+      "quota": 36,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-181": {
+      "textSha256": "e128440e0115e746ff13963fedad0d4d328f705ffed52613d17682fbe4ceeb45",
+      "file": "e128440e0115e746ff13963fedad0d4d328f705ffed52613d17682fbe4ceeb45.mp3",
+      "fileSha256": "bb13b8b430a6796a78cbb0c17537dc4b6d8fac5ea88e9295f7585d8fb2ff429f",
+      "chars": 42,
+      "quota": 38,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-182": {
+      "textSha256": "56c4e54e2406ee262cd13a4ce7f918a99e05484a53487ac403fbb1adb1987575",
+      "file": "56c4e54e2406ee262cd13a4ce7f918a99e05484a53487ac403fbb1adb1987575.mp3",
+      "fileSha256": "f1f85f8743f59ebb024f4d00ab7e484760311b72c182c1a1c9f7f03f135524d5",
+      "chars": 46,
+      "quota": 42,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-183": {
+      "textSha256": "ff4ddaf1f201b76b9f1d4f2d491c3036b25e501eb415656c6e162f67258002d7",
+      "file": "ff4ddaf1f201b76b9f1d4f2d491c3036b25e501eb415656c6e162f67258002d7.mp3",
+      "fileSha256": "8e46c881a8ed9a11dd433d3bdf66503d32241c79050721e586270f873a3b9629",
+      "chars": 111,
+      "quota": 107,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-184": {
+      "textSha256": "bd5045d965a4a65f810c58fb3776a4c7b7af49f51d9e78c629a7551e37736cd5",
+      "file": "bd5045d965a4a65f810c58fb3776a4c7b7af49f51d9e78c629a7551e37736cd5.mp3",
+      "fileSha256": "3f89f0f89c50cc030b58818d46be4c7f087f421bc440113a09b070ca9948455e",
+      "chars": 105,
+      "quota": 101,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-185": {
+      "textSha256": "2bfac189002ef7683b368936bedf380e5642c761ac91416801afbe9fa4ebb061",
+      "file": "2bfac189002ef7683b368936bedf380e5642c761ac91416801afbe9fa4ebb061.mp3",
+      "fileSha256": "2745560e9fc6870955b3c869dfd79502114adc1d1666de288805a37a05562cb4",
+      "chars": 196,
+      "quota": 180,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-186": {
+      "textSha256": "a6122722f9579d1795a7a9bc3203f3e5a684e69d3ba6b4108e50a430c9437387",
+      "file": "a6122722f9579d1795a7a9bc3203f3e5a684e69d3ba6b4108e50a430c9437387.mp3",
+      "fileSha256": "a6563b3d889b1bdf5b1987b497084a24a333f532a72da599ce1c223afcf61b6d",
+      "chars": 178,
+      "quota": 162,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-187": {
+      "textSha256": "9d6bbee5310afbf9754afe26f29596977a583d507148f82a9dcd4390081dd94f",
+      "file": "9d6bbee5310afbf9754afe26f29596977a583d507148f82a9dcd4390081dd94f.mp3",
+      "fileSha256": "5e4599ac8e580f6b58631ea679c3097986ab34953332edb365c715cfd2b72275",
+      "chars": 80,
+      "quota": 76,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-188": {
+      "textSha256": "3dfd2a48169f4e6f563adca0597b7de161af6a7eb5fed3aa974d2f4ebdcdefda",
+      "file": "3dfd2a48169f4e6f563adca0597b7de161af6a7eb5fed3aa974d2f4ebdcdefda.mp3",
+      "fileSha256": "b632f1524c4aca64af67ad242ae3810aa5f6096b8094367e871c948424b30082",
+      "chars": 88,
+      "quota": 84,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-189": {
+      "textSha256": "48c5f84c6f187cc0e62988059aebae7bc1e28a19c3df2a8e8f8f590789559384",
+      "file": "48c5f84c6f187cc0e62988059aebae7bc1e28a19c3df2a8e8f8f590789559384.mp3",
+      "fileSha256": "8789bda62fb3cef630cfa33ae43a15d62fbbb349b171178d5c98e841365656dd",
+      "chars": 70,
+      "quota": 66,
+      "generatedAt": "2026-10-24"
+    },
+    "ho-hsin-chun-190": {
+      "textSha256": "6efa2e68956c9374c4840cc1a0d2a1fff7572cf3b4c28c61959a1048ff7225cd",
+      "file": "6efa2e68956c9374c4840cc1a0d2a1fff7572cf3b4c28c61959a1048ff7225cd.mp3",
+      "fileSha256": "910bb9c4e2450b85d2f07fca12e8764fcdabee8da319c9cdc3559fb4fa0d6947",
+      "chars": 97,
+      "quota": 93,
+      "generatedAt": "2026-10-24"
+    }
+  }
+}

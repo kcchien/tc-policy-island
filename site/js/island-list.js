@@ -6,6 +6,7 @@ import { el } from './dom.js';
 import { islandLayout, markerLegend } from './island-layout.js';
 import { heroSceneFor } from './island-heroes.js';
 import { heroHint, MARKER_TEXT, NO_MATCH_TEXT, NO_POLICY_LABEL } from './ui-text.js';
+import { seenMark } from './reading-progress.js';
 
 function markerBadge(marker, offText) {
   const state = marker.lit ? MARKER_TEXT.lit : offText;
@@ -27,7 +28,8 @@ export function renderLegend(container, vm) {
 }
 
 // filtered 是篩選後的檢視模型（未篩選時就是 vm）。被篩掉的議題區不列出，其餘議題區保留原編號。
-export function renderIslandList(container, vm, filtered, { selectedId, onPick }) {
+// seen 是讀者看過的議題區識別碼集合（閱讀進度）。
+export function renderIslandList(container, vm, filtered, { selectedId, onPick, seen = new Set() }) {
   const shown = new Set(filtered.rows.map((row) => row.issueArea.id));
   const offText = filtered.filter?.active ? NO_MATCH_TEXT : NO_POLICY_LABEL;
   const items = islandLayout(vm, { filtered })
@@ -41,6 +43,7 @@ export function renderIslandList(container, vm, filtered, { selectedId, onPick }
           'span',
           { class: 'island-item-name' },
           tile.name,
+          seen.has(tile.id) && seenMark(),
           el('span', { class: 'island-item-hero' }, heroHint(heroSceneFor(tile.id).name)),
         ),
         el('span', { class: 'island-item-markers' }, tile.markers.map((m) => markerBadge(m, offText))),

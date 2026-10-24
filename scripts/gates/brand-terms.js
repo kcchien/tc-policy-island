@@ -7,7 +7,8 @@ import { isVerbatimRepoFile } from './repo-documents.js';
 // 掃描整理者撰寫的文字：網站文案、公開資料集、網址與檔名。
 // 不掃候選人本人的文字：原文引述、候選人資料的學歷與經歷、出處快照、出處的原網址、存檔網址與標題。
 // three.js 等第三方程式碼不是整理者文字，只掃檔名。
-const SKIP_CONTENT = [THIRD_PARTY, /^data\/snapshots\//];
+// 政見語音清單只有識別碼、雜湊、字數與語音設定，沒有整理者寫的句子；雜湊的十六進位會誤中數字代號。
+const SKIP_CONTENT = [THIRD_PARTY, /^data\/snapshots\//, /^data\/audio\/manifest\.json$/];
 const TEXT_FILE = /(\.(html|css|js|mjs|json|svg|txt|md|webmanifest|xml)|\/?_headers|\/?_redirects)$/;
 const CODE_FILE = /\.(css|js|mjs)$/;
 
