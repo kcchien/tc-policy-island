@@ -66,7 +66,8 @@ const COLLECT_LAYOUT = `(() => {
   const toolbar = document.getElementById('hud-toolbar');
   const obstacleNodes = [
     document.querySelector('.title-card'),
-    ...(toolbar ? (mobile ? [toolbar] : toolbar.querySelectorAll('.tool-group')) : []),
+    ...(toolbar ? (mobile ? [toolbar] : toolbar.querySelectorAll('.tool-group, .scene-controls > summary')) : []),
+    ...document.querySelectorAll('.scene-controls[open] .scene-settings'),
     document.getElementById('index-panel'),
     document.getElementById('view-note'),
     ...document.querySelectorAll('dialog[open]'),

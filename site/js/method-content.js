@@ -1,4 +1,4 @@
-// 整理方法頁由資料產生的內容。瀏覽器與 Node 共用，不得引用 node: 模組。
+// 整理方法頁由資料產生的內容；來源狀態使用與其他檢視相同的檢視模型。瀏覽器與 Node 共用，不得引用 node: 模組。
 import { CANDIDATE_ORDER_RULES } from './dataset.js';
 import { repoDocumentByPath, repoFileUrl } from './repo-documents.js';
 import { METHOD_TEXT } from './ui-text.js';
@@ -18,9 +18,8 @@ export function resolveDocLink(fromPath, href) {
   return repoFileUrl(path) + (hash ? `#${hash}` : '');
 }
 
-export const dataStatusItems = (candidates) => candidates
-  .filter((c) => c.dataStatus !== null)
-  .map((c) => METHOD_TEXT.dataStatus(c.name, c.dataStatus));
+export const sourceStatusItems = (candidates) => candidates
+  .map((c) => METHOD_TEXT.sourceStatus(c.name, c.sourceStatusText));
 
 // 檢核表與品牌用語清單（JSON）排成清單與表格時的內容。欄位值照原檔，不換字、不省略。
 export const checklistView = ({ version, items }) => ({

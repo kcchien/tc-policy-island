@@ -1,4 +1,4 @@
-// 我的對照單的對話框（手機為底部抽屜）：只列出勾選政見所在的議題區，每區三欄依排序規則並排，沒有政見的欄位照常顯示，
+// 我的對照單的對話框（手機為底部抽屜）：只列出勾選政見所在的議題區，每區三欄依排序規則並排，空欄顯示收錄狀態，
 // 每條政見附出處連結，被勾的政見標「已勾選」。可列印（main.css 的列印樣式只印這個對話框）與複製帶 pick 參數的網址。
 // 列哪些議題區由 shortlist.js 的 shortlistRows 決定；勾選狀態由呼叫端保管。只在瀏覽器使用，畫面文字取自 ui-text.js。
 
@@ -40,6 +40,7 @@ function shortlistArea(row, vm) {
           'div',
           { class: 'shortlist-column' },
           el('h4', { class: 'candidate-name' }, candidate.name),
+          el('p', { class: 'data-status' }, candidate.sourceStatusText),
           cell.policies.length === 0
             ? el('p', { class: 'no-policy' }, vm.noPolicyText)
             : el('ul', { class: 'shortlist-policies' }, cell.policies.map(shortlistPolicy)),

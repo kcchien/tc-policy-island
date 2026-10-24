@@ -1,11 +1,12 @@
 // 政見卡片：一個議題區內三位候選人的政見並排。表格檢視與島嶼檢視共用，只讀檢視模型的一列（row）。
-// 桌面島嶼檢視停靠在畫布下方、可一鍵放大成全高；800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js），
-// 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，
+// 桌面島嶼檢視停靠在畫布下方、可一鍵放大成全高；800px 以下預設全高，仍可手動改半高或關閉（sheet.js），
+// 三位候選人改為同尺寸的分頁切換。桌面三欄各自捲動、欄頭固定，手機共用內容捲動區；控制項過高時外層也可捲動。
+// 長說明與篩選由讀者展開；啟用的篩選條件與清除入口收合時仍可見。每筆政見預設只顯示摘要與適用行政區，
 // 點開才顯示原文引述、出處與核對紀錄。欄內篩選用 filter.js 的 policyMatcher。畫面文字取自 ui-text.js。
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（createPolicyReader：有 audioUrl 播預先生成的音檔，
 // 沒有時用瀏覽器內建語音；一次一筆，換議題區或關卡片即停止；按鈕帶喇叭圖示 SPEAK_ICON，播放中換成停止方塊）。本模組是唯一引用音檔的畫面模組，只用公開資料集給的 audioUrl。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
 // 右下角的「上一題」「下一題」只通知呼叫端（onStep），換哪一區由呼叫端決定。
-// 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。
+// 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。數量放在三人相同的可展開收錄說明。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
@@ -13,8 +14,9 @@ import { policyMatcher } from './filter.js';
 import { policySpeech, policyText } from './policy-text.js';
 import { sourceReportHref } from './report-link.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
+import { collectionNote } from './collection-note.js';
 import {
-  candidateCountText, DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
+  DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
 } from './ui-text.js';
 
 // 桌面島嶼檢視的卡片高度偏好：預設接近全高，使用者按「縮小卡片」改停靠在下方後記住。
@@ -183,7 +185,9 @@ function policyArticle(policy, { focused, open, canRead, picked }) {
           'dl',
           { class: 'policy-facts' },
           el('dt', {}, T.verification),
-          el('dd', {}, el('span', { class: 'verification-line' }, verificationText(policy.verification))),
+          el('dd', {},
+            el('span', { class: 'verification-line' }, verificationText(policy.verification)),
+            el('p', { class: 'verification-scope' }, T.verificationScope, ' ', el('a', { href: './method.html#verification' }, T.verificationMethod))),
         ),
         // 連結、複製、朗讀同一列；按鈕的動作由卡片控制器以事件委派處理，沒有語音功能時不放朗讀鈕。
         el(
@@ -226,11 +230,11 @@ function candidateColumn(candidate, cell, policies, {
       { class: 'card-column-head' },
       el('h3', { class: 'candidate-name' }, candidate.name),
       el('p', { class: 'candidate-meta' }, candidate.party),
-      el('p', { class: 'candidate-meta' }, candidateCountText(cell.policies.length, candidate.rawPolicyItems)),
       matcher.active && el('p', { class: 'candidate-meta candidate-match' }, T.columnMatch(policies.length)),
     ),
     // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。
-    candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
+    el('p', { class: 'data-status' }, candidate.sourceStatusText),
+    collectionNote(candidate, { cutoffDate: vm.meta.dataCutoffDate, areaPolicyCount: cell.policies.length }),
     empty && el('p', { class: 'no-policy' }, empty),
     // 市民補件：這一欄在本議題區完全沒有政見時（不是篩選後才沒有），三欄同一句、同一位置。
     cell.policies.length === 0 && el(
@@ -281,8 +285,12 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
     el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, T.searchLabel), search),
     el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, T.districts), district),
     el('label', { class: 'card-conflict', for: 'card-conflict' }, conflict, el('span', {}, FILTER_TEXT.conflictOnly)),
-    expandButton,
   );
+  const filterSummary = el('summary', {}, T.filters);
+  const filterTools = el('details', { class: 'card-filter-tools' }, filterSummary, filters);
+  const clearFilters = el('button', { type: 'button', class: 'card-clear-filter', hidden: true }, T.clearFilters);
+  const context = el('details', { class: 'card-context' }, el('summary', {}, T.description), description, shareLink);
+  const tools = el('div', { class: 'card-tools' }, context, filterTools, clearFilters, expandButton);
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
   // 下一題：卡片右下角，依議題區編號換區，頭尾相接。
@@ -293,7 +301,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
   const steps = el('nav', { class: 'card-steps', 'aria-label': T.stepsLabel }, previousButton, nextButton);
   const dialog = el(
     'dialog',
-    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'tall' },
+    { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'full', 'data-height': 'tall' },
     el(
       'div',
       { class: 'card-inner' },
@@ -306,11 +314,10 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
           { class: 'card-heading' },
           number,
           el('div', { class: 'card-heading-text' }, el('p', { class: 'card-eyebrow' }, T.eyebrow), title),
-          description,
         ),
-        el('div', { class: 'card-actions' }, shareLink, heightButton, closeButton),
+        el('div', { class: 'card-actions' }, heightButton, closeButton),
       ),
-      filters,
+      tools,
       filterStatus,
       tabs,
       body,
@@ -406,11 +413,14 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
       if (i === index && focus) tab.focus();
     });
     [...body.children].forEach((column, i) => column.classList.toggle('is-active', i === index));
+    body.scrollTop = 0;
   };
 
   const render = ({ focusPolicyId = null } = {}) => {
     const { row, vm } = current;
     const matcher = policyMatcher({ query: search.value, district: district.value, conflictOnly: conflict.checked });
+    filterSummary.textContent = T.filterSummary({ query: search.value, district: matcher.district, conflictOnly: conflict.checked });
+    clearFilters.hidden = !matcher.active;
     // 重畫前讀者自己點開的政見，重畫後照樣展開。
     const openIds = new Set([...body.querySelectorAll('.policy-details[open]')].map((d) => d.closest('.policy').id.slice('card-policy-'.length)));
     const tabbed = tabbedQuery.matches;
@@ -470,6 +480,14 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
   filters.addEventListener('input', () => {
     if (current) render();
   });
+  clearFilters.addEventListener('click', () => {
+    search.value = '';
+    district.value = '';
+    conflict.checked = false;
+    if (current) render();
+    // 清除鈕隱藏後焦點回到篩選入口，鍵盤讀者可繼續操作。
+    filterSummary.focus();
+  });
 
   return {
     element: dialog,
@@ -491,6 +509,8 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
         body.replaceChildren();
         setExpanded(false);
         active = 0;
+        context.open = false;
+        filterTools.open = false;
       }
       if (focusPolicyId) {
         search.value = '';
@@ -504,7 +524,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
       if (focusIndex >= 0) active = focusIndex;
       render({ focusPolicyId });
       if (!dialog.open) {
-        dialog.dataset.snap = 'half';
+        dialog.dataset.snap = 'full';
         setTall(readTallPreference());
         dialog.showModal();
       }

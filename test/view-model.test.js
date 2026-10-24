@@ -75,10 +75,10 @@ test('候選人欄位附原始政見條目總數與其出處、公開政見數�
   );
 });
 
-test('「未提出相關政見」的說明文字帶資料截止日', () => {
+test('空欄只說明本站的收錄狀態，附資料截止日', () => {
   const vm = viewModelOf(makeRaw());
 
-  assert.equal(vm.noPolicyText, '未提出相關政見（截至 2026-10-23）');
+  assert.equal(vm.noPolicyText, '本站尚未收錄這個議題的政見（截至 2026-10-23）');
   assert.equal(vm.meta.dataCutoffDate, '2026-10-23');
 });
 
@@ -92,7 +92,7 @@ test('檢視模型附上目前採用的候選人排序規則說明', () => {
   assert.equal(byBallot.candidateOrderNote, '候選人排列依選委會抽籤號次');
 });
 
-test('沒有任何公開政見時，每一格都是「未提出相關政見」', () => {
+test('沒有任何公開政見時，每一格都是尚未收錄', () => {
   const raw = makeRaw();
   raw.policies = [policy('p-pending', 'cand-a', pendingVerification())];
 
@@ -100,6 +100,24 @@ test('沒有任何公開政見時，每一格都是「未提出相關政見」',
 
   const statuses = vm.rows.flatMap((row) => row.cells.map((cell) => cell.status));
   assert.deepEqual(statuses, Array(6).fill('no-policies'));
+});
+
+test('來源狀態依政見出處紀錄呈現，候選人資料出處不當成政見來源，三人適用同一規則', () => {
+  for (const id of ['cand-a', 'cand-b', 'cand-c']) {
+    const raw = makeRaw();
+    raw.policies = [];
+    const candidate = raw.candidates.find((c) => c.id === id);
+    candidate.dataStatus = '尚無一手來源';
+    const status = () => viewModelOf(raw).candidates.find((c) => c.id === id).sourceStatusText;
+    assert.equal(status(), '本站尚未取得可核對的政見一手來源');
+    candidate.dataStatus = null;
+    assert.equal(status(), '本站尚未公開政見一手來源的收錄紀錄');
+    candidate.rawPolicyItems = { total: null, sourceIds: [`src-${id}`] };
+    assert.equal(status(), '本站已取得政見一手來源，收錄範圍見整理方法');
+    candidate.rawPolicyItems.sourceIds = [];
+    raw.policies = [policy('p-recorded', id)];
+    assert.equal(status(), '本站已取得政見一手來源，收錄範圍見整理方法');
+  }
 });
 
 test('每則原文引述附上出處（來源類型中文名、網址、出處快照位置），供政見卡片使用', () => {

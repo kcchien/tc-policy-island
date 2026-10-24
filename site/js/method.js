@@ -1,9 +1,10 @@
 // 整理方法頁：填入由公開資料集產生的內容與統計的揭露文字，並在 data-repo-file 容器裡呈現引用 repo 文件的原文。
 // 進頁時送一次頁面瀏覽。
 import { orderCandidates } from './dataset.js';
+import { buildViewModel } from './view-model.js';
 import { el } from './dom.js';
 import { parseMarkdown } from './markdown.js';
-import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from './method-content.js';
+import { brandTermsView, candidateOrderItems, checklistView, sourceStatusItems, resolveDocLink } from './method-content.js';
 import { REPO_FILES_MANIFEST, repoDocumentByPath, repoFileSitePath, repoFileUrl } from './repo-documents.js';
 import { pageviewHit, sendHit } from './hits.js';
 import { HITS_TEXT, LOAD_TEXT, METHOD_TEXT, REPO_DOCUMENT_TEXT } from './ui-text.js';
@@ -121,10 +122,8 @@ async function renderRepoDocument(container, available) {
 
 function fillDataset(dataset) {
   document.getElementById('data-cutoff-date').textContent = dataset.meta.dataCutoffDate;
-  const statusItems = dataStatusItems(dataset.candidates);
-  document.getElementById('data-status-list').replaceChildren(...(statusItems.length > 0
-    ? statusItems.map((text) => el('li', {}, text))
-    : [el('li', {}, METHOD_TEXT.allHaveSources)]));
+  const statusItems = sourceStatusItems(buildViewModel(dataset).candidates);
+  document.getElementById('source-status-list').replaceChildren(...statusItems.map((text) => el('li', {}, text)));
   const { candidateOrder } = orderCandidates(dataset.candidates);
   document.getElementById('order-rule-list').replaceChildren(...candidateOrderItems(candidateOrder).map(({ text, current }) =>
     el('li', { class: current ? 'is-current' : null }, text, current ? el('strong', { class: 'current-rule' }, METHOD_TEXT.currentRule) : null)));

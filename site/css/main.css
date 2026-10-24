@@ -311,6 +311,68 @@ select {
   gap: 8px;
 }
 
+.scene-controls {
+  position: relative;
+  pointer-events: auto;
+}
+
+.scene-controls > summary {
+  min-height: 56px;
+  padding: 14px 18px;
+  background: var(--glass);
+  border-radius: 999px;
+  box-shadow: var(--float-shadow);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.scene-settings {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--rice);
+  box-shadow: var(--float-shadow);
+}
+
+.scene-settings .tool-group {
+  flex-wrap: wrap;
+  background: transparent;
+  box-shadow: none;
+}
+
+.index-tools {
+  display: none;
+}
+
+/* 卡片內只篩選目前議題，背景的全站查找暫時隱去，保留原位置與條件。 */
+body:has(> .policy-card[open]) :is(#index-panel, #controls, .scene-controls) {
+  visibility: hidden;
+}
+
+.collection-note {
+  font-size: 0.8125rem;
+  font-weight: normal;
+  color: var(--charcoal-soft);
+}
+
+.collection-note summary {
+  min-height: 32px;
+  padding: 4px 0;
+  color: var(--laterite);
+  cursor: pointer;
+}
+
+.collection-note p {
+  margin: 4px 0;
+}
+
 .tool-group {
   display: flex;
   gap: 2px;
@@ -1196,7 +1258,7 @@ body[data-view="island"] .policy-card::backdrop {
   gap: 4px;
 }
 
-/* 標記徽章：三人同色同尺寸，亮起是實心，沒有政見是淡灰。 */
+/* 標記徽章：三人同色同尺寸，亮起是實心，尚未收錄或無符合篩選結果是淡灰。 */
 .marker-badge {
   display: inline-grid;
   place-items: center;
@@ -1481,6 +1543,42 @@ body[data-view="island"] .card-height {
   white-space: nowrap;
 }
 
+/* 說明與篩選按需展開；收合時保留條件與清除入口。 */
+.card-tools {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 0 20px;
+}
+
+.card-tools summary {
+  padding: 8px 0;
+  cursor: pointer;
+  color: var(--laterite);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.card-context,
+.card-filter-tools {
+  min-width: 0;
+}
+
+.card-context[open],
+.card-filter-tools[open] {
+  flex-basis: 100%;
+}
+
+.card-context .card-description {
+  margin: 0 0 8px;
+}
+
+.card-tools .card-filters {
+  margin: 0;
+}
+
 /* 欄內篩選：關鍵字、行政區與「全部展開」排成一列 */
 .card-filters {
   display: flex;
@@ -1604,7 +1702,7 @@ body[data-view="island"] .card-height {
   color: var(--laterite);
 }
 
-/* 市民補件：沒有政見的欄位在「未提出相關政見」下方放回報連結，三欄同一句 */
+/* 市民補件：空欄在收錄狀態下方放回報連結，三欄同一句 */
 .source-report {
   font-size: 0.8125rem;
   line-height: 1.6;
@@ -2498,6 +2596,28 @@ body[data-view="island"] .card-height {
     flex: 5 1 auto;
   }
 
+  body[data-view="island"] .scene-controls {
+    flex: 1 1 auto;
+  }
+
+  body[data-view="island"] .scene-controls > summary {
+    min-height: 48px;
+    padding: 12px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body[data-view="island"] .scene-settings {
+    top: auto;
+    bottom: calc(100% + 8px);
+    max-height: 60dvh;
+    overflow-y: auto;
+  }
+
+  body[data-view="island"] .index-tools {
+    display: flex;
+  }
+
   body[data-view="island"] .tool-button {
     flex: 1 1 0;
     min-width: 0;
@@ -2702,6 +2822,35 @@ body[data-view="island"] .card-height {
 
   .card-head {
     padding: 0 var(--gap) 8px;
+  }
+
+  /* 政見卡片的內容區至少保留可捲動空間；半高或文字放大使控制項過高時，外層也能自然捲動。候選人資料卡不變。 */
+  .policy-card .card-inner {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .policy-card .card-tools {
+    padding: 0 var(--gap);
+  }
+
+  .policy-card .card-columns {
+    display: block;
+    flex: 1 0 12rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .policy-card .card-column {
+    overflow: visible;
+  }
+
+  .policy-card .card-column-head {
+    position: static;
+  }
+
+  .policy-card .card-steps {
+    margin-top: auto;
   }
 
   body[data-view="island"] .card-height {

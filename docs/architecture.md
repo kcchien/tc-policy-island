@@ -46,12 +46,12 @@ site/
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js  js/reading-progress.js
 js/shortlist.js  js/shortlist-dialog.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/policy-text.js  js/report-link.js  js/candidate-card.js  js/sheet.js
-js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js  js/schedule-view.js
+js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  js/election-schedule.js  js/schedule-view.js
 ```
 
 ### 檢視模型
 
-檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount`、`rawPolicyItems` 與 `profileSource`（候選人資料的出處，含 `snapshotNote`；`profile` 為 `null` 時也是 `null`），另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
+檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格收錄狀態 `status` 為 `has-policies` 或 `no-policies`。候選人附 `policyCount`、`rawPolicyItems`、`sourceStatusText`（依政見出處紀錄與已知舊來源狀態產生的白話說明，不把候選人資料出處當成政見來源）與 `profileSource`（候選人資料的出處，含 `snapshotNote`；`profile` 為 `null` 時也是 `null`），另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；整理方法與對照單的來源狀態也取自同一檢視模型，不直接呈現原始 `dataStatus`。島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子是否有收錄決定，不呈現政見數量。`filterViewModel` 篩選後，原本已收錄但沒有符合政見的格子 `status` 為 `no-matches`，原本 `no-policies` 的空欄維持收錄狀態；沒有任何符合政見的議題區整列移除。索引標記依每格狀態提供無障礙說明，亮暗邏輯不變。見 ADR 0004 的缺漏推論邊界。
 
 ### 網址參數
 
@@ -60,6 +60,14 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js
 ### 開啟候選人資料卡
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
+
+### 政見卡片的閱讀與表格定位
+
+`policy-card.js` 的手機抽屜每次初次開啟預設全高，手動半高與關閉沿用 `sheet.js`，不改候選人資料卡的預設高度。長說明與篩選放在原生 `details`；篩選收合時，`summary` 仍列出啟用條件，清除按鈕留在外面。手機三人分頁共用內容捲動區，上下題在捲動區之外；半高或文字放大使控制項過高時，卡片外層也可捲動，不截斷內容。各開卡入口沿用同一個 `openCard`，人物抵達的等待流程不變。
+
+`main.js` 記錄開卡入口，首次閱讀更新紀錄並重畫表格或索引後，關閉卡片時用議題區識別碼與政見按鈕的 `data-policy` 找回焦點。`table-view.js` 的 `scrollToTableRow(container, areaId)` 在每次定位時量測實際固定欄頭高度，設定目標列的捲動留白；窄版隱藏欄頭時不保留高度，文字換行與縮放後重新量測，不使用單一固定偏移。
+
+`collection-note.js` 由表格與政見卡片共用，將公開收錄筆數、原始條目數與截止日放入三人一致的原生 `details`，保留未知數量，說明拆分方式與來源範圍會影響筆數，不代表品質或完整度。時段、暫停、名牌、全景與音樂收在頁首原生「場景設定」，查找、隨機一題與檢視切換留在外面。政見卡片開啟時用 CSS 隱去背景全站查找與場景設定，條件與狀態不變；名牌避讓與截圖量測同步計入展開的設定區。
 
 ### 隨機一題
 

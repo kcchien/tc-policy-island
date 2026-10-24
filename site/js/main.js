@@ -1,6 +1,6 @@
 // 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
 // 頁首的選舉時程（與自動時段同一節奏重算）、隨機一題、下一題與閱讀進度、上手導覽與統計（資料載入後送一次頁面瀏覽，
-// 旁聽出處連結的點擊）。
+// 旁聽出處連結的點擊）。開卡後關閉會回到原入口，閱讀紀錄重畫按鈕時用穩定識別碼尋回。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -8,7 +8,7 @@ import { buildViewModel } from './view-model.js';
 import { filterViewModel } from './filter.js';
 import { chooseView, formatSearch, parseSearch } from './app-state.js';
 import { createPolicyCard } from './policy-card.js';
-import { renderTable } from './table-view.js';
+import { renderTable, scrollToTableRow } from './table-view.js';
 import { renderIslandList, renderLegend } from './island-list.js';
 import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
@@ -135,11 +135,22 @@ function startApp(vm, state, initialView) {
 
   const updateUrl = () => history.replaceState(null, '', formatSearch(state) || location.pathname);
 
+  // 記錄開卡入口。首次閱讀會重畫表格與索引，原按鈕可能已移除，關閉卡片後用穩定識別碼找回同一個入口。
+  let cardTrigger = null;
+
   const card = createPolicyCard({
     onClose() {
       state.area = null;
       state.policy = null;
       updateUrl();
+      if (cardTrigger && !document.querySelector('dialog[open]')) {
+        const { node, areaId, policyId, inTable, inIndex } = cardTrigger;
+        const replacement = inTable
+          ? document.getElementById(`area-${areaId}`)?.querySelector(policyId ? `[data-policy="${CSS.escape(policyId)}"]` : '.area-open')
+          : inIndex ? document.querySelector(`.island-item[data-area="${CSS.escape(areaId)}"]`) : null;
+        (node.isConnected ? node : replacement)?.focus({ preventScroll: true });
+      }
+      cardTrigger = null;
     },
     onStep: (step) => stepArea(step),
     picks: () => picks,
@@ -196,6 +207,7 @@ function startApp(vm, state, initialView) {
   // 名牌要避開的浮動元件（見 stageObstacles）開關時，請島嶼檢視重排名牌。鏡頭沒動時不會自己重排。
   const refreshLabels = () => withIsland((controller) => controller.refreshLabels());
   candidateDialog.element.addEventListener('close', refreshLabels);
+  document.getElementById('scene-controls').addEventListener('toggle', refreshLabels);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
@@ -229,13 +241,15 @@ function startApp(vm, state, initialView) {
   const panelObstacles = () => {
     const nodes = [
       titleCard,
-      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
+      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group, .scene-controls > summary')),
+      ...toolbar.querySelectorAll('.scene-controls[open] .scene-settings'),
       panel,
       document.getElementById('view-note'),
       card.element.open && card.element,
       candidateDialog.element.open && candidateDialog.element,
     ];
-    return nodes.filter(Boolean).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+    return nodes.filter((node) => node && getComputedStyle(node).visibility !== 'hidden')
+      .map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
   };
 
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。
@@ -350,8 +364,6 @@ function startApp(vm, state, initialView) {
     return island;
   };
 
-  const scrollToTableRow = (areaId) => document.getElementById(`area-${areaId}`)?.scrollIntoView({ block: 'start' });
-
   const highlightTableRow = () => {
     for (const row of tableRoot.querySelectorAll('.area-row')) {
       row.classList.toggle('is-selected', row.id === `area-${selectedArea}`);
@@ -377,6 +389,14 @@ function startApp(vm, state, initialView) {
   const openCard = (areaId, policyId, { unfiltered = false } = {}) => {
     const row = vm.rows.find((r) => r.issueArea.id === areaId);
     if (!row) return false;
+    if (!card.element.open) {
+      const node = document.activeElement;
+      cardTrigger = {
+        node, areaId, policyId,
+        inTable: Boolean(node.closest('#table-root')),
+        inIndex: Boolean(node.closest('#island-list')),
+      };
+    }
     candidateDialog.close();
     state.candidate = null;
     selectedArea = areaId;
@@ -407,14 +427,14 @@ function startApp(vm, state, initialView) {
   // 表格檢視先捲到該列（被篩掉時不捲）；島嶼檢視由 openCard 等載入完成、飛到該區再開。
   const openRandomArea = () => {
     const areaId = pickRandomArea(vm.rows, Math.random, selectedArea);
-    if (view === 'table') scrollToTableRow(areaId);
+    if (view === 'table') scrollToTableRow(tableRoot, areaId);
     return openCard(areaId, null, { unfiltered: true });
   };
 
   // 下一題與上一題：依全部議題區的編號（不看篩選），與隨機一題同樣不帶篩選開卡。
   const stepArea = (step) => {
     const areaId = nextAreaId(vm.rows, selectedArea, step);
-    if (view === 'table') scrollToTableRow(areaId);
+    if (view === 'table') scrollToTableRow(tableRoot, areaId);
     return openCard(areaId, null, { unfiltered: true });
   };
 
@@ -514,7 +534,7 @@ function startApp(vm, state, initialView) {
       });
     } else {
       highlightTableRow();
-      if (selectedArea) scrollToTableRow(selectedArea);
+      if (selectedArea) scrollToTableRow(tableRoot, selectedArea);
     }
   }
 
@@ -591,7 +611,7 @@ function startApp(vm, state, initialView) {
   if (policyRow) {
     openCard(policyRow.issueArea.id, state.policy);
   } else if (state.area && vm.rows.some((r) => r.issueArea.id === state.area)) {
-    if (view === 'table') scrollToTableRow(state.area);
+    if (view === 'table') scrollToTableRow(tableRoot, state.area);
     openCard(state.area, null);
   } else if (state.candidate && !openCandidateCard(state.candidate)) {
     state.candidate = null;

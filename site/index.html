@@ -57,6 +57,9 @@
     </header>
 
     <nav class="hud-toolbar" id="hud-toolbar" aria-label="檢視操作">
+      <details class="scene-controls" id="scene-controls">
+        <summary>場景設定</summary>
+        <div class="scene-settings">
       <div class="tool-group time-group" role="group" aria-label="時段" data-island-only>
         <button type="button" class="tool-button" data-time="auto" aria-pressed="true">
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M12 7.5V12l3 2" /></svg>
@@ -96,10 +99,6 @@
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
           <span class="tool-label">全景</span>
         </button>
-        <button type="button" class="tool-button index-toggle" id="tool-index" aria-expanded="false" aria-controls="index-panel">
-          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1" /></svg>
-          <span class="tool-label">索引</span>
-        </button>
       </div>
       <!-- 背景音樂（bgm-control.js）：預設靜音，按下才建立音訊並開始播放。 -->
       <div class="tool-group music-group" role="group" aria-label="背景音樂">
@@ -108,6 +107,14 @@
           <span class="tool-label">音樂</span>
         </button>
         <input type="range" class="music-volume" id="tool-music-volume" min="0" max="1" step="0.05" />
+      </div>
+        </div>
+      </details>
+      <div class="tool-group index-tools" data-island-only>
+        <button type="button" class="tool-button index-toggle" id="tool-index" aria-expanded="false" aria-controls="index-panel">
+          <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1" /></svg>
+          <span class="tool-label">找議題</span>
+        </button>
       </div>
       <div class="tool-group view-switch" role="group" aria-label="檢視方式">
         <button type="button" class="tool-button view-button" data-view="island" aria-pressed="false">
@@ -124,7 +131,7 @@
 
     <!-- 共用控制區：島嶼檢視時放在索引面板的議題區分頁，表格檢視時放在表格上方（main.js 搬移）。 -->
     <div class="controls" id="controls">
-      <form class="filters" id="filters" role="search" aria-label="搜尋與篩選政見">
+      <form class="filters" id="filters" role="search" aria-label="全站政見搜尋與篩選">
         <div class="field field-search">
           <label for="search">關鍵字</label>
           <input id="search" name="q" type="search" placeholder="例如：托育、捷運、大里" autocomplete="off" />

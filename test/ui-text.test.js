@@ -17,6 +17,16 @@ test('尚未通過的核對紀錄照實寫出每一道的結果', () => {
   assert.equal(UI.verificationText(pendingVerification()), '原文逐字比對：未核對；AI 依公開檢核表檢查：未核對');
 });
 
+test('圖例與導覽只描述本站收錄；篩選與空欄分開，核對附近說明其限制', () => {
+  assert.equal(UI.MARKER_TEXT.lit, '本站已收錄這個議題的政見');
+  assert.match(UI.MARKER_TEXT.legendNote, /尚未收錄不代表候選人未提出/);
+  assert.match(UI.MARKER_TEXT.legendNote, /篩選/);
+  assert.match(UI.TOUR_TEXT.steps.markers.body, /本站/);
+  assert.match(UI.TOUR_TEXT.steps.markers.body, /尚未收錄不代表候選人未提出/);
+  assert.equal(UI.NO_MATCH_TEXT, '沒有符合篩選條件的政見');
+  assert.equal(UI.POLICY_CARD_TEXT.verificationScope, '只核對引用文字與摘要，不代表查核政見事實、評估可行性或保證履約。');
+});
+
 test('候選人資料的核對紀錄寫出逐字比對的結果與日期', () => {
   assert.equal(UI.profileVerificationText({ layer1: { status: 'pass', checkedAt: '2026-10-24' } }), '已通過核對：學歷與經歷逐字比對原文（2026-10-24）');
   assert.equal(UI.profileVerificationText({ layer1: { status: 'pending', checkedAt: null } }), '學歷與經歷逐字比對原文：未核對');
@@ -30,9 +40,10 @@ test('原文存檔說明只在有字形還原時出現，改寫成白話，不�
   assert.equal(UI.snapshotNoteText(restored), '部分文字因原始檔案的字型無法直接轉成文字，已比對公報影像逐字還原。');
 });
 
-test('卡片欄位顯示此區政見數與原始政見條目總數，尚未統計時照實寫出', () => {
-  assert.equal(UI.candidateCountText(2, { total: 117 }), '此議題區 2 筆政見，原始政見條目共 117 項');
-  assert.equal(UI.candidateCountText(0, { total: null }), '此議題區 0 筆政見，原始政見條目尚未統計');
+test('收錄說明保留此區與全站筆數、原始條目，尚未統計時照實寫出', () => {
+  assert.equal(UI.COLLECTION_TEXT.areaCount(2), '此議題區收錄 2 筆政見');
+  assert.equal(UI.COLLECTION_TEXT.totalCount(0), '本站共收錄 0 筆政見');
+  assert.equal(UI.rawPolicyItemsText({ total: null }), '原始政見條目尚未統計');
 });
 
 test('政見卡片內篩選時，欄頭另列符合篩選的筆數，篩選總結列出三欄合計', () => {

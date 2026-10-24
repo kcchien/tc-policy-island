@@ -34,13 +34,25 @@ export const GLYPH_RESTORED_TEXT = '部分文字因原始檔案的字型無法�
 export const snapshotNoteText = (note) => (note && note.includes(GLYPH_RESTORED_MARK) ? GLYPH_RESTORED_TEXT : null);
 
 export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
-export const candidateCountText = (areaPolicyCount, rawPolicyItems) =>
-  `此議題區 ${areaPolicyCount} 筆政見，${rawPolicyItemsText(rawPolicyItems)}`;
+export const COLLECTION_TEXT = {
+  title: '收錄說明',
+  areaCount: (n) => `此議題區收錄 ${n} 筆政見`,
+  totalCount: (n) => `本站共收錄 ${n} 筆政見`,
+  cutoff: (date) => `資料截止日 ${date}`,
+  note: '整理時的拆分方式與目前取得的來源範圍會影響筆數，數量不代表政見品質或收錄完整度。',
+};
 
-// 沒有政見與篩選結果。
-export const NO_POLICY_LABEL = '未提出相關政見';
+// 收錄狀態與篩選結果。空欄只描述本站的收錄，不推論候選人是否提出。
+export const NO_POLICY_LABEL = '本站尚未收錄這個議題的政見';
 export const noPolicyText = (cutoffDate) => `${NO_POLICY_LABEL}（截至 ${cutoffDate}）`;
 export const NO_MATCH_TEXT = '沒有符合篩選條件的政見';
+
+// 來源狀態只依既有紀錄。只轉換已知的舊狀態，不替未知狀態猜測未蒐集的原因。
+export function sourceStatusText({ hasPolicySources, dataStatus }) {
+  if (hasPolicySources) return '本站已取得政見一手來源，收錄範圍見整理方法';
+  if (dataStatus?.startsWith('尚無一手來源')) return '本站尚未取得可核對的政見一手來源';
+  return '本站尚未公開政見一手來源的收錄紀錄';
+}
 // 全站篩選的「只看兩說並列」開關（索引面板與表格上方共用）。
 export const FILTER_TEXT = {
   conflictOnly: '只看出處說法不一的政見',
@@ -72,12 +84,21 @@ export const POLICY_CARD_TEXT = {
   areaLink: '這個議題區的連結',
   policyLink: '這筆政見的連結',
   areaDescription: (description, departments) => `${description}（對應局處：${departments.join('、')}）`,
+  description: '議題說明',
+  filters: '篩選這個議題',
+  clearFilters: '清除篩選',
+  filterSummary({ query, district, conflictOnly }) {
+    const conditions = [query.trim(), district, conflictOnly && FILTER_TEXT.conflictOnly].filter(Boolean);
+    return conditions.length > 0 ? `本議題篩選：${conditions.join('／')}` : '篩選這個議題';
+  },
   conflict: '出處說法不一：',
   conflictFlag: '出處說法不一',
   districts: '適用行政區',
   districtsLine: (names) => `適用行政區：${names}`,
   noDistricts: '未指定',
   verification: '核對紀錄',
+  verificationScope: '只核對引用文字與摘要，不代表查核政見事實、評估可行性或保證履約。',
+  verificationMethod: '了解核對範圍',
   eyebrow: '議題區',
   tabsLabel: '候選人',
   enlarge: '放大卡片',
@@ -143,7 +164,7 @@ export const SHORTLIST_TEXT = {
   button: (count) => `我的對照單（${count} 條）`,
   buttonHint: '只列出你勾選的政見所在的議題區，可列印或把網址傳給別人',
   title: '我的對照單',
-  note: '只列出你勾選的政見所在的議題區；三位候選人照排序並排，沒有政見的欄位照常列出。勾選只記在這台裝置的瀏覽器。',
+  note: '只列出你勾選的政見所在的議題區；三位候選人照排序並排，本站尚未收錄的欄位照常列出，列印也一樣。尚未收錄不代表候選人未提出。勾選只記在這台裝置的瀏覽器。',
   picked: '已勾選',
   // 一條政見有多個出處時依序編號。
   sourceLink: (index, total) => (total > 1 ? `出處 ${index + 1}` : '出處'),
@@ -175,15 +196,15 @@ export const TABLE_TEXT = {
   openCard: '看政見卡片',
   openProfile: '看候選人資料',
   ballotNumber: (n) => `${n} 號`,
-  policyCount: (n) => `公開政見 ${n} 筆`,
   districts: (names) => `適用行政區：${names.join('、')}`,
   conflictFlag: POLICY_CARD_TEXT.conflictFlag,
 };
 
 // 索引面板的標記。
 export const MARKER_TEXT = {
-  lit: '有政見',
-  legendNote: '亮起表示有政見，灰色表示沒有；標記不表示政見多寡。',
+  lit: '本站已收錄這個議題的政見',
+  match: '有符合篩選條件的政見',
+  legendNote: '亮起表示本站已收錄，灰色表示尚未收錄；尚未收錄不代表候選人未提出。篩選時，亮起表示有符合的政見，灰色也可能是沒有符合結果。標記不表示政見多寡。',
   state: (name, state) => `${name}：${state}`,
   // 螢幕閱讀器念的版本，接在標記符號之後。
   spoken: (name, state) => `${name}${state}`,
@@ -264,12 +285,12 @@ export const TOUR_TEXT = {
       body: '島上每一格是一個議題區，名牌上的編號和索引裡的編號相同。點一下格子，就會打開這個議題區的政見卡片。拖曳可以移動畫面，滾輪或兩指可以放大縮小；按住右鍵或用兩指轉動，可以換個角度看。',
     },
     markers: {
-      title: '三個標記：有沒有政見',
-      body: '每一格都有 ○ △ □ 三個一樣大的標記，依排序代表三位候選人。亮起表示在這個議題區有政見，灰色表示沒有。標記只看有沒有，不代表政見多寡。',
+      title: '三個標記：本站是否收錄',
+      body: '每一格都有 ○ △ □ 三個一樣大的標記，依排序代表三位候選人。亮起表示本站已收錄這個議題的政見，灰色表示尚未收錄；尚未收錄不代表候選人未提出。篩選時，標記亮起表示有符合的政見。標記不表示政見多寡。',
     },
     random: {
       title: '同一個議題區，三人對照',
-      body: `這是隨機選出的一個議題區。同一張卡片裡有三位候選人的政見摘要，沒有政見的也照樣列出；每筆都附原文引述與出處。看完說明就能點出處看原文，之後按頁首的「${RANDOM_AREA_TEXT.button}」可以再換一題。`,
+      body: `這是隨機選出的一個議題區。同一張卡片裡有三位候選人的政見摘要，本站尚未收錄的欄位也照樣列出；每筆都附原文引述與出處。看完說明就能點出處看原文，之後按頁首的「${RANDOM_AREA_TEXT.button}」可以再換一題。`,
     },
   },
 };
@@ -291,8 +312,7 @@ export const LOAD_TEXT = {
 
 // 整理方法頁。
 export const METHOD_TEXT = {
-  allHaveSources: '每位候選人都已有一手來源。',
-  dataStatus: (name, status) => `${name}：${status}`,
+  sourceStatus: (name, status) => `${name}：${status}`,
   currentRule: '（目前採用）',
   documentLabel: '公開原文',
   originalFile: '原始檔案',
@@ -325,4 +345,5 @@ export const REPO_DOCUMENT_TEXT = {
   'adr-neutrality': { title: '中立規則（決策紀錄）', description: '本站中立規則的完整原文與理由。' },
   'adr-verification': { title: '以 AI 核對取代人工審查（決策紀錄）', description: '為什麼不靠人工逐筆審查，改用兩道核對與公開流程。' },
   'adr-hit-counter': { title: '統計頁面瀏覽與出處點擊（決策紀錄）', description: '為什麼網站會統計頁面瀏覽與出處點擊，以及為什麼只記次數、不記讀者是誰。' },
+  'adr-collection-status': { title: '收錄缺漏的說明邊界（決策紀錄）', description: '為什麼尚未收錄不代表候選人未提出，以及收錄、來源與篩選結果如何分開說明。' },
 };
