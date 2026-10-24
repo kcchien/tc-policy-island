@@ -1831,6 +1831,13 @@ body[data-view="island"] .card-height {
   color: var(--rice);
 }
 
+/* 朗讀播放中：音檔與瀏覽器語音同一個按下狀態，不顯示時間軸 */
+.policy-action[aria-pressed="true"] {
+  background: var(--laterite);
+  border-color: var(--laterite);
+  color: var(--rice);
+}
+
 .policy-action-status {
   color: var(--charcoal-soft);
   font-size: 0.75rem;
