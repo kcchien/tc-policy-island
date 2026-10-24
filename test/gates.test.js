@@ -344,6 +344,16 @@ test('數字代號不因小數點或頓號前後的數字而誤擋，英文用�
   assert.equal(code, 0, output);
 });
 
+test('政見語音清單裡的雜湊含數字代號不擋：清單只有識別碼、雜湊與語音設定，沒有整理者的句子', () => {
+  const hash = `1680ab${'c'.repeat(58)}`;
+  const manifest = { voice: { ...SPEECH_VOICE }, items: { 'p-a1': { textSha256: hash, file: `${hash}.mp3`, fileSha256: `${'d'.repeat(61)}168`, chars: 10, quota: 9, generatedAt: '2026-10-24' } } };
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'data/audio/manifest.json': JSON.stringify(manifest) });
+
+  const { code, output } = runGates(site);
+
+  assert.equal(code, 0, output);
+});
+
 test('程式碼註解裡的陣營高頻詞不擋，字串裡的文案照擋', () => {
   const site = makeSite(() => {}, {
     ...COMPLIANT_FILES,
