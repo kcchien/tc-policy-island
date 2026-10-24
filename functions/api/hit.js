@@ -6,7 +6,7 @@
 const KINDS = new Set(['pageview', 'source']);
 const VIEWS = new Set(['island', 'table', 'method']);
 const SOURCE_ID = /^[A-Za-z0-9_-]{1,80}$/;
-// 合格的內容不到 100 字元，超過就不解析。
+// 合格的內容不到 150 字元，超過就不解析（內容已讀進來，這裡只擋解析與寫入）。
 const MAX_BODY = 512;
 
 const respond = (status, headers = {}) => new Response(null, { status, headers: { 'cache-control': 'no-store', ...headers } });
