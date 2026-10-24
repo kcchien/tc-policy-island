@@ -43,6 +43,7 @@ site/
 
 ```
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js  js/reading-progress.js
+js/shortlist.js  js/shortlist-dialog.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/blind-reading.js  js/policy-text.js  js/report-link.js  js/candidate-card.js  js/sheet.js
 js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js  js/schedule-view.js
 ```
@@ -53,7 +54,7 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js
 
 ### 網址參數
 
-網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`conflict=1` 只看兩說並列（有出處說法不一標註）的政見、`view`（`island` 或 `table`）。不支援 WebGL 時一律用表格檢視。
+網址參數（`app-state.js`）：`area` 議題區、`policy` 政見、`candidate` 候選人（開該候選人的候選人資料卡）、`q` 關鍵字、`district` 適用行政區、`conflict=1` 只看兩說並列（有出處說法不一標註）的政見、`view`（`island` 或 `table`）、`pick` 我的對照單勾選的政見（逗號分隔；進站時以網址為準寫回瀏覽器、從網址移除並打開對照單，分享網址由對照單的「複製網址」產生）。不支援 WebGL 時一律用表格檢視。
 
 ### 開啟候選人資料卡
 

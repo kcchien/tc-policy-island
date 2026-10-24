@@ -15,11 +15,14 @@ import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
 import { pickRandomArea } from './random-area.js';
 import { markSeen, nextAreaId, parseSeen, SEEN_KEY, serializeSeen } from './reading-progress.js';
+import { knownPicks, parsePicks, PICKS_KEY, serializePicks } from './shortlist.js';
+import { createShortlistDialog } from './shortlist-dialog.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
 import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
 import {
-  FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, READING_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT,
+  FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, READING_TEXT, resultStatusText, SHORTLIST_TEXT, TIME_NAMES,
+  TOUR_TEXT,
 } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 import { scheduleView, taipeiDate } from './election-schedule.js';
@@ -139,7 +142,33 @@ function startApp(vm, state, initialView) {
       updateUrl();
     },
     onStep: (step) => stepArea(step),
+    picks: () => picks,
+    onPick: (policyId, checked) => togglePick(policyId, checked),
   });
+
+  // 我的對照單：勾選存在讀者的瀏覽器；網址帶 pick 時以網址為準並寫回，之後從網址拿掉（分享網址由「複製網址」產生）。
+  // 頁首按鈕只顯示勾選總數，不依候選人分，沒有勾選時不出現。
+  const fromUrl = knownPicks(vm, state.pick);
+  let picks = fromUrl.size > 0 ? fromUrl : knownPicks(vm, parsePicks(readStorage(PICKS_KEY)));
+  if (fromUrl.size > 0) writeStorage(PICKS_KEY, serializePicks(picks));
+  state.pick = [];
+  const shortlistButton = el('button', { type: 'button', class: 'shortlist-open', title: SHORTLIST_TEXT.buttonHint });
+  const shortlistUrl = () => `${location.origin}${location.pathname}${formatSearch({ pick: [...picks] })}`;
+  const shortlist = createShortlistDialog({ onPick: (policyId, checked) => togglePick(policyId, checked) });
+  const syncShortlistButton = () => {
+    shortlistButton.textContent = SHORTLIST_TEXT.button(picks.size);
+    shortlistButton.hidden = picks.size === 0;
+  };
+  const togglePick = (policyId, checked) => {
+    picks = new Set(picks);
+    if (checked) picks.add(policyId);
+    else picks.delete(policyId);
+    writeStorage(PICKS_KEY, serializePicks(picks));
+    syncShortlistButton();
+    if (shortlist.element.open) shortlist.open(vm, picks, shortlistUrl());
+  };
+  shortlistButton.addEventListener('click', () => shortlist.open(vm, picks, shortlistUrl()));
+  syncShortlistButton();
 
   // 閱讀進度：看過的議題區只記在讀者的瀏覽器，索引與表格打淡勾；有紀錄時才出現說明與「清除紀錄」。
   let seen = parseSeen(readStorage(SEEN_KEY));
@@ -153,7 +182,7 @@ function startApp(vm, state, initialView) {
   };
   readingProgress.hidden = seen.size === 0;
   clearSeenButton.addEventListener('click', () => setSeen(new Set()));
-  document.body.append(card.element);
+  document.body.append(card.element, shortlist.element);
 
   const candidateDialog = createCandidateDialog({
     onClose() {
@@ -390,7 +419,7 @@ function startApp(vm, state, initialView) {
   const webgl = document.body.dataset.webgl === 'yes';
   let tour = initialTour({ seen: readStorage(TOUR_SEEN_KEY) === '1' });
   // 網址指定要開卡片時，第一次進島嶼檢視不自動出現導覽（島嶼檢視的卡片要等鏡頭飛到才開，所以另外記）。
-  let deepLink = Boolean(state.policy || state.area || state.candidate);
+  let deepLink = Boolean(state.policy || state.area || state.candidate || fromUrl.size > 0);
   let tourArea = null;
   const tourTarget = (step) => {
     if (step === 'random') {
@@ -534,6 +563,7 @@ function startApp(vm, state, initialView) {
   randomButton.title = RANDOM_AREA_TEXT.hint;
   randomButton.addEventListener('click', openRandomArea);
   randomButton.hidden = false;
+  randomButton.after(shortlistButton);
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
@@ -562,6 +592,9 @@ function startApp(vm, state, initialView) {
   } else if (state.candidate && !openCandidateCard(state.candidate)) {
     state.candidate = null;
     updateUrl();
+  } else if (!state.candidate && fromUrl.size > 0) {
+    // 別人分享的對照單網址：沒有指定其他卡片時直接打開對照單。
+    shortlist.open(vm, picks, shortlistUrl());
   }
 }
 
