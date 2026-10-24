@@ -52,6 +52,10 @@ export default {
       for (const text of datasetModuleTexts(site)) failures.push(...describe(DATASET_MODULE, text));
     }
     const dataset = site.dataset();
+    // 選舉時程的事件名稱是整理者寫的；公告標題是選委會的原文，不掃。
+    for (const event of dataset.meta?.electionSchedule?.events ?? []) {
+      failures.push(...describe(`${DATASET_PATH} meta.electionSchedule.events[${event.id}].name`, event.name));
+    }
     for (const [key, fieldsOf] of Object.entries(SCREEN_FIELDS)) {
       for (const item of dataset[key] ?? []) {
         for (const [field, text] of fieldsOf(item)) {

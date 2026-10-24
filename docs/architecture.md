@@ -13,6 +13,7 @@ wrangler.toml          Pages 專案設定與統計資料集綁定 HITS
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
   local-elements.json  decorative-tiles.json   元素清單與裝飾格（可省略，視為空陣列；但上線關卡「人物一致」要求至少一個裝飾格當候選人廣場）
+  election-schedule.json   選舉時程（可省略，視為 null，頁首不顯示）
   sources/<candidateId>.json   每位候選人一檔，陣列
   policies/<candidateId>.json  每位候選人一檔，陣列
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
@@ -43,7 +44,7 @@ site/
 ```
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/candidate-card.js  js/sheet.js
-js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js
+js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js  js/schedule-view.js
 ```
 
 ### 檢視模型

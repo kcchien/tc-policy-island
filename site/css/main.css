@@ -417,6 +417,123 @@ select {
   font-size: 0.8125rem;
 }
 
+/* 選舉時程：桌面的表格檢視一行列出全部日期；島嶼檢視與手機只顯示天數，按下展開日期清單 */
+.election-schedule {
+  margin: 2px 0 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.schedule-summary,
+.schedule-toggle {
+  margin: 0;
+  color: var(--laterite);
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.schedule-summary {
+  display: none;
+}
+
+.schedule-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.schedule-caret {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform 0.15s ease;
+}
+
+.schedule-toggle[aria-expanded="true"] .schedule-caret {
+  transform: rotate(180deg);
+}
+
+.schedule-body {
+  display: none;
+}
+
+.schedule-toggle[aria-expanded="true"] + .schedule-body {
+  display: block;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.schedule-event {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+
+.schedule-date {
+  font-weight: bold;
+}
+
+.schedule-state {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--rice-deep);
+  font-size: 0.6875rem;
+}
+
+.schedule-note {
+  margin: 4px 0 0;
+  font-size: 0.6875rem;
+}
+
+@media (min-width: 801px) {
+  body[data-view="table"] .election-schedule {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 16px;
+  }
+
+  body[data-view="table"] .schedule-summary {
+    display: block;
+  }
+
+  body[data-view="table"] .schedule-toggle {
+    display: none;
+  }
+
+  body[data-view="table"] .schedule-body {
+    display: contents;
+  }
+
+  body[data-view="table"] .schedule-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin: 0;
+  }
+
+  body[data-view="table"] .schedule-note {
+    flex-basis: 100%;
+    margin: 0;
+  }
+}
+
 /* 文字按鈕：最小高度 44px、圓角 9px；滑過填主色、按下壓深一階並下沉 1px、鍵盤焦點用外框 */
 .tour-skip,
 .tour-next,

@@ -280,3 +280,49 @@ test('公開資料集保留出處說法不一標註、適用行政區與建置�
   assert.equal(dataset.meta.builtAt, '2026-10-24T08:00:00.000Z');
   assert.equal(dataset.meta.dataCutoffDate, '2026-10-23');
 });
+
+const scheduleEvent = (id, extra = {}) => ({
+  id,
+  name: `事件${id}`,
+  date: '2026-11-12',
+  endDate: null,
+  sourceUrl: `https://web.cec.gov.tw/central/article/${id}`,
+  sourceTitle: `公告${id}`,
+  ...extra,
+});
+
+test('選舉時程隨公開資料集的 meta.electionSchedule 公開', () => {
+  const raw = makeRaw();
+  raw.meta.electionSchedule = {
+    votingDate: '2026-11-28',
+    events: [scheduleEvent('list'), scheduleEvent('presentations', { date: '2026-11-13', endDate: '2026-11-27' })],
+  };
+
+  assert.deepEqual(buildPublicDataset(raw).meta.electionSchedule, raw.meta.electionSchedule);
+});
+
+test('沒有選舉時程時 meta.electionSchedule 為 null，仍可建置', () => {
+  assert.equal(buildPublicDataset(makeRaw()).meta.electionSchedule, null);
+});
+
+test('選舉時程的事件缺欄位、日期顛倒、識別碼重複或公告不在選委會網站時列出每一處', () => {
+  const raw = makeRaw();
+  const missingTitle = scheduleEvent('a');
+  delete missingTitle.sourceTitle;
+  raw.meta.electionSchedule = {
+    votingDate: '2026-11-28',
+    events: [
+      missingTitle,
+      scheduleEvent('b', { date: '2026-11-27', endDate: '2026-11-13' }),
+      scheduleEvent('b'),
+      scheduleEvent('c', { sourceUrl: 'https://news.example.org/c' }),
+    ],
+  };
+
+  const errors = validationErrors(raw);
+
+  assert.ok(errors.some((e) => e.includes('選舉時程事件 a') && e.includes('sourceTitle')), errors.join('\n'));
+  assert.ok(errors.some((e) => e.includes('選舉時程事件 b') && e.includes('endDate')), errors.join('\n'));
+  assert.ok(errors.some((e) => e.includes('選舉時程事件 b') && e.includes('識別碼重複')), errors.join('\n'));
+  assert.ok(errors.some((e) => e.includes('選舉時程事件 c') && e.includes('中選會')), errors.join('\n'));
+});

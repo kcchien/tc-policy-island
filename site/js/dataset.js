@@ -66,6 +66,19 @@ const SCHEMAS = {
   meta: {
     dataCutoffDate: 'date',
     checklistVersion: 'string?',
+    // 選舉時程（原始資料放 election-schedule.json，建置時併進 meta），null 表示沒有資料，畫面不顯示。
+    electionSchedule: 'object?',
+    'electionSchedule.votingDate': 'date',
+    'electionSchedule.events': 'array',
+  },
+  // 選舉時程的一個事件。日期只取中選會或選舉委員會的公告，sourceUrl 是公告網址；endDate 是期間的最後一天。
+  electionEvent: {
+    id: 'string',
+    name: 'string',
+    date: 'date',
+    endDate: 'date?',
+    sourceUrl: 'url',
+    sourceTitle: 'string',
   },
   candidate: {
     id: 'string',
@@ -150,7 +163,7 @@ const SCHEMAS = {
   },
 };
 
-const LABELS = { meta: '中繼資料', candidate: '候選人', issueArea: '議題區', localElement: '元素', decorativeTile: '裝飾格', source: '出處', policy: '政見' };
+const LABELS = { meta: '中繼資料', electionEvent: '選舉時程事件',candidate: '候選人', issueArea: '議題區', localElement: '元素', decorativeTile: '裝飾格', source: '出處', policy: '政見' };
 
 function lookup(record, path) {
   let value = record;
@@ -289,10 +302,33 @@ function checkPolicy(policy, refs, errors) {
   checkVerification(where, policy.verification, errors);
 }
 
+// 中選會與各選舉委員會的網站都在 cec.gov.tw 底下（例如 web.cec.gov.tw/tcec 是臺中市選舉委員會）。
+const ELECTION_AUTHORITY_URL = /^https:\/\/([a-z0-9-]+\.)*cec\.gov\.tw\//;
+
+// 選舉時程只收中選會或選舉委員會的公告（ADR 0001）。
+function checkElectionSchedule(schedule, errors) {
+  const seen = new Set();
+  schedule.events.forEach((event, index) => {
+    const hasId = TYPES.string.ok(event?.id);
+    const where = `${LABELS.electionEvent} ${hasId ? event.id : `#${index}`}`;
+    if (!TYPES.object.ok(event)) {
+      errors.push(`${where}：應為物件`);
+      return;
+    }
+    if (hasId && seen.has(event.id)) errors.push(`${where}：識別碼重複`);
+    if (hasId) seen.add(event.id);
+    if (!checkFields(event, SCHEMAS.electionEvent, where, errors)) return;
+    if (event.endDate !== null && event.endDate < event.date) errors.push(`${where}：endDate ${event.endDate} 早於 date ${event.date}`);
+    if (!ELECTION_AUTHORITY_URL.test(event.sourceUrl)) errors.push(`${where}：sourceUrl 須是中選會或選舉委員會網站（cec.gov.tw）的公告，實際為 ${event.sourceUrl}`);
+  });
+}
+
 export function validateRawData(raw) {
   const errors = [];
   if (!TYPES.object.ok(raw?.meta)) errors.push('原始資料：缺少 meta');
-  else checkFields(raw.meta, SCHEMAS.meta, LABELS.meta, errors);
+  else if (checkFields(raw.meta, SCHEMAS.meta, LABELS.meta, errors) && raw.meta.electionSchedule !== null) {
+    checkElectionSchedule(raw.meta.electionSchedule, errors);
+  }
   const candidates = checkList(raw, 'candidates', 'candidate', errors);
   const issueAreas = checkList(raw, 'issueAreas', 'issueArea', errors);
   const localElements = checkList(raw, 'localElements', 'localElement', errors);

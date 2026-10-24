@@ -76,7 +76,7 @@ export const localElement = (id, category = '自然景觀') => ({
 // 候選人刻意不依筆畫順序列出，排序測試才有意義。
 export function makeRaw() {
   return {
-    meta: { dataCutoffDate: '2026-10-23', checklistVersion: '1' },
+    meta: { dataCutoffDate: '2026-10-23', checklistVersion: '1', electionSchedule: null },
     candidates: [
       candidate('cand-b', '候選人乙', 7),
       candidate('cand-c', '候選人丙', 9),

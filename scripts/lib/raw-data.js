@@ -29,9 +29,14 @@ function readOptionalArray(path) {
   return existsSync(path) ? readJson(path) : [];
 }
 
+// 選舉時程放在自己的檔案，併進 meta.electionSchedule；沒有檔案時為 null（畫面不顯示時程）。
+function readElectionSchedule(path) {
+  return existsSync(path) ? readJson(path) : null;
+}
+
 export function loadRawData(rawDir) {
   return {
-    meta: readJson(join(rawDir, 'meta.json')),
+    meta: { ...readJson(join(rawDir, 'meta.json')), electionSchedule: readElectionSchedule(join(rawDir, 'election-schedule.json')) },
     candidates: readJson(join(rawDir, 'candidates.json')),
     issueAreas: readJson(join(rawDir, 'issue-areas.json')),
     localElements: readOptionalArray(join(rawDir, 'local-elements.json')),

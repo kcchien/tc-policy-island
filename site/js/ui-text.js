@@ -145,6 +145,20 @@ export const RANDOM_AREA_TEXT = {
   hint: '隨機選一個議題區，三位候選人的政見並排',
 };
 
+// 頁首的選舉時程：日期只取中選會或選舉委員會的公告，與候選人無關。投票日後不再顯示天數。
+const monthDay = (date) => `${Number(date.slice(5, 7))}/${Number(date.slice(8, 10))}`;
+export const SCHEDULE_TEXT = {
+  label: '選舉時程',
+  countdown: (days) => `距投票日 ${days} 天`,
+  votingDay: '今天投票',
+  ended: '投票已結束',
+  eventDate: ({ date, endDate }) => (endDate ? monthDay(date) + ' 至 ' + monthDay(endDate) : monthDay(date)),
+  // 接在日期連結之後，給螢幕閱讀器念。
+  announcement: '的公告',
+  states: { past: '已過', ongoing: '進行中', upcoming: '' },
+  note: '日期與連結都是中選會或臺中市選舉委員會的公告。',
+};
+
 // 上手導覽：三步，每一步只以議題區為單位，不提任何候選人。頁首「怎麼看」按鈕可重開。
 export const TOUR_TEXT = {
   open: '怎麼看',
