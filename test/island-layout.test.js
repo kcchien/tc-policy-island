@@ -4,7 +4,7 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { filterViewModel } from '../site/js/filter.js';
 import {
-  cameraLimits, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, viewOffset,
+  cameraLimits, clampTarget, frameIsland, islandLayout, islandPoints, markerLegend, markerOutline, orbitCenter, projectedBox, viewOffset,
 } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 
@@ -155,16 +155,41 @@ test('圖例依候選人排序列出形狀與姓名', () => {
 const frameOf = (layout, aspect) =>
   frameIsland(islandPoints(layout, { surface: 0.44, top: 1.7 }), { fov: 32, aspect, polar: 0.6, fill: 0.8 });
 
-test('鏡頭不能平移，距離有上下限，仰角不會低到水平面以下', () => {
+test('鏡頭可以沿島面平移，距離有上下限，仰角不會低到水平面以下', () => {
   const layout = islandLayout(viewModelOf(makeRaw()));
 
   const limits = cameraLimits(layout.bounds, frameOf(layout, 1.6).distance);
 
-  assert.equal(limits.enablePan, false);
+  assert.equal(limits.enablePan, true);
+  assert.equal(limits.screenSpacePanning, false);
   assert.ok(limits.minDistance > 0);
   assert.ok(Number.isFinite(limits.maxDistance) && limits.maxDistance > limits.minDistance);
   assert.ok(limits.minPolarAngle >= 0);
   assert.ok(limits.maxPolarAngle < Math.PI / 2);
+});
+
+test('平移的邊界：旋轉中心離最近的格心不超過一個格距，範圍內的點不動，超出的拉回最近格子的邊界', () => {
+  // 兩格相距 10，格距 3：兩格之間有一段水面不在範圍內。
+  const layout = { spacing: 3, tiles: [{ position: { x: 0, z: 0 } }, { position: { x: 10, z: 0 } }] };
+
+  assert.deepEqual(clampTarget(layout, { x: 1, z: 2 }), { x: 1, z: 2 });
+  assert.deepEqual(clampTarget(layout, { x: 12, z: 0 }), { x: 12, z: 0 });
+  assert.deepEqual(clampTarget(layout, { x: -30, z: 0 }), { x: -3, z: 0 });
+  assert.deepEqual(clampTarget(layout, { x: 10, z: 40 }), { x: 10, z: 3 });
+  // 兩格之間的水面拉回較近的那一格。
+  assert.deepEqual(clampTarget(layout, { x: 4, z: 0 }), { x: 3, z: 0 });
+  assert.deepEqual(clampTarget(layout, { x: 6, z: 0 }), { x: 7, z: 0 });
+});
+
+test('平移的邊界：島形不規則時，外框矩形的空角落也拉回離它最近的格子', () => {
+  const layout = islandLayout(viewModelOf(makeRaw()));
+  const centers = layout.tiles.map((tile) => tile.position);
+  const nearest = (p) => Math.min(...centers.map((c) => Math.hypot(p.x - c.x, p.z - c.z)));
+
+  for (const far of [{ x: 1e4, z: 1e4 }, { x: -1e4, z: 50 }, { x: layout.bounds.maxX, z: layout.bounds.maxZ }]) {
+    const clamped = clampTarget(layout, far);
+    assert.ok(nearest(clamped) <= layout.spacing + 1e-9);
+  }
 });
 
 test('窄而高的畫面要退得比較遠才能看到整座島，距離上限也跟著放寬', () => {

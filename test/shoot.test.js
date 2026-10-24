@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { FLIGHT_MS } from '../site/js/island-camera.js';
 import { TRANSITION_MS } from '../site/js/island-daylight.js';
-import { DEVICES, SETTLE_MS, USAGE, buildScenario, overlapArea, parseClick, parseShootArgs, summarizeLayout } from '../scripts/lib/shoot.js';
+import { DEVICES, SETTLE_MS, USAGE, buildScenario, overlapArea, parseClick, parseDrag, parseShootArgs, summarizeLayout } from '../scripts/lib/shoot.js';
 import { CHROME_CANDIDATES, chromeArgs, findChrome } from '../scripts/lib/cdp.js';
 
 const SHOOT_SCRIPT = fileURLToPath(new URL('../scripts/shoot.js', import.meta.url));
@@ -24,7 +24,7 @@ test('說明：指令印出子指令與每個參數並以結束碼 0 結束', ()
     assert.equal(result.stdout, USAGE);
   }
   for (const name of ['shot', 'measure', '--device', '--motion', '--time', '--path', '--view', '--area', '--policy', '--candidate',
-    '--q', '--district', '--click', '--wait', '--out', '--strict', '--url', '--dir', '--port', '--chrome', '--timeout']) {
+    '--q', '--district', '--click', '--drag', '--no-settle', '--wait', '--out', '--strict', '--url', '--dir', '--port', '--chrome', '--timeout']) {
     assert.ok(USAGE.includes(name), `說明缺少 ${name}`);
   }
 });
@@ -39,7 +39,7 @@ test('截圖參數：預設桌面、減少動態、白天，子指令省略為 s
   assert.equal(options.time, 'day');
   assert.equal(options.out, 'shot.png');
   assert.equal(options.url, null);
-  assert.deepEqual(options.clicks, []);
+  assert.deepEqual(options.actions, []);
 });
 
 test('截圖參數：measure 預設不寫檔；網址參數、點擊與等待都會解析', () => {
@@ -51,8 +51,43 @@ test('截圖參數：measure 預設不寫檔；網址參數、點擊與等待都
   assert.equal(options.command, 'measure');
   assert.equal(options.out, null);
   assert.deepEqual(options.params, { view: 'island', area: 'transportation', policy: null, candidate: 'sample-jia', query: '捷運', district: '' });
-  assert.deepEqual(options.clicks, [{ x: 120, y: 300 }, { selector: '#tool-index' }]);
+  assert.deepEqual(options.actions, [{ type: 'click', x: 120, y: 300 }, { type: 'click', selector: '#tool-index' }]);
   assert.equal(options.waitMs, 500);
+});
+
+test('拖曳參數：--drag x1,y1-x2,y2 解析成起訖座標，與 --click 依命令列的順序執行', () => {
+  const options = parseShootArgs(['--click', '#tool-index', '--drag', '700,450-400,300', '--click', '10,20', '--drag', '1.5, 2 - 3,4.5']);
+
+  assert.deepEqual(options.actions, [
+    { type: 'click', selector: '#tool-index' },
+    { type: 'drag', from: { x: 700, y: 450 }, to: { x: 400, y: 300 } },
+    { type: 'click', x: 10, y: 20 },
+    { type: 'drag', from: { x: 1.5, y: 2 }, to: { x: 3, y: 4.5 } },
+  ]);
+  assert.deepEqual(parseDrag('0,0-10,0'), { from: { x: 0, y: 0 }, to: { x: 10, y: 0 } });
+  for (const bad of ['700,450', '#tool-index', '1,2-3', 'a,b-c,d', '']) {
+    assert.throws(() => parseShootArgs(['--drag', bad]), /--drag/);
+  }
+});
+
+test('場景：--no-settle 只省略最後一個操作之後的等待，--wait 從操作完成起算（截動畫途中的畫面）', () => {
+  const options = parseShootArgs(['--motion', 'full', '--click', '#tool-index', '--click', '.island-list button', '--wait', '400', '--no-settle']);
+  assert.equal(options.settleLast, false);
+  assert.equal(parseShootArgs(['shot']).settleLast, true);
+
+  const { steps } = buildScenario(options, 'http://localhost:8123/');
+
+  assert.deepEqual(steps.map((s) => s.type), ['ready', 'settle', 'time', 'settle', 'click', 'settle', 'click', 'wait']);
+  assert.equal(steps.at(-1).ms, 400);
+});
+
+test('場景：拖曳和點擊一樣是一個步驟，之後等動畫到位', () => {
+  const options = parseShootArgs(['--device', 'phone', '--drag', '200,400-100,300', '--wait', '100']);
+
+  const { steps } = buildScenario(options, 'http://localhost:8123/');
+
+  assert.deepEqual(steps.map((s) => s.type), ['ready', 'settle', 'time', 'settle', 'drag', 'settle', 'wait']);
+  assert.deepEqual(steps[4], { type: 'drag', from: { x: 200, y: 400 }, to: { x: 100, y: 300 } });
 });
 
 test('截圖參數：不在清單內的值與格式錯誤一律拒絕並說明', () => {

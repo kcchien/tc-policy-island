@@ -1,4 +1,5 @@
-// 島嶼檢視的鏡頭：飛行（1.15 秒、依經過時間、拖曳取消）、拖曳判斷、卡片遮住範圍造成的畫面偏移與平滑、
+// 島嶼檢視的鏡頭：飛行（預設 1.15 秒、可經過中途視角、依經過時間、拖曳取消）、等飛行與步行都完成（joinArrivals）、
+// 點選與拖曳的判斷（createTapTracker）、卡片遮住範圍造成的畫面偏移與平滑、
 // 預設視角（直式畫面較低俯角並另轉方位角）。
 // 只做計算，不碰 three.js 與 DOM，瀏覽器與 Node 共用。
 
@@ -6,7 +7,7 @@ import { easeInOut, frameIsland } from './island-layout.js';
 
 // 飛到議題區的時間（毫秒）。
 export const FLIGHT_MS = 1150;
-// 按下後移動超過這個像素數算拖曳（旋轉、縮放），在範圍內算點選。
+// 按下後移動超過這個像素數算拖曳（平移、旋轉），在範圍內算點選。
 export const DRAG_SLOP = 6;
 // 畫面偏移跟上卡片的速度：每幀走 1 - e^(-dt·rate) 的距離。
 const OFFSET_RATE = 6;
@@ -29,8 +30,13 @@ const PORTRAIT_BELOW = 0.85;
 const lerp = (a, b, k) => a + (b - a) * k;
 const lerpPoint = (a, b, k) => ({ x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), z: lerp(a.z, b.z, k) });
 
+// 有中途視角時，前 VIA_AT 的時間飛到中途視角，其餘時間飛到目的地，兩段各自起訖放慢。
+// 走到同一格時人物出發段（步行起訖放慢，前三成時間只走一成多路程）就在中途視角的畫面裡。
+const VIA_AT = 0.3;
+
 // 鏡頭飛行。step(now) 依開始後實際經過的時間回傳這一幀的 { target, position }，不依畫了幾幀，
 // 慢裝置也準時抵達；抵達或 cancel 時呼叫一次 onArrive。沒在飛時 step 回傳 null。
+// via 是中途視角（可省略），例如先拉到框住人物出發點與終點的視角，再飛進目的格。
 export function createCameraFlight() {
   let flight = null;
   const finish = () => {
@@ -42,14 +48,17 @@ export function createCameraFlight() {
     get active() {
       return flight !== null;
     },
-    start({ from, to, now, durationMs = FLIGHT_MS, onArrive = () => {} }) {
-      flight = { from, to, start: now, durationMs, onArrive };
+    start({ from, via = null, to, now, durationMs = FLIGHT_MS, onArrive = () => {} }) {
+      flight = { from, via, to, start: now, durationMs, onArrive };
     },
     step(now) {
       if (!flight) return null;
       const t = flight.durationMs > 0 ? Math.min(1, Math.max(0, (now - flight.start) / flight.durationMs)) : 1;
-      const k = easeInOut(t);
-      const pose = { target: lerpPoint(flight.from.target, flight.to.target, k), position: lerpPoint(flight.from.position, flight.to.position, k) };
+      const { from, via, to } = flight;
+      const [a, b, k] = !via ? [from, to, easeInOut(t)]
+        : t < VIA_AT ? [from, via, easeInOut(t / VIA_AT)]
+          : [via, to, easeInOut((t - VIA_AT) / (1 - VIA_AT))];
+      const pose = { target: lerpPoint(a.target, b.target, k), position: lerpPoint(a.position, b.position, k) };
       if (t >= 1) {
         const { to } = flight;
         finish();
@@ -64,11 +73,58 @@ export function createCameraFlight() {
   };
 }
 
-// 飛行時間：減少動態時為 0，第一幀就落在目的地。
-export const flightDuration = ({ reducedMotion }) => (reducedMotion ? 0 : FLIGHT_MS);
+// 等幾件事都完成才做下一步：names 每一項都 arrive 過才呼叫一次 done，先後不拘，重複報到不重複呼叫。
+// 走到同一格用它讓政見卡片等鏡頭到位（'flight'）且三人都抵達（'walk'）才開。
+export function joinArrivals(names, done) {
+  const pending = new Set(names);
+  let called = false;
+  return {
+    arrive(name) {
+      pending.delete(name);
+      if (pending.size > 0 || called) return;
+      called = true;
+      done();
+    },
+  };
+}
+
+// 飛行時間：減少動態時為 0，第一幀就落在目的地。durationMs 是完整動態時的時間（例如配合人物步行）。
+export const flightDuration = ({ reducedMotion, durationMs = FLIGHT_MS }) => (reducedMotion ? 0 : durationMs);
 
 export function isDrag(down, point, slop = DRAG_SLOP) {
   return Boolean(down) && Math.hypot(point.x - down.x, point.y - down.y) > slop;
+}
+
+// 點選與拖曳分開：依指標識別碼記每根手指按下的位置。按下後曾移動超過 DRAG_SLOP（拖曳平移或旋轉，
+// 即使拖回原處才放開）、或同時有兩指以上（縮放、旋轉）的那一次都不算點選；手指全放開後重新計算。
+// down 與 move 在開始拖曳或多指時回傳 true（取消鏡頭飛行用），up 回傳這次放開算不算點選。
+export function createTapTracker(slop = DRAG_SLOP) {
+  const downs = new Map();
+  let multiTouch = false;
+  const release = (id) => {
+    downs.delete(id);
+    if (downs.size === 0) multiTouch = false;
+  };
+  return {
+    down(id, point) {
+      downs.set(id, { ...point, dragged: false });
+      if (downs.size > 1) multiTouch = true;
+      return multiTouch;
+    },
+    move(id, point) {
+      const down = downs.get(id);
+      if (!down || down.dragged || !isDrag(down, point, slop)) return false;
+      down.dragged = true;
+      return true;
+    },
+    up(id, point) {
+      const down = downs.get(id);
+      const tap = Boolean(down) && !multiTouch && !down.dragged && !isDrag(down, point, slop);
+      release(id);
+      return tap;
+    },
+    cancel: release,
+  };
 }
 
 const ZERO = { top: 0, right: 0, bottom: 0, left: 0 };

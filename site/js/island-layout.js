@@ -199,16 +199,35 @@ export function frameIsland(points, { fov, aspect, polar, fill = 0.8, azimuth = 
   return { target, distance };
 }
 
-// OrbitControls 的限制：不能平移（島不會被拖出畫面），距離依島的大小，仰角保持在水平面以上。
+// OrbitControls 的限制：沿島面平移（旋轉中心另由 clampTarget 夾在島內），距離依島的大小，仰角保持在水平面以上。
 // fit 是預設視角（frameIsland）的距離，距離上限至少要能看到整座島。
 export function cameraLimits(bounds, fit) {
   return {
-    enablePan: false,
+    enablePan: true,
+    screenSpacePanning: false,
     minDistance: Math.max(3, bounds.radius * 0.35),
     maxDistance: Math.max(bounds.radius * 3.2, fit * 1.25),
     minPolarAngle: 0.15,
     maxPolarAngle: 1.2,
   };
+}
+
+// 平移的邊界：旋轉中心（鏡頭看的點，落在可見區正中）離最近的格心不超過一個格距 layout.spacing，
+// 超出就拉回最近那一格範圍的邊上。拖到最遠時畫面正中仍緊鄰最外圍的格子，島不會被拖出畫面。
+// 用每一格而不用外框矩形：島形不規則，矩形的空角落離格子很遠。相鄰格心相距 √3 倍格距，範圍互相重疊，
+// 沿著島平移不會在水道卡住。回傳 { x, z }。
+export function clampTarget(layout, target) {
+  const reach = layout.spacing;
+  let best = null;
+  for (const { position } of layout.tiles) {
+    const [dx, dz] = [target.x - position.x, target.z - position.z];
+    const distance = Math.hypot(dx, dz);
+    if (distance <= reach) return { x: target.x, z: target.z };
+    if (!best || distance < best.distance) best = { position, dx, dz, distance };
+  }
+  if (!best) return { x: target.x, z: target.z };
+  const k = reach / best.distance;
+  return { x: best.position.x + best.dx * k, z: best.position.z + best.dz * k };
 }
 
 // 鏡頭的旋轉中心。飛到議題區後繞該格轉；使用者縮遠時，中心隨距離從該格移回島中心，

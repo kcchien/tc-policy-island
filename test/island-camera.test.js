@@ -4,7 +4,8 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout, islandPoints, projectedBox } from '../site/js/island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, FILL, FLIGHT_MS, flightDuration, homeView, isDrag,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, createTapTracker, FILL, FLIGHT_MS, flightDuration, homeView,
+  isDrag, joinArrivals,
 } from '../site/js/island-camera.js';
 import { makeRaw } from './fixtures/make-raw.js';
 
@@ -67,6 +68,9 @@ test('飛行途中改飛別處：新的飛行取代前一段，前一段抵達�
 
 test('減少動態時飛行時間為 0，第一幀就落在目的地', () => {
   assert.equal(flightDuration({ reducedMotion: false }), FLIGHT_MS);
+  // 配合人物步行指定時間時，減少動態仍是 0。
+  assert.equal(flightDuration({ reducedMotion: false, durationMs: 1600 }), 1600);
+  assert.equal(flightDuration({ reducedMotion: true, durationMs: 1600 }), 0);
   const flight = createCameraFlight();
   let arrived = 0;
   flight.start({ from, to, now: 0, durationMs: flightDuration({ reducedMotion: true }), onArrive: () => (arrived += 1) });
@@ -80,6 +84,96 @@ test('按下後移動超過 6 像素算拖曳，在範圍內算點選', () => {
   assert.equal(isDrag(down, { x: 104, y: 103 }), false);
   assert.equal(isDrag(down, { x: 105, y: 105 }), true);
   assert.equal(isDrag(null, { x: 300, y: 300 }), false);
+});
+
+test('走到同一格開卡：飛行與步行都結束才呼叫一次，先後順序不拘，重複報到不重複呼叫', () => {
+  const calls = [];
+  const arrivals = joinArrivals(['flight', 'walk'], () => calls.push('open'));
+
+  arrivals.arrive('flight');
+  assert.deepEqual(calls, []);
+  arrivals.arrive('flight');
+  assert.deepEqual(calls, []);
+  arrivals.arrive('walk');
+  assert.deepEqual(calls, ['open']);
+  arrivals.arrive('walk');
+  assert.deepEqual(calls, ['open']);
+
+  const reversed = [];
+  const other = joinArrivals(['flight', 'walk'], () => reversed.push('open'));
+  other.arrive('walk');
+  assert.deepEqual(reversed, []);
+  other.arrive('flight');
+  assert.deepEqual(reversed, ['open']);
+});
+
+test('走到同一格開卡：只等飛行時（卡片已開著換題）飛行結束就呼叫', () => {
+  const calls = [];
+  joinArrivals(['flight'], () => calls.push('open')).arrive('flight');
+  assert.deepEqual(calls, ['open']);
+});
+
+test('鏡頭飛行可經過中途視角：前三成時間先到中途視角，之後飛進目的地', () => {
+  const via = { target: { x: 10, y: 0, z: 10 }, position: { x: 10, y: 30, z: 40 } };
+  const flight = createCameraFlight();
+  let arrived = 0;
+  flight.start({ from, via, to, now: 0, durationMs: 1600, onArrive: () => (arrived += 1) });
+
+  // 中途視角在 0.3 × 1600 = 480 毫秒；前後都還在路上。
+  assert.ok(flight.step(240).target.x > from.target.x && flight.step(240).target.x < via.target.x);
+  assert.ok(flight.step(1000).target.x < via.target.x && flight.step(1000).target.x > to.target.x);
+  const middle = flight.step(480);
+  for (const key of ['x', 'y', 'z']) {
+    assert.ok(Math.abs(middle.target[key] - via.target[key]) < 1e-9);
+    assert.ok(Math.abs(middle.position[key] - via.position[key]) < 1e-9);
+  }
+  assert.deepEqual(flight.step(0), from);
+  assert.equal(arrived, 0);
+  assert.deepEqual(flight.step(1600), to);
+  assert.equal(arrived, 1);
+});
+
+test('點選判斷：原地按下放開算點選，拖曳平移不算，拖遠再拖回原處放開也不算', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 103, y: 102 });
+  assert.equal(taps.up(1, { x: 103, y: 102 }), true);
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 160, y: 120 });
+  assert.equal(taps.up(1, { x: 160, y: 120 }), false);
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 200, y: 100 });
+  taps.move(1, { x: 101, y: 100 });
+  assert.equal(taps.up(1, { x: 101, y: 100 }), false);
+});
+
+test('點選判斷：兩指操作（縮放或旋轉）整次不算點選，手指全放開後重新計算；取消的指標不算點選', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.down(2, { x: 200, y: 200 });
+  assert.equal(taps.up(2, { x: 200, y: 200 }), false);
+  assert.equal(taps.up(1, { x: 100, y: 100 }), false);
+
+  taps.down(3, { x: 50, y: 50 });
+  assert.equal(taps.up(3, { x: 50, y: 50 }), true);
+
+  taps.down(4, { x: 50, y: 50 });
+  taps.cancel(4);
+  assert.equal(taps.up(4, { x: 50, y: 50 }), false);
+});
+
+test('點選判斷：拖曳超過門檻或第二指按下時回報開始操作（取消鏡頭飛行用）', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 0, y: 0 });
+  assert.equal(taps.move(1, { x: 3, y: 0 }), false);
+  assert.equal(taps.move(1, { x: 30, y: 0 }), true);
+  assert.equal(taps.down(2, { x: 80, y: 0 }), true);
+  assert.equal(taps.move(7, { x: 80, y: 80 }), false);
 });
 
 test('卡片遮住的範圍：停靠在下方的卡片算下緣被遮住，保留面積最大的那一側', () => {
