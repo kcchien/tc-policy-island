@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { speechParts, speechScript } from '../scripts/lib/speech.js';
+import { findFfmpeg, speechParts, speechScript } from '../scripts/lib/speech.js';
 import { policy } from './fixtures/make-raw.js';
 
 const withText = (summary, quotes, candidateId = 'cand-a') => ({
@@ -83,4 +83,12 @@ test('單一句子就超過上限時，退到逗號處切開，仍不超過上�
   const parts = speechParts(sentence, 40);
 
   assert.deepEqual(parts, [`${'丁'.repeat(30)}，`, `${'戊'.repeat(30)}。`]);
+});
+
+test('找 ffmpeg：先看 FFMPEG_PATH，再看 PATH，最後看常見安裝位置；都找不到時說明怎麼安裝或指定', () => {
+  assert.equal(findFfmpeg({ explicit: '/opt/ff', exists: () => true }), '/opt/ff');
+  assert.throws(() => findFfmpeg({ explicit: '/opt/ff', exists: () => false }), /找不到 ffmpeg.*FFMPEG_PATH/);
+  assert.equal(findFfmpeg({ explicit: '', pathEnv: '/a:/b', platform: 'linux', exists: (p) => p === '/b/ffmpeg' }), '/b/ffmpeg');
+  assert.equal(findFfmpeg({ explicit: '', pathEnv: '', platform: 'linux', exists: (p) => p === '/usr/bin/ffmpeg' }), '/usr/bin/ffmpeg');
+  assert.throws(() => findFfmpeg({ explicit: '', pathEnv: '/a', platform: 'linux', exists: () => false }), /安裝.*FFMPEG_PATH/);
 });

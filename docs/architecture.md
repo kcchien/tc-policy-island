@@ -19,7 +19,7 @@ data/raw/              原始資料（建置輸入）
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
 data/extraction/       政見抽取指示 instructions.md、判準裁決紀錄 judgement-log.md、候選人資料抽取方法 candidate-profiles.md、每位候選人的抽取紀錄 records/、PDF 字型對照檔 glyph-maps/
 data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版；核對報告寫在 report.md（整理方法頁照原文公開，還沒有時顯示「尚未產生」）
-data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256）與清單 manifest.json，由 scripts/speak.js 生成
+data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256，48 kbps 單聲道，不進版控）與清單 manifest.json（進版控），由 scripts/speak.js 生成
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組

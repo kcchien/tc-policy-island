@@ -1,11 +1,12 @@
-// 生成政見語音：每條公開政見組成朗讀文字，送語音合成服務生成 mp3，存進 data/audio/ 並維護清單 manifest.json。
+// 生成政見語音：每條公開政見組成朗讀文字，送語音合成服務生成 mp3，用 ffmpeg 轉成清單設定的位元率，存進 data/audio/ 並維護清單 manifest.json。
+// --reencode 不呼叫服務，只把既有音檔轉成現行位元率。
 // 三位候選人同一組設定與文字樣板，見 scripts/lib/speech.js 與 GLOSSARY「朗讀」。參數與注意事項見 USAGE（--help）。
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { buildPublicDataset, DatasetValidationError } from '../site/js/dataset.js';
 import { loadRawData, readJson } from './lib/raw-data.js';
-import { AUDIO_MANIFEST, audioProblems, charCount, sha256, SPEECH_VOICE, speechParts, speechScript } from './lib/speech.js';
+import { AUDIO_MANIFEST, audioProblems, charCount, findFfmpeg, sha256, SPEECH_VOICE, speechParts, speechScript, transcodeSpeech } from './lib/speech.js';
 import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
 
 const USAGE = formatUsage({
@@ -30,6 +31,7 @@ const USAGE = formatUsage({
       rows: [
         ['--dry-run', '不呼叫服務、不寫檔，列出要生成的政見與估計點數'],
         ['--prune', '刪除清單沒有引用的音檔，以及已不公開政見的清單項目'],
+        ['--reencode', '不呼叫服務，把清單裡的既有音檔重新轉碼成現行位元率（清單只有位元率不同或沒記位元率時用）；可加 --dry-run'],
       ],
     },
     {
@@ -45,7 +47,9 @@ const USAGE = formatUsage({
     '會花點數：金鑰讀環境變數 VOAI_API_KEY，有要生成的政見卻沒設金鑰就直接失敗。對正式資料先跑 --dry-run。',
     '音檔檔名是朗讀文字的 sha256，文字沒變且檔案雜湊與清單相符就跳過；文字變了產生新檔，舊檔留到 --prune 才刪。',
     '同時最多 2 個請求；單次文字上限 1000 字，超過時依句子拆段生成後接成一個檔案，清單記 parts。',
-    '清單的語音設定與 scripts/lib/speech.js 的 SPEECH_VOICE 不同時直接失敗：刪掉清單與音檔後全部重生成，三人才會是同一聲線。',
+    `服務回傳的 mp3 用 ffmpeg 轉成 ${SPEECH_VOICE.bitrate} 單聲道（取樣率不變）再寫檔。ffmpeg 依序找環境變數 FFMPEG_PATH、PATH 與常見安裝位置，找不到時在呼叫服務前就失敗。`,
+    '清單的語音設定與 scripts/lib/speech.js 的 SPEECH_VOICE 不同時直接失敗：只差位元率時跑 --reencode；其他設定不同時刪掉清單與音檔後全部重生成，三人才會是同一聲線。',
+    '音檔不進版控（只有清單進版控），由維護者在部署的機器上生成。',
     '建置指令只在每條公開政見都有相符音檔時才把音檔放上網站（全有或全無）。',
   ],
 });
@@ -63,6 +67,7 @@ const { values } = parseArgs({
     limit: { type: 'string' },
     'dry-run': { type: 'boolean', default: false },
     prune: { type: 'boolean', default: false },
+    reencode: { type: 'boolean', default: false },
     endpoint: { type: 'string', default: 'https://connect.voai.ai/TTS/generate-voice' },
     'retry-delays': { type: 'string', default: '5,15,45' },
     date: { type: 'string', default: new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }) },
@@ -116,13 +121,20 @@ function stripId3(bytes) {
   return bytes.subarray(10 + size + footer);
 }
 
-function readManifest(path) {
+// 語音設定去掉位元率：只有位元率不同時可以轉碼既有音檔，不必重生成。
+const voiceKeyWithoutBitrate = ({ bitrate: _, ...voice } = {}) => JSON.stringify(voice);
+const isCurrentVoice = (voice) => JSON.stringify(voice) === JSON.stringify(SPEECH_VOICE);
+
+// allowBitrateMismatch 為 true 時（--reencode）接受只有位元率與現行設定不同的清單，舊清單沒有 bitrate 也算。
+function readManifest(path, { allowBitrateMismatch = false } = {}) {
   if (!existsSync(path)) return { voice: { ...SPEECH_VOICE }, items: {} };
   const manifest = readJson(path);
-  if (JSON.stringify(manifest.voice) !== JSON.stringify(SPEECH_VOICE)) {
+  if (isCurrentVoice(manifest.voice)) return manifest;
+  if (voiceKeyWithoutBitrate(manifest.voice) !== voiceKeyWithoutBitrate(SPEECH_VOICE)) {
     throw new Error(`清單 ${path} 的語音設定 ${JSON.stringify(manifest.voice)} 與現行設定 ${JSON.stringify(SPEECH_VOICE)} 不同；刪掉清單與音檔後重新生成全部，三人才會是同一聲線`);
   }
-  return manifest;
+  if (allowBitrateMismatch) return manifest;
+  throw new Error(`清單 ${path} 的位元率 ${manifest.voice.bitrate ?? '（未記錄）'} 與現行設定 ${SPEECH_VOICE.bitrate} 不同；先跑 node scripts/speak.js --reencode 把既有音檔轉成現行設定`);
 }
 
 // 項目依政見識別碼排序，清單的差異才好讀。
@@ -153,7 +165,56 @@ function prune(manifest, audioDir, publicIds, dryRun) {
   return { items, files };
 }
 
+// --reencode：清單只有位元率與現行設定不同時，把既有音檔重新轉碼，更新 fileSha256 並把 voice 改成現行設定。
+// 不呼叫服務。音檔不存在或雜湊與清單不符的項目跳過，留給下次生成。
+// 每轉完一個檔就寫回清單，項目暫記 bitrate 表示已轉過；中途中斷後重跑會跳過這些，不重複轉碼。全部轉完才改 voice、拿掉暫記。
+async function reencode(audioDir, manifestPath, dryRun) {
+  if (!existsSync(manifestPath)) throw new Error(`找不到清單 ${manifestPath}，沒有可轉碼的音檔`);
+  const manifest = readManifest(manifestPath, { allowBitrateMismatch: true });
+  if (isCurrentVoice(manifest.voice)) {
+    console.log(`清單已是現行設定（位元率 ${SPEECH_VOICE.bitrate}），不用轉碼`);
+    return;
+  }
+  const from = manifest.voice.bitrate ?? '（未記錄）';
+  // 文字相同的政見共用一個音檔，同一個檔只轉一次。
+  const targets = new Map();
+  const skipped = [];
+  for (const [id, item] of Object.entries(manifest.items)) {
+    const path = join(audioDir, item.file);
+    if (!existsSync(path)) skipped.push(`${id}：音檔 ${item.file} 不存在`);
+    else if (sha256(readFileSync(path)) !== item.fileSha256) skipped.push(`${id}：音檔與清單的雜湊不符`);
+    else if (item.bitrate !== SPEECH_VOICE.bitrate) targets.set(item.file, [...(targets.get(item.file) ?? []), item]);
+  }
+  const count = [...targets.values()].flat().length;
+  for (const line of skipped) console.log(`跳過 ${line}，下次生成時重生成`);
+  if (dryRun) {
+    console.log(`要轉碼 ${count} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
+    return;
+  }
+
+  const ffmpeg = targets.size > 0 ? findFfmpeg() : null;
+  for (const [file, items] of targets) {
+    const bytes = await transcodeSpeech(readFileSync(join(audioDir, file)), ffmpeg);
+    writeFileSync(join(audioDir, file), bytes);
+    for (const item of items) Object.assign(item, { fileSha256: sha256(bytes), bitrate: SPEECH_VOICE.bitrate });
+    writeManifest(manifestPath, manifest);
+  }
+  for (const item of Object.values(manifest.items)) delete item.bitrate;
+  manifest.voice = { ...SPEECH_VOICE };
+  writeManifest(manifestPath, manifest);
+  console.log(`轉碼 ${count} 條，位元率 ${from} → ${SPEECH_VOICE.bitrate}；跳過 ${skipped.length} 條`);
+}
+
 async function main() {
+  const audioDir = resolve(values.audio);
+  const manifestPath = join(audioDir, AUDIO_MANIFEST);
+  if (values.reencode) {
+    const conflicts = ['candidate', 'limit', 'prune'].filter((name) => values[name] !== undefined && values[name] !== false);
+    if (conflicts.length > 0) throw new Error(`--reencode 轉清單裡全部的音檔，不能和 ${conflicts.map((name) => `--${name}`).join('、')} 一起用`);
+    await reencode(audioDir, manifestPath, values['dry-run']);
+    return;
+  }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(values.date)) throw new Error(`--date 應為 YYYY-MM-DD，實際為 ${values.date}`);
   const delays = values['retry-delays'].split(',').map((d) => (d.trim() === '' ? NaN : Number(d)));
   if (delays.some((d) => !Number.isFinite(d) || d < 0)) throw new Error(`--retry-delays 應為逗號分隔的秒數，實際為 ${values['retry-delays']}`);
@@ -165,8 +226,6 @@ async function main() {
   for (const id of values.candidate ?? []) {
     if (!candidateIds.has(id)) throw new Error(`--candidate ${id} 不是原始資料中的候選人`);
   }
-  const audioDir = resolve(values.audio);
-  const manifestPath = join(audioDir, AUDIO_MANIFEST);
   const manifest = readManifest(manifestPath);
 
   // 清單項目與現在的文字相符、音檔存在且雜湊相符（與建置的判準相同），才不必重生成。
@@ -196,6 +255,8 @@ async function main() {
   if (targets.length > 0 && !key) {
     throw new Error(`要生成 ${targets.length} 條政見語音，但沒有設定環境變數 VOAI_API_KEY（語音合成服務的金鑰）。只想看要生成哪些，加 --dry-run`);
   }
+  // 先確認找得到 ffmpeg 再呼叫服務，找不到時不花點數。
+  const ffmpeg = targets.length > 0 ? findFfmpeg() : null;
   mkdirSync(audioDir, { recursive: true });
 
   const generateOne = async ({ policy, text }) => {
@@ -207,7 +268,7 @@ async function main() {
       chunks.push(chunks.length === 0 ? result.bytes : stripId3(result.bytes));
       quota += result.quota;
     }
-    const bytes = Buffer.concat(chunks);
+    const bytes = await transcodeSpeech(Buffer.concat(chunks), ffmpeg);
     const textSha256 = sha256(text);
     const file = `${textSha256}.mp3`;
     writeFileSync(join(audioDir, file), bytes);
