@@ -241,7 +241,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   let order = null;
 
   // 朗讀：瀏覽器內建語音，一次只唸一筆。三人同一個 zh-TW 聲音、預設語速；沒有語音功能時不放朗讀鈕。
-  const speech = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  const speech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window ? window.speechSynthesis : null;
   const canSpeak = Boolean(speech);
   let speakingId = null;
   const syncSpeakButtons = () => {

@@ -20,10 +20,8 @@ export function policyText(policy, { areaName, candidateName, cutoffDate, url })
   ].filter(Boolean).join('\n');
 }
 
-// 句尾沒有標點時補句號，語音才會停頓。
-const sentence = (text) => (/[。！？!?]$/.test(text) ? text : text + POLICY_CARD_TEXT.sentenceEnd);
-
 // 朗讀的文字：摘要與每則原文引述，不唸網址。
 export function policySpeech(policy) {
-  return [policy.summary, ...policy.quotes.map(({ text }) => POLICY_CARD_TEXT.speechQuote(text))].map(sentence).join('');
+  return [policy.summary, ...policy.quotes.map(({ text }) => POLICY_CARD_TEXT.speechQuote(text))]
+    .map(POLICY_CARD_TEXT.speechSentence).join('');
 }
