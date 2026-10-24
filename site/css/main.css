@@ -2177,12 +2177,22 @@ body[data-view="island"] .card-height {
 }
 
 .profile-head {
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--candidate);
+}
+
+.profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-identity {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 3px solid var(--candidate);
+  min-width: 0;
 }
 
 .profile-head .marker-badge {
@@ -2198,16 +2208,27 @@ body[data-view="island"] .card-height {
 }
 
 .profile-portrait {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  margin: 0;
+  flex: 0 0 80px;
 }
 
-.profile-portrait[hidden] { display: none; }
-.profile-portrait img { display: block; width: 72px; height: 96px; object-fit: contain; }
-.profile-portrait figcaption { font-size: 0.75rem; line-height: 1.6; overflow-wrap: anywhere; }
+.profile-portrait img {
+  display: block;
+  width: 80px;
+  height: 80px;
+  /* 三人以同一比例填滿圓形，靠上保留髮頂，只收掉照片外角與下方衣服。 */
+  object-fit: cover;
+  object-position: center top;
+  border: 1px solid var(--candidate);
+  border-radius: 50%;
+  background: var(--rice);
+}
+
+.profile-portrait-source {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 
 .profile-fields dt {
   color: var(--charcoal-soft);

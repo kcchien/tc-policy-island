@@ -56,19 +56,22 @@ function mountPortraits(container, candidates) {
     portraitKey = key;
   }
   const batch = portraitBatch;
-  const figures = candidates.map((candidate, i) => {
+  const entries = candidates.map((candidate, i) => {
     const photo = portraits[i];
-    const img = el('img', { src: photo.url, alt: T.portraitAlt(candidate.name), width: 72, height: 96 });
+    const img = el('img', { src: photo.url, alt: T.portraitAlt(candidate.name), width: 80, height: 80 });
     img.addEventListener('error', batch.fail);
-    const figure = el('figure', { class: 'profile-portrait', hidden: true }, img,
-      el('figcaption', {}, el('a', { href: candidate.profileSource.url, target: '_blank', rel: 'noopener noreferrer' }, T.portraitSource(photo.electionYear)),
-        el('br'), el('a', { href: './method.html#candidate-portraits' }, T.portraitMethod)));
-    container.children[i].querySelector('.profile-head').after(figure);
-    return figure;
+    const portrait = el('div', { class: 'profile-portrait', hidden: true }, img);
+    const credit = el('p', { class: 'profile-portrait-source', hidden: true },
+      el('a', { href: candidate.profileSource.url, target: '_blank', rel: 'noopener noreferrer' }, T.portraitSource(photo.electionYear)),
+      el('br'), el('a', { href: './method.html#candidate-portraits' }, T.portraitMethod));
+    const head = container.children[i].querySelector('.profile-head');
+    head.querySelector('.profile-heading').prepend(portrait);
+    head.append(credit);
+    return { portrait, credit, img };
   });
-  portraitGroups.set(container, batch.reveal(figures.map(f => f.querySelector('img')), {
-    show: () => figures.forEach(f => { f.hidden = false; }),
-    hide: () => figures.forEach(f => { f.hidden = true; }),
+  portraitGroups.set(container, batch.reveal(entries.map(entry => entry.img), {
+    show: () => entries.forEach(({ portrait, credit }) => { portrait.hidden = credit.hidden = false; }),
+    hide: () => entries.forEach(({ portrait, credit }) => { portrait.hidden = credit.hidden = true; }),
   }));
 }
 
@@ -99,9 +102,11 @@ function profileCard(content, { idPrefix, focused, symbol }) {
     el(
       'header',
       { class: 'profile-head' },
-      el('span', { class: 'marker-badge is-lit', title: T.markerTitle, 'aria-hidden': 'true' }, symbol),
-      el('h3', { class: 'candidate-name', id: titleId }, content.name),
-      el('p', { class: 'candidate-meta' }, content.party),
+      el('div', { class: 'profile-heading' },
+        el('div', { class: 'profile-identity' },
+          el('span', { class: 'marker-badge is-lit', title: T.markerTitle, 'aria-hidden': 'true' }, symbol),
+          el('h3', { class: 'candidate-name', id: titleId }, content.name),
+          el('p', { class: 'candidate-meta' }, content.party))),
     ),
     content.emptyText
       ? el('p', { class: 'no-policy' }, content.emptyText)
