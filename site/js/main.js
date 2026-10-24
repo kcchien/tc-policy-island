@@ -11,7 +11,8 @@ import { renderIslandList, renderLegend } from './island-list.js';
 import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
-import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
+import { pickRandomArea } from './random-area.js';
+import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 
 const DATASET_URL = './data/dataset.json';
@@ -328,6 +329,14 @@ function startApp(vm, state, initialView) {
     return true;
   };
 
+  // 隨機一題：從全部議題區（不看篩選）均勻選一個開政見卡片，不與目前選中的議題區相同。
+  // 頁首按鈕與上手導覽共用。表格檢視先捲到該列；島嶼檢視由 openCard 等載入完成、飛到該區再開。
+  const openRandomArea = () => {
+    const areaId = pickRandomArea(vm.rows, Math.random, selectedArea);
+    if (view === 'table') scrollToTableRow(areaId);
+    return openCard(areaId, null);
+  };
+
   function setView(next) {
     view = next;
     document.body.dataset.view = next;
@@ -383,6 +392,12 @@ function startApp(vm, state, initialView) {
     updateUrl();
     render();
   });
+
+  const randomButton = document.getElementById('random-area');
+  document.getElementById('random-area-label').textContent = RANDOM_AREA_TEXT.button;
+  randomButton.title = RANDOM_AREA_TEXT.hint;
+  randomButton.addEventListener('click', openRandomArea);
+  randomButton.hidden = false;
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
