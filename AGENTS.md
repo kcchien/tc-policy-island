@@ -54,6 +54,7 @@
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、列在 `rawPolicyItems.sourceIds`、或是公開候選人資料出處的那些。
 - **候選人資料** `profile`：`birthYear`、`education[]`、`experience[]`（學歷與經歷逐字照出處）、`sourceId`（出處須屬同一位候選人）、`electionYear`、`electionName`（資料取自哪一場選舉，例如「第11屆立法委員選舉（臺中市第8選舉區）」）、`verification { layer1 { status, checkedAt? } }`。只有第一層（逐字比對），`pass` 才公開，否則公開資料集的 `profile` 為 `null`。姓名與政黨沿用候選人的欄位。抽取方法見 `data/extraction/candidate-profiles.md`。
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。
+- **正式肖像** `portrait?`：只在公開候選人，建置時全部核對完成才三人一起加入 `{ url, sourceId, electionYear, retrievedAt }`，否則全部沒有此欄位。出處與候選人資料須相同，`url` 只指向本站 `data/portraits/<candidateId>.png`。原始照片及完整來源授權清單放 `data/portraits/`，以 `scripts/lib/portraits.js` 核對。僅 `candidate-card.js` 共用資料卡可呈現，任一載入失敗全頁三人均回退。見 ADR 0001 正式肖像有限例外。
 
 檢視模型的輸出、網址參數與候選人資料卡的開啟流程見 `docs/architecture.md`。
 

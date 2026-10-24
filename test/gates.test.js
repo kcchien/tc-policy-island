@@ -941,3 +941,43 @@ test('即時合成的背景音樂程式、叫做 midi 的欄位與文案提到�
 
   assert.equal(code, 0, output);
 });
+
+function portraitSite(tamper = () => {}) {
+  let files={...COMPLIANT_FILES};
+  return makeSite(dataset => {
+    const bytes=Buffer.from('89504e470d0a1a0a0000000d49484452000000f0000001400802000000','hex');
+    const items=dataset.candidates.map(c=>{
+      c.portrait={url:`data/portraits/${c.id}.png`,sourceId:c.profile.sourceId,electionYear:2024,retrievedAt:'2026-10-24'};
+      files[c.portrait.url]=bytes;
+      return {candidateId:c.id,candidateName:c.name,sourceId:c.profile.sourceId,sourceUrl:dataset.sources.find(s=>s.id===c.profile.sourceId).url,
+        electionYear:2024,retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:'b'.repeat(64),
+        extraction:'抽取原始黑白影像',identityCheckedAt:'2026-10-24',rights:{status:'cleared',specialExclusion:false,
+          declarationUrl:'https://web.cec.gov.tw/central/article/21322',licenseUrl:'https://data.gov.tw/license',checkedAt:'2026-10-24'},
+        file:`${c.id}.png`,fileSha256:sha256(bytes),width:240,height:320};
+    });
+    tamper(dataset,files,items);
+    files['data/portraits/manifest.json']=JSON.stringify({items});
+  },files);
+}
+
+test('三人正式肖像與授權清單齊全可通過關卡',()=>{
+  const result=runGates(portraitSite());assert.equal(result.code,0,result.output);
+});
+
+test('肖像缺檔、來源不符、只放一人、無公開欄位卻遺留檔案與資料卡以外引用皆擋下',()=>{
+  for (const tamper of [
+    (d,f)=>delete f[d.candidates[0].portrait.url],
+    d=>d.candidates[0].portrait.sourceId=d.candidates[1].profile.sourceId,
+    d=>delete d.candidates[0].portrait,
+    d=>d.candidates.forEach(c=>delete c.portrait),
+    (d,f)=>f['js/table-view.js']='const image = candidate.portrait.url;',
+    (d,f)=>f['index.html']='<img src="data/portraits/cand-a.png">',
+  ]) {
+    const result=runGates(portraitSite(tamper));assert.notEqual(result.code,0,result.output);assert.match(result.output,/正式肖像/);
+  }
+});
+
+test('直式構圖的 FILL.portrait 不是候選人肖像資料，不得誤擋場景',()=>{
+  const site=makeSite(()=>{},{...COMPLIANT_FILES,'js/island-camera.js':'const fill = portrait ? FILL.portrait : FILL.landscape;'});
+  const result=runGates(site);assert.equal(result.code,0,result.output);
+});

@@ -13,11 +13,12 @@ import fixedDecor from './fixed-decor.js';
 import figureConsistency from './figure-consistency.js';
 import audienceText from './audience-text.js';
 import audioFiles from './audio-files.js';
+import candidatePortraits from './candidate-portraits.js';
 
 // 上線關卡清單。新增關卡：在本目錄寫一個 { id, name, check(site) → 失敗訊息陣列 } 模組，加進這裡。
 export const GATES = [
   datasetStructure, verifiedPolicies, candidateColumns, candidateProfiles, brandTerms, forbiddenColors, repoDocuments, fixedMotion, fixedDecor, figureConsistency, audienceText,
-  audioFiles,
+  audioFiles, candidatePortraits,
 ];
 
 export function runGates(siteDir) {

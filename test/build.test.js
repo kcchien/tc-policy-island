@@ -14,7 +14,8 @@ const SAMPLE_RAW = fileURLToPath(new URL('./fixtures/raw-sample', import.meta.ur
 function build(rawDir, args = []) {
   const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : join(mkdtempSync(join(tmpdir(), 'build-out-')), 'dataset.json');
   const audio = args.includes('--audio') ? [] : ['--audio', join(tmpdir(), 'build-no-audio')];
-  const result = spawnSync(process.execPath, [BUILD_SCRIPT, '--raw', rawDir, '--out', out, ...audio, ...args], { encoding: 'utf8' });
+  const portraits = args.includes('--portraits') ? [] : ['--portraits', join(tmpdir(), 'build-no-portraits')];
+  const result = spawnSync(process.execPath, [BUILD_SCRIPT, '--raw', rawDir, '--out', out, ...audio, ...portraits, ...args], { encoding: 'utf8' });
   return { code: result.status, output: result.stdout + result.stderr, out };
 }
 
@@ -183,4 +184,57 @@ test('沒有政見語音清單時照常建置，政見不帶 audioUrl', () => {
   assert.equal(code, 0, output);
   assert.ok(JSON.parse(readFileSync(out, 'utf8')).policies.every((p) => !('audioUrl' in p)));
   assert.match(output, /沒有政見語音清單/);
+});
+
+// 肖像夾具沿用虛構候選人資料，影像以中性像素代替真實肖像。
+function makePortraits(rawDir) {
+  const portraitDir = mkdtempSync(join(tmpdir(), 'build-portraits-'));
+  const candidates = JSON.parse(readFileSync(join(rawDir, 'candidates.json')));
+  const bytes = Buffer.from('89504e470d0a1a0a0000000d49484452000000f0000001400802000000', 'hex');
+  const items = candidates.map(c => {
+    const source = JSON.parse(readFileSync(join(rawDir, 'sources', `${c.id}.json`))).find(s => s.id === c.profile.sourceId);
+    const file = `${c.id}.png`;
+    writeFileSync(join(portraitDir,file),bytes);
+    return {candidateId:c.id,candidateName:c.name,sourceId:source.id,sourceUrl:source.url,electionYear:2024,
+      retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:'b'.repeat(64),
+      extraction:'抽取原始影像',identityCheckedAt:'2026-10-24',
+      rights:{status:'cleared',specialExclusion:false,declarationUrl:'https://web.cec.gov.tw/central/article/21322',licenseUrl:'https://data.gov.tw/license',checkedAt:'2026-10-24'},
+      file,fileSha256:sha256(bytes),width:240,height:320};
+  });
+  writeFileSync(join(portraitDir,'manifest.json'),JSON.stringify({items}));
+  return portraitDir;
+}
+
+test('肖像建置全有全無，缺檔、未清權與來源不符不會洩漏照片，且清除上次產物', () => {
+  const rawDir=mkdtempSync(join(tmpdir(),'build-portrait-raw-'));
+  cpSync(SAMPLE_RAW,rawDir,{recursive:true});
+  for (const c of JSON.parse(readFileSync(join(rawDir,'candidates.json')))) {
+    const path=join(rawDir,'sources',`${c.id}.json`),sources=JSON.parse(readFileSync(path));
+    sources.find(s=>s.id===c.profile.sourceId).url=`https://bulletin.cec.gov.tw/test-fixture/${c.id}.pdf`;
+    writeFileSync(path,JSON.stringify(sources));
+  }
+  const portraits = makePortraits(rawDir);
+  const out=join(mkdtempSync(join(tmpdir(),'build-portrait-out-')),'dataset.json');
+  let result=build(rawDir,['--out',out,'--portraits',portraits]);
+  assert.equal(result.code,0,result.output);
+  assert.ok(JSON.parse(readFileSync(out)).candidates.every(c=>c.portrait));
+  assert.equal(readdirSync(join(dirname(out),'portraits')).length,4);
+  for (const mutate of [
+    m => m.items[0].rights.status='pending',
+    m => m.items[0].sourceId=m.items[1].sourceId,
+    m => m.items.pop(),
+  ]) {
+    const dir=makePortraits(rawDir);
+    const path=join(dir,'manifest.json'),manifest=JSON.parse(readFileSync(path)); mutate(manifest);writeFileSync(path,JSON.stringify(manifest));
+    result=build(rawDir,['--out',out,'--portraits',dir]);
+    assert.equal(result.code,0,result.output);
+    assert.ok(JSON.parse(readFileSync(out)).candidates.every(c=>!c.portrait));
+    assert.equal(existsSync(join(dirname(out),'portraits')),false);
+  }
+  // 缺檔以同樣不發布處理。
+  const manifest=JSON.parse(readFileSync(join(portraits,'manifest.json')));
+  writeFileSync(join(portraits,manifest.items[0].file),'broken');
+  result=build(rawDir,['--out',out,'--portraits',portraits]);
+  assert.ok(JSON.parse(readFileSync(out)).candidates.every(c=>!c.portrait));
+  assert.equal(existsSync(join(dirname(out),'portraits')),false);
 });

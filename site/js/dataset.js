@@ -90,6 +90,12 @@ const SCHEMAS = {
     'rawPolicyItems.total': 'count?',
     'rawPolicyItems.sourceIds': 'strings',
     dataStatus: 'string?',
+    // 僅建置時加入；正式肖像的完整來源與授權證據在肖像清單，三人全有或全無。
+    'portrait?': 'object',
+    'portrait.url': 'string',
+    'portrait.sourceId': 'string',
+    'portrait.electionYear': 'int',
+    'portrait.retrievedAt': 'date',
     // 候選人資料（中選會登記資料），null 表示尚未收錄。學歷與經歷逐字照出處，逐字比對通過才公開。
     profile: 'object?',
     'profile.birthYear': 'int',
@@ -400,6 +406,8 @@ export function buildPublicDataset(raw, { builtAt = null } = {}) {
     ...c,
     profile: isProfileVerified(c.profile) ? c.profile : null,
   })));
+  // 原始資料不能自行帶出未經檔案與授權核對的肖像；只由建置指令加入。
+  for (const candidate of candidates) delete candidate.portrait;
   const policies = copy.policies.filter(isVerified);
   const sourceIds = publicSourceIds(candidates, policies);
   return {

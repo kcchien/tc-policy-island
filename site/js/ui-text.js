@@ -181,6 +181,9 @@ export const PROFILE_TEXT = {
   snapshotNoteLabel: '原文存檔說明：',
   markerTitle: '島上標記',
   cardLink: '這張候選人資料卡的連結',
+  portraitAlt: (name) => `${name}的正式肖像`,
+  portraitSource: (year) => `照片：中選會 ${year} 年選舉公報`,
+  portraitMethod: '照片來源與使用說明',
 };
 
 // 表格檢視。
@@ -330,6 +333,7 @@ export const REPO_DOCUMENT_TEXT = {
   'layer2-prompt': { title: 'AI 核對指示', description: '每條政見交給 AI 檢查時使用的完整指示，三位候選人共用。' },
   'extraction-instructions': { title: '政見整理指示', description: 'AI 從候選人公開資料整理出政見、原文引述與摘要時依循的指示。' },
   'candidate-profiles': { title: '候選人資料整理方法', description: '從中選會選舉公報逐字摘錄學歷與經歷，以及核對文字的步驟。' },
+  'candidate-portraits': { title: '正式肖像整理方法', description: '照片出處、使用依據，以及三人一致呈現的處理方式。' },
   'verification-report': { title: '核對報告', description: '各候選人政見的核對通過率、退回次數與刪除筆數。' },
   'speech-manifest': { title: '朗讀音檔清單', description: '朗讀音檔的語音設定，以及每條政見對應哪一個音檔、朗讀了多少字。' },
   'local-elements': { title: '元素清單說明', description: '島上在地感元素的選取原則與每項元素的理由。' },
