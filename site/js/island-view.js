@@ -1,6 +1,7 @@
 // 島嶼檢視：把島嶼配置畫成 3D 場景。只讀檢視模型（經 island-layout.js），不直接碰公開資料集。
 // 由 main.js 以動態 import 載入，不支援 WebGL 的裝置不會下載 three.js。
-// 控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）。
+// 控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）、
+// areaScreenRects（議題區名牌與標記在畫面上的範圍，上手導覽用）。
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -637,6 +638,30 @@ export function createIslandView(stage, {
       requestRender();
     },
     resize,
+    // 上手導覽用：議題區名牌與三個標記在畫面上的範圍（視窗座標）。名牌關閉、被避讓隱藏或不在畫面上時為 null；
+    // 標記以鏡頭投影立牌的外框，在鏡頭後方時為 null。只讀目前的畫面，不加 3D 物件。
+    areaScreenRects(areaId) {
+      const tile = tiles.get(areaId);
+      if (!tile) return null;
+      const labelShown = !stage.classList.contains('labels-off') && !tile.label.classList.contains('is-hidden');
+      const labelRect = labelShown ? tile.label.getBoundingClientRect() : null;
+      const box = stage.getBoundingClientRect();
+      const bounds = new THREE.Box3();
+      for (const marker of tile.markers) bounds.expandByObject(marker);
+      let markers = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+      const corner = new THREE.Vector3();
+      for (let i = 0; i < 8 && markers; i += 1) {
+        corner.set(i & 1 ? bounds.max.x : bounds.min.x, i & 2 ? bounds.max.y : bounds.min.y, i & 4 ? bounds.max.z : bounds.min.z).project(camera);
+        if (corner.z > 1) markers = null;
+        else {
+          const x = box.left + ((corner.x + 1) / 2) * box.width;
+          const y = box.top + ((1 - corner.y) / 2) * box.height;
+          markers = { left: Math.min(markers.left, x), top: Math.min(markers.top, y), right: Math.max(markers.right, x), bottom: Math.max(markers.bottom, y) };
+        }
+      }
+      const label = labelRect && labelRect.width > 0 ? { left: labelRect.left, top: labelRect.top, right: labelRect.right, bottom: labelRect.bottom } : null;
+      return { label, markers };
+    },
     // 浮動元件變了（例如名牌開關、索引抽屜或候選人資料卡開關）時重排名牌。
     refreshLabels() {
       labelsDirty = true;
