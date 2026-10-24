@@ -128,9 +128,9 @@ js/repo-documents.js  js/markdown.js  js/method-content.js  js/method.js
 ## scripts
 
 ```
-build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  verify.js   指令入口，用法見 AGENTS.md「指令」
+build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  verify.js   指令入口，參數看各腳本的 --help
 lib/      archive-queue.js  audience-text.js  brand-terms.js  cdp.js  colors.js  deploy.js
-          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  verification.js
+          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  usage.js  verification.js
 gates/    index.js（關卡清單 GATES）  site.js（讀取網站目錄的入口）
           audience-text.js  brand-terms.js  candidate-columns.js  candidate-profiles.js  dataset-structure.js
           figure-consistency.js  fixed-decor.js  fixed-motion.js  forbidden-colors.js  no-audio-files.js
