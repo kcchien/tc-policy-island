@@ -1829,6 +1829,35 @@ body[data-view="island"] .card-height {
   color: var(--rice);
 }
 
+/* 朗讀鈕的喇叭圖示放在文字前，線條跟著按鈕文字色；播放中喇叭換成停止方塊 */
+.policy-action:has(.policy-action-icon) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 9px;
+}
+
+.policy-action-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.policy-action .icon-playing,
+.policy-action[aria-pressed="true"] .icon-idle {
+  display: none;
+}
+
+.policy-action[aria-pressed="true"] .icon-playing {
+  display: inline;
+  fill: currentColor;
+}
+
 .policy-action-status {
   color: var(--charcoal-soft);
   font-size: 0.75rem;

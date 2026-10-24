@@ -3,7 +3,7 @@
 // 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，
 // 點開才顯示原文引述、出處與核對紀錄。欄內篩選用 filter.js 的 policyMatcher。畫面文字取自 ui-text.js。
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（createPolicyReader：有 audioUrl 播預先生成的音檔，
-// 沒有時用瀏覽器內建語音；一次一筆，換議題區或關卡片即停止）。本模組是唯一引用音檔的畫面模組，只用公開資料集給的 audioUrl。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
+// 沒有時用瀏覽器內建語音；一次一筆，換議題區或關卡片即停止；按鈕帶喇叭圖示 SPEAK_ICON，播放中換成停止方塊）。本模組是唯一引用音檔的畫面模組，只用公開資料集給的 audioUrl。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
 // 右下角的「上一題」「下一題」只通知呼叫端（onStep），換哪一區由呼叫端決定。
 // 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。
 
@@ -102,6 +102,32 @@ export function createPolicyReader({ createAudio, speech, createUtterance, onCha
   };
 }
 
+// 朗讀鈕的喇叭圖示（內嵌、只有線條、顏色跟著按鈕文字色）：未播放是喇叭加聲波（idle），播放中換成停止方塊（playing），
+// 由 main.css 依按鈕的按下狀態切換。形狀放成資料，Node 可測。
+export const SPEAK_ICON = {
+  viewBox: '0 0 24 24',
+  shapes: [
+    { part: 'idle', tag: 'path', attrs: { d: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4Z' } },
+    { part: 'idle', tag: 'path', attrs: { d: 'M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11' } },
+    { part: 'playing', tag: 'rect', attrs: { x: '6.5', y: '6.5', width: '11', height: '11', rx: '2' } },
+  ],
+};
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const speakIcon = () => {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'policy-action-icon');
+  svg.setAttribute('viewBox', SPEAK_ICON.viewBox);
+  svg.setAttribute('aria-hidden', 'true');
+  for (const { part, tag, attrs } of SPEAK_ICON.shapes) {
+    const shape = document.createElementNS(SVG_NS, tag);
+    shape.setAttribute('class', `icon-${part}`);
+    for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key, value);
+    svg.append(shape);
+  }
+  return svg;
+};
+
 // 我的對照單的勾選框，政見卡片與對照單共用；變更由外層以事件委派（data-pick）處理。
 // 放在政見的摘要列裡：點勾選框只切換勾選，不會展開或收合政見。
 export const pickBox = (policyId, checked) => el(
@@ -168,6 +194,7 @@ function policyArticle(policy, { focused, open, canRead, picked }) {
           canRead(policy) && el(
             'button',
             { type: 'button', class: 'policy-action', 'data-action': 'speak', 'data-policy': policy.id, 'aria-pressed': 'false', title: T.speakHint },
+            speakIcon(),
             T.speak,
           ),
           el('span', { class: 'policy-action-status', role: 'status' }),
