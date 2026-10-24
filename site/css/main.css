@@ -426,6 +426,8 @@ select {
 .card-height,
 .card-blind,
 .card-expand,
+.card-step,
+.reading-clear,
 .index-close {
   min-height: var(--button-height);
   padding: 6px 14px;
@@ -444,6 +446,8 @@ select {
 .card-height:hover,
 .card-blind:hover,
 .card-expand:hover,
+.card-step:hover,
+.reading-clear:hover,
 .index-close:hover {
   background: var(--laterite);
   color: var(--rice);
@@ -457,6 +461,8 @@ select {
 .card-height:active,
 .card-blind:active,
 .card-expand:active,
+.card-step:active,
+.reading-clear:active,
 .index-close:active {
   background: var(--pressed);
   border-color: var(--pressed);
@@ -987,6 +993,28 @@ body[data-view="island"] .policy-card::backdrop {
   box-shadow: inset 4px 0 0 var(--laterite);
 }
 
+/* 閱讀進度的淡勾：看過的議題區名稱旁，淡色、不搶名稱 */
+.seen-mark {
+  margin-left: 6px;
+  color: var(--charcoal-soft);
+  font-size: 0.8125em;
+  opacity: 0.6;
+}
+
+.reading-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 10px 0;
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+}
+
+.reading-progress[hidden] {
+  display: none;
+}
+
 .island-item-markers {
   display: inline-flex;
   flex: none;
@@ -1343,6 +1371,16 @@ body[data-view="island"] .card-height {
   gap: 12px;
   min-height: 0;
   padding: 12px 20px 20px;
+}
+
+/* 上一題、下一題：卡片右下角 */
+.card-steps {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: -8px;
+  padding: 0 20px 16px;
 }
 
 .card-column {
@@ -2308,7 +2346,11 @@ body[data-view="island"] .card-height {
   .card-columns {
     grid-auto-flow: row;
     grid-auto-columns: auto;
-    padding: 10px var(--gap) calc(var(--gap) + env(safe-area-inset-bottom));
+    padding: 10px var(--gap) var(--gap);
+  }
+
+  .card-steps {
+    padding: 0 var(--gap) calc(10px + env(safe-area-inset-bottom));
   }
 
   .card-column:not(.is-active) {

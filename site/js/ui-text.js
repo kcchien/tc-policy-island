@@ -112,6 +112,10 @@ export const POLICY_CARD_TEXT = {
   report: '你找到這位候選人在這題的公開說法？把連結給我們。',
   reportHint: '開啟 GitHub 回報頁，已填好議題區與候選人，只需貼上候選人本人或中選會發布的連結',
   reportTitle: (areaName, candidateName) => `補件：${areaName}／${candidateName}`,
+  // 下一題：只依議題區編號，最後一題接回第一題。
+  stepsLabel: '換議題區',
+  previous: '← 上一題',
+  next: '下一題 →',
   // 卡片內的篩選，三欄一起套用。
   filtersLabel: '在這個議題區篩選政見',
   searchLabel: '在這個議題區找政見的關鍵字',
@@ -124,6 +128,14 @@ export const POLICY_CARD_TEXT = {
     if (matchCount === 0) return '這個議題區沒有符合篩選條件的政見。';
     return `這個議題區符合篩選條件的政見共 ${matchCount} 筆。`;
   },
+};
+
+// 閱讀進度：看過的議題區在索引與表格打淡勾。只記在讀者的瀏覽器，沒有獎勵與完成訊息。
+export const READING_TEXT = {
+  mark: '✓',
+  seen: '已看過',
+  note: '看過的議題區會打淡勾，只記在這台裝置的瀏覽器。',
+  clear: '清除紀錄',
 };
 
 // 候選人資料卡。

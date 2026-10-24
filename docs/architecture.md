@@ -41,7 +41,7 @@ site/
 ## site/js：資料、進站流程與共用介面
 
 ```
-js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js
+js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js  js/reading-progress.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/blind-reading.js  js/policy-text.js  js/report-link.js  js/candidate-card.js  js/sheet.js
 js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js
 ```

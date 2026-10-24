@@ -6,6 +6,7 @@
 // 帶得出候選人的政見連結、複製鈕與市民補件連結先不放，順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（瀏覽器內建語音，一次一筆，
 // 換議題區或關卡片即停止）。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
+// 右下角的「上一題」「下一題」只通知呼叫端（onStep），換哪一區由呼叫端決定。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
@@ -165,7 +166,8 @@ function candidateColumn(candidate, cell, policies, {
 }
 
 // 回傳卡片控制器。onClose 在使用者關閉卡片後呼叫（例如清掉網址參數）。
-export function createPolicyCard({ onClose = () => {} } = {}) {
+// onStep(step) 在按「上一題」（-1）或「下一題」（1）時呼叫，由呼叫端決定開哪個議題區（reading-progress.js 的 nextAreaId）。
+export function createPolicyCard({ onClose = () => {}, onStep = () => {} } = {}) {
   const number = el('span', { class: 'card-number' });
   const title = el('h2', { class: 'card-title', id: 'policy-card-title' });
   const description = el('p', { class: 'card-description' });
@@ -198,6 +200,12 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   );
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
+  // 下一題：卡片右下角，依議題區編號換區，頭尾相接。
+  const previousButton = el('button', { type: 'button', class: 'card-step' }, T.previous);
+  const nextButton = el('button', { type: 'button', class: 'card-step' }, T.next);
+  previousButton.addEventListener('click', () => onStep(-1));
+  nextButton.addEventListener('click', () => onStep(1));
+  const steps = el('nav', { class: 'card-steps', 'aria-label': T.stepsLabel }, previousButton, nextButton);
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'tall' },
@@ -221,6 +229,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       filterStatus,
       tabs,
       body,
+      steps,
     ),
   );
   bindSheetDialog(dialog, {

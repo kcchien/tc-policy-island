@@ -4,6 +4,7 @@
 
 import { el } from './dom.js';
 import { NO_MATCH_TEXT, rawPolicyItemsText, TABLE_TEXT as T } from './ui-text.js';
+import { seenMark } from './reading-progress.js';
 
 function candidateButton(candidate, label, onOpenCandidate) {
   const button = el('button', { type: 'button', class: 'area-open candidate-open' }, label);
@@ -60,13 +61,13 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
   );
 }
 
-function areaHeader(row, onOpenCard) {
+function areaHeader(row, onOpenCard, seen) {
   const button = el('button', { type: 'button', class: 'area-open' }, T.openCard);
   button.addEventListener('click', () => onOpenCard(row.issueArea.id, null));
   return el(
     'th',
     { scope: 'row', role: 'rowheader', class: 'area-cell' },
-    el('span', { class: 'area-name' }, el('span', { class: 'area-number' }, row.number), row.issueArea.name),
+    el('span', { class: 'area-name' }, el('span', { class: 'area-number' }, row.number), row.issueArea.name, seen.has(row.issueArea.id) && seenMark()),
     el('span', { class: 'area-departments' }, row.issueArea.departments.join('、')),
     button,
   );
@@ -83,7 +84,8 @@ function candidateStrip(candidates, onOpenCandidate) {
 }
 
 // onOpenCard(areaId, policyId) 開政見卡片；onOpenCandidate(candidateId) 開候選人資料卡。
-export function renderTable(container, vm, { onOpenCard, onOpenCandidate }) {
+// seen 是讀者看過的議題區識別碼集合（閱讀進度），議題區名稱旁打淡勾。
+export function renderTable(container, vm, { onOpenCard, onOpenCandidate, seen = new Set() }) {
   const strip = candidateStrip(vm.candidates, onOpenCandidate);
   if (vm.rows.length === 0) {
     container.replaceChildren(strip, el('p', { class: 'empty-result' }, NO_MATCH_TEXT));
@@ -106,7 +108,7 @@ export function renderTable(container, vm, { onOpenCard, onOpenCandidate }) {
         el(
           'tr',
           { role: 'row', id: `area-${row.issueArea.id}`, class: 'area-row' },
-          areaHeader(row, onOpenCard),
+          areaHeader(row, onOpenCard, seen),
           // 依欄標題的候選人順序取格子，不靠陣列位置對應。
           vm.candidates.map((candidate) =>
             policyCell(row.cells.find((cell) => cell.candidateId === candidate.id), candidate, {

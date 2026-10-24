@@ -1,5 +1,5 @@
 // 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
-// 隨機一題、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
+// 隨機一題、下一題與閱讀進度、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -13,10 +13,11 @@ import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
 import { pickRandomArea } from './random-area.js';
+import { markSeen, nextAreaId, parseSeen, SEEN_KEY, serializeSeen } from './reading-progress.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
 import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
-import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
+import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, READING_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 
 const DATASET_URL = './data/dataset.json';
@@ -131,7 +132,21 @@ function startApp(vm, state, initialView) {
       state.policy = null;
       updateUrl();
     },
+    onStep: (step) => stepArea(step),
   });
+
+  // 閱讀進度：看過的議題區只記在讀者的瀏覽器，索引與表格打淡勾；有紀錄時才出現說明與「清除紀錄」。
+  let seen = parseSeen(readStorage(SEEN_KEY));
+  const clearSeenButton = el('button', { type: 'button', class: 'reading-clear' }, READING_TEXT.clear);
+  const readingProgress = el('p', { class: 'reading-progress' }, el('span', {}, READING_TEXT.note), clearSeenButton);
+  const setSeen = (next) => {
+    seen = next;
+    writeStorage(SEEN_KEY, serializeSeen(seen));
+    readingProgress.hidden = seen.size === 0;
+    renderLists();
+  };
+  readingProgress.hidden = seen.size === 0;
+  clearSeenButton.addEventListener('click', () => setSeen(new Set()));
   document.body.append(card.element);
 
   const candidateDialog = createCandidateDialog({
@@ -246,7 +261,7 @@ function startApp(vm, state, initialView) {
   });
 
   const renderIslandPanel = () => {
-    renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null) });
+    renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null), seen });
   };
 
   // 第一次進入島嶼檢視時才載入 three.js。載入或建立場景失敗就改用表格檢視。
@@ -312,6 +327,7 @@ function startApp(vm, state, initialView) {
     candidateDialog.close();
     state.candidate = null;
     selectedArea = areaId;
+    if (!seen.has(areaId)) setSeen(markSeen(seen, areaId));
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
@@ -336,6 +352,13 @@ function startApp(vm, state, initialView) {
   // 表格檢視先捲到該列（被篩掉時不捲）；島嶼檢視由 openCard 等載入完成、飛到該區再開。
   const openRandomArea = () => {
     const areaId = pickRandomArea(vm.rows, Math.random, selectedArea);
+    if (view === 'table') scrollToTableRow(areaId);
+    return openCard(areaId, null, { unfiltered: true });
+  };
+
+  // 下一題與上一題：依全部議題區的編號（不看篩選），與隨機一題同樣不帶篩選開卡。
+  const stepArea = (step) => {
+    const areaId = nextAreaId(vm.rows, selectedArea, step);
     if (view === 'table') scrollToTableRow(areaId);
     return openCard(areaId, null, { unfiltered: true });
   };
@@ -420,6 +443,9 @@ function startApp(vm, state, initialView) {
     }
     // 搜尋與篩選：島嶼檢視放在索引面板，表格檢視放在表格上方。
     document.getElementById(next === 'island' ? 'panel-controls-slot' : 'table-controls-slot').append(controls);
+    // 閱讀進度的說明與清除鈕：島嶼檢視放在議題區清單下方，表格檢視放在表格上方。
+    if (next === 'island') islandList.after(readingProgress);
+    else tableRoot.before(readingProgress);
     if (next === 'island') {
       setPanelOpen(false);
       renderIslandPanel();
@@ -445,11 +471,16 @@ function startApp(vm, state, initialView) {
     });
   }
 
-  const render = () => {
-    filtered = filterViewModel(vm, { query: state.query, district: state.district });
-    renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard });
+  // 表格與索引清單（看過紀錄改變時也重畫，淡勾才跟著更新）。
+  function renderLists() {
+    renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard, seen });
     highlightTableRow();
     renderIslandPanel();
+  }
+
+  const render = () => {
+    filtered = filterViewModel(vm, { query: state.query, district: state.district });
+    renderLists();
     withIsland((controller) => controller.update(filtered));
     status.textContent = resultStatusText(filtered);
   };
