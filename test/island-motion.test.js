@@ -303,10 +303,10 @@ test('市民、車輛與循環動畫都是時間的函式：同一時間同一�
   }
 });
 
-test('道具與市民放大到全景看得到，每格的倍率相同，倍率算進動態的強度', () => {
+// 道具的大小上限由「選中議題區時，循環道具不擋住主題場景」那條測試把關。
+test('市民放大到全景看得到，道具與市民每格的倍率相同，倍率算進動態的強度', () => {
   const tiles = areaPlans(motionPlan(layoutOf(rawWith(FEW))));
 
-  assert.ok(LOOP_SCALE >= 2, `道具倍率 ${LOOP_SCALE}`);
   assert.ok(CITIZEN_SCALE * CITIZEN_ZOOM.max >= 1.2, `市民全景倍率 ${CITIZEN_SCALE * CITIZEN_ZOOM.max}`);
   for (const tile of tiles) {
     assert.ok(tile.loops.every((loop) => loop.scale === LOOP_SCALE), tile.id);
@@ -356,6 +356,43 @@ test('放大後的道具底座不進元素區、不碰市民路線，吊臂擺�
   // 吊臂（原尺寸伸出 0.14）往格心擺動時離元素區最近。
   const swings = Array.from({ length: 60 }, (_, i) => Math.abs(loopPose('crane', (i / 60) * LOOP_SECONDS).swing));
   assert.ok(LOOP_SPOTS[0].z - 0.14 * LOOP_SCALE * Math.sin(Math.max(...swings)) >= ELEMENT_MAX_Z, '吊臂伸進元素區');
+});
+
+test('正式資料每格的循環道具（含會動零件掃過的範圍）不穿進主題場景的零件，也不進在地感元素區', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  const plan = motionPlan(layout);
+  const heroes = new Map(heroPlan(layout).map((hero) => [hero.areaId, hero]));
+  // 道具是兩段直立圓柱：柱子（地面到 LOOP_HEIGHT、半徑 LOOP_CORE）與會動零件（LOOP_REACH_FROM 以上、半徑 LOOP_REACH）。
+  // 外框 { min: [x, y, z], max } 的 y 從格子頂面量起；圓柱與外框在俯視平面相交、高度也重疊才算碰到。
+  const hits = (cyl, box) => {
+    const dx = Math.max(box.min[0] - cyl.x, 0, cyl.x - box.max[0]);
+    const dz = Math.max(box.min[2] - cyl.z, 0, cyl.z - box.max[2]);
+    return Math.hypot(dx, dz) < cyl.radius && cyl.bottom < box.max[1] && box.min[1] < cyl.top;
+  };
+  const failures = [];
+  for (const tile of areaPlans(plan)) {
+    const layoutTile = layout.tiles.find((t) => t.id === tile.id);
+    const { x, z, scale } = heroes.get(tile.id).transform;
+    const offset = [x, 0, z];
+    const boxes = heroSceneFor(tile.id).parts.map((part, i) => {
+      const b = partBounds(part);
+      return { name: `主題場景零件 ${i}（${part.shape}）`, min: b.min.map((v, k) => offset[k] + v * scale), max: b.max.map((v, k) => offset[k] + v * scale) };
+    });
+    const e = layoutTile.elementSlot;
+    const [cx, cz] = [tile.center.x, tile.center.z];
+    boxes.push({ name: '在地感元素區', min: [cx + e.minX, 0, cz + e.minZ], max: [cx + e.maxX, e.maxY, cz + e.maxZ] });
+    for (const loop of tile.loops) {
+      const at = { x: cx + loop.x, z: cz + loop.z };
+      const parts = [
+        { name: '柱子', ...at, radius: LOOP_CORE, bottom: 0, top: LOOP_HEIGHT },
+        { name: '會動零件', ...at, radius: LOOP_REACH, bottom: LOOP_REACH_FROM, top: LOOP_HEIGHT },
+      ];
+      for (const cyl of parts) {
+        for (const box of boxes.filter((b) => hits(cyl, b))) failures.push(`${tile.id} 的 ${tile.theme} 道具（${loop.x}, ${loop.z}）${cyl.name}碰到${box.name}`);
+      }
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 // 標記離鏡頭的視線有沒有被擋：從標記頂面中心往鏡頭取樣，碰到直立圓柱（離格子頂面 bottom 到 height）就算擋住。
@@ -429,6 +466,42 @@ test('放大後的道具、市民、主題場景、在地感元素與靜態裝�
       .map((m) => `${tile.id}/${m.candidateId}`));
     assert.deepEqual(hidden, [], `長寬比 ${aspect}`);
   }
+});
+
+test('選中議題區時，循環道具不擋住正式資料任何主題場景的零件：桌面與手機的預設視角', () => {
+  const layout = islandLayout(buildViewModel(buildPublicDataset(loadRawData(RAW_DIR))));
+  const plan = motionPlan(layout);
+  const outline = islandPoints(layout, { surface: SURFACE, top: SURFACE + 1.1 });
+  const props = plan.tiles.flatMap((tile) => tile.loops.flatMap((loop) => {
+    const at = { x: tile.center.x + loop.x, z: tile.center.z + loop.z, height: LOOP_HEIGHT };
+    return [{ ...at, radius: LOOP_CORE }, { ...at, radius: LOOP_REACH, bottom: LOOP_REACH_FROM }];
+  }));
+  // 每個零件取外框頂面中心，照擺放放大平移。
+  const tops = heroPlan(layout).flatMap((hero) => {
+    const { x, z, scale } = hero.transform;
+    return heroSceneFor(hero.areaId).parts.map((part, i) => {
+      const { min, max } = partBounds(part);
+      return { areaId: hero.areaId, name: `${i}（${part.shape}）`, at: [x + ((min[0] + max[0]) / 2) * scale, SURFACE + max[1] * scale, z + ((min[2] + max[2]) / 2) * scale] };
+    });
+  });
+  // 選中議題區時鏡頭保持預設視角的俯角與方位角，對準格心，距離取 FOCUS_DISTANCE 與預設距離較近者（island-view.js 的 focusArea）。
+  const FOCUS_DISTANCE = 14;
+  const failures = [];
+  for (const aspect of [2.6, 2.0, 1.6, 1.2, 0.9, 0.6, 0.46]) {
+    const view = homeView(outline, { fov: 32, aspect });
+    const distance = Math.min(FOCUS_DISTANCE, view.distance);
+    for (const tile of layout.tiles.filter((t) => t.heroSlot)) {
+      const camera = [
+        tile.position.x + distance * Math.sin(view.polar) * Math.sin(view.azimuth),
+        SURFACE + distance * Math.cos(view.polar),
+        tile.position.z + distance * Math.sin(view.polar) * Math.cos(view.azimuth),
+      ];
+      for (const top of tops.filter((t) => t.areaId === tile.id)) {
+        if (props.some((o) => blocked(top.at, camera, o))) failures.push(`長寬比 ${aspect}：${tile.id} 零件 ${top.name}`);
+      }
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 // 封閉折線繞 point 的圈數（俯視平面上）。
