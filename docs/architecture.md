@@ -51,7 +51,7 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js
 
 ### 檢視模型
 
-檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格 `status` 為 `has-policies` 或 `no-policies`，候選人附 `policyCount`、`rawPolicyItems` 與 `profileSource`（候選人資料的出處，含 `snapshotNote`；`profile` 為 `null` 時也是 `null`），另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子有無政見決定，不呈現政見數量。`filterViewModel` 篩選後，沒有符合政見的格子 `status` 為 `no-matches`，沒有任何符合政見的議題區整列移除。
+檢視模型（`buildViewModel`）輸出 `rows[].cells[]` 與議題區編號 `rows[].number`（依資料順序的 `01`、`02`⋯，篩選不重編），每格收錄狀態 `status` 為 `has-policies` 或 `no-policies`。候選人附 `policyCount`、`rawPolicyItems`、`sourceStatusText`（依政見出處紀錄與已知舊來源狀態產生的白話說明，不把候選人資料出處當成政見來源）與 `profileSource`（候選人資料的出處，含 `snapshotNote`；`profile` 為 `null` 時也是 `null`），另有 `noPolicyText` 與 `candidateOrderNote`。政見的 `quotes[].source` 附出處的中文來源類型與 `snapshotUrl`（網站上的出處快照位置）。島嶼檢視與表格檢視都只讀檢視模型；整理方法與對照單的來源狀態也取自同一檢視模型，不直接呈現原始 `dataStatus`。島嶼檢視另用 `rows[].localElement`（議題區配對的元素）與 `decorativeTiles[]`（含 `localElement`）。島上標記的亮暗由 `islandLayout` 依格子是否有收錄決定，不呈現政見數量。`filterViewModel` 篩選後，原本已收錄但沒有符合政見的格子 `status` 為 `no-matches`，原本 `no-policies` 的空欄維持收錄狀態；沒有任何符合政見的議題區整列移除。索引標記依每格狀態提供無障礙說明，亮暗邏輯不變。見 ADR 0004 的缺漏推論邊界。
 
 ### 網址參數
 

@@ -1196,7 +1196,7 @@ body[data-view="island"] .policy-card::backdrop {
   gap: 4px;
 }
 
-/* 標記徽章：三人同色同尺寸，亮起是實心，沒有政見是淡灰。 */
+/* 標記徽章：三人同色同尺寸，亮起是實心，尚未收錄或無符合篩選結果是淡灰。 */
 .marker-badge {
   display: inline-grid;
   place-items: center;
@@ -1604,7 +1604,7 @@ body[data-view="island"] .card-height {
   color: var(--laterite);
 }
 
-/* 市民補件：沒有政見的欄位在「未提出相關政見」下方放回報連結，三欄同一句 */
+/* 市民補件：空欄在收錄狀態下方放回報連結，三欄同一句 */
 .source-report {
   font-size: 0.8125rem;
   line-height: 1.6;

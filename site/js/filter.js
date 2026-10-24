@@ -3,8 +3,8 @@
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 
-// 篩選中某格沒有符合的政見時 status 為 no-matches，畫面用 ui-text.js 的 NO_MATCH_TEXT，
-// 與 no-policies（該候選人在此區未提出相關政見）分開，避免誤導。
+// 已收錄但篩選後沒有符合政見時 status 為 no-matches，畫面用 ui-text.js 的 NO_MATCH_TEXT。
+// 原本 no-policies（本站尚未收錄這個議題的政見）的空欄維持原狀，不混用收錄狀態與篩選結果。
 
 // 全形轉半形、英文字母轉小寫。
 const normalize = (text) => text.normalize('NFKC').toLowerCase();
@@ -41,7 +41,8 @@ export function filterViewModel(vm, { query = '', district = '', conflictOnly = 
       ...row,
       cells: row.cells.map((cell) => {
         const policies = cell.policies.filter(matches);
-        return { ...cell, status: policies.length > 0 ? 'has-policies' : 'no-matches', policies };
+        const status = cell.status === 'no-policies' ? 'no-policies' : policies.length > 0 ? 'has-policies' : 'no-matches';
+        return { ...cell, status, policies };
       }),
     }))
     .filter((row) => row.cells.some((cell) => cell.policies.length > 0));

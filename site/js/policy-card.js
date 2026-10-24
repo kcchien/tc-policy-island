@@ -183,7 +183,9 @@ function policyArticle(policy, { focused, open, canRead, picked }) {
           'dl',
           { class: 'policy-facts' },
           el('dt', {}, T.verification),
-          el('dd', {}, el('span', { class: 'verification-line' }, verificationText(policy.verification))),
+          el('dd', {},
+            el('span', { class: 'verification-line' }, verificationText(policy.verification)),
+            el('p', { class: 'verification-scope' }, T.verificationScope, ' ', el('a', { href: './method.html#verification' }, T.verificationMethod))),
         ),
         // 連結、複製、朗讀同一列；按鈕的動作由卡片控制器以事件委派處理，沒有語音功能時不放朗讀鈕。
         el(
@@ -230,7 +232,7 @@ function candidateColumn(candidate, cell, policies, {
       matcher.active && el('p', { class: 'candidate-meta candidate-match' }, T.columnMatch(policies.length)),
     ),
     // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。
-    candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
+    el('p', { class: 'data-status' }, candidate.sourceStatusText),
     empty && el('p', { class: 'no-policy' }, empty),
     // 市民補件：這一欄在本議題區完全沒有政見時（不是篩選後才沒有），三欄同一句、同一位置。
     cell.policies.length === 0 && el(

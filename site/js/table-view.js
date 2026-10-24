@@ -27,7 +27,7 @@ function candidateHeader(candidate, onOpenCandidate) {
     ...meta.map((text) => el('span', { class: 'candidate-meta' }, text)),
     // 按鈕放在資料狀態說明之前，三欄的按鈕才會在同一高度。
     button,
-    candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
+    el('span', { class: 'data-status' }, candidate.sourceStatusText),
   );
 }
 
@@ -36,7 +36,7 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
     'span',
     { class: 'cell-candidate', 'aria-hidden': 'true' },
     candidate.name,
-    candidate.dataStatus && el('span', { class: 'data-status' }, candidate.dataStatus),
+    el('span', { class: 'data-status' }, candidate.sourceStatusText),
   );
   if (cell.policies.length === 0) {
     const text = cell.status === 'no-matches' ? NO_MATCH_TEXT : noPolicyText;

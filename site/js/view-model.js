@@ -1,8 +1,9 @@
-// 檢視模型：公開資料集 → 議題區 × 候選人矩陣。島嶼檢視與表格檢視都只讀這個矩陣。
+// 檢視模型：公開資料集 → 議題區 × 候選人收錄狀態矩陣，並依政見出處紀錄產生來源狀態。
+// 島嶼檢視與表格檢視都只讀這個矩陣；候選人資料出處不算政見來源。
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
 import { CANDIDATE_ORDER_RULES, SOURCE_TYPES } from './dataset.js';
-import { noPolicyText } from './ui-text.js';
+import { noPolicyText, sourceStatusText } from './ui-text.js';
 
 // 出處快照放在公開資料集（site/data/dataset.json）旁的 snapshots/，檔名沿用原快照檔名。
 // 建置指令依此複製檔案，卡片依此產生連結。
@@ -55,6 +56,11 @@ export function buildViewModel(dataset) {
   const candidates = dataset.candidates.map((candidate) => ({
     ...candidate,
     policyCount: dataset.policies.filter((p) => p.candidateId === candidate.id).length,
+    sourceStatusText: sourceStatusText({
+      hasPolicySources: candidate.rawPolicyItems.sourceIds.length > 0
+        || dataset.policies.some((p) => p.candidateId === candidate.id),
+      dataStatus: candidate.dataStatus,
+    }),
     // 候選人資料卡用的出處；公開資料集的 profile 為 null（尚未收錄或未通過逐字比對）時也為 null。
     profileSource: candidate.profile ? sources.get(candidate.profile.sourceId) : null,
   }));

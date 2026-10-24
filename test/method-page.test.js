@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
-import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from '../site/js/method-content.js';
+import { brandTermsView, candidateOrderItems, checklistView, sourceStatusItems, resolveDocLink } from '../site/js/method-content.js';
 import { REPO_DOCUMENTS, repoDocumentByPath } from '../site/js/repo-documents.js';
 import { HITS_TEXT, REPO_DOCUMENT_TEXT } from '../site/js/ui-text.js';
-import { candidate } from './fixtures/make-raw.js';
+import { buildPublicDataset } from '../site/js/dataset.js';
+import { buildViewModel } from '../site/js/view-model.js';
+import { makeRaw } from './fixtures/make-raw.js';
 import { SPEECH_VOICE } from '../scripts/lib/speech.js';
 
 const page = (name) => readFileSync(new URL(`../site/${name}`, import.meta.url), 'utf8');
@@ -18,13 +20,26 @@ test('repo 文件中的相對連結：方法頁有收錄的文件連到頁內，
   assert.equal(resolveDocLink(from, 'https://example.org/a'), 'https://example.org/a');
 });
 
-test('只列出有資料狀態說明的候選人，附姓名與政黨', () => {
-  const candidates = [
-    candidate('cand-a', '候選人甲', 5),
-    { ...candidate('cand-c', '候選人丙', 9), dataStatus: '尚無一手來源' },
-  ];
+test('整理方法使用檢視模型的來源狀態，三位候選人都列出，不直接公開舊狀態文字', () => {
+  const raw = makeRaw();
+  raw.candidates.find((c) => c.id === 'cand-c').dataStatus = '尚無一手來源';
+  const vm = buildViewModel(buildPublicDataset(raw));
+  assert.deepEqual(sourceStatusItems(vm.candidates), [
+    '候選人甲：本站已取得政見一手來源，收錄範圍見整理方法',
+    '候選人乙：本站已取得政見一手來源，收錄範圍見整理方法',
+    '候選人丙：本站尚未取得可核對的政見一手來源',
+  ]);
+});
 
-  assert.deepEqual(dataStatusItems(candidates), ['候選人丙：尚無一手來源']);
+test('整理方法揭露收錄缺漏與核對限制，三種狀態分開說明並公開缺資料推論決策', () => {
+  const html = page('method.html');
+  const sources = html.match(/<section[^>]*id="sources"[\s\S]*?<\/section>/)[0];
+  const verification = html.match(/<section[^>]*id="verification"[\s\S]*?<\/section>/)[0];
+  for (const term of ['收錄狀態', '來源狀態', '篩選結果', '不代表候選人未提出', '可能有缺漏']) assert.ok(sources.includes(term), term);
+  assert.match(verification, /不是政見內容的事實查核/);
+  assert.match(verification, /可行性/);
+  assert.match(verification, /履約/);
+  assert.match(sources, /data-repo-file="docs\/adr\/0004-collection-status-boundaries\.md"/);
 });
 
 // JSON 原檔中的每個字串與數字值（不含欄位名）。

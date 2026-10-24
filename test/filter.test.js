@@ -35,11 +35,21 @@ test('沒有任何篩選條件時，檢視模型原樣保留', () => {
   assert.equal(filtered.filter.active, false);
 });
 
+test('篩選無結果不改變原本的收錄狀態：已有收錄才標 no-matches，原本空欄維持 no-policies', () => {
+  const vm = sampleViewModel();
+  const filtered = filterViewModel(vm, { query: '公車' });
+  assert.deepEqual(filtered.rows[0].cells.map((c) => [c.candidateId, c.status]), [
+    ['cand-a', 'has-policies'], ['cand-b', 'no-matches'], ['cand-c', 'no-policies'],
+  ]);
+  assert.deepEqual(filterViewModel(vm, {}).rows, vm.rows);
+  assert.equal(vm.rows[0].cells[1].status, 'has-policies');
+});
+
 test('關鍵字比對摘要：只留有符合政見的議題區，同區其他候選人的格子標為沒有符合的政見', () => {
   const filtered = filterViewModel(sampleViewModel(), { query: '公車' });
 
   assert.deepEqual(shape(filtered), [
-    ['area-a', [['has-policies', ['p-a1']], ['no-matches', []], ['no-matches', []]]],
+    ['area-a', [['has-policies', ['p-a1']], ['no-matches', []], ['no-policies', []]]],
   ]);
   assert.equal(filtered.filter.active, true);
   assert.equal(filtered.filter.matchCount, 1);
@@ -49,7 +59,7 @@ test('關鍵字也比對原文引述', () => {
   const filtered = filterViewModel(sampleViewModel(), { query: '太平' });
 
   assert.deepEqual(shape(filtered), [
-    ['area-a', [['no-matches', []], ['has-policies', ['p-b1']], ['no-matches', []]]],
+    ['area-a', [['no-matches', []], ['has-policies', ['p-b1']], ['no-policies', []]]],
   ]);
 });
 
@@ -57,7 +67,7 @@ test('關鍵字輸入不含「區」的行政區名稱，也比對到適用行�
   const filtered = filterViewModel(sampleViewModel(), { query: '霧峰' });
 
   assert.deepEqual(shape(filtered), [
-    ['area-b', [['has-policies', ['p-a2']], ['no-matches', []], ['no-matches', []]]],
+    ['area-b', [['has-policies', ['p-a2']], ['no-policies', []], ['no-policies', []]]],
   ]);
 });
 
@@ -80,8 +90,8 @@ test('行政區篩選只留適用行政區包含該區的政見', () => {
   const filtered = filterViewModel(sampleViewModel(), { district: '大里區' });
 
   assert.deepEqual(shape(filtered), [
-    ['area-a', [['has-policies', ['p-a1']], ['no-matches', []], ['no-matches', []]]],
-    ['area-b', [['has-policies', ['p-a2']], ['no-matches', []], ['no-matches', []]]],
+    ['area-a', [['has-policies', ['p-a1']], ['no-matches', []], ['no-policies', []]]],
+    ['area-b', [['has-policies', ['p-a2']], ['no-policies', []], ['no-policies', []]]],
   ]);
   assert.equal(filtered.filter.matchCount, 2);
 });
@@ -90,7 +100,7 @@ test('搜尋與行政區篩選同時使用時，兩個條件都要符合', () =>
   const filtered = filterViewModel(sampleViewModel(), { query: '托育', district: '大里區' });
 
   assert.deepEqual(shape(filtered), [
-    ['area-b', [['has-policies', ['p-a2']], ['no-matches', []], ['no-matches', []]]],
+    ['area-b', [['has-policies', ['p-a2']], ['no-policies', []], ['no-policies', []]]],
   ]);
   assert.equal(filterViewModel(sampleViewModel(), { query: '公車', district: '霧峰區' }).rows.length, 0);
 });
@@ -125,8 +135,8 @@ test('只看兩說並列：只留有出處說法不一標註的政見，其他�
   const filtered = filterViewModel(vm, { conflictOnly: true });
 
   assert.deepEqual(shape(filtered), [
-    ['area-a', [['no-matches', []], ['has-policies', ['p-b1']], ['no-matches', []]]],
-    ['area-b', [['has-policies', ['p-a2']], ['no-matches', []], ['no-matches', []]]],
+    ['area-a', [['no-matches', []], ['has-policies', ['p-b1']], ['no-policies', []]]],
+    ['area-b', [['has-policies', ['p-a2']], ['no-policies', []], ['no-policies', []]]],
   ]);
   assert.deepEqual(filtered.filter, { active: true, query: '', district: null, conflictOnly: true, matchCount: 2 });
   assert.deepEqual(filterViewModel(vm, { conflictOnly: true, query: '托育' }).rows.map((row) => row.issueArea.id), ['area-b']);
