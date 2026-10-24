@@ -21,10 +21,14 @@ export function createTourView({ targetOf, onNext, onSkip, onMove }) {
   const dialog = el('dialog', { class: 'tour', 'aria-labelledby': 'tour-title', 'aria-describedby': 'tour-body' }, frame, bubble);
   skip.addEventListener('click', () => onSkip());
   next.addEventListener('click', () => onNext());
-  // Escape 等同跳過。
+  // Escape 等同跳過。瀏覽器在沒有使用者操作時連按 Escape 會略過 preventDefault 直接關閉，
+  // 所以也聽 close：導覽還在進行卻被關掉就當作跳過（hide 與 raise 自己關閉時不算）。
   dialog.addEventListener('cancel', (event) => {
     event.preventDefault();
     onSkip();
+  });
+  dialog.addEventListener('close', () => {
+    if (step !== null && !dialog.open) onSkip();
   });
 
   let step = null;
@@ -42,6 +46,8 @@ export function createTourView({ targetOf, onNext, onSkip, onMove }) {
       bottom: target.bottom + FRAME_PADDING,
     };
     const viewport = { width: document.documentElement.clientWidth, height: window.innerHeight };
+    // 先讀說明框尺寸再改框線樣式，避免每幀強制重排。
+    const size = { width: dialog.offsetWidth, height: dialog.offsetHeight };
     frame.classList.toggle('is-empty', !padded);
     const box = padded ?? { left: viewport.width / 2, top: viewport.height / 2, right: viewport.width / 2, bottom: viewport.height / 2 };
     Object.assign(frame.style, {
@@ -50,7 +56,6 @@ export function createTourView({ targetOf, onNext, onSkip, onMove }) {
       width: `${box.right - box.left}px`,
       height: `${box.bottom - box.top}px`,
     });
-    const size = { width: dialog.offsetWidth, height: dialog.offsetHeight };
     const position = placeTourBubble({ target: padded, bubble: size, viewport, previous: side });
     side = position.side;
     const key = `${Math.round(position.left)},${Math.round(position.top)},${size.width},${size.height}`;
@@ -58,7 +63,7 @@ export function createTourView({ targetOf, onNext, onSkip, onMove }) {
     placed = key;
     dialog.style.left = `${position.left}px`;
     dialog.style.top = `${position.top}px`;
-    onMove?.();
+    onMove();
   };
 
   return {
@@ -71,10 +76,7 @@ export function createTourView({ targetOf, onNext, onSkip, onMove }) {
       count.textContent = TOUR_TEXT.count(index + 1, TOUR_STEPS.length);
       title.textContent = TOUR_TEXT.steps[nextStep].title;
       body.textContent = TOUR_TEXT.steps[nextStep].body;
-      // 最後一步只留「開始逛」，跳過與完成的效果相同。
-      const last = index === TOUR_STEPS.length - 1;
-      next.textContent = last ? TOUR_TEXT.done : TOUR_TEXT.next;
-      skip.hidden = last;
+      next.textContent = index === TOUR_STEPS.length - 1 ? TOUR_TEXT.done : TOUR_TEXT.next;
       if (!dialog.open) dialog.showModal();
       next.focus();
       if (frameId === null) layout();

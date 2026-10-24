@@ -1,4 +1,5 @@
-// 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）。
+// 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
+// 隨機一題與上手導覽。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -18,7 +19,7 @@ import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusTex
 import { setupMusicToggle } from './bgm-control.js';
 
 const DATASET_URL = './data/dataset.json';
-// 上手導覽看過或跳過的紀錄。沿用舊的文字版進站說明的鍵，看過舊說明的人不再自動出現導覽。
+// 上手導覽看過或跳過的紀錄。沿用舊版文字說明的鍵，看過舊說明的人不再自動出現導覽。
 const TOUR_SEEN_KEY = 'policy-island:intro-seen';
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 // 與 main.css 的手機斷點相同：底部膠囊工具列、索引與卡片改為底部抽屜。
@@ -342,7 +343,7 @@ function startApp(vm, state, initialView) {
   // 第三步呼叫隨機一題並框住開好的政見卡片。框哪一格只依畫面位置（pickTourArea），不讀政見。
   const webgl = document.body.dataset.webgl === 'yes';
   let tour = initialTour({ seen: readStorage(TOUR_SEEN_KEY) === '1' });
-  // 網址指定要開卡片時，第一次進島嶼檢視不自動出現導覽。
+  // 網址指定要開卡片時，第一次進島嶼檢視不自動出現導覽（島嶼檢視的卡片要等鏡頭飛到才開，所以另外記）。
   let deepLink = Boolean(state.policy || state.area || state.candidate);
   let tourArea = null;
   const tourTarget = (step) => {
@@ -359,8 +360,8 @@ function startApp(vm, state, initialView) {
     // 上一幀框的那一格，標記仍在可見範圍內就不換。名牌可能被說明框擋住而避讓隱藏，不看名牌，
     // 否則說明框一移動就會換格、來回跳。
     let rects = tourArea && rectsOf(tourArea);
-    const keep = rects?.markers && pickTourArea([{ ...rects, label: rects.markers }], { visible, obstacles: panelObstacles() });
-    if (!keep) {
+    const markersVisible = (r) => r && r.left >= visible.left && r.top >= visible.top && r.right <= visible.right && r.bottom <= visible.bottom;
+    if (!markersVisible(rects?.markers)) {
       tourArea = pickTourArea(vm.rows.map((row) => rectsOf(row.issueArea.id)), { visible, obstacles: panelObstacles() });
       if (!tourArea) return null;
       rects = rectsOf(tourArea);
@@ -400,7 +401,8 @@ function startApp(vm, state, initialView) {
     if (card.element.open && currentTourStep(tour) === 'random') tourView.raise();
   }).observe(card.element, { attributes: true, attributeFilter: ['open'] });
   const autoStart = () => {
-    setTour(autoStartTour(tour, { view, webgl, deepLink }));
+    const cardOpen = deepLink || card.element.open || candidateDialog.element.open;
+    setTour(autoStartTour(tour, { view, webgl, cardOpen }));
     deepLink = false;
   };
   const tourButton = document.getElementById('tour-open');

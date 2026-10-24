@@ -11,7 +11,7 @@ import {
   skipTour,
 } from '../site/js/tour.js';
 
-const ISLAND = { view: 'island', webgl: true, deepLink: false };
+const ISLAND = { view: 'island', webgl: true, cardOpen: false };
 
 test('第一次進入島嶼檢視時自動出現上手導覽，從議題區格子開始', () => {
   const state = autoStartTour(initialTour({ seen: false }), ISLAND);
@@ -44,11 +44,11 @@ test('看過就不再自動出現', () => {
   assert.equal(currentTourStep(autoStartTour(initialTour({ seen: true }), ISLAND)), null);
 });
 
-test('表格檢視、沒有 WebGL 或網址指定要開的卡片時不自動出現，之後進島嶼檢視才出現', () => {
+test('表格檢視、沒有 WebGL 或讀者正在看卡片時不自動出現，之後進島嶼檢視、卡片關著時才出現', () => {
   const fresh = initialTour({ seen: false });
   assert.equal(currentTourStep(autoStartTour(fresh, { ...ISLAND, view: 'table' })), null);
   assert.equal(currentTourStep(autoStartTour(fresh, { ...ISLAND, webgl: false })), null);
-  const linked = autoStartTour(fresh, { ...ISLAND, deepLink: true });
+  const linked = autoStartTour(fresh, { ...ISLAND, cardOpen: true });
   assert.equal(currentTourStep(linked), null);
   assert.equal(linked.seen, false);
   assert.equal(currentTourStep(autoStartTour(linked, ISLAND)), 'area');

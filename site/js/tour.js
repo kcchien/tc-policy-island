@@ -8,10 +8,10 @@ export const initialTour = ({ seen }) => ({ step: null, seen: Boolean(seen) });
 
 export const currentTourStep = (state) => (state.step === null ? null : TOUR_STEPS[state.step]);
 
-// 自動出現：沒看過、正在島嶼檢視且 WebGL 可用時才出現。deepLink 表示網址指定了要開的卡片，
-// 這次不出現（不記為看過），讓分享連結直接看到卡片。
-export function autoStartTour(state, { view, webgl, deepLink = false }) {
-  if (state.seen || state.step !== null || view !== 'island' || !webgl || deepLink) return state;
+// 自動出現：沒看過、正在島嶼檢視且 WebGL 可用時才出現。cardOpen 表示讀者正在看卡片（包括網址指定要開的卡片），
+// 這次不出現也不記為看過，不收掉讀者正在看的卡片。
+export function autoStartTour(state, { view, webgl, cardOpen = false }) {
+  if (state.seen || state.step !== null || view !== 'island' || !webgl || cardOpen) return state;
   return { ...state, step: 0 };
 }
 
@@ -23,7 +23,7 @@ export function nextTourStep(state) {
 }
 
 // 跳過：結束並記為看過。
-export const skipTour = (state) => ({ step: null, seen: true });
+export const skipTour = () => ({ step: null, seen: true });
 
 // 頁首「怎麼看」重開：看過也從第一步開始，只在島嶼檢視且 WebGL 可用時。
 export function reopenTour(state, { view, webgl }) {
