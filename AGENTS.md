@@ -19,6 +19,7 @@
 | `node scripts/preview.js` | 本機預覽網站目錄。參數與注意事項看 `--help` |
 | `node scripts/verify.js` | 核對候選人資料與政見（ADR 0002），第二層會花費用。參數與注意事項看 `--help` |
 | `node scripts/fetch-source.js` | 擷取一個出處（出處快照、存檔、出處紀錄），或補送存檔。參數與注意事項看 `--help` |
+| `node scripts/speak.js` | 生成政見語音音檔與清單（`data/audio/`），會花點數，正式資料先跑 `--dry-run`。參數與注意事項看 `--help` |
 | `node scripts/shoot.js` | 截圖與版面量測，手機版驗證用這個。參數與注意事項看 `--help` |
 | `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
 | `node scripts/deploy.js`（`npm run deploy`） | 檢查後部署到 Cloudflare Pages，真的部署只由維護者執行。參數與注意事項看 `--help` |
@@ -49,7 +50,7 @@
 - **元素**：`id`、`name`、`category`（`LOCAL_ELEMENT_CATEGORIES`：自然景觀、小吃、老建築）、`place`、`reason`（與任何市長任期的政績無關的理由）。
 - **裝飾格**：`id`、`axial [q, r]`、`localElementId?`。島上沒有議題區的格子。議題區與裝飾格的座標不得重複，每個元素只放一格。公開資料集另含 `localElements` 與 `decorativeTiles`。
 - **出處**：`id`、`candidateId`、`url`、`archiveUrl?`、`archiveError?`（存檔失敗原因）、`snapshotPath`（相對 repo 根目錄）、`snapshotSha256`、`snapshotNote?`（快照的產生方式，例如 PDF 轉文字與字型對照還原；取自網頁可見文字時為 `null`；給維護者看，畫面只在有字形還原時以 `snapshotNoteText` 改寫成白話）、`sourceType`（`official-website`、`official-facebook`、`policy-presentation`、`election-bulletin`，中文名見 `SOURCE_TYPES`）、`title`、`retrievedAt`。
-- **政見**：`id`、`candidateId`、`issueAreaId`（恰好一個）、`summary`、`quotes[] { text, sourceId }`（至少一則，出處須屬同一位候選人）、`districts[]`（`TAICHUNG_DISTRICTS` 的 29 區正式名稱，可空）、`conflictNote?`（出處說法不一標註）、`verification`。
+- **政見**：`id`、`candidateId`、`issueAreaId`（恰好一個）、`summary`、`quotes[] { text, sourceId }`（至少一則，出處須屬同一位候選人）、`districts[]`（`TAICHUNG_DISTRICTS` 的 29 區正式名稱，可空）、`conflictNote?`（出處說法不一標註）、`verification`。公開資料集另加 `audioUrl`（政見音檔，相對網站根目錄）：建置時每條公開政見在 `data/audio/manifest.json` 都有相符音檔才全部加上，否則全部沒有這個欄位（`SCHEMAS` 欄位名結尾的 `?` 表示可以沒有）。
 - **核對紀錄** `verification`：`layer1 { status, checkedAt? }`、`layer2 { status, reason?, checklistVersion?, model?, checkedAt? }`。`status` 為 `pending`（未核對）、`pass`、`fail`。有結果時其餘欄位必填。兩層都是 `pass` 才進公開資料集；出處只公開被公開政見引用、列在 `rawPolicyItems.sourceIds`、或是公開候選人資料出處的那些。
 - **候選人資料** `profile`：`birthYear`、`education[]`、`experience[]`（學歷與經歷逐字照出處）、`sourceId`（出處須屬同一位候選人）、`electionYear`、`electionName`（資料取自哪一場選舉，例如「第11屆立法委員選舉（臺中市第8選舉區）」）、`verification { layer1 { status, checkedAt? } }`。只有第一層（逐字比對），`pass` 才公開，否則公開資料集的 `profile` 為 `null`。姓名與政黨沿用候選人的欄位。抽取方法見 `data/extraction/candidate-profiles.md`。
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。

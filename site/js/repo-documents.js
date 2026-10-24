@@ -15,7 +15,7 @@ export const repoFileSitePath = (path) => `data/${REPO_FILES_DIR}/${path}`;
 export const repoFileUrl = (path) => `${REPO_URL}/blob/main/${path}`;
 
 // format：markdown 依 Markdown 排版；text 照原樣逐行呈現；checklist、brand-terms 是 JSON 清單，排成表格。
-// optional：檔案還不存在也能建置與上線，頁面顯示「尚未產生」。
+// optional：檔案還不存在也能建置與上線，頁面顯示「尚未產生」（核對報告與政見語音清單）。
 export const REPO_DOCUMENTS = [
   { id: 'classification-rules', path: 'docs/rules/classification-rules.md', format: 'markdown' },
   { id: 'checklist', path: 'data/verification/checklist.json', format: 'checklist' },
@@ -23,6 +23,7 @@ export const REPO_DOCUMENTS = [
   { id: 'extraction-instructions', path: 'data/extraction/instructions.md', format: 'markdown' },
   { id: 'candidate-profiles', path: 'data/extraction/candidate-profiles.md', format: 'markdown' },
   { id: 'verification-report', path: 'data/verification/report.md', format: 'markdown', optional: true },
+  { id: 'speech-manifest', path: 'data/audio/manifest.json', format: 'text', optional: true },
   { id: 'local-elements', path: 'docs/rules/local-elements.md', format: 'markdown' },
   { id: 'brand-terms-rules', path: 'docs/rules/brand-terms.md', format: 'markdown' },
   { id: 'brand-terms', path: 'data/rules/brand-terms.json', format: 'brand-terms' },
