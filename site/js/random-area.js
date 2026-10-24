@@ -6,5 +6,5 @@
 export function pickRandomArea(rows, random = Math.random, previousId = null) {
   const ids = rows.map((row) => row.issueArea.id);
   const pool = ids.length > 1 ? ids.filter((id) => id !== previousId) : ids;
-  return pool[Math.min(Math.floor(random() * pool.length), pool.length - 1)];
+  return pool[Math.floor(random() * pool.length)];
 }

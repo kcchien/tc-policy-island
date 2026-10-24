@@ -305,7 +305,8 @@ function startApp(vm, state, initialView) {
     return true;
   };
 
-  const openCard = (areaId, policyId) => {
+  // unfiltered：卡片內不帶入全站篩選（隨機一題用，三欄照常顯示全部政見）。
+  const openCard = (areaId, policyId, { unfiltered = false } = {}) => {
     const row = vm.rows.find((r) => r.issueArea.id === areaId);
     if (!row) return false;
     candidateDialog.close();
@@ -314,7 +315,8 @@ function startApp(vm, state, initialView) {
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const show = () => card.open(row, vm, { focusPolicyId: policyId, filter: { query: state.query, district: state.district } });
+    const filter = unfiltered ? {} : { query: state.query, district: state.district };
+    const show = () => card.open(row, vm, { focusPolicyId: policyId, filter });
     if (view === 'island') {
       setPanelOpen(false);
       renderIslandPanel();
@@ -329,12 +331,13 @@ function startApp(vm, state, initialView) {
     return true;
   };
 
-  // 隨機一題：從全部議題區（不看篩選）均勻選一個開政見卡片，不與目前選中的議題區相同。
-  // 頁首按鈕與上手導覽共用。表格檢視先捲到該列；島嶼檢視由 openCard 等載入完成、飛到該區再開。
+  // 隨機一題：從全部議題區（不看篩選）均勻選一個開政見卡片，不與目前選中的議題區相同；卡片也不帶篩選。
+  // 頁首按鈕呼叫；上手導覽在 startApp 內直接呼叫或以回呼傳入（main.js 是入口，沒有 export）。
+  // 表格檢視先捲到該列（被篩掉時不捲）；島嶼檢視由 openCard 等載入完成、飛到該區再開。
   const openRandomArea = () => {
     const areaId = pickRandomArea(vm.rows, Math.random, selectedArea);
     if (view === 'table') scrollToTableRow(areaId);
-    return openCard(areaId, null);
+    return openCard(areaId, null, { unfiltered: true });
   };
 
   function setView(next) {

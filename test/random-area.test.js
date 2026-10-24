@@ -64,12 +64,14 @@ test('大量抽樣時各議題區次數接近均勻，不依政見數量加權�
   }
 });
 
-test('篩選後仍從全部議題區抽：傳入完整檢視模型的 rows，篩選掉的議題區照樣抽得到', () => {
+// 篩選只影響畫面，隨機一題的呼叫端（main.js）傳未篩選的 rows；這裡確認篩選掉的議題區在完整 rows 中照樣抽得到。
+test('篩選後仍從全部議題區抽：被篩選掉的議題區照樣抽得到', () => {
   const vm = sampleViewModel();
-  const filtered = filterViewModel(vm, { query: '', district: '大里區' });
-  assert.ok(filtered.rows.length < vm.rows.length);
+  const kept = new Set(filterViewModel(vm, { query: '', district: '大里區' }).rows.map((row) => row.issueArea.id));
+  const removed = vm.rows.map((row) => row.issueArea.id).filter((id) => !kept.has(id));
+  assert.ok(removed.length > 0);
   const counts = tally(vm.rows, 3000, { chained: true });
-  assert.ok(Object.values(counts).every((count) => count > 0));
+  for (const id of removed) assert.ok(counts[id] > 900, `${id} 抽到 ${counts[id]} 次`);
 });
 
 test('只有一個議題區時，連續兩次都抽到它', () => {

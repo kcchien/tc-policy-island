@@ -58,7 +58,7 @@ js/island-list.js  js/ui-text.js  js/dom.js
 
 ### 隨機一題
 
-`main.js` 的 `openRandomArea()`，頁首按鈕與上手導覽共用：以 `random-area.js` 的 `pickRandomArea(vm.rows, random, previousId)` 從未篩選的全部議題區均勻選一個（排除目前選中的議題區），再走 `openCard(areaId, null)`。表格檢視先捲到該列；島嶼檢視等載入完成、飛到該區再開卡。
+`main.js` 的 `openRandomArea()`，`startApp` 內的函式（`main.js` 是入口，沒有 export），頁首按鈕呼叫，其他流程在 `startApp` 內直接呼叫或以回呼傳入：以 `random-area.js` 的 `pickRandomArea(vm.rows, random, previousId)` 從未篩選的全部議題區均勻選一個（排除目前選中的議題區），再走 `openCard(areaId, null, { unfiltered: true })`，卡片不帶入全站篩選。表格檢視先捲到該列；島嶼檢視等載入完成、飛到該區再開卡。
 
 ## site/js：島嶼檢視
 
