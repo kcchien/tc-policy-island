@@ -1,10 +1,24 @@
 // 表格檢視：議題區 × 候選人。只讀檢視模型（可為 filterViewModel 篩選後的版本），不直接碰公開資料集。
 // 800px 以下由 CSS 改為單欄，所以每個元素明確標上 ARIA 表格角色，避免 display 改變後失去表格語意。
 // 每格的候選人名稱只在單欄時顯示，對螢幕閱讀器隱藏（欄標題已提供）。
+// 定位議題列時量測實際固定欄頭，換行與文字縮放後也保留足夠空間；窄版不計隱藏欄頭。
 
 import { el } from './dom.js';
 import { NO_MATCH_TEXT, rawPolicyItemsText, TABLE_TEXT as T } from './ui-text.js';
 import { seenMark } from './reading-progress.js';
+
+export function scrollToTableRow(container, areaId) {
+  const row = [...container.querySelectorAll('.area-row')].find((node) => node.id === `area-${areaId}`);
+  if (!row) return;
+  const head = container.querySelector('thead');
+  const stickyHeads = head && getComputedStyle(head).position !== 'absolute'
+    ? [...head.querySelectorAll('th')].filter((node) => getComputedStyle(node).position === 'sticky')
+    : [];
+  const height = Math.max(0, ...stickyHeads.map((node) => node.getBoundingClientRect().height));
+  row.style.scrollMarginTop = `${Math.ceil(height)}px`;
+  // auto 遵循頁面樣式；減少動態時既有 CSS 會關閉平滑捲動。
+  row.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
 
 function candidateButton(candidate, label, onOpenCandidate) {
   const button = el('button', { type: 'button', class: 'area-open candidate-open' }, label);
@@ -50,7 +64,7 @@ function policyCell(cell, candidate, { noPolicyText, openPolicy }) {
       'ul',
       { class: 'policy-list' },
       cell.policies.map((policy) => {
-        const button = el('button', { type: 'button', class: 'policy-chip' }, el('span', { class: 'chip-summary' }, policy.summary));
+        const button = el('button', { type: 'button', class: 'policy-chip', 'data-policy': policy.id }, el('span', { class: 'chip-summary' }, policy.summary));
         if (policy.districts.length > 0) {
           button.append(el('span', { class: 'chip-districts' }, T.districts(policy.districts)));
         }

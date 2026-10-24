@@ -79,6 +79,13 @@ export const POLICY_CARD_TEXT = {
   areaLink: '這個議題區的連結',
   policyLink: '這筆政見的連結',
   areaDescription: (description, departments) => `${description}（對應局處：${departments.join('、')}）`,
+  description: '議題說明',
+  filters: '篩選政見',
+  clearFilters: '清除篩選',
+  filterSummary({ query, district, conflictOnly }) {
+    const conditions = [query.trim(), district, conflictOnly && FILTER_TEXT.conflictOnly].filter(Boolean);
+    return conditions.length > 0 ? `篩選：${conditions.join('／')}` : '篩選政見';
+  },
   conflict: '出處說法不一：',
   conflictFlag: '出處說法不一',
   districts: '適用行政區',

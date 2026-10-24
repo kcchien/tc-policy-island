@@ -61,6 +61,12 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js  js/election-schedule.js
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 
+### 政見卡片的閱讀與表格定位
+
+`policy-card.js` 的手機抽屜每次初次開啟預設全高，手動半高與關閉沿用 `sheet.js`，不改候選人資料卡的預設高度。長說明與篩選放在原生 `details`；篩選收合時，`summary` 仍列出啟用條件，清除按鈕留在外面。手機三人分頁共用內容捲動區，上下題在捲動區之外；半高或文字放大使控制項過高時，卡片外層也可捲動，不截斷內容。各開卡入口沿用同一個 `openCard`，人物抵達的等待流程不變。
+
+`main.js` 記錄開卡入口，首次閱讀更新紀錄並重畫表格或索引後，關閉卡片時用議題區識別碼與政見按鈕的 `data-policy` 找回焦點。`table-view.js` 的 `scrollToTableRow(container, areaId)` 在每次定位時量測實際固定欄頭高度，設定目標列的捲動留白；窄版隱藏欄頭時不保留高度，文字換行與縮放後重新量測，不使用單一固定偏移。
+
 ### 隨機一題
 
 `main.js` 的 `openRandomArea()`，`startApp` 內的函式（`main.js` 是入口，沒有 export），頁首按鈕呼叫，其他流程在 `startApp` 內直接呼叫或以回呼傳入：以 `random-area.js` 的 `pickRandomArea(vm.rows, random, previousId)` 從未篩選的全部議題區均勻選一個（排除目前選中的議題區），再走 `openCard(areaId, null, { unfiltered: true })`，卡片不帶入全站篩選。表格檢視先捲到該列；島嶼檢視等載入完成、飛到該區再開卡。
