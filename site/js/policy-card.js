@@ -2,10 +2,13 @@
 // 桌面島嶼檢視停靠在畫布下方、可一鍵放大成全高；800px 以下由 CSS 改為可拖成三段的底部抽屜（sheet.js），
 // 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，
 // 點開才顯示原文引述、出處與核對紀錄。欄內篩選用 filter.js 的 policyMatcher。畫面文字取自 ui-text.js。
+// 遮名閱讀（blind-reading.js）：讀者按下才開啟，三欄的姓名、政黨、政見筆數、資料狀態與出處標題同時遮住、
+// 順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
 import { policyMatcher } from './filter.js';
+import { maskedColumnLabel, revealedIndex, shuffleColumns } from './blind-reading.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 import {
   candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
@@ -42,7 +45,8 @@ export const sourceLinks = (source) => [
   source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.archive),
 ];
 
-function quoteBlock(quote) {
+// masked 表示遮名閱讀中：出處標題常含候選人姓名，跟著姓名一起遮住，來源類型與連結照常顯示。
+function quoteBlock(quote, masked) {
   const { source } = quote;
   return el(
     'figure',
@@ -52,14 +56,14 @@ function quoteBlock(quote) {
       'figcaption',
       { class: 'quote-source' },
       el('span', { class: 'source-type' }, source.sourceTypeName),
-      el('span', {}, SOURCE_TEXT.titleWithDate(source.title, source.retrievedAt)),
+      !masked && el('span', {}, SOURCE_TEXT.titleWithDate(source.title, source.retrievedAt)),
       el('span', { class: 'source-links' }, sourceLinks(source)),
     ),
   );
 }
 
 // 一筆政見：摘要列（摘要、適用行政區、出處說法不一的提示）可點開，展開後才是原文引述、出處與核對紀錄。
-function policyArticle(policy, { focused, open }) {
+function policyArticle(policy, { focused, open, masked }) {
   const districts = policy.districts.length > 0 ? policy.districts.join('、') : T.noDistricts;
   return el(
     'article',
@@ -82,7 +86,7 @@ function policyArticle(policy, { focused, open }) {
         'div',
         { class: 'policy-more' },
         policy.conflictNote && el('p', { class: 'conflict-note' }, el('strong', {}, T.conflict), policy.conflictNote),
-        ...policy.quotes.map(quoteBlock),
+        ...policy.quotes.map((quote) => quoteBlock(quote, masked)),
         el(
           'dl',
           { class: 'policy-facts' },
@@ -97,7 +101,8 @@ function policyArticle(policy, { focused, open }) {
 
 // 一欄：欄頭（姓名、政黨、筆數）固定在欄頂，下面是資料狀態與政見。policies 是篩選後的政見。
 // openIds 是重畫前已展開的政見，篩選時保留；tabbed 表示手機分頁模式（欄位才是分頁面板）。
-function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, openIds, active, index, tabbed }) {
+// masked 是遮名閱讀中這一欄的代號（不遮名時為 null）：欄頭改成代號與同一句說明，三欄欄頭同高。
+function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, openIds, active, index, tabbed, masked }) {
   let empty = null;
   if (cell.policies.length === 0) empty = vm.noPolicyText;
   else if (policies.length === 0) empty = NO_MATCH_TEXT;
@@ -108,22 +113,26 @@ function candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId
       id: `card-column-${index}`,
       role: tabbed ? 'tabpanel' : null,
       'aria-labelledby': tabbed ? `card-tab-${index}` : null,
-      'aria-label': tabbed ? null : candidate.name,
+      'aria-label': tabbed ? null : (masked ? T.maskedName(masked) : candidate.name),
     },
     el(
       'header',
       { class: 'card-column-head' },
-      el('h3', { class: 'candidate-name' }, candidate.name),
-      el('p', { class: 'candidate-meta' }, candidate.party),
-      el('p', { class: 'candidate-meta' }, candidateCountText(cell.policies.length, candidate.rawPolicyItems)),
+      el('h3', { class: 'candidate-name' }, masked ? T.maskedName(masked) : candidate.name),
+      masked
+        ? el('p', { class: 'candidate-meta' }, T.maskedNote)
+        : [
+          el('p', { class: 'candidate-meta' }, candidate.party),
+          el('p', { class: 'candidate-meta' }, candidateCountText(cell.policies.length, candidate.rawPolicyItems)),
+        ],
       matcher.active && el('p', { class: 'candidate-meta candidate-match' }, T.columnMatch(policies.length)),
     ),
-    // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。
-    candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
+    // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。遮名時跟著姓名一起遮住。
+    !masked && candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
     empty
       ? el('p', { class: 'no-policy' }, empty)
       : el('div', { class: 'policy-stack' }, policies.map((policy) =>
-        policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id) }))),
+        policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id), masked }))),
   );
 }
 
@@ -139,6 +148,8 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   // 這兩顆按鈕的文字說明按下後的動作（放大／縮小、展開／收合），不另標按下狀態。
   const heightButton = el('button', { type: 'button', class: 'card-height' }, T.enlarge);
   const expandButton = el('button', { type: 'button', class: 'card-expand' }, T.expandAll);
+  // 遮名閱讀的開關：未遮名時寫「先遮住名字」，遮名中寫「揭曉」，同樣以文字說明按下後的動作。
+  const blindButton = el('button', { type: 'button', class: 'card-blind', title: T.blindHint }, T.blindOn);
   const shareLink = el('a', { class: 'card-share' }, T.areaLink);
   const search = el('input', { id: 'card-search', type: 'search', autocomplete: 'off', placeholder: T.searchPlaceholder });
   const district = el(
@@ -154,6 +165,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     // 欄位名稱只給輔助科技讀，畫面上用提示文字與預設選項說明，省下卡片高度。
     el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, T.searchLabel), search),
     el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, T.districts), district),
+    blindButton,
     expandButton,
   );
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
@@ -183,12 +195,21 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       body,
     ),
   );
-  bindSheetDialog(dialog, { handle, closeButton, onClose });
+  bindSheetDialog(dialog, {
+    handle,
+    closeButton,
+    onClose: () => {
+      setBlind(null);
+      onClose();
+    },
+  });
 
   // 目前顯示的議題區與狀態。expanded 是「全部展開」，active 是手機分頁目前的候選人（依排序規則的位置）。
   let current = null;
   let expanded = false;
   let active = 0;
+  // 遮名閱讀中的欄位順序（畫面位置 → 排序規則的位置），不遮名時為 null。
+  let order = null;
   // 與 main.css 的手機斷點相同：800px 以下三欄改為分頁。在函式內讀，Node 載入本模組時不碰 window。
   const tabbedQuery = window.matchMedia('(max-width: 800px)');
   tabbedQuery.addEventListener('change', () => {
@@ -211,17 +232,19 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     // 重畫前讀者自己點開的政見，重畫後照樣展開。
     const openIds = new Set([...body.querySelectorAll('.policy-details[open]')].map((d) => d.closest('.policy').id.slice('card-policy-'.length)));
     const tabbed = tabbedQuery.matches;
-    const columns = vm.candidates.map((candidate) => {
+    const ruleOrder = vm.candidates.map((candidate) => {
       const cell = row.cells.find((c) => c.candidateId === candidate.id);
       return { candidate, cell, policies: cell.policies.filter(matcher.matches) };
     });
-    // 分頁：三位候選人同尺寸、依排序規則排列，只放姓名。
+    const columns = order ? order.map((i) => ruleOrder[i]) : ruleOrder;
+    const masked = (index) => (order ? maskedColumnLabel(index) : null);
+    // 分頁：三位候選人同尺寸、依排序規則排列，只放姓名；遮名時改放代號。
     tabs.replaceChildren(
       ...columns.map(({ candidate }, index) => {
         const tab = el(
           'button',
           { type: 'button', class: 'card-tab', role: 'tab', id: `card-tab-${index}`, 'aria-controls': `card-column-${index}` },
-          candidate.name,
+          order ? T.maskedName(masked(index)) : candidate.name,
         );
         tab.addEventListener('click', () => selectTab(index));
         tab.addEventListener('keydown', (event) => {
@@ -233,7 +256,9 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     );
     body.replaceChildren(
       ...columns.map(({ candidate, cell, policies }, index) =>
-        candidateColumn(candidate, cell, policies, { vm, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed })),
+        candidateColumn(candidate, cell, policies, {
+          vm, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed, masked: masked(index),
+        })),
     );
     selectTab(active);
     filterStatus.textContent = T.filterStatus({
@@ -248,6 +273,20 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     for (const details of body.querySelectorAll('.policy-details')) details.open = next;
   };
   expandButton.addEventListener('click', () => setExpanded(!expanded));
+
+  // 遮名閱讀：next 是新的欄位順序，null 為揭曉。揭曉時用同一張卡片重畫，手機分頁停在同一位候選人。
+  const setBlind = (next) => {
+    active = next ? 0 : revealedIndex(order, active);
+    order = next;
+    dialog.dataset.blind = next ? 'on' : 'off';
+    blindButton.textContent = next ? T.reveal : T.blindOn;
+  };
+  const shuffledOrder = () => shuffleColumns(current.vm.candidates.map((_, i) => i));
+  blindButton.addEventListener('click', () => {
+    if (!current) return;
+    setBlind(order ? null : shuffledOrder());
+    render();
+  });
 
   // 桌面島嶼檢視的卡片高度：接近全高（預設），或縮小停靠在下方、上方露出島。
   const setTall = (tall) => {
@@ -276,6 +315,9 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       title.textContent = issueArea.name;
       description.textContent = T.areaDescription(issueArea.description, issueArea.departments);
       shareLink.setAttribute('href', areaHref(issueArea.id));
+      // 卡片原本沒開時一律從不遮名開始；遮名中換議題區時重新打亂。
+      if (!dialog.open) setBlind(null);
+      else if (order && !sameArea) setBlind(shuffledOrder());
       if (!sameArea) {
         search.value = filter.query ?? '';
         district.value = TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
@@ -292,7 +334,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       const focusIndex = focusPolicyId
         ? vm.candidates.findIndex((c) => row.cells.find((cell) => cell.candidateId === c.id).policies.some((p) => p.id === focusPolicyId))
         : -1;
-      if (focusIndex >= 0) active = focusIndex;
+      if (focusIndex >= 0) active = order ? order.indexOf(focusIndex) : focusIndex;
       render({ focusPolicyId });
       if (!dialog.open) {
         dialog.dataset.snap = 'half';
