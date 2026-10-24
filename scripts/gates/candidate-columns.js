@@ -1,3 +1,5 @@
+// 上線關卡：三位候選人欄位齊全，且依排序規則（筆畫或號次）排列。
+
 import { CANDIDATE_ORDER_RULES, orderCandidates } from '../../site/js/dataset.js';
 import { buildViewModel } from '../../site/js/view-model.js';
 

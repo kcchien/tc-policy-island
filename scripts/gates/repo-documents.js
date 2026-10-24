@@ -1,3 +1,5 @@
+// 上線關卡「引用 repo 文件」：整理方法頁照原文公開的檔案要與 repo 檔案逐字相同。
+
 import { readFileSync } from 'node:fs';
 import { REPO_DOCUMENTS, repoDocumentByPath, repoFileSitePath } from '../../site/js/repo-documents.js';
 

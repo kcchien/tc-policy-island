@@ -1,3 +1,5 @@
+// 上線關卡：公開的候選人資料欄位固定、三人一致，並通過逐字比對。
+
 import { dirname } from 'node:path';
 import { SNAPSHOT_DIR, snapshotFileName } from '../../site/js/view-model.js';
 import { checkProfileLayer1 } from '../lib/verification.js';

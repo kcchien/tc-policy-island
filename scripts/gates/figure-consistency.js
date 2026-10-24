@@ -1,3 +1,5 @@
+// 上線關卡「人物一致」：載入網站目錄裡的 island-plaza.js，檢查三位候選人人物外觀相同（ADR 0001）。
+
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

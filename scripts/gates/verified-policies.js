@@ -1,3 +1,5 @@
+// 上線關卡：公開資料集的每一筆政見都通過兩層核對（ADR 0002）。
+
 import { isVerified } from '../../site/js/dataset.js';
 
 export default {

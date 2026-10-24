@@ -1,3 +1,6 @@
+// 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）。
+// 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
+
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 import { buildViewModel } from './view-model.js';
 import { filterViewModel } from './filter.js';

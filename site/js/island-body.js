@@ -1,5 +1,6 @@
 // 島體配置：分離的六角小島、島間水道、拱橋、步道環與行人路網。只做計算，不碰 three.js，瀏覽器與 Node 共用，
 // 不 import 其他模組（island-layout.js 從這裡取島的尺寸）。畫成 3D 在 island-body-view.js。
+// 拱橋每對相鄰島一座，接步道環邊中點；另有外圈環線（outerLoop）、每島六盞路燈與島上位置 TILE_SLOTS。
 // 島體每格相同，只看格子的位置，不讀政見（ADR 0001）。
 
 // 每格是一座尖頂六角小島（頂點朝南北）。ISLAND_RADIUS 是島頂面的外接半徑；相鄰兩島的對邊之間隔 CHANNEL_WIDTH 的水道。

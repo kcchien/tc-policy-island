@@ -1,3 +1,5 @@
+// 關卡讀取建置後網站目錄的入口（openSite）：site.dataset()、site.files()、site.readText(path)。
+
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 

@@ -1,7 +1,7 @@
 // 島體的 3D 場景：每座小島的頂面（程序地面貼圖）、側壁、頂緣圖案帶、步道環、路緣（路燈在 island-decor-view.js），
 // 島外的淺水環與泡沫環，以及相鄰島之間的拱橋。配置來自 island-body.js（只看格子位置，不讀政見）。
 // 靜態零件用零件庫的共用幾何，放進格子群組（選取抬高時跟著動），之後由 instancify 合批；
-// 側壁用水面材質、淺水與泡沫環半透明，這三種自己建 InstancedMesh。
+// 側壁用水面材質、淺水與泡沫環半透明，這三種自己建 InstancedMesh。paint 與 setLift 給選取用。
 
 import * as THREE from 'three';
 import {

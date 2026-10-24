@@ -1,3 +1,5 @@
+// 上線關卡「受眾文案」：給市民看的整理者文字不得外漏內部細節，判斷規則在 scripts/lib/audience-text.js。
+
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { htmlScreenText, internalDetails, stringLiterals } from '../lib/audience-text.js';

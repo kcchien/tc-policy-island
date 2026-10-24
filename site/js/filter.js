@@ -1,4 +1,4 @@
-// 搜尋與行政區篩選：檢視模型 → 只含符合條件政見的檢視模型。表格檢視與島嶼檢視共用。
+// 搜尋與行政區篩選（filterViewModel）：檢視模型 → 只含符合條件政見的檢視模型。表格檢視與島嶼檢視共用。
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';

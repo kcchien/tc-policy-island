@@ -1,3 +1,5 @@
+// 上線關卡清單 GATES 與執行入口。新增關卡時加進 GATES，並在 test/gates.test.js 驗證擋下與放行。
+
 import { openSite } from './site.js';
 import datasetStructure from './dataset-structure.js';
 import verifiedPolicies from './verified-policies.js';

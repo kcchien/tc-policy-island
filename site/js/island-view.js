@@ -1,5 +1,6 @@
 // 島嶼檢視：把島嶼配置畫成 3D 場景。只讀檢視模型（經 island-layout.js），不直接碰公開資料集。
 // 由 main.js 以動態 import 載入，不支援 WebGL 的裝置不會下載 three.js。
+// 控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）。
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';

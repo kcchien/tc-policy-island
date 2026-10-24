@@ -1,3 +1,5 @@
+// 上線關卡「品牌用語掃描」：整理者撰寫的文字不得出現 data/rules/brand-terms.json 的品牌用語與陣營高頻詞。
+
 import { createScanner, loadBrandTerms, TIER_NAMES, TIERS } from '../lib/brand-terms.js';
 import { DATASET_PATH, THIRD_PARTY } from './site.js';
 import { isVerbatimRepoFile } from './repo-documents.js';

@@ -1,5 +1,5 @@
 // 背景音樂的音色：全部用 Web Audio 的振盪器、濾波器與程式產生的雜訊即時合成，不用任何音檔。
-// 可用於一般與離線（OfflineAudioContext）的音訊環境。樂曲在 bgm-score.js。
+// 可用於一般與離線（OfflineAudioContext）的音訊環境。樂曲在 bgm-score.js。上線關卡「不載入音檔」檢查網站沒有音檔。
 
 import { midiToFrequency } from './bgm-score.js';
 

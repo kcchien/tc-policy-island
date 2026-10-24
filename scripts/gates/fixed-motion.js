@@ -1,3 +1,5 @@
+// 上線關卡「動態數量固定」：載入網站目錄裡的 island-motion.js，換幾種政見資料重算，每個議題區格子的動態都要相同。
+
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { buildViewModel } from '../../site/js/view-model.js';
