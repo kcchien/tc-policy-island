@@ -3,7 +3,7 @@
 // 三位候選人改為同尺寸的分頁切換。三欄各自捲動，欄頭固定在欄頂；每筆政見預設只顯示摘要與適用行政區，
 // 點開才顯示原文引述、出處與核對紀錄。欄內篩選用 filter.js 的 policyMatcher。畫面文字取自 ui-text.js。
 // 遮名閱讀（blind-reading.js）：讀者按下才開啟，三欄的姓名、政黨、政見筆數、資料狀態與出處標題同時遮住、
-// 順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
+// 帶得出候選人的政見連結、複製鈕與市民補件連結先不放，順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（瀏覽器內建語音，一次一筆，
 // 換議題區或關卡片即停止）。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
 
@@ -98,11 +98,12 @@ function policyArticle(policy, { focused, open, masked, canSpeak }) {
           el('dd', {}, el('span', { class: 'verification-line' }, verificationText(policy.verification))),
         ),
         // 連結、複製、朗讀同一列；按鈕的動作由卡片控制器以事件委派處理，沒有語音功能時不放朗讀鈕。
+        // 遮名時不放政見連結與複製：連結網址與複製文字都帶得出候選人，揭曉後恢復。
         el(
           'div',
           { class: 'policy-actions' },
-          el('a', { class: 'policy-link', href: policyHref(policy.id) }, T.policyLink),
-          el('button', { type: 'button', class: 'policy-action', 'data-action': 'copy', 'data-policy': policy.id, title: T.copyHint }, T.copy),
+          !masked && el('a', { class: 'policy-link', href: policyHref(policy.id) }, T.policyLink),
+          !masked && el('button', { type: 'button', class: 'policy-action', 'data-action': 'copy', 'data-policy': policy.id, title: T.copyHint }, T.copy),
           canSpeak && el('button', { type: 'button', class: 'policy-action', 'data-action': 'speak', 'data-policy': policy.id, title: T.speakHint }, T.speak),
           el('span', { class: 'policy-action-status', role: 'status' }),
         ),
@@ -120,6 +121,7 @@ function candidateColumn(candidate, cell, policies, {
   let empty = null;
   if (cell.policies.length === 0) empty = vm.noPolicyText;
   else if (policies.length === 0) empty = NO_MATCH_TEXT;
+  const shownName = masked ? T.maskedName(masked) : candidate.name;
   return el(
     'section',
     {
@@ -127,12 +129,12 @@ function candidateColumn(candidate, cell, policies, {
       id: `card-column-${index}`,
       role: tabbed ? 'tabpanel' : null,
       'aria-labelledby': tabbed ? `card-tab-${index}` : null,
-      'aria-label': tabbed ? null : (masked ? T.maskedName(masked) : candidate.name),
+      'aria-label': tabbed ? null : shownName,
     },
     el(
       'header',
       { class: 'card-column-head' },
-      el('h3', { class: 'candidate-name' }, masked ? T.maskedName(masked) : candidate.name),
+      el('h3', { class: 'candidate-name' }, shownName),
       masked
         ? el('p', { class: 'candidate-meta' }, T.maskedNote)
         : [
@@ -145,7 +147,8 @@ function candidateColumn(candidate, cell, policies, {
     !masked && candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
     empty && el('p', { class: 'no-policy' }, empty),
     // 市民補件：這一欄在本議題區完全沒有政見時（不是篩選後才沒有），三欄同一句、同一位置。
-    cell.policies.length === 0 && el(
+    // 回報網址帶候選人姓名，遮名時不放，揭曉後恢復。
+    !masked && cell.policies.length === 0 && el(
       'a',
       {
         class: 'source-report',
