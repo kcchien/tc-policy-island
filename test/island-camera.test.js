@@ -4,7 +4,8 @@ import { buildPublicDataset } from '../site/js/dataset.js';
 import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout, islandPoints, projectedBox } from '../site/js/island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, FILL, FLIGHT_MS, flightDuration, homeView, isDrag,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, createTapTracker, FILL, FLIGHT_MS, flightDuration, homeView,
+  isDrag,
 } from '../site/js/island-camera.js';
 import { makeRaw } from './fixtures/make-raw.js';
 
@@ -80,6 +81,49 @@ test('按下後移動超過 6 像素算拖曳，在範圍內算點選', () => {
   assert.equal(isDrag(down, { x: 104, y: 103 }), false);
   assert.equal(isDrag(down, { x: 105, y: 105 }), true);
   assert.equal(isDrag(null, { x: 300, y: 300 }), false);
+});
+
+test('點選判斷：原地按下放開算點選，拖曳平移不算，拖遠再拖回原處放開也不算', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 103, y: 102 });
+  assert.equal(taps.up(1, { x: 103, y: 102 }), true);
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 160, y: 120 });
+  assert.equal(taps.up(1, { x: 160, y: 120 }), false);
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.move(1, { x: 200, y: 100 });
+  taps.move(1, { x: 101, y: 100 });
+  assert.equal(taps.up(1, { x: 101, y: 100 }), false);
+});
+
+test('點選判斷：兩指操作（縮放或旋轉）整次不算點選，手指全放開後重新計算；取消的指標不算點選', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 100, y: 100 });
+  taps.down(2, { x: 200, y: 200 });
+  assert.equal(taps.up(2, { x: 200, y: 200 }), false);
+  assert.equal(taps.up(1, { x: 100, y: 100 }), false);
+
+  taps.down(3, { x: 50, y: 50 });
+  assert.equal(taps.up(3, { x: 50, y: 50 }), true);
+
+  taps.down(4, { x: 50, y: 50 });
+  taps.cancel(4);
+  assert.equal(taps.up(4, { x: 50, y: 50 }), false);
+});
+
+test('點選判斷：拖曳超過門檻或第二指按下時回報開始操作（取消鏡頭飛行用）', () => {
+  const taps = createTapTracker();
+
+  taps.down(1, { x: 0, y: 0 });
+  assert.equal(taps.move(1, { x: 3, y: 0 }), false);
+  assert.equal(taps.move(1, { x: 30, y: 0 }), true);
+  assert.equal(taps.down(2, { x: 80, y: 0 }), true);
+  assert.equal(taps.move(7, { x: 80, y: 80 }), false);
 });
 
 test('卡片遮住的範圍：停靠在下方的卡片算下緣被遮住，保留面積最大的那一側', () => {

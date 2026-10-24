@@ -1,4 +1,4 @@
-// 島嶼檢視的鏡頭：飛行（1.15 秒、依經過時間、拖曳取消）、拖曳判斷、卡片遮住範圍造成的畫面偏移與平滑、
+// 島嶼檢視的鏡頭：飛行（1.15 秒、依經過時間、拖曳取消）、點選與拖曳的判斷（createTapTracker）、卡片遮住範圍造成的畫面偏移與平滑、
 // 預設視角（直式畫面較低俯角並另轉方位角）。
 // 只做計算，不碰 three.js 與 DOM，瀏覽器與 Node 共用。
 
@@ -6,7 +6,7 @@ import { easeInOut, frameIsland } from './island-layout.js';
 
 // 飛到議題區的時間（毫秒）。
 export const FLIGHT_MS = 1150;
-// 按下後移動超過這個像素數算拖曳（旋轉、縮放），在範圍內算點選。
+// 按下後移動超過這個像素數算拖曳（平移、旋轉），在範圍內算點選。
 export const DRAG_SLOP = 6;
 // 畫面偏移跟上卡片的速度：每幀走 1 - e^(-dt·rate) 的距離。
 const OFFSET_RATE = 6;
@@ -69,6 +69,38 @@ export const flightDuration = ({ reducedMotion }) => (reducedMotion ? 0 : FLIGHT
 
 export function isDrag(down, point, slop = DRAG_SLOP) {
   return Boolean(down) && Math.hypot(point.x - down.x, point.y - down.y) > slop;
+}
+
+// 點選與拖曳分開：依指標識別碼記每根手指按下的位置。按下後曾移動超過 DRAG_SLOP（拖曳平移或旋轉，
+// 即使拖回原處才放開）、或同時有兩指以上（縮放、旋轉）的那一次都不算點選；手指全放開後重新計算。
+// down 與 move 在開始拖曳或多指時回傳 true（取消鏡頭飛行用），up 回傳這次放開算不算點選。
+export function createTapTracker(slop = DRAG_SLOP) {
+  const downs = new Map();
+  let multiTouch = false;
+  const release = (id) => {
+    downs.delete(id);
+    if (downs.size === 0) multiTouch = false;
+  };
+  return {
+    down(id, point) {
+      downs.set(id, { ...point, dragged: false });
+      if (downs.size > 1) multiTouch = true;
+      return multiTouch;
+    },
+    move(id, point) {
+      const down = downs.get(id);
+      if (!down || down.dragged || !isDrag(down, point, slop)) return false;
+      down.dragged = true;
+      return true;
+    },
+    up(id, point) {
+      const down = downs.get(id);
+      const tap = Boolean(down) && !multiTouch && !down.dragged && !isDrag(down, point, slop);
+      release(id);
+      return tap;
+    },
+    cancel: release,
+  };
 }
 
 const ZERO = { top: 0, right: 0, bottom: 0, left: 0 };

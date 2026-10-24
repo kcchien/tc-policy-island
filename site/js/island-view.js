@@ -7,9 +7,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, islandLayout, islandPoints, orbitCenter, viewOffset } from './island-layout.js';
+import { cameraLimits, clampTarget, islandLayout, islandPoints, orbitCenter, viewOffset } from './island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, flightDuration, homeView, isDrag, sameInsets,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, createTapTracker, flightDuration, homeView, sameInsets,
 } from './island-camera.js';
 import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
@@ -209,6 +209,14 @@ export function createIslandView(stage, {
   controls.dampingFactor = 0.08;
   controls.rotateSpeed = 0.6;
   controls.zoomSpeed = 0.8;
+  // 操作照一般地圖：左鍵拖曳平移、右鍵（或按住 Ctrl、Shift 拖曳）旋轉、滾輪縮放；觸控一指平移、兩指縮放與旋轉。
+  // 平移沿島面（cameraLimits 的 screenSpacePanning），旋轉中心每幀夾在島內（clampToIsland）。
+  controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+  controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+  // 方向鍵平移（按住 Ctrl、Shift 旋轉）只在焦點在畫布時生效。畫布不進 Tab 順序（對輔助科技隱藏，
+  // 議題區由索引面板提供），點過畫布後才有焦點。
+  renderer.domElement.tabIndex = -1;
+  controls.listenToKeyEvents(renderer.domElement);
 
   let renderPending = false;
   const flight = createCameraFlight();
@@ -221,22 +229,43 @@ export function createIslandView(stage, {
   let lastFrame = null;
   // 最近一次飛往的議題區格心；還沒飛過時是 null，旋轉中心就是預設視角的中心。
   let focus = null;
-  // 使用者縮遠時把旋轉中心移回預設視角的中心（orbitCenter），鏡頭與中心一起平移，視角不變。
+  // 讀者自己平移過就是 true：不再自動把旋轉中心拉回島中心，直到下一次飛往議題區或回到全景。
+  // settledTarget 是上一次由本模組擺好鏡頭後的旋轉中心；之後若變了而且不是在飛行，就是讀者平移。
+  let panned = false;
+  const settledTarget = new THREE.Vector3();
+  const noticePan = () => {
+    if (!flight.active && !controls.target.equals(settledTarget)) panned = true;
+  };
+  // 鏡頭與旋轉中心一起水平移動 (dx, dz)，視角不變。
+  const shiftView = (dx, dz) => {
+    controls.target.x += dx;
+    controls.target.z += dz;
+    camera.position.x += dx;
+    camera.position.z += dz;
+  };
+  // 使用者縮遠時把旋轉中心移回預設視角的中心（orbitCenter），鏡頭與中心一起平移，視角不變。讀者平移過就不拉回。
   const recenter = () => {
-    if (!home) return;
+    if (!home || panned) return;
     const distance = camera.position.distanceTo(controls.target);
     const near = Math.min(FOCUS_DISTANCE, home.distance);
     const c = orbitCenter(focus ?? home.target, home.target, distance, { near, far: Math.max(home.distance, near + 1) });
-    const delta = new THREE.Vector3(c.x - controls.target.x, 0, c.z - controls.target.z);
-    if (delta.lengthSq() < 1e-8) return;
-    controls.target.add(delta);
-    camera.position.add(delta);
+    const [dx, dz] = [c.x - controls.target.x, c.z - controls.target.z];
+    if (dx * dx + dz * dz < 1e-8) return;
+    shiftView(dx, dz);
+  };
+  // 平移的邊界：旋轉中心超出島的範圍（clampTarget）就連同鏡頭拉回邊界上，島不會被拖出畫面。
+  const clampToIsland = () => {
+    const c = clampTarget(layout, controls.target);
+    shiftView(c.x - controls.target.x, c.z - controls.target.z);
   };
   const render = () => {
     renderPending = false;
     const now = performance.now();
     const dt = lastFrame === null ? 0 : Math.min(0.25, (now - lastFrame) / 1000);
     lastFrame = now;
+    // 讀者平移過：旋轉與縮放不改旋轉中心，只有平移會改。OrbitControls 在拖曳與按鍵的事件裡就直接移動，
+    // 慣性則在下面的 controls.update 裡移動，兩處都和上一幀結束時的旋轉中心比。
+    noticePan();
     const pose = flight.step(now);
     if (pose) {
       controls.target.copy(pose.target);
@@ -244,12 +273,16 @@ export function createIslandView(stage, {
     } else {
       recenter();
     }
+    settledTarget.copy(controls.target);
     const shifting = !sameInsets(shown, cover);
     if (shifting) {
       shown = approachInsets(shown, cover, dt, { reducedMotion: reducedMotion() });
       applyOffset();
     }
     const moving = controls.update();
+    noticePan();
+    if (panned) clampToIsland();
+    settledTarget.copy(controls.target);
     const { lighting, settled } = daylight.at(now);
     lastNight = lighting.night;
     environment.apply(lighting, renderer);
@@ -355,7 +388,7 @@ export function createIslandView(stage, {
   };
   controls.addEventListener('change', requestRender);
 
-  // 依畫面大小決定預設視角（島置中、占畫布約 80%）與距離限制。不能平移，鏡頭只繞著目前的議題區或預設中心轉。
+  // 依畫面大小決定預設視角（島置中、占畫布約 80%）與距離限制。平移的範圍由 clampToIsland 限制在島內。
   let home = null;
   // 投影中心移到沒被遮住的區域正中（浮動元件加上卡片）。只移投影中心，鏡頭位置與畫面縮放都不變。
   function applyOffset() {
@@ -398,6 +431,7 @@ export function createIslandView(stage, {
     controls.target.copy(target);
     camera.position.copy(target).add(new THREE.Vector3().setFromSphericalCoords(distance, polar, azimuth));
     camera.lookAt(target);
+    settledTarget.copy(target);
   }
 
   // 鏡頭飛到 target，距離為 distance；沒給 polar 與 azimuth 時保持目前的俯角與方位角。
@@ -411,6 +445,8 @@ export function createIslandView(stage, {
     spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
     const toPosition = target.clone().add(new THREE.Vector3().setFromSpherical(spherical));
     focus = { x: target.x, z: target.z };
+    // 飛往議題區或回到全景後，縮遠時旋轉中心又會回到島中心。
+    panned = false;
     touched = true;
     controls.enableDamping = !reducedMotion();
     // 飛行途中又選了別的議題區：新的飛行取代前一段，前一段抵達後的動作不再執行。
@@ -426,6 +462,7 @@ export function createIslandView(stage, {
       const pose = flight.step(performance.now());
       controls.target.copy(pose.target);
       camera.position.copy(pose.position);
+      settledTarget.copy(pose.target);
     }
     requestRender();
   }
@@ -572,23 +609,15 @@ export function createIslandView(stage, {
     hoverTip.style.top = `${hoverAt.y - rect.top}px`;
   };
 
-  // 依 pointerId 記每根手指按下的位置；同時有兩指以上（雙指縮放）就整次不算點選。
-  // 按下後移動超過門檻（拖曳旋轉）、雙指縮放或滾輪縮放都會取消鏡頭飛行。
-  const downs = new Map();
-  let multiTouch = false;
-  const release = (event) => {
-    downs.delete(event.pointerId);
-    if (downs.size === 0) multiTouch = false;
-  };
+  // 點選與拖曳分開（island-camera.js 的 createTapTracker）：拖曳平移或旋轉、兩指操作都不算點選。
+  // 按下後移動超過門檻、兩指操作或滾輪縮放都會取消鏡頭飛行。
+  const taps = createTapTracker();
+  const pointOf = (event) => ({ x: event.clientX, y: event.clientY });
   renderer.domElement.addEventListener('pointerdown', (event) => {
-    downs.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (downs.size > 1) {
-      multiTouch = true;
-      flight.cancel();
-    }
+    if (taps.down(event.pointerId, pointOf(event))) flight.cancel();
   });
   renderer.domElement.addEventListener('pointermove', (event) => {
-    if (isDrag(downs.get(event.pointerId), { x: event.clientX, y: event.clientY })) flight.cancel();
+    if (taps.move(event.pointerId, pointOf(event))) flight.cancel();
     if (event.pointerType !== 'mouse') return;
     // 拖曳中不顯示滑過。
     hoverAt = event.buttons === 0 ? { x: event.clientX, y: event.clientY } : null;
@@ -602,12 +631,9 @@ export function createIslandView(stage, {
     setHover(null);
   });
   renderer.domElement.addEventListener('wheel', () => flight.cancel(), { passive: true });
-  renderer.domElement.addEventListener('pointercancel', release);
+  renderer.domElement.addEventListener('pointercancel', (event) => taps.cancel(event.pointerId));
   renderer.domElement.addEventListener('pointerup', (event) => {
-    const down = downs.get(event.pointerId);
-    const isClick = down && !multiTouch && !isDrag(down, { x: event.clientX, y: event.clientY });
-    release(event);
-    if (!isClick) return;
+    if (!taps.up(event.pointerId, pointOf(event))) return;
     const target = targetAt(event.clientX, event.clientY);
     if (target?.areaId) onSelectArea(target.areaId);
     else if (target?.candidateId) onSelectCandidate?.(target.candidateId);

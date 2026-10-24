@@ -157,6 +157,30 @@ async function click(page, step, { touch }) {
   await page.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
 }
 
+// 拖曳分成 DRAG_MOVES 段移動，每段之間隔一格畫面的時間，頁面才會像真的拖曳一樣逐段收到移動事件。
+const DRAG_MOVES = 12;
+const DRAG_STEP_MS = 16;
+
+async function drag(page, { from, to }, { touch }) {
+  const at = (i) => ({ x: from.x + ((to.x - from.x) * i) / DRAG_MOVES, y: from.y + ((to.y - from.y) * i) / DRAG_MOVES });
+  if (touch) {
+    await page.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] });
+    for (let i = 1; i <= DRAG_MOVES; i++) {
+      await sleep(DRAG_STEP_MS);
+      await page.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [at(i)] });
+    }
+    await page.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    return;
+  }
+  await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...from });
+  await page.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...from, button: 'left', buttons: 1, clickCount: 1 });
+  for (let i = 1; i <= DRAG_MOVES; i++) {
+    await sleep(DRAG_STEP_MS);
+    await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...at(i), button: 'left', buttons: 1 });
+  }
+  await page.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...to, button: 'left', buttons: 0, clickCount: 1 });
+}
+
 async function runStep(page, step, { options, scenario }) {
   switch (step.type) {
     case 'ready':
@@ -175,6 +199,8 @@ async function runStep(page, step, { options, scenario }) {
     }
     case 'click':
       return click(page, step, { touch: scenario.metrics.touch });
+    case 'drag':
+      return drag(page, step, { touch: scenario.metrics.touch });
     case 'settle':
       await sleep(step.ms);
       return evaluate(page, framesExpression(step.frames));

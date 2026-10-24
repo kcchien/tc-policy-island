@@ -36,6 +36,7 @@ const OPTIONS = {
   q: { type: 'string' },
   district: { type: 'string' },
   click: { type: 'string', multiple: true, default: [] },
+  drag: { type: 'string', multiple: true, default: [] },
   wait: { type: 'string', default: '0' },
   out: { type: 'string' },
   url: { type: 'string' },
@@ -62,6 +63,24 @@ export function parseClick(text) {
   if (match) return { x: Number(match[1]), y: Number(match[2]) };
   if (text.trim() === '') throw new Error('--click 不能是空字串');
   return { selector: text };
+}
+
+// 拖曳：「x1,y1-x2,y2」是起點與終點的畫面座標（CSS 像素），只收座標。
+export function parseDrag(text) {
+  const number = '\\s*(\\d+(?:\\.\\d+)?)\\s*';
+  const match = text.match(new RegExp(`^${number},${number}-${number},${number}$`));
+  if (!match) throw new Error(`--drag 應為 x1,y1-x2,y2，實際為 ${text}`);
+  const [x1, y1, x2, y2] = match.slice(1).map(Number);
+  return { from: { x: x1, y: y1 }, to: { x: x2, y: y2 } };
+}
+
+// 操作（--click、--drag）依命令列上的順序排成一串。
+function actionsOf(tokens) {
+  return tokens
+    .filter((token) => token.kind === 'option' && (token.name === 'click' || token.name === 'drag'))
+    .map((token) => (token.name === 'click'
+      ? { type: 'click', ...parseClick(token.value) }
+      : { type: 'drag', ...parseDrag(token.value) }));
 }
 
 export const USAGE = formatUsage({
@@ -95,6 +114,7 @@ export const USAGE = formatUsage({
       title: '操作',
       rows: [
         ['--click <x,y 或 CSS 選擇器>', '點擊畫面座標或元素中心，可重複，依序執行'],
+        ['--drag <x1,y1-x2,y2>', '從起點拖到終點（滑鼠左鍵；手機用一指觸控），可重複，與 --click 依命令列順序執行'],
         ['--wait <毫秒>', '最後再多等的時間（預設 0）'],
       ],
     },
@@ -126,7 +146,7 @@ export const USAGE = formatUsage({
 // 沒有任何參數、或有 --help／-h 時回傳 { command: 'help' }。
 export function parseShootArgs(argv) {
   if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) return { command: 'help' };
-  const { values, positionals } = parseArgs({ args: argv, options: OPTIONS, allowPositionals: true });
+  const { values, positionals, tokens } = parseArgs({ args: argv, options: OPTIONS, allowPositionals: true, tokens: true });
   if (positionals.length > 1) throw new Error(`多出的參數：${positionals.slice(1).join(' ')}`);
   const command = oneOf('子指令', positionals[0] ?? 'shot', COMMANDS);
   if (values.url && !/^https?:\/\/\S+$/.test(values.url)) throw new Error(`--url 應為 http(s) 網址，實際為 ${values.url}`);
@@ -147,7 +167,7 @@ export function parseShootArgs(argv) {
       query: values.q ?? '',
       district: values.district ?? '',
     },
-    clicks: values.click.map(parseClick),
+    actions: actionsOf(tokens),
     waitMs: nonNegativeInt('wait', values.wait),
     out: values.out ?? (command === 'shot' ? 'shot.png' : null),
     url: values.url ?? null,
@@ -160,14 +180,14 @@ export function parseShootArgs(argv) {
 }
 
 // 設定 → 場景：要開的網址、裝置尺寸、媒體特性與依序執行的步驟。
-// 步驟：ready（等頁面就緒）、time（切時段）、click、settle（等動畫到位）、wait（額外毫秒）。
+// 步驟：ready（等頁面就緒）、time（切時段）、click、drag、settle（等動畫到位）、wait（額外毫秒）。
 export function buildScenario(options, baseUrl) {
   const url = new URL(options.path, baseUrl);
   url.search = formatSearch(options.params);
   const settle = { type: 'settle', ms: SETTLE_MS[options.motion], frames: SETTLE_FRAMES };
   const steps = [{ type: 'ready' }, settle];
   if (options.time !== 'auto') steps.push({ type: 'time', time: options.time }, settle);
-  for (const click of options.clicks) steps.push({ type: 'click', ...click }, settle);
+  for (const action of options.actions) steps.push(action, settle);
   if (options.waitMs > 0) steps.push({ type: 'wait', ms: options.waitMs });
   // 列印樣式在點擊與等待之後才套用（列印樣式常把按鈕藏起來，先套用就點不到）。
   if (options.media !== 'screen') steps.push({ type: 'media', media: options.media }, settle);
