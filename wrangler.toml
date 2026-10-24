@@ -1,0 +1,9 @@
+# Cloudflare Pages 專案設定。部署指令（scripts/deploy.js）在 repo 根目錄執行 wrangler pages deploy site，
+# 會一併上傳 functions/ 的統計端點，並依這裡的綁定把 env.HITS 接到統計資料集（ADR 0003）。
+name = "tc-policy-island"
+pages_build_output_dir = "site"
+compatibility_date = "2026-10-01"
+
+[[analytics_engine_datasets]]
+binding = "HITS"
+dataset = "tc_policy_island_hits"

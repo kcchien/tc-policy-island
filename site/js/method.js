@@ -1,10 +1,12 @@
-// 整理方法頁：填入由公開資料集產生的內容，並在 data-repo-file 容器裡呈現引用 repo 文件的原文。
+// 整理方法頁：填入由公開資料集產生的內容與統計的揭露文字，並在 data-repo-file 容器裡呈現引用 repo 文件的原文。
+// 進頁時送一次頁面瀏覽。
 import { orderCandidates } from './dataset.js';
 import { el } from './dom.js';
 import { parseMarkdown } from './markdown.js';
 import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from './method-content.js';
 import { REPO_FILES_MANIFEST, repoDocumentByPath, repoFileSitePath, repoFileUrl } from './repo-documents.js';
-import { LOAD_TEXT, METHOD_TEXT, REPO_DOCUMENT_TEXT } from './ui-text.js';
+import { pageviewHit, sendHit } from './hits.js';
+import { HITS_TEXT, LOAD_TEXT, METHOD_TEXT, REPO_DOCUMENT_TEXT } from './ui-text.js';
 
 const DATASET_URL = './data/dataset.json';
 const MANIFEST_URL = `./data/${REPO_FILES_MANIFEST}`;
@@ -140,6 +142,8 @@ function fillRows(tableId, rows) {
 }
 
 async function start() {
+  document.getElementById('hits-disclosure').textContent = HITS_TEXT.disclosure;
+  sendHit(navigator, pageviewHit('method'));
   const [datasetResult, manifestResult] = await Promise.allSettled([fetchOk(DATASET_URL, 'json'), fetchOk(MANIFEST_URL, 'json')]);
   const dataset = datasetResult.status === 'fulfilled' ? datasetResult.value : null;
   if (dataset) fillDataset(dataset);

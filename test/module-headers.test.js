@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 // docs/architecture.md 只列分組與檔名，各模組的職責寫在檔頭註解，所以每個模組開頭都要有註解。
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const MODULE_DIRS = ['site/js', 'scripts'];
+const MODULE_DIRS = ['site/js', 'scripts', 'functions'];
 
 function jsFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -16,7 +16,7 @@ function jsFiles(dir) {
   });
 }
 
-test('site/js 與 scripts 的每個模組開頭都有檔頭註解', () => {
+test('site/js、scripts 與 functions 的每個模組開頭都有檔頭註解', () => {
   const files = MODULE_DIRS.flatMap((dir) => jsFiles(join(ROOT, dir)));
   assert.ok(files.length > 0);
   const missing = files

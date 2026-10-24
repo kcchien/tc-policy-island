@@ -7,7 +7,9 @@ repo 的目錄、`site/js/` 與 `scripts/` 模組的分組，以及跨模組的�
 ## 頂層目錄
 
 ```
-site/                  部署根目錄（Cloudflare Pages 只上傳這裡）
+site/                  部署根目錄（Cloudflare Pages 的靜態檔只上傳這裡）
+functions/api/hit.js   統計端點（Pages Function，本站唯一的後端程式，ADR 0003）；部署時跟著上傳
+wrangler.toml          Pages 專案設定與統計資料集綁定 HITS
 data/raw/              原始資料（建置輸入）
   meta.json  candidates.json  issue-areas.json
   local-elements.json  decorative-tiles.json   元素清單與裝飾格（可省略，視為空陣列；但上線關卡「人物一致」要求至少一個裝飾格當候選人廣場）
@@ -41,7 +43,7 @@ site/
 ```
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js
 js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/candidate-card.js  js/sheet.js
-js/island-list.js  js/ui-text.js  js/dom.js
+js/island-list.js  js/ui-text.js  js/dom.js  js/hits.js
 ```
 
 ### 檢視模型
@@ -63,6 +65,10 @@ js/island-list.js  js/ui-text.js  js/dom.js
 ### 上手導覽
 
 步驟狀態機與框線位置的純函式在 `tour.js`，覆蓋層在 `tour-view.js`，由 `main.js` 的 `startApp` 接上。島嶼檢視載入完成後自動檢查要不要出現（沒看過、WebGL 可用、網址沒指定要開的卡片）；看過或跳過寫入 localStorage 的 `policy-island:intro-seen`，頁首「怎麼看」重開。覆蓋層是 `showModal` 的對話框，才能疊在政見卡片之上，說明框計入 `stageObstacles`，名牌會避開它。第一步框議題區名牌、第二步框同一格的三個標記，位置由島嶼檢視的 `areaScreenRects(areaId)`（名牌 DOM 與鏡頭投影，不加 3D 物件）每幀提供，框哪一格只看畫面位置（`pickTourArea`）；第三步呼叫 `openRandomArea()`，卡片在鏡頭飛到後開啟，覆蓋層再回到最上層並框住卡片。
+
+### 統計
+
+`hits.js` 送頁面瀏覽與出處點擊到 `functions/api/hit.js`（ADR 0003），內容只有 `{ kind, id, view }`。`main.js` 在資料載入後送一次頁面瀏覽（`view` 為當時的檢視），並在 `document` 上用事件委派旁聽 `.source-links` 裡的連結點擊；出處識別碼由同一組連結中原文存檔的網址對照檢視模型的 `snapshotUrl` 取得，所以政見卡片與候選人資料卡的連結不必改。`method.js` 進頁時送一次 `view: 'method'` 的頁面瀏覽，並填入 `ui-text.js` 的揭露文字。瀏覽器開啟「不要追蹤」或全域隱私控制時都不送。
 
 ## site/js：島嶼檢視
 
