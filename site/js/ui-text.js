@@ -43,7 +43,7 @@ export const noPolicyText = (cutoffDate) => `${NO_POLICY_LABEL}（截至 ${cutof
 export const NO_MATCH_TEXT = '沒有符合篩選條件的政見';
 // 全站篩選的「只看兩說並列」開關（索引面板與表格上方共用）。
 export const FILTER_TEXT = {
-  conflictOnly: '只看兩說並列的政見',
+  conflictOnly: '只看出處說法不一的政見',
   conflictHint: '候選人自己的兩個來源說法不同時，兩說並列，不替候選人選一個。',
 };
 export function resultStatusText(filtered) {
