@@ -89,6 +89,8 @@ js/island-daylight.js  js/island-environment.js
 js/island-body.js  js/island-body-view.js  js/island-models.js  js/island-plaza.js
 ```
 
+走到同一格（ADR 0001）：`island-view.js` 的 `select(areaId)`（經 `focusArea`）讓三位候選人人物從目前位置同時出發，與鏡頭飛行同時進行；`main.js` 在政見卡片關閉時呼叫 `returnFigures()`，三人同時走回候選人廣場，換議題區時直接走去下一格；切回島嶼檢視時只有卡片開著才出發。目的地與路徑是 `island-plaza.js` 的純函式 `figureDestinations`、`walkPlan`、`walkPose`（規則見檔頭註解），上線關卡「人物一致」載入它們，對每個議題區檢查三人的目的地、出發與抵達時間、途中姿勢相同，且目的地不隨政見資料改變。減少動態或暫停動畫時直接出現在目的地。
+
 ### 主題場景與靜態裝飾
 
 ```
