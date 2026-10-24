@@ -180,7 +180,6 @@ export const PROFILE_TEXT = {
   origin: (sourceTypeName, year, electionName) => `中選會${sourceTypeName}，${year} 年${electionName}`,
   snapshotNoteLabel: '原文存檔說明：',
   markerTitle: '島上標記',
-  cardLink: '這張候選人資料卡的連結',
   portraitAlt: (name) => `${name}的正式肖像`,
   portraitSource: (year) => `照片：中選會 ${year} 年選舉公報`,
   portraitMethod: '照片來源與使用說明',
