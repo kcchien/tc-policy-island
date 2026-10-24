@@ -7,6 +7,7 @@
 - 純靜態網站：HTML 加 importmap、原生 ES 模組、手寫 CSS 變數。不用框架、不打包。
 - 工具與測試只用 Node 24 內建模組（`node:test`、`node:assert`、`node:fs` 等）。`package.json` 不得有任何相依欄位，也不得出現 lockfile 與 `node_modules`，`test/repo.test.js` 會擋。
 - `site/js/` 的模組瀏覽器與 Node 共用，只能 import 同目錄的相對路徑，不得 import `node:` 模組。只給 Node 用的程式放 `scripts/`。
+- 例外：repo 根目錄的 `functions/` 只放統計端點 `functions/api/hit.js`（Cloudflare Pages Function，綁定設定在 `wrangler.toml`），不得放其他後端邏輯，也不得讀或記錄可識別讀者的資料，見 `docs/adr/0003-hit-counter-on-pages-function.md`。`test/repo.test.js` 會擋。
 
 ### 指令
 

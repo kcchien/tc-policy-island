@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from '../site/js/method-content.js';
 import { REPO_DOCUMENTS } from '../site/js/repo-documents.js';
+import { HITS_TEXT } from '../site/js/ui-text.js';
 import { candidate } from './fixtures/make-raw.js';
 
 const page = (name) => readFileSync(new URL(`../site/${name}`, import.meta.url), 'utf8');
@@ -78,4 +79,12 @@ test('整理方法頁為每份引用 repo 文件留一個標了 data-repo-file �
   assert.deepEqual(marked.toSorted(), REPO_DOCUMENTS.map((doc) => doc.path).toSorted());
   assert.match(html, /<a [^>]*href="\.\/data\/dataset\.json"[^>]*download/);
   assert.match(html, /https:\/\/github\.com\/kcchien\/tc-policy-island\/issues/);
+});
+
+test('整理方法頁的揭露聲明列出統計收集什麼、不收集什麼', () => {
+  const disclosure = page('method.html').match(/<section[^>]*id="disclosure"[\s\S]*?<\/section>/)[0];
+
+  assert.match(disclosure, /<li id="hits-disclosure"><\/li>/);
+  assert.equal(HITS_TEXT.disclosure,
+    '本站只統計頁面被看了幾次、出處連結被點了幾次，不記錄你是誰、從哪裡來、用什麼裝置，也不放 cookie；瀏覽器開啟「不要追蹤」時完全不統計。');
 });

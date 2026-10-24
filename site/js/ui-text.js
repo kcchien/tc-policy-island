@@ -199,6 +199,11 @@ export const METHOD_TEXT = {
   tierHeading: (label, count) => `${label}（${count} 個）`,
 };
 
+// 統計的揭露文字，整理方法頁的揭露聲明列出。收集範圍改變時一起改這句。
+export const HITS_TEXT = {
+  disclosure: '本站只統計頁面被看了幾次、出處連結被點了幾次，不記錄你是誰、從哪裡來、用什麼裝置，也不放 cookie；瀏覽器開啟「不要追蹤」時完全不統計。',
+};
+
 // 整理方法頁照原文公開的文件：白話標題與一句說明（以文件識別碼對應 repo-documents.js 的清單）。
 export const REPO_DOCUMENT_TEXT = {
   'classification-rules': { title: '分類規則', description: '一條政見要歸入哪個議題區、議題區怎麼劃分的判斷準則。' },

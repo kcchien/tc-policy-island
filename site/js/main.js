@@ -1,5 +1,5 @@
 // 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
-// 隨機一題與上手導覽。
+// 隨機一題、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -15,6 +15,7 @@ import { timeOfDayAt } from './island-daylight.js';
 import { pickRandomArea } from './random-area.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
+import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
 import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 
@@ -487,6 +488,8 @@ function startApp(vm, state, initialView) {
   updateUrl();
   render();
   setView(view);
+  sendHit(navigator, pageviewHit(view));
+  trackSourceClicks(document, { bySnapshot: sourceIdsBySnapshot(vm), view: () => view });
 
   // 網址指向政見時開到該政見所在議題區的卡片；指向議題區時開該區卡片（表格檢視先捲到該列）；
   // 都沒有時，指向候選人就開該候選人的候選人資料卡。識別碼不存在就從網址移除。
