@@ -163,7 +163,7 @@ const SCHEMAS = {
   },
 };
 
-const LABELS = { meta: '中繼資料', electionEvent: '選舉時程事件',candidate: '候選人', issueArea: '議題區', localElement: '元素', decorativeTile: '裝飾格', source: '出處', policy: '政見' };
+const LABELS = { meta: '中繼資料', electionEvent: '選舉時程事件', candidate: '候選人', issueArea: '議題區', localElement: '元素', decorativeTile: '裝飾格', source: '出處', policy: '政見' };
 
 function lookup(record, path) {
   let value = record;

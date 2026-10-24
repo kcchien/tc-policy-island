@@ -35,8 +35,12 @@ function readElectionSchedule(path) {
 }
 
 export function loadRawData(rawDir) {
+  const meta = readJson(join(rawDir, 'meta.json'));
+  if (meta !== null && typeof meta === 'object' && 'electionSchedule' in meta) {
+    throw new Error(`原始資料 ${join(rawDir, 'meta.json')} 不應有 electionSchedule，選舉時程放 election-schedule.json`);
+  }
   return {
-    meta: { ...readJson(join(rawDir, 'meta.json')), electionSchedule: readElectionSchedule(join(rawDir, 'election-schedule.json')) },
+    meta: { ...meta, electionSchedule: readElectionSchedule(join(rawDir, 'election-schedule.json')) },
     candidates: readJson(join(rawDir, 'candidates.json')),
     issueAreas: readJson(join(rawDir, 'issue-areas.json')),
     localElements: readOptionalArray(join(rawDir, 'local-elements.json')),

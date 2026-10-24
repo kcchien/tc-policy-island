@@ -2,14 +2,6 @@
   "votingDate": "2026-11-28",
   "events": [
     {
-      "id": "ballot-draw",
-      "name": "候選人號次抽籤",
-      "date": "2026-10-27",
-      "endDate": null,
-      "sourceUrl": "https://web.cec.gov.tw/tcec/article/65294",
-      "sourceTitle": "如因颱風來襲停止上班，候選人抽籤改至115年10月27日同時間、同地點舉行"
-    },
-    {
       "id": "candidate-list",
       "name": "公告市長候選人名單",
       "date": "2026-11-12",
