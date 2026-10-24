@@ -1,4 +1,4 @@
-// 搜尋與行政區篩選（filterViewModel）：檢視模型 → 只含符合條件政見的檢視模型。表格檢視與島嶼檢視共用。
+// 搜尋、行政區與只看兩說並列的篩選（filterViewModel）：檢視模型 → 只含符合條件政見的檢視模型。表格檢視與島嶼檢視共用。
 // 瀏覽器與 Node 共用，不得引用 node: 模組。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -14,15 +14,17 @@ function searchText(policy) {
 }
 
 // 關鍵字比對摘要、原文引述與適用行政區；以空白分開的每個詞都要符合。
-// district 須是 29 區正式名稱之一，其他值視為未篩選。全站篩選與政見卡片的欄內篩選共用。
+// district 須是 29 區正式名稱之一，其他值視為未篩選。conflictOnly 為 true 時只留有出處說法不一標註
+// （conflictNote，兩說並列）的政見。全站篩選與政見卡片的欄內篩選共用。
 // 回傳 { active, district, matches(policy) }；district 是生效的行政區（沒有時為 null）。
-export function policyMatcher({ query = '', district = '' } = {}) {
+export function policyMatcher({ query = '', district = '', conflictOnly = false } = {}) {
   const terms = normalize(query).split(/\s+/).filter(Boolean);
   const districtFilter = TAICHUNG_DISTRICTS.includes(district) ? district : null;
   return {
-    active: terms.length > 0 || districtFilter !== null,
+    active: terms.length > 0 || districtFilter !== null || conflictOnly,
     district: districtFilter,
     matches(policy) {
+      if (conflictOnly && policy.conflictNote === null) return false;
       if (districtFilter !== null && !policy.districts.includes(districtFilter)) return false;
       const text = searchText(policy);
       return terms.every((term) => text.includes(term));
@@ -30,9 +32,9 @@ export function policyMatcher({ query = '', district = '' } = {}) {
   };
 }
 
-export function filterViewModel(vm, { query = '', district = '' } = {}) {
-  const { active, district: districtFilter, matches } = policyMatcher({ query, district });
-  if (!active) return { ...vm, filter: { active, query: '', district: null, matchCount: null } };
+export function filterViewModel(vm, { query = '', district = '', conflictOnly = false } = {}) {
+  const { active, district: districtFilter, matches } = policyMatcher({ query, district, conflictOnly });
+  if (!active) return { ...vm, filter: { active, query: '', district: null, conflictOnly: false, matchCount: null } };
 
   const rows = vm.rows
     .map((row) => ({
@@ -44,5 +46,5 @@ export function filterViewModel(vm, { query = '', district = '' } = {}) {
     }))
     .filter((row) => row.cells.some((cell) => cell.policies.length > 0));
   const matchCount = rows.reduce((sum, row) => sum + row.cells.reduce((n, cell) => n + cell.policies.length, 0), 0);
-  return { ...vm, rows, filter: { active, query: query.trim(), district: districtFilter, matchCount } };
+  return { ...vm, rows, filter: { active, query: query.trim(), district: districtFilter, conflictOnly, matchCount } };
 }

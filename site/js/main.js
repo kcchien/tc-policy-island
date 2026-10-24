@@ -1,5 +1,5 @@
 // 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
-// 隨機一題、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
+// 頁首的選舉時程（與自動時段同一節奏重算）、隨機一題、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -16,8 +16,10 @@ import { pickRandomArea } from './random-area.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
 import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
-import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
+import { FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
+import { scheduleView, taipeiDate } from './election-schedule.js';
+import { renderSchedule, setupScheduleToggle } from './schedule-view.js';
 
 const DATASET_URL = './data/dataset.json';
 // 上手導覽看過或跳過的紀錄。沿用舊版文字說明的鍵，看過舊說明的人不再自動出現導覽。
@@ -104,6 +106,7 @@ function startApp(vm, state, initialView) {
   const form = document.getElementById('filters');
   const search = document.getElementById('search');
   const district = document.getElementById('district');
+  const conflictOnly = document.getElementById('conflict-only');
   const status = document.getElementById('result-status');
   const stage = document.getElementById('island-stage');
   const panel = document.getElementById('index-panel');
@@ -203,9 +206,23 @@ function startApp(vm, state, initialView) {
   const checkAutoTime = () => {
     if (hud.timeMode === AUTO_TIME.id && timeOfDayAt(Date.now()) !== hud.time) applyTime();
   };
-  setInterval(checkAutoTime, AUTO_CHECK_MS);
+  // 頁首的選舉時程：與自動時段同一個節奏檢查，台灣日期換日才重畫（天數只在換日時改變）。
+  const scheduleRoot = document.getElementById('election-schedule');
+  let scheduleDay = null;
+  const showSchedule = () => {
+    const now = Date.now();
+    if (taipeiDate(now) === scheduleDay) return;
+    scheduleDay = taipeiDate(now);
+    renderSchedule(scheduleRoot, scheduleView(vm.meta.electionSchedule, now));
+  };
+  setupScheduleToggle(scheduleRoot, { onToggle: refreshLabels });
+  const everyMinute = () => {
+    checkAutoTime();
+    showSchedule();
+  };
+  setInterval(everyMinute, AUTO_CHECK_MS);
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) checkAutoTime();
+    if (!document.hidden) everyMinute();
   });
   const applyPaused = () => {
     const button = document.getElementById('tool-pause');
@@ -449,7 +466,7 @@ function startApp(vm, state, initialView) {
   }
 
   const render = () => {
-    filtered = filterViewModel(vm, { query: state.query, district: state.district });
+    filtered = filterViewModel(vm, { query: state.query, district: state.district, conflictOnly: state.conflict });
     renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard });
     highlightTableRow();
     renderIslandPanel();
@@ -459,16 +476,21 @@ function startApp(vm, state, initialView) {
 
   search.value = state.query;
   setupDistricts(district, state.district);
+  conflictOnly.checked = state.conflict;
+  document.getElementById('conflict-only-label').textContent = FILTER_TEXT.conflictOnly;
+  document.getElementById('conflict-hint').textContent = FILTER_TEXT.conflictHint;
   form.addEventListener('submit', (event) => event.preventDefault());
   form.addEventListener('input', () => {
     state.query = search.value;
     state.district = district.value;
+    state.conflict = conflictOnly.checked;
     updateUrl();
     render();
   });
   form.addEventListener('reset', () => {
     state.query = '';
     state.district = '';
+    state.conflict = false;
     updateUrl();
     render();
   });
@@ -485,6 +507,7 @@ function startApp(vm, state, initialView) {
   document.getElementById('panel-profile-note').textContent = PROFILE_TEXT.note;
   renderProfileCards(document.getElementById('candidate-profiles'), vm, { idPrefix: 'panel-profile' });
   setupTabs();
+  showSchedule();
   applyTime();
   applyPaused();
   applyLabels();

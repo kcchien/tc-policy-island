@@ -1,0 +1,37 @@
+{
+  "votingDate": "2026-11-28",
+  "events": [
+    {
+      "id": "candidate-list",
+      "name": "公告市長候選人名單",
+      "date": "2026-11-12",
+      "endDate": null,
+      "sourceUrl": "https://web.cec.gov.tw/central/article/61722",
+      "sourceTitle": "中選會委員會議討論通過115年地方公職人員選舉投票日及工作進行程序表"
+    },
+    {
+      "id": "policy-presentations",
+      "name": "市長公辦政見發表會",
+      "date": "2026-11-13",
+      "endDate": "2026-11-27",
+      "sourceUrl": "https://web.cec.gov.tw/central/article/61722",
+      "sourceTitle": "中選會委員會議討論通過115年地方公職人員選舉投票日及工作進行程序表"
+    },
+    {
+      "id": "election-bulletin",
+      "name": "選舉公報送達各戶的期限",
+      "date": "2026-11-25",
+      "endDate": null,
+      "sourceUrl": "https://web.cec.gov.tw/tcec/article/63718",
+      "sourceTitle": "臺中市第5屆市長、市議員暨里長選舉選務工作進行程序表"
+    },
+    {
+      "id": "voting",
+      "name": "投票日",
+      "date": "2026-11-28",
+      "endDate": null,
+      "sourceUrl": "https://web.cec.gov.tw/central/article/61722",
+      "sourceTitle": "中選會委員會議討論通過115年地方公職人員選舉投票日及工作進行程序表"
+    }
+  ]
+}

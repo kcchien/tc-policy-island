@@ -481,6 +481,27 @@ test('網站上的排序規則說明與來源類型名稱含內部細節時，�
   assert.match(output, /js\/dataset\.js：含程式欄位名「sourceType」/);
 });
 
+test('選舉時程的事件名稱含內部細節時，受眾文案關卡不通過；公告標題不掃', () => {
+  const site = makeSite((dataset) => {
+    dataset.meta.electionSchedule = {
+      votingDate: '2026-11-28',
+      events: [{
+        id: 'voting',
+        name: '投票日（votingDate）',
+        date: '2026-11-28',
+        endDate: null,
+        sourceUrl: 'https://web.cec.gov.tw/central/article/61722',
+        sourceTitle: '公告 data/raw/election-schedule.json',
+      }],
+    };
+  }, COMPLIANT_FILES);
+
+  const { output } = runGates(site);
+
+  assert.match(output, /electionSchedule\.events\[voting\]\.name：含程式欄位名「votingDate」/, output);
+  assert.doesNotMatch(output, /election-schedule\.json/);
+});
+
 test('網站目錄缺少畫面文案模組時，受眾文案關卡不通過', () => {
   const files = { ...COMPLIANT_FILES };
   delete files['js/ui-text.js'];

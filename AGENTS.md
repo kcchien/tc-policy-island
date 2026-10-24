@@ -42,7 +42,8 @@
 
 欄位的唯一定義是 `site/js/dataset.js` 的 `SCHEMAS`。改欄位時同時改 `SCHEMAS`、本節與測試。欄位名用英文 camelCase，內容只有中文，不做雙語結構。`?` 表示可為 `null`。
 
-- **meta**：`dataCutoffDate`（YYYY-MM-DD）、`checklistVersion?`。公開資料集另加 `candidateOrder`（`name-strokes` 或 `ballot-number`）與 `builtAt`。
+- **meta**：`dataCutoffDate`（YYYY-MM-DD）、`checklistVersion?`、`electionSchedule?`。公開資料集另加 `candidateOrder`（`name-strokes` 或 `ballot-number`）與 `builtAt`。
+- **選舉時程** `electionSchedule`：原始資料放 `data/raw/election-schedule.json`，建置時併進 `meta`，沒有檔案時為 `null`（頁首不顯示）。`votingDate`、`events[] { id, name, date, endDate?（期間的最後一天）, sourceUrl, sourceTitle }`。日期只收中選會或選舉委員會的公告，`sourceUrl` 須在 `cec.gov.tw` 底下，`sourceTitle` 照公告標題。
 - **候選人**：`id`、`name`、`party`、`ballotNumber?`、`nameStrokes`、`rawPolicyItems { total?, sourceIds[] }`（原始政見條目總數與其出處，`total` 為 `null` 表示尚未統計）、`dataStatus?`（例如「尚無一手來源」，指政見）、`profile?`（候選人資料，`null` 表示尚未收錄）。號次須全部為 `null`（抽籤前，依筆畫排序）或全部填寫（抽籤後，依號次排序）；排序鍵不得相同。
 - **議題區**：`id`、`name`、`departments[]`、`description`、`axial [q, r]`、`localElementId?`。清單依 `docs/rules/classification-rules.md` 劃分，數量與島的格數無關。
 - **元素**：`id`、`name`、`category`（`LOCAL_ELEMENT_CATEGORIES`：自然景觀、小吃、老建築）、`place`、`reason`（與任何市長任期的政績無關的理由）。
