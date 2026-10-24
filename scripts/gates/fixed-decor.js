@@ -1,3 +1,5 @@
+// 上線關卡「裝飾數量固定」：載入網站目錄裡的 island-decor.js，換幾種政見資料重算，每個議題區格子的裝飾都要相同。
+
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

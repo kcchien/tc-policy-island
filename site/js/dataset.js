@@ -1,5 +1,5 @@
 // 政見資料集：原始資料 → 驗證結構 → 排除未通過核對的政見 → 排列候選人 → 公開資料集。
-// 瀏覽器與 Node 共用，不得引用 node: 模組。欄位說明見 AGENTS.md「資料結構」。
+// 瀏覽器與 Node 共用，不得引用 node: 模組。欄位的唯一定義是 SCHEMAS，說明見 AGENTS.md「資料結構」。
 
 export const SOURCE_TYPES = {
   'official-website': '官網',

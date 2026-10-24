@@ -1,6 +1,6 @@
-import { validateRawData } from '../../site/js/dataset.js';
+// 上線關卡：公開資料集是原始資料的子集，必須同樣通過結構驗證。
 
-// 公開資料集是原始資料的子集，必須同樣通過結構驗證。
+import { validateRawData } from '../../site/js/dataset.js';
 export default {
   id: 'dataset-structure',
   name: '公開資料集結構合法',

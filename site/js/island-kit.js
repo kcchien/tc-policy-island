@@ -1,5 +1,7 @@
-// 零件庫：靜態零件用共用的單位幾何建立，場景組好後由 instancify 依形體與材質種類收進 InstancedMesh，
-// 每桶一次繪製呼叫，每個實例各自上色與變換。分桶規則在 island-parts.js（Node 可測）。
+// 零件庫：靜態零件用共用的單位幾何建立（含圓角盒、四坡屋頂、圓頂、環、稜柱、發光件），場景組好後由 instancify 合批：
+// 非發光零件依材質、LOD、投影合併成一個網格（頂點色與議題區序號，選取抬高在著色器做，點選依議題區區段檢查），
+// 發光件依形體收進 InstancedMesh。主題場景零件用黏土材質與縮放微抖動；祖先標 userData.lod 的零件另外分桶。
+// 分桶規則在 island-parts.js（Node 可測）。
 // 會動的零件不要用共用幾何，或在 mesh.userData.dynamic 設 true，instancify 會略過。
 
 import * as THREE from 'three';

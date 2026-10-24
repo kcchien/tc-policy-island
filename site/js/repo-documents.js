@@ -1,4 +1,4 @@
-// 引用 repo 文件：整理方法頁照原文公開的規則文件與清單。瀏覽器與 Node 共用，不得引用 node: 模組。
+// 引用 repo 文件清單 REPO_DOCUMENTS：整理方法頁照原文公開的規則文件與清單。瀏覽器與 Node 共用，不得引用 node: 模組。
 // 建置指令把每份文件逐字複製到網站目錄的 data/repo-files/<repo 路徑>，頁面在標了 data-repo-file 的容器裡呈現。
 // 品牌用語掃描不掃這些檔案，改由上線關卡「引用 repo 文件」驗證與 repo 檔案逐字相同，見 docs/rules/brand-terms.md。
 // 頁面上每份文件的白話標題與說明在 ui-text.js 的 REPO_DOCUMENT_TEXT，以 id 對應；頁面不顯示檔案路徑。

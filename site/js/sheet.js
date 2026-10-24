@@ -1,5 +1,5 @@
 // 手機底部抽屜的拖曳：把手往上拖變高、往下拖變矮，放開時吸附到三段之一（約一半、全螢幕、關閉）。
-// snapSheet 是純函式，Node 可測；bindSheetDrag 只在瀏覽器使用。
+// snapSheet 是純函式，Node 可測；bindSheetDrag 與卡片對話框共用的行為 bindSheetDialog 只在瀏覽器使用。
 
 export const SHEET_SNAPS = ['half', 'full'];
 // 吸附門檻（占可視高度的比例）。

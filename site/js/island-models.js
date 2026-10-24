@@ -1,4 +1,5 @@
-// 島嶼檢視的低多邊形模型：格子、在地感元素、候選人標記。全部由程式產生，不載入外部模型檔。
+// 島嶼檢視的低多邊形模型：格子、在地感元素、候選人標記與人物。全部由程式產生，不載入外部模型檔。
+// 標記是 markerSign 小立牌，牌面由 batchMarkerFaces 合批成每種形狀亮灰各一個 InstancedMesh。
 // 3D 材質色碼只寫在 PALETTE，一律用 0xrrggbb，上線關卡「禁用色檢查」會掃這些色碼（ADR 0001）。
 
 import * as THREE from 'three';

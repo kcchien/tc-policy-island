@@ -1,4 +1,4 @@
-// 把主題場景（island-heroes.js 的零件資料）畫成 3D。零件用零件庫的共用單位幾何，之後由 instancify 合批，
+// 把主題場景（island-heroes.js 的零件資料）畫成 3D：buildHeroScene(areaId, transform)。零件用零件庫的共用單位幾何，之後由 instancify 合批，
 // 二十座場景的零件只多出十幾個 InstancedMesh。
 
 import * as THREE from 'three';

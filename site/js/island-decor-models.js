@@ -1,5 +1,5 @@
 // 靜態裝飾的模型：路燈、各樹種的大樹、花台、長椅、垃圾桶、盆栽、盆花與踏石。只做計算，不碰 three.js，
-// 瀏覽器與 Node 共用；零件格式與主題場景相同（island-heroes.js），畫成 3D 在 island-decor-view.js。
+// 瀏覽器與 Node 共用；零件格式與主題場景相同（island-heroes.js），畫成 3D 在 island-decor-view.js。色碼在 DECOR_COLORS。
 // 尺寸是場景單位（不是單位空間）：底面中心在原點，y 從島面往上，正面朝 +z。
 // 每種模型不得高過、寬過 island-decor.js 的 DECOR_KINDS（height、reach），標記的視線測試靠這些範圍，測試會檢查。
 

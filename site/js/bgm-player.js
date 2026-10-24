@@ -1,5 +1,6 @@
 // 背景音樂的播放：第一次開啟時才建立 AudioContext，用前瞻排程播放循環。
 // 暫停時把 AudioContext 停住，音訊時間跟著停，恢復後從原位置接著播。
+// renderBars 用離線音訊環境渲染前幾小節供試聽。
 
 import { buildScore } from './bgm-score.js';
 import { createCursor, planSteps, stepSeconds } from './bgm-schedule.js';

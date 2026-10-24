@@ -1,8 +1,9 @@
+// 讀取原始資料目錄。檔案配置見 docs/architecture.md「頂層目錄」。
+// sources/ 與 policies/ 內每位候選人一個檔案（<candidateId>.json），合併時依檔名排序。
+
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-// 原始資料目錄的檔案配置，見 docs/architecture.md「頂層目錄」。
-// sources/ 與 policies/ 內每位候選人一個檔案（<candidateId>.json），合併時依檔名排序。
 export function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, 'utf8'));

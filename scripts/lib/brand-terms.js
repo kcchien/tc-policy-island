@@ -1,3 +1,5 @@
+// 品牌用語清單的讀取與掃描器。上線關卡「品牌用語掃描」與測試共用。
+
 import { readJson } from './raw-data.js';
 
 // 品牌用語清單：data/rules/brand-terms.json。分兩級，見 docs/rules/brand-terms.md。

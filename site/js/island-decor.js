@@ -1,7 +1,9 @@
 // 島上的靜態裝飾配置：主題場景、路燈、大樹、長椅、花台、盆栽、垃圾桶與踏石。只做計算，不碰 three.js，
 // 瀏覽器與 Node 共用；畫成 3D 在 island-decor-view.js。
 // 靜態裝飾數量固定（ADR 0001）：每個議題區格子的裝飾種類、數量、位置與主題場景放大倍率相同，
-// 只讀格子的種類、順序與位置，不讀標記亮暗與政見。上線關卡「裝飾數量固定」會換一份政見資料重算，結果必須相同。
+// 只讀格子的種類、順序與位置，不讀標記亮暗與政見。上線關卡「裝飾數量固定」會換一份政見資料重算，結果必須相同；
+// 關卡也要載入這裡 import 的模組，所以只能 import 同樣不碰 three.js 的模組。
+// 大樹的樹種依格子位置，相鄰格不同；每種裝飾的高度與寬度上限與小物件的隱藏距離（LOD_DISTANCE）也定義在這裡。
 
 import { islandBody, TILE_SLOTS, WALKWAY, WALKWAY_APOTHEM } from './island-body.js';
 import { heroPlan } from './island-heroes.js';

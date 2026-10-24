@@ -1,3 +1,5 @@
+// 上線關卡「禁用色檢查」：網站配色不落在 data/rules/forbidden-colors.json 的政黨色與候選人識別色範圍。
+
 import { extractColors, forbiddenRangesOf, loadForbiddenColors } from '../lib/colors.js';
 import { THIRD_PARTY } from './site.js';
 

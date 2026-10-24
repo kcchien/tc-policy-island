@@ -1,6 +1,7 @@
+// 上線關卡「不載入音檔」：背景音樂在瀏覽器即時合成，網站不放也不載入任何音檔（避免混入既有歌曲）。
+
 import { THIRD_PARTY } from './site.js';
 
-// 背景音樂在瀏覽器即時合成，網站不放也不載入任何音檔（避免混入既有歌曲）。
 const AUDIO_EXTENSIONS = 'mp3|wav|ogg|oga|opus|m4a|aac|flac|weba|mid|midi';
 const AUDIO_FILE = new RegExp(`\\.(${AUDIO_EXTENSIONS})$`, 'i');
 // 程式與頁面裡引用音檔的寫法：字串或 url() 裡以音檔副檔名結尾的路徑、<audio> 元素、new Audio()。
