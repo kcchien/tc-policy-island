@@ -84,13 +84,6 @@ export const POLICY_CARD_TEXT = {
   shrink: '縮小卡片',
   expandAll: '全部展開',
   collapseAll: '全部收合',
-  // 遮名閱讀：讀者自己開啟，三欄同時遮住姓名與政黨、順序打亂；揭曉時同時揭開並回到排序規則。
-  blindOn: '先遮住名字',
-  blindHint: '三欄同時遮住姓名與政黨、順序打亂，讀完再揭曉',
-  reveal: '揭曉',
-  maskedLabels: ['甲', '乙', '丙'],
-  maskedName: (label) => `候選人${label}`,
-  maskedNote: '姓名與政黨先遮住',
   // 每筆政見展開後的複製與朗讀，三人同一格式。
   copy: '複製',
   copyHint: '把這筆政見的摘要、原文與出處複製成一段文字',

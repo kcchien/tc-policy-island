@@ -557,7 +557,6 @@ select {
 .area-open,
 .card-close,
 .card-height,
-.card-blind,
 .card-expand,
 .card-step,
 .reading-clear,
@@ -578,7 +577,6 @@ select {
 .area-open:hover,
 .card-close:hover,
 .card-height:hover,
-.card-blind:hover,
 .card-expand:hover,
 .card-step:hover,
 .reading-clear:hover,
@@ -594,7 +592,6 @@ select {
 .area-open:active,
 .card-close:active,
 .card-height:active,
-.card-blind:active,
 .card-expand:active,
 .card-step:active,
 .reading-clear:active,
@@ -1535,15 +1532,9 @@ body[data-view="island"] .card-height {
   font-size: 16px;
 }
 
-/* 「先遮住名字」與「全部展開」靠右並排 */
-.card-blind {
+/* 「全部展開」靠右 */
+.card-expand {
   margin-left: auto;
-}
-
-/* 遮名中按鈕寫「揭曉」，填主色讓讀者知道正在遮名 */
-.policy-card[data-blind="on"] .card-blind {
-  background: var(--laterite);
-  color: var(--rice);
 }
 
 .card-filter-status {
@@ -2707,14 +2698,13 @@ body[data-view="island"] .card-height {
     flex: 1 1 8rem;
   }
 
-  .card-blind,
+  /* 「只看出處說法不一」與「全部展開」同一列，省下抽屜高度 */
   .card-expand {
-    flex: 1 1 40%;
-    margin-left: 0;
+    flex: none;
   }
 
   .card-conflict {
-    flex: 1 1 100%;
+    flex: 1 1 auto;
   }
 
   .card-filter-status {
