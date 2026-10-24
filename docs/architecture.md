@@ -97,7 +97,7 @@ js/island-terrain.js  js/island-outskirts.js
 
 ### 關卡直接載入的配置模組
 
-上線關卡「裝飾數量固定」「動態數量固定」「人物一致」在 Node 直接載入網站目錄裡的 `island-decor.js`、`island-motion.js`、`island-plaza.js`，連同它們 import 的模組：`island-decor.js` 引入 `island-body.js`、`island-heroes.js`、`island-layout.js`、`island-motion.js`、`island-plaza.js`；`island-motion.js` 引入 `island-body.js`；`island-plaza.js` 不 import 其他模組。這些模組只能 import 同樣不碰 three.js 的模組。
+上線關卡「裝飾數量固定」「動態數量固定」「人物一致」在 Node 直接載入網站目錄裡的 `island-decor.js`、`island-motion.js`、`island-plaza.js`，連同它們 import 的模組（看各檔開頭的 import）。這些模組只能 import 同樣不碰 three.js 的模組，新增 import 前先確認對方也是配置模組。
 
 ## site/js：背景音樂
 

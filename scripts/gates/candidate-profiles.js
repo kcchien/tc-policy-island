@@ -1,4 +1,5 @@
-// 上線關卡：公開的候選人資料欄位固定、三人一致，並通過逐字比對。
+// 上線關卡：公開的候選人資料欄位齊全且三人相同；出處在公開資料集、是中選會網站的選舉公報，
+// 出處快照在網站目錄，學歷與經歷逐字出自出處快照。
 
 import { dirname } from 'node:path';
 import { SNAPSHOT_DIR, snapshotFileName } from '../../site/js/view-model.js';
