@@ -34,8 +34,13 @@ export const GLYPH_RESTORED_TEXT = '部分文字因原始檔案的字型無法�
 export const snapshotNoteText = (note) => (note && note.includes(GLYPH_RESTORED_MARK) ? GLYPH_RESTORED_TEXT : null);
 
 export const rawPolicyItemsText = ({ total }) => (total === null ? '原始政見條目尚未統計' : `原始政見條目共 ${total} 項`);
-export const candidateCountText = (areaPolicyCount, rawPolicyItems) =>
-  `此議題區收錄 ${areaPolicyCount} 筆政見，${rawPolicyItemsText(rawPolicyItems)}`;
+export const COLLECTION_TEXT = {
+  title: '收錄說明',
+  areaCount: (n) => `此議題區收錄 ${n} 筆政見`,
+  totalCount: (n) => `本站共收錄 ${n} 筆政見`,
+  cutoff: (date) => `資料截止日 ${date}`,
+  note: '整理時的拆分方式與目前取得的來源範圍會影響筆數，數量不代表政見品質或收錄完整度。',
+};
 
 // 收錄狀態與篩選結果。空欄只描述本站的收錄，不推論候選人是否提出。
 export const NO_POLICY_LABEL = '本站尚未收錄這個議題的政見';
@@ -80,11 +85,11 @@ export const POLICY_CARD_TEXT = {
   policyLink: '這筆政見的連結',
   areaDescription: (description, departments) => `${description}（對應局處：${departments.join('、')}）`,
   description: '議題說明',
-  filters: '篩選政見',
+  filters: '篩選這個議題',
   clearFilters: '清除篩選',
   filterSummary({ query, district, conflictOnly }) {
     const conditions = [query.trim(), district, conflictOnly && FILTER_TEXT.conflictOnly].filter(Boolean);
-    return conditions.length > 0 ? `篩選：${conditions.join('／')}` : '篩選政見';
+    return conditions.length > 0 ? `本議題篩選：${conditions.join('／')}` : '篩選這個議題';
   },
   conflict: '出處說法不一：',
   conflictFlag: '出處說法不一',
@@ -191,7 +196,6 @@ export const TABLE_TEXT = {
   openCard: '看政見卡片',
   openProfile: '看候選人資料',
   ballotNumber: (n) => `${n} 號`,
-  policyCount: (n) => `公開政見 ${n} 筆`,
   districts: (names) => `適用行政區：${names.join('、')}`,
   conflictFlag: POLICY_CARD_TEXT.conflictFlag,
 };

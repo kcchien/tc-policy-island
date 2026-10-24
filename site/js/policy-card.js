@@ -6,7 +6,7 @@
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（createPolicyReader：有 audioUrl 播預先生成的音檔，
 // 沒有時用瀏覽器內建語音；一次一筆，換議題區或關卡片即停止；按鈕帶喇叭圖示 SPEAK_ICON，播放中換成停止方塊）。本模組是唯一引用音檔的畫面模組，只用公開資料集給的 audioUrl。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
 // 右下角的「上一題」「下一題」只通知呼叫端（onStep），換哪一區由呼叫端決定。
-// 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。
+// 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。數量放在三人相同的可展開收錄說明。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
@@ -14,8 +14,9 @@ import { policyMatcher } from './filter.js';
 import { policySpeech, policyText } from './policy-text.js';
 import { sourceReportHref } from './report-link.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
+import { collectionNote } from './collection-note.js';
 import {
-  candidateCountText, DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
+  DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
 } from './ui-text.js';
 
 // 桌面島嶼檢視的卡片高度偏好：預設接近全高，使用者按「縮小卡片」改停靠在下方後記住。
@@ -229,11 +230,11 @@ function candidateColumn(candidate, cell, policies, {
       { class: 'card-column-head' },
       el('h3', { class: 'candidate-name' }, candidate.name),
       el('p', { class: 'candidate-meta' }, candidate.party),
-      el('p', { class: 'candidate-meta' }, candidateCountText(cell.policies.length, candidate.rawPolicyItems)),
       matcher.active && el('p', { class: 'candidate-meta candidate-match' }, T.columnMatch(policies.length)),
     ),
     // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。
     el('p', { class: 'data-status' }, candidate.sourceStatusText),
+    collectionNote(candidate, { cutoffDate: vm.meta.dataCutoffDate, areaPolicyCount: cell.policies.length }),
     empty && el('p', { class: 'no-policy' }, empty),
     // 市民補件：這一欄在本議題區完全沒有政見時（不是篩選後才沒有），三欄同一句、同一位置。
     cell.policies.length === 0 && el(

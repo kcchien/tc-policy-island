@@ -311,6 +311,68 @@ select {
   gap: 8px;
 }
 
+.scene-controls {
+  position: relative;
+  pointer-events: auto;
+}
+
+.scene-controls > summary {
+  min-height: 56px;
+  padding: 14px 18px;
+  background: var(--glass);
+  border-radius: 999px;
+  box-shadow: var(--float-shadow);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.scene-settings {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--rice);
+  box-shadow: var(--float-shadow);
+}
+
+.scene-settings .tool-group {
+  flex-wrap: wrap;
+  background: transparent;
+  box-shadow: none;
+}
+
+.index-tools {
+  display: none;
+}
+
+/* 卡片內只篩選目前議題，背景的全站查找暫時隱去，保留原位置與條件。 */
+body:has(> .policy-card[open]) :is(#index-panel, #controls, .scene-controls) {
+  visibility: hidden;
+}
+
+.collection-note {
+  font-size: 0.8125rem;
+  font-weight: normal;
+  color: var(--charcoal-soft);
+}
+
+.collection-note summary {
+  min-height: 32px;
+  padding: 4px 0;
+  color: var(--laterite);
+  cursor: pointer;
+}
+
+.collection-note p {
+  margin: 4px 0;
+}
+
 .tool-group {
   display: flex;
   gap: 2px;
@@ -2532,6 +2594,28 @@ body[data-view="island"] .card-height {
 
   body[data-view="island"] .tool-group:has(.time-cycle) {
     flex: 5 1 auto;
+  }
+
+  body[data-view="island"] .scene-controls {
+    flex: 1 1 auto;
+  }
+
+  body[data-view="island"] .scene-controls > summary {
+    min-height: 48px;
+    padding: 12px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body[data-view="island"] .scene-settings {
+    top: auto;
+    bottom: calc(100% + 8px);
+    max-height: 60dvh;
+    overflow-y: auto;
+  }
+
+  body[data-view="island"] .index-tools {
+    display: flex;
   }
 
   body[data-view="island"] .tool-button {

@@ -207,6 +207,7 @@ function startApp(vm, state, initialView) {
   // 名牌要避開的浮動元件（見 stageObstacles）開關時，請島嶼檢視重排名牌。鏡頭沒動時不會自己重排。
   const refreshLabels = () => withIsland((controller) => controller.refreshLabels());
   candidateDialog.element.addEventListener('close', refreshLabels);
+  document.getElementById('scene-controls').addEventListener('toggle', refreshLabels);
 
   // 手機的索引抽屜。桌面的索引面板一直顯示，不受 is-open 影響。
   // 開啟時焦點移到「關閉索引」，Escape 或關閉後焦點回到索引鈕。
@@ -240,13 +241,15 @@ function startApp(vm, state, initialView) {
   const panelObstacles = () => {
     const nodes = [
       titleCard,
-      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
+      ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group, .scene-controls > summary')),
+      ...toolbar.querySelectorAll('.scene-controls[open] .scene-settings'),
       panel,
       document.getElementById('view-note'),
       card.element.open && card.element,
       candidateDialog.element.open && candidateDialog.element,
     ];
-    return nodes.filter(Boolean).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+    return nodes.filter((node) => node && getComputedStyle(node).visibility !== 'hidden')
+      .map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
   };
 
   // 工具列：時段、暫停、名牌、全景。島嶼檢視還沒載入時先記下狀態，載入後套用。

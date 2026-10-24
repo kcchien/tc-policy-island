@@ -40,9 +40,10 @@ test('原文存檔說明只在有字形還原時出現，改寫成白話，不�
   assert.equal(UI.snapshotNoteText(restored), '部分文字因原始檔案的字型無法直接轉成文字，已比對公報影像逐字還原。');
 });
 
-test('卡片欄位顯示此區政見數與原始政見條目總數，尚未統計時照實寫出', () => {
-  assert.equal(UI.candidateCountText(2, { total: 117 }), '此議題區收錄 2 筆政見，原始政見條目共 117 項');
-  assert.equal(UI.candidateCountText(0, { total: null }), '此議題區收錄 0 筆政見，原始政見條目尚未統計');
+test('收錄說明保留此區與全站筆數、原始條目，尚未統計時照實寫出', () => {
+  assert.equal(UI.COLLECTION_TEXT.areaCount(2), '此議題區收錄 2 筆政見');
+  assert.equal(UI.COLLECTION_TEXT.totalCount(0), '本站共收錄 0 筆政見');
+  assert.equal(UI.rawPolicyItemsText({ total: null }), '原始政見條目尚未統計');
 });
 
 test('政見卡片內篩選時，欄頭另列符合篩選的筆數，篩選總結列出三欄合計', () => {

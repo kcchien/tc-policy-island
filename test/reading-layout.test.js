@@ -109,6 +109,49 @@ test('政見卡片初次可讀、篩選可辨認且可清除，表格定位避�
     assert.deepEqual(result.empty, ['本站尚未收錄這個議題的政見（截至 2026-10-23）']);
   });
 
+  await t.test('數量收進三人一致的收錄說明，未知不改成零；場景設定使用可展開入口且保留功能', async () => {
+    await open(390, 844);
+    const reading = await evaluate(`(() => ({
+      notes: [...document.querySelectorAll('.policy-card .collection-note')].map((n) => ({ open: n.open, text: n.textContent })),
+      heads: [...document.querySelectorAll('.card-column-head')].map((n) => n.textContent),
+      tableNotes: document.querySelectorAll('.policy-table thead .collection-note').length,
+      background: getComputedStyle(document.getElementById('controls')).visibility,
+    }))()`);
+    assert.equal(reading.notes.length, 3);
+    assert.equal(reading.tableNotes, 3);
+    assert.ok(reading.notes.every((n) => !n.open && n.text.includes('原始政見條目尚未統計') && n.text.includes('不代表') && n.text.includes('2026-10-23')));
+    assert.ok(reading.heads.every((text) => !text.includes('筆政見') && !text.includes('原始政見')));
+    assert.equal(reading.background, 'hidden');
+    await evaluate("document.querySelector('.policy-card').close()");
+    const scene = await evaluate(`(() => {
+      const settings = document.getElementById('scene-controls');
+      const initial = settings.open;
+      settings.querySelector('summary').click();
+      document.getElementById('tool-pause').click();
+      document.getElementById('tool-labels').click();
+      return { initial, open: settings.open, name: settings.querySelector('summary').textContent.trim(), timeButtons: settings.querySelectorAll('[data-time]').length, paused: document.getElementById('tool-pause').getAttribute('aria-pressed'), labels: document.getElementById('tool-labels').getAttribute('aria-pressed'), music: Boolean(settings.querySelector('#tool-music')), volume: Boolean(settings.querySelector('#tool-music-volume')), indexOutside: !settings.contains(document.getElementById('tool-index')), viewsOutside: !settings.contains(document.querySelector('.view-switch')), background: getComputedStyle(document.getElementById('controls')).visibility };
+    })()`);
+    assert.deepEqual(scene, { initial: false, open: true, name: '場景設定', timeButtons: 5, paused: 'true', labels: 'false', music: true, volume: true, indexOutside: true, viewsOutside: true, background: 'visible' });
+  });
+
+  await t.test('摘要展開後出處與朗讀入口仍可用，勾選對照單保留三人與列印出口', async () => {
+    await open(390, 844);
+    const policy = await evaluate(`(() => {
+      document.querySelector('.is-active .policy-head').click();
+      const source = document.querySelector('.is-active .source-links a');
+      const speak = document.querySelector('.is-active [data-action="speak"]');
+      document.querySelector('.is-active .policy-pick input').click();
+      return { source: source.href, speak: speak.textContent.trim(), disabled: speak.disabled, picked: document.querySelector('.shortlist-open').hidden === false };
+    })()`);
+    assert.deepEqual(policy, { source: 'https://example.org/cand-a', speak: '朗讀', disabled: false, picked: true });
+    await evaluate("document.querySelector('.policy-card').close()");
+    const shortlist = await evaluate(`(() => {
+      document.querySelector('.shortlist-open').click();
+      return { columns: document.querySelectorAll('.shortlist-dialog .shortlist-column').length, note: document.querySelector('.shortlist-dialog .no-policy').textContent, print: [...document.querySelectorAll('.shortlist-dialog button')].some((n) => n.textContent === '列印' && !n.disabled) };
+    })()`);
+    assert.deepEqual(shortlist, { columns: 3, note: '本站尚未收錄這個議題的政見（截至 2026-10-23）', print: true });
+  });
+
   await t.test('網址政見、隨機一題與下一題使用全高；Esc 關閉後焦點回到觸發點', async () => {
     await open(390, 844, '?view=table&policy=p-a1');
     assert.equal(await evaluate("document.querySelector('.policy-card').dataset.snap"), 'full');

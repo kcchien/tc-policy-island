@@ -2,10 +2,12 @@
 // 800px 以下由 CSS 改為單欄，所以每個元素明確標上 ARIA 表格角色，避免 display 改變後失去表格語意。
 // 每格的候選人名稱只在單欄時顯示，對螢幕閱讀器隱藏（欄標題已提供）。
 // 定位議題列時量測實際固定欄頭，換行與文字縮放後也保留足夠空間；窄版不計隱藏欄頭。
+// 收錄筆數與原始條目由 collection-note.js 放在三人相同的可展開說明，不在姓名旁常駐。
 
 import { el } from './dom.js';
-import { NO_MATCH_TEXT, rawPolicyItemsText, TABLE_TEXT as T } from './ui-text.js';
+import { NO_MATCH_TEXT, TABLE_TEXT as T } from './ui-text.js';
 import { seenMark } from './reading-progress.js';
+import { collectionNote } from './collection-note.js';
 
 export function scrollToTableRow(container, areaId) {
   const row = [...container.querySelectorAll('.area-row')].find((node) => node.id === `area-${areaId}`);
@@ -26,13 +28,11 @@ function candidateButton(candidate, label, onOpenCandidate) {
   return button;
 }
 
-function candidateHeader(candidate, onOpenCandidate) {
+function candidateHeader(candidate, onOpenCandidate, cutoffDate) {
   const button = candidateButton(candidate, T.openProfile, onOpenCandidate);
   const meta = [
     candidate.party,
     candidate.ballotNumber === null ? null : T.ballotNumber(candidate.ballotNumber),
-    T.policyCount(candidate.policyCount),
-    rawPolicyItemsText(candidate.rawPolicyItems),
   ].filter(Boolean);
   return el(
     'th',
@@ -41,6 +41,7 @@ function candidateHeader(candidate, onOpenCandidate) {
     ...meta.map((text) => el('span', { class: 'candidate-meta' }, text)),
     // 按鈕放在資料狀態說明之前，三欄的按鈕才會在同一高度。
     button,
+    collectionNote(candidate, { cutoffDate }),
     el('span', { class: 'data-status' }, candidate.sourceStatusText),
   );
 }
@@ -115,7 +116,7 @@ export function renderTable(container, vm, { onOpenCard, onOpenCandidate, seen =
     el(
       'thead',
       { role: 'rowgroup' },
-      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, T.areaHead), vm.candidates.map((candidate) => candidateHeader(candidate, onOpenCandidate))),
+      el('tr', { role: 'row' }, el('th', { scope: 'col', role: 'columnheader' }, T.areaHead), vm.candidates.map((candidate) => candidateHeader(candidate, onOpenCandidate, vm.meta.dataCutoffDate))),
     ),
     el(
       'tbody',
