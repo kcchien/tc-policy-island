@@ -324,6 +324,7 @@ export const REPO_DOCUMENT_TEXT = {
   'extraction-instructions': { title: '政見整理指示', description: 'AI 從候選人公開資料整理出政見、原文引述與摘要時依循的指示。' },
   'candidate-profiles': { title: '候選人資料整理方法', description: '從中選會選舉公報逐字摘錄學歷與經歷，以及核對文字的步驟。' },
   'verification-report': { title: '核對報告', description: '各候選人政見的核對通過率、退回次數與刪除筆數。' },
+  'speech-manifest': { title: '朗讀音檔清單', description: '朗讀音檔的語音設定，以及每條政見對應哪一個音檔、朗讀了多少字。' },
   'local-elements': { title: '元素清單說明', description: '島上在地感元素的選取原則與每項元素的理由。' },
   'brand-terms-rules': { title: '品牌用語清單說明', description: '哪些詞算候選人的品牌用語，以及本站怎麼避開。' },
   'brand-terms': { title: '品牌用語清單', description: '本站文字不得使用的品牌用語與陣營高頻詞。' },

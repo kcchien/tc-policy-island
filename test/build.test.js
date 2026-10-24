@@ -1,17 +1,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sha256, SPEECH_VOICE, speechScript } from '../scripts/lib/speech.js';
 
 const BUILD_SCRIPT = fileURLToPath(new URL('../scripts/build.js', import.meta.url));
 const SAMPLE_RAW = fileURLToPath(new URL('./fixtures/raw-sample', import.meta.url));
 
-function build(rawDir) {
-  const out = join(mkdtempSync(join(tmpdir(), 'build-out-')), 'dataset.json');
-  const result = spawnSync(process.execPath, [BUILD_SCRIPT, '--raw', rawDir, '--out', out], { encoding: 'utf8' });
+// 預設指向不存在的音檔目錄，結果不受 repo 裡 data/audio/ 的內容影響。
+function build(rawDir, args = []) {
+  const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : join(mkdtempSync(join(tmpdir(), 'build-out-')), 'dataset.json');
+  const audio = args.includes('--audio') ? [] : ['--audio', join(tmpdir(), 'build-no-audio')];
+  const result = spawnSync(process.execPath, [BUILD_SCRIPT, '--raw', rawDir, '--out', out, ...audio, ...args], { encoding: 'utf8' });
   return { code: result.status, output: result.stdout + result.stderr, out };
 }
 
@@ -102,4 +105,82 @@ test('建置指令把整理方法頁引用的 repo 文件逐字複製到公開�
   const manifest = JSON.parse(readFileSync(join(dir, 'repo-files.json'), 'utf8'));
   assert.ok(manifest.documents.includes('data/verification/checklist.json'));
   assert.ok(manifest.documents.includes('data/extraction/instructions.md'));
+});
+
+// 依夾具的公開政見做一份齊全的政見語音清單與音檔（音檔內容是假的位元組）。
+function makeAudio(rawDir, { skip = [] } = {}) {
+  const audioDir = mkdtempSync(join(tmpdir(), 'build-audio-'));
+  const items = {};
+  const policies = ['sample-jia', 'sample-yi'].flatMap((id) => JSON.parse(readFileSync(join(rawDir, 'policies', `${id}.json`), 'utf8')));
+  for (const policy of policies.filter((p) => p.verification.layer2.status === 'pass' && !skip.includes(p.id))) {
+    const text = speechScript(policy);
+    const bytes = Buffer.from(`FAKE-MP3:${policy.id}`);
+    const file = `${sha256(text)}.mp3`;
+    writeFileSync(join(audioDir, file), bytes);
+    items[policy.id] = { textSha256: sha256(text), file, fileSha256: sha256(bytes), chars: [...text].length, quota: 1, generatedAt: '2026-10-24' };
+  }
+  writeFileSync(join(audioDir, 'manifest.json'), JSON.stringify({ voice: SPEECH_VOICE, items }));
+  return audioDir;
+}
+
+const audioFiles = (out) => (existsSync(join(dirname(out), 'audio')) ? readdirSync(join(dirname(out), 'audio')).sort() : []);
+
+test('政見語音清單齊全時，每條公開政見帶 audioUrl，音檔與清單複製到公開資料集旁的 audio/', () => {
+  const audioDir = makeAudio(SAMPLE_RAW);
+  const manifest = JSON.parse(readFileSync(join(audioDir, 'manifest.json'), 'utf8'));
+
+  const { code, output, out } = build(SAMPLE_RAW, ['--audio', audioDir]);
+
+  assert.equal(code, 0, output);
+  const dataset = JSON.parse(readFileSync(out, 'utf8'));
+  assert.deepEqual(
+    dataset.policies.map((p) => [p.id, p.audioUrl]),
+    dataset.policies.map((p) => [p.id, `data/audio/${manifest.items[p.id].file}`]),
+  );
+  assert.deepEqual(audioFiles(out), [...Object.values(manifest.items).map((item) => item.file), 'manifest.json'].sort());
+  assert.ok(readFileSync(join(dirname(out), 'audio', manifest.items['sample-jia-001'].file)).equals(Buffer.from('FAKE-MP3:sample-jia-001')));
+  assert.match(output, /政見語音 2 條/);
+});
+
+test('缺一條政見語音時，全部政見都不帶 audioUrl、不複製任何音檔，輸出列出缺少的政見', () => {
+  const { code, output, out } = build(SAMPLE_RAW, ['--audio', makeAudio(SAMPLE_RAW, { skip: ['sample-yi-001'] })]);
+
+  assert.equal(code, 0, output);
+  const dataset = JSON.parse(readFileSync(out, 'utf8'));
+  assert.ok(dataset.policies.every((p) => !('audioUrl' in p)));
+  assert.deepEqual(audioFiles(out), []);
+  assert.match(output, /sample-yi-001：清單沒有這條/);
+  assert.doesNotMatch(output, /sample-jia-001/);
+});
+
+test('文字已變或音檔雜湊不符時視為缺少，同樣全部不帶；上一次建置留下的音檔也一併清掉', () => {
+  const rawDir = mkdtempSync(join(tmpdir(), 'build-raw-'));
+  cpSync(SAMPLE_RAW, rawDir, { recursive: true });
+  const audioDir = makeAudio(rawDir);
+  const out = join(mkdtempSync(join(tmpdir(), 'build-out-')), 'dataset.json');
+  assert.equal(build(rawDir, ['--audio', audioDir, '--out', out]).code, 0);
+  assert.equal(audioFiles(out).length, 3);
+
+  const file = join(rawDir, 'policies', 'sample-yi.json');
+  const policies = JSON.parse(readFileSync(file, 'utf8'));
+  policies[0].summary = '每區至少設兩所托育中心。';
+  writeFileSync(file, JSON.stringify(policies));
+  const manifest = JSON.parse(readFileSync(join(audioDir, 'manifest.json'), 'utf8'));
+  writeFileSync(join(audioDir, manifest.items['sample-jia-001'].file), 'broken');
+
+  const { code, output } = build(rawDir, ['--audio', audioDir, '--out', out]);
+
+  assert.equal(code, 0, output);
+  assert.ok(JSON.parse(readFileSync(out, 'utf8')).policies.every((p) => !('audioUrl' in p)));
+  assert.deepEqual(audioFiles(out), []);
+  assert.match(output, /sample-yi-001：文字已變/);
+  assert.match(output, /sample-jia-001：音檔與清單的雜湊不符/);
+});
+
+test('沒有政見語音清單時照常建置，政見不帶 audioUrl', () => {
+  const { code, output, out } = build(SAMPLE_RAW, ['--audio', join(mkdtempSync(join(tmpdir(), 'build-audio-')), 'missing')]);
+
+  assert.equal(code, 0, output);
+  assert.ok(JSON.parse(readFileSync(out, 'utf8')).policies.every((p) => !('audioUrl' in p)));
+  assert.match(output, /沒有政見語音清單/);
 });

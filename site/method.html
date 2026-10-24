@@ -32,6 +32,7 @@
           <li><a href="#order">候選人排序規則</a></li>
           <li><a href="#classification">議題區與分類規則</a></li>
           <li><a href="#verification">整理與核對</a></li>
+          <li><a href="#speech">政見朗讀</a></li>
           <li><a href="#elements">元素清單</a></li>
           <li><a href="#neutrality">中立規則</a></li>
           <li><a href="#download">資料下載</a></li>
@@ -122,6 +123,17 @@
         <h3>核對報告</h3>
         <p>核對報告記錄各候選人在第二道核對的通過率、退回次數與刪除筆數，對全部政見執行核對後產生，公開在下方。</p>
         <div data-repo-file="data/verification/report.md" data-open></div>
+      </section>
+
+      <section class="method-section" id="speech" aria-labelledby="speech-title">
+        <h2 id="speech-title">政見朗讀</h2>
+        <p>政見的朗讀音檔由語音合成服務依固定設定預先生成，三位候選人同一個聲音與語速；設定與每條音檔的對照清單照原文公開在下方。</p>
+        <ul>
+          <li>朗讀的內容只有政見摘要與原文引述，三位候選人用同一套念法：先念「摘要」，停一秒再逐則念「原文引述」，不加其他文字。</li>
+          <li>全有或全無：三位候選人公開的每一條政見都有音檔，網站才放上音檔；缺任何一條，整站都不放。每次上線前自動檢查。</li>
+          <li>原文以畫面上的文字為準，音檔只是方便收聽。</li>
+        </ul>
+        <div data-repo-file="data/audio/manifest.json"></div>
       </section>
 
       <section class="method-section" id="elements" aria-labelledby="elements-title">

@@ -37,6 +37,17 @@ test('矩陣每一列是一個議題區，每一格依候選人排序列出該�
   ]);
 });
 
+test('政見帶公開資料集給的 audioUrl；公開資料集沒有音檔時為 null', () => {
+  const dataset = buildPublicDataset(makeRaw());
+  const withAudio = structuredClone(dataset);
+  for (const p of withAudio.policies) p.audioUrl = `data/audio/${p.id}.mp3`;
+
+  const audioOf = (vm) => vm.rows[0].cells.flatMap((cell) => cell.policies.map((p) => [p.id, p.audioUrl]));
+
+  assert.deepEqual(audioOf(buildViewModel(withAudio)), [['p-a1', 'data/audio/p-a1.mp3'], ['p-b1', 'data/audio/p-b1.mp3']]);
+  assert.deepEqual(audioOf(buildViewModel(dataset)), [['p-a1', null], ['p-b1', null]]);
+});
+
 test('候選人欄位附原始政見條目總數與其出處、公開政見數與資料狀態說明', () => {
   const raw = makeRaw();
   const candA = raw.candidates.find((c) => c.id === 'cand-a');
