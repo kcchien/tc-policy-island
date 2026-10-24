@@ -55,9 +55,10 @@ export const sourceLinks = (source) => [
 // 沒有時退回瀏覽器內建語音（speech 為 null 表示沒有語音功能）。一次只播一條，再按同一條停止，開始另一條先停掉前一條。
 // 音檔只來自公開資料集給的 audioUrl，不在程式裡寫任何音檔路徑。onChange(policyId) 在播放狀態改變時呼叫（停止時為 null）。
 export function createPolicyReader({ createAudio, speech, createUtterance, onChange = () => {} }) {
+  // playing 是目前這一次播放；結束事件只結束發出它的那一次，同一條政見重播時舊事件不影響新的一次。
   let playing = null;
-  const finish = (id) => {
-    if (playing?.id !== id) return;
+  const finish = (session) => {
+    if (playing !== session) return;
     playing = null;
     onChange(null);
   };
@@ -70,22 +71,25 @@ export function createPolicyReader({ createAudio, speech, createUtterance, onCha
   };
   const start = (policy) => {
     stop();
-    const { id } = policy;
+    const session = { id: policy.id };
+    const done = () => finish(session);
+    playing = session;
     if (policy.audioUrl) {
       const audio = createAudio(policy.audioUrl);
       audio.preload = 'none';
-      audio.addEventListener('ended', () => finish(id));
-      audio.addEventListener('error', () => finish(id));
-      playing = { id, halt: () => audio.pause() };
-      audio.play()?.catch?.(() => finish(id));
+      audio.addEventListener('ended', done);
+      audio.addEventListener('error', done);
+      session.halt = () => audio.pause();
+      // 瀏覽器擋下播放（例如沒有使用者手勢）時回到未播放。
+      audio.play().catch(done);
     } else {
       const utterance = createUtterance(policySpeech(policy));
-      utterance.addEventListener('end', () => finish(id));
-      utterance.addEventListener('error', () => finish(id));
-      playing = { id, halt: () => speech.cancel() };
+      utterance.addEventListener('end', done);
+      utterance.addEventListener('error', done);
+      session.halt = () => speech.cancel();
       speech.speak(utterance);
     }
-    onChange(id);
+    onChange(policy.id);
   };
   return {
     get playingId() {
@@ -306,7 +310,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
     closeButton,
     onClose: () => {
       setBlind(null);
-      stopSpeaking();
+      reader.stop();
       onClose();
     },
   });
@@ -318,13 +322,12 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
   // 遮名閱讀中的欄位順序（畫面位置 → 排序規則的位置），不遮名時為 null。
   let order = null;
 
-  // 朗讀：有音檔播音檔，沒有時用瀏覽器內建語音（三人同一個 zh-TW 聲音、預設語速）。播放中的按鈕標成按下。
+  // 朗讀：有音檔播音檔，沒有時用瀏覽器內建語音（三人同一個 zh-TW 聲音、預設語速）。
+  // 按鈕名稱固定為「朗讀」，播放中以按下狀態表示（同背景音樂開關的做法）。
   const speech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window ? window.speechSynthesis : null;
   const syncSpeakButtons = () => {
     for (const button of body.querySelectorAll('[data-action="speak"]')) {
-      const playing = button.dataset.policy === reader.playingId;
-      button.textContent = playing ? T.stopSpeaking : T.speak;
-      button.setAttribute('aria-pressed', String(playing));
+      button.setAttribute('aria-pressed', String(button.dataset.policy === reader.playingId));
     }
   };
   const reader = createPolicyReader({
@@ -339,7 +342,6 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
     },
     onChange: syncSpeakButtons,
   });
-  const stopSpeaking = () => reader.stop();
 
   // 複製成一段話：成功顯示兩秒的提示；剪貼簿不能用時在同一列放出文字並選取，讓讀者自己複製。
   const copyPolicy = async (policy, button) => {
@@ -491,7 +493,7 @@ export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks 
       if (!dialog.open) setBlind(null);
       else if (order && !sameArea) setBlind(shuffledOrder());
       if (!sameArea) {
-        stopSpeaking();
+        reader.stop();
         search.value = filter.query ?? '';
         district.value = TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
         conflict.checked = Boolean(filter.conflictOnly);

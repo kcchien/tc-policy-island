@@ -97,8 +97,8 @@ export const POLICY_CARD_TEXT = {
   copied: '已複製',
   copyFailed: '無法自動複製，已選取文字，請自行複製',
   speak: '朗讀',
-  speakHint: '用瀏覽器內建語音唸出摘要與原文',
-  stopSpeaking: '停止朗讀',
+  // 朗讀鈕名稱固定，播放中以按下狀態表示，再按一次停止。
+  speakHint: '朗讀這筆政見的摘要與原文，再按一次停止',
   // 複製成一段話的各行。
   copyLines: {
     heading: (areaName, candidateName) => `【${areaName}】${candidateName}`,

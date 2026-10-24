@@ -103,6 +103,21 @@ test('播完自動回到未播放；前一條被停掉後才傳來的結束事�
   assert.equal(changes.at(-1), null);
 });
 
+test('同一條政見播、停、再播時，第一次播放晚到的結束事件不會把第二次的狀態清掉', () => {
+  const { reader, log } = setup();
+  reader.toggle(withAudio);
+  reader.toggle(withAudio);
+  reader.toggle(withAudio);
+  log.audios[0].fire('error');
+  assert.equal(reader.playingId, 'p-1');
+  reader.stop();
+  reader.toggle(withoutAudio);
+  reader.toggle(withoutAudio);
+  reader.toggle(withoutAudio);
+  log.utterances[0].fire('error');
+  assert.equal(reader.playingId, 'p-2');
+});
+
 test('停止（關卡片、換議題區）時不論音檔或語音都停下', () => {
   const { reader, log } = setup();
   reader.toggle(withAudio);
