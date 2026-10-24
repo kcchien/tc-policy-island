@@ -10,6 +10,31 @@ import { buildPublicDataset, DatasetValidationError } from '../site/js/dataset.j
 import { SNAPSHOT_DIR, snapshotFileName } from '../site/js/view-model.js';
 import { REPO_DOCUMENTS, REPO_FILES_DIR, REPO_FILES_MANIFEST } from '../site/js/repo-documents.js';
 import { loadRawData } from './lib/raw-data.js';
+import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
+
+const USAGE = formatUsage({
+  summary: '建置公開資料集：原始資料 → 公開資料集，連同公開出處的出處快照與整理方法頁引用的 repo 文件。',
+  usage: [
+    ['node scripts/build.js [參數]', '驗證原始資料並寫出公開資料集'],
+    ['node scripts/build.js --help', '顯示這段說明（-h 也一樣）'],
+  ],
+  sections: [
+    {
+      title: '參數',
+      rows: [
+        ['--raw <目錄>', '原始資料目錄（預設 data/raw）；看夾具資料用 test/fixtures/raw-sample'],
+        ['--out <路徑>', '公開資料集的輸出檔（預設 site/data/dataset.json）'],
+      ],
+    },
+  ],
+  notes: [
+    '原始資料驗證失敗時列出全部錯誤並以結束碼 1 退出，不寫出檔案。',
+    '只有兩層核對都通過的政見進公開資料集，輸出會列出未通過核對而排除的筆數。',
+    '輸出目錄（預設 site/data/）是建置產物、不進版控，內容取決於上一次用的原始資料；看完夾具記得用正式資料重建。',
+  ],
+});
+
+if (wantsHelp(process.argv.slice(2))) exitWithUsage(USAGE);
 
 // snapshotPath 相對於 repo 根目錄。
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));

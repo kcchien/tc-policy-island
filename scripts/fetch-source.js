@@ -21,6 +21,58 @@ import { readJson } from './lib/raw-data.js';
 import { pdfPageText } from './lib/pdf-text.js';
 import { htmlToSnapshotText, pageTitle } from './lib/source-capture.js';
 import { createArchiver, retryMissingArchives } from './lib/archive-queue.js';
+import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
+
+const USAGE = formatUsage({
+  summary: '擷取一個出處：存出處快照、送 Wayback Machine 存檔、把出處紀錄寫進原始資料；也能補送先前失敗的存檔。',
+  usage: [
+    ['node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型> [參數]', ''],
+    ['', '擷取一個出處'],
+    ['node scripts/fetch-source.js --retry-archive [--candidate <id>] [--raw data/raw]', ''],
+    ['', '補送 archiveUrl 為 null 的出處存檔'],
+    ['node scripts/fetch-source.js --help', '顯示這段說明（-h 也一樣）'],
+  ],
+  sections: [
+    {
+      title: '必填',
+      rows: [
+        ['--candidate <id>', '候選人識別碼；補送存檔時改為只補這位（可省略）'],
+        ['--id <sourceId>', '出處識別碼，小寫英數與連字號'],
+        ['--url <url>', '原網址（http 或 https）；用 --html 或 --pdf 時仍填原網址'],
+        ['--type <來源類型>', `來源類型：${Object.keys(SOURCE_TYPES).join('、')}`],
+      ],
+    },
+    {
+      title: '內容來源',
+      rows: [
+        ['--title <標題>', '出處標題；不給時取頁面標題，PDF 出處必填'],
+        ['--html <本機 HTML 檔>', '要登入或由瀏覽器渲染的頁面，先在瀏覽器另存 HTML 再指定'],
+        ['--pdf <本機 PDF 檔>', 'PDF 出處（例如選舉公報）先下載再指定，與 --html 擇一'],
+        ['--page <頁碼>', 'PDF 要轉出的頁（預設 1）'],
+        ['--glyph-map <字型對照檔>', '字形抽不出文字時用來還原，只用於 --pdf'],
+        ['--pdftotext <執行檔>', 'poppler 的 pdftotext 路徑（預設 pdftotext）'],
+      ],
+    },
+    {
+      title: '輸出',
+      rows: [
+        ['--no-archive', '不送存檔；同識別碼已有存檔網址時保留原紀錄的存檔欄位'],
+        ['--raw <目錄>', '原始資料目錄（預設 data/raw）'],
+        ['--snapshots <目錄>', '出處快照目錄（預設 data/snapshots）'],
+        ['--date YYYY-MM-DD', '擷取日期（預設今天，台灣時間）'],
+      ],
+    },
+  ],
+  notes: [
+    '頁面可見文字存成 <snapshots>/<sourceId>.txt，出處紀錄寫進 <raw>/sources/<candidateId>.json：同識別碼取代，否則加在最後。',
+    'PDF 以 pdftotext 轉出 --page 那一頁；字形還原的做法見 data/extraction/candidate-profiles.md。出處紀錄的 snapshotNote 自動註明轉換方法。',
+    '存檔失敗先依 60、120、240、480 秒退避重試，仍失敗只記錄原因（archiveError），不中止。',
+    '存檔流程以跨程序鎖檔排隊，同一時間只有一個在送，兩次送出至少隔 20 秒；平行擷取時會互相等待。',
+    '--retry-archive 對 <raw>/sources/*.json 中 archiveUrl 為 null 的出處逐一補送並寫回，仍有失敗時結束碼 1；不能和擷取參數一起用。',
+  ],
+});
+
+if (wantsHelp(process.argv.slice(2))) exitWithUsage(USAGE);
 
 // snapshotPath 相對於 repo 根目錄，與 build.js、verify.js 相同。
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');

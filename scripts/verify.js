@@ -22,6 +22,48 @@ import {
   parseLayer2Output,
   recordVerification,
 } from './lib/verification.js';
+import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
+
+const USAGE = formatUsage({
+  summary: '核對政見：先對候選人資料跑逐字比對，再對政見跑兩層核對（見 ADR 0002），結果寫回原始資料。',
+  usage: [
+    ['node scripts/verify.js [參數]', '核對候選人資料與政見'],
+    ['node scripts/verify.js --help', '顯示這段說明（-h 也一樣）'],
+  ],
+  sections: [
+    {
+      title: '範圍',
+      rows: [
+        ['--raw <目錄>', '原始資料目錄（預設 data/raw）'],
+        ['--candidate <id>', '只核對這位候選人，可重複；不給時核對全部'],
+        ['--skip-passed', '只跑未核對、已退回或以舊版檢核表通過的政見'],
+        ['--profiles-only', '只跑候選人資料的逐字比對，不核對政見'],
+      ],
+    },
+    {
+      title: '第二層',
+      rows: [
+        ['--jobs <數量>', '同時執行的 session 數（預設 1）'],
+        ['--model <模型>', '第二層用的模型（預設 claude-opus-5-5）'],
+        ['--claude <執行檔>', 'claude 指令的路徑（預設 claude）'],
+        ['--brand-terms <路徑>', '品牌用語清單，第二層檢查用（預設 data/rules/brand-terms.json）'],
+      ],
+    },
+    {
+      title: '紀錄',
+      rows: [['--date YYYY-MM-DD', '寫進核對紀錄的日期（預設今天，台灣時間）']],
+    },
+  ],
+  notes: [
+    '候選人資料只有第一層（逐字比對出處快照、不花費用），結果寫回 <raw>/candidates.json；--profiles-only 到此為止。',
+    '政見先跑第一層，不過就不送第二層；結果寫回 <raw>/policies/<candidateId>.json 的 verification。',
+    '第二層每筆開一個全新 claude -p session，會花費用；--jobs 只決定同時幾個，每筆仍各開一個 session。',
+    '第二層的工作目錄是空的暫存目錄，讀不到本 repo 與其他候選人的資料；提示詞中的候選人姓名與政黨以「○○」遮蔽。',
+    '出處快照不存在或雜湊與出處紀錄不符時，視為沒有可用的快照，第一層不會通過。',
+  ],
+});
+
+if (wantsHelp(process.argv.slice(2))) exitWithUsage(USAGE);
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LAYER2_TIMEOUT_MS = 5 * 60 * 1000;

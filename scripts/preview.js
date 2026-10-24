@@ -4,6 +4,30 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { parseArgs } from 'node:util';
+import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';
+
+const USAGE = formatUsage({
+  summary: '本機預覽：以本機 HTTP 伺服器開網站目錄，Ctrl+C 結束。',
+  usage: [
+    ['node scripts/preview.js [參數]', '開本機預覽'],
+    ['node scripts/preview.js --help', '顯示這段說明（-h 也一樣）'],
+  ],
+  sections: [
+    {
+      title: '參數',
+      rows: [
+        ['--port <埠>', '監聽的埠（預設 8000）'],
+        ['--dir <目錄>', '網站目錄（預設 site）'],
+      ],
+    },
+  ],
+  notes: [
+    '只供本機開發，不是正式部署用的伺服器。',
+    '開啟前先跑 node scripts/build.js 產生公開資料集；npm run preview 會先建置再開。',
+  ],
+});
+
+if (wantsHelp(process.argv.slice(2))) exitWithUsage(USAGE);
 
 const { values } = parseArgs({
   options: {

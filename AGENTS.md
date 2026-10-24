@@ -14,14 +14,14 @@
 | 指令 | 作用 |
 |---|---|
 | `node --test` | 跑全部測試（`test/**/*.js`） |
-| `node scripts/build.js [--raw data/raw] [--out site/data/dataset.json]` | 原始資料 → 公開資料集；驗證失敗列出全部錯誤並以結束碼 1 退出 |
-| `node scripts/gates.js [site]` | 對建置後的網站目錄跑上線關卡，任一項失敗結束碼 1 |
-| `node scripts/preview.js [--port 8000] [--dir site]` | 本機預覽網站目錄 |
-| `node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--profiles-only] [--jobs 1] [--brand-terms data/rules/brand-terms.json] [--model claude-opus-5-5] [--claude claude] [--date YYYY-MM-DD]` | 先對候選人資料跑逐字比對（只有第一層、不花費用），結果寫回 `candidates.json`，`--profiles-only` 到此為止。再對政見跑兩層核對（ADR 0002），結果寫回 `policies/*.json`；第一層不過不送第二層，`--skip-passed` 只跑未核對、已退回或以舊版檢核表通過的政見。第二層每筆開一個全新 `claude -p` session，會花費用，`--jobs` 是同時執行的 session 數；提示詞中的候選人姓名與政黨以「○○」遮蔽 |
-| `node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型> [--title <標題>] [--html <本機 HTML 檔>] [--pdf <本機 PDF 檔> [--page 1] [--glyph-map <字型對照檔>] [--pdftotext pdftotext]] [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]`；補送存檔：`--retry-archive [--candidate <id>] [--raw data/raw]` | 擷取一個出處：頁面可見文字存成 `data/snapshots/<sourceId>.txt`、送 Wayback Machine 存檔、出處紀錄寫進 `sources/<candidateId>.json`（同識別碼取代）。要登入或瀏覽器渲染的頁面先另存 HTML 再用 `--html`。PDF（選舉公報）先下載再用 `--pdf`，以 poppler 的 pdftotext 轉出指定頁；字形抽不出文字時用 `--glyph-map` 還原，見 `data/extraction/candidate-profiles.md`。`snapshotNote` 自動註明轉換方法。存檔失敗依 60、120、240、480 秒退避重試，仍失敗只記原因；跨程序鎖檔讓同一時間只有一個存檔流程，兩次送出至少隔 20 秒。`--retry-archive` 對 `sources/*.json` 中 `archiveUrl` 為 `null` 的出處逐一補送並寫回，仍有失敗時結束碼 1 |
-| `node scripts/shoot.js [shot\|measure] [--device desktop\|laptop\|phone] [--motion reduce\|full] [--time auto\|dawn\|day\|dusk\|night] [--path /] [--view] [--area] [--policy] [--candidate] [--q] [--district] [--click <x,y 或選擇器>]... [--wait 0] [--out shot.png] [--url <網址>] [--dir site] [--chrome <執行檔>] [--strict]` | 以 CDP 驅動本機無頭 Chrome 截圖（PNG），裝置寬度用模擬（390px 不會被撐寬）。預設減少動態、白天，截圖可重現；沒給 `--url` 時自動開本機預覽（先建置）。`measure` 印出名牌與浮動元件重疊數、名牌彼此重疊數與水平捲動（JSON），`--strict` 有問題時結束碼 1。手機版驗證用這個，不用無頭 Chrome 的 `--window-size` |
+| `node scripts/build.js` | 原始資料 → 公開資料集。參數與注意事項看 `--help` |
+| `node scripts/gates.js` | 對建置後的網站目錄跑上線關卡。參數與注意事項看 `--help` |
+| `node scripts/preview.js` | 本機預覽網站目錄。參數與注意事項看 `--help` |
+| `node scripts/verify.js` | 核對候選人資料與政見（ADR 0002），第二層會花費用。參數與注意事項看 `--help` |
+| `node scripts/fetch-source.js` | 擷取一個出處（出處快照、存檔、出處紀錄），或補送存檔。參數與注意事項看 `--help` |
+| `node scripts/shoot.js` | 截圖與版面量測，手機版驗證用這個。參數與注意事項看 `--help` |
 | `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
-| `node scripts/deploy.js [--dry-run] [--wrangler wrangler]`（`npm run deploy`） | 測試 → 建置 → 關卡 → `wrangler pages deploy site` 到 Cloudflare Pages 專案 `tc-policy-island` 的正式環境（`--branch main`），專案不存在時先建立；任一步失敗結束碼 1、不部署。`--dry-run` 跑完檢查與唯讀的專案查詢，只列出建立與部署指令。真的部署只由維護者執行；試部署流程用 `--dry-run` 或 `--wrangler` 指向假指令 |
+| `node scripts/deploy.js`（`npm run deploy`） | 檢查後部署到 Cloudflare Pages，真的部署只由維護者執行。參數與注意事項看 `--help` |
 
 看夾具資料的畫面：`node scripts/build.js --raw test/fixtures/raw-sample` 後開預覽；看完再跑一次 `node scripts/build.js` 換回正式資料。CI（`.github/workflows/check.yml`）每次 push 跑測試、建置、關卡，不部署。
 
