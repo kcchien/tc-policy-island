@@ -541,6 +541,7 @@ select {
 .area-open,
 .card-close,
 .card-height,
+.card-blind,
 .card-expand,
 .index-close {
   min-height: var(--button-height);
@@ -558,6 +559,7 @@ select {
 .area-open:hover,
 .card-close:hover,
 .card-height:hover,
+.card-blind:hover,
 .card-expand:hover,
 .index-close:hover {
   background: var(--laterite);
@@ -570,6 +572,7 @@ select {
 .area-open:active,
 .card-close:active,
 .card-height:active,
+.card-blind:active,
 .card-expand:active,
 .index-close:active {
   background: var(--pressed);
@@ -1468,8 +1471,15 @@ body[data-view="island"] .card-height {
   font-size: 16px;
 }
 
-.card-expand {
+/* 「先遮住名字」與「全部展開」靠右並排 */
+.card-blind {
   margin-left: auto;
+}
+
+/* 遮名中按鈕寫「揭曉」，填主色讓讀者知道正在遮名 */
+.policy-card[data-blind="on"] .card-blind {
+  background: var(--laterite);
+  color: var(--rice);
 }
 
 .card-filter-status {
@@ -1527,6 +1537,12 @@ body[data-view="island"] .card-height {
 
 .candidate-match {
   color: var(--laterite);
+}
+
+/* 市民補件：沒有政見的欄位在「未提出相關政見」下方放回報連結，三欄同一句 */
+.source-report {
+  font-size: 0.8125rem;
+  line-height: 1.6;
 }
 
 .policy-stack {
@@ -1692,6 +1708,47 @@ body[data-view="island"] .card-height {
 
 .policy-link {
   font-size: 0.75rem;
+}
+
+/* 政見連結、複製、朗讀同一列；按鈕小一號但觸控高度仍夠 */
+.policy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.policy-action {
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--laterite-soft);
+  border-radius: var(--radius-button);
+  background: var(--rice);
+  color: var(--laterite);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.policy-action:hover {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+.policy-action:active {
+  background: var(--pressed);
+  border-color: var(--pressed);
+  color: var(--rice);
+}
+
+.policy-action-status {
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+/* 剪貼簿不能用時放出的文字，已選取供讀者自己複製 */
+.policy-copy-text {
+  flex: 1 1 100%;
+  font-size: 0.8125rem;
 }
 
 /* 候選人資料卡：三張同尺寸、同字級。格線本身不設高度（捲動放在外層），1fr 的列或欄才會撐成最高那張的大小。 */
@@ -2402,8 +2459,9 @@ body[data-view="island"] .card-height {
     flex: 1 1 8rem;
   }
 
+  .card-blind,
   .card-expand {
-    flex: 1 1 100%;
+    flex: 1 1 40%;
     margin-left: 0;
   }
 

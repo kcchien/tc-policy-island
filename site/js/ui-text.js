@@ -84,6 +84,39 @@ export const POLICY_CARD_TEXT = {
   shrink: '縮小卡片',
   expandAll: '全部展開',
   collapseAll: '全部收合',
+  // 遮名閱讀：讀者自己開啟，三欄同時遮住姓名與政黨、順序打亂；揭曉時同時揭開並回到排序規則。
+  blindOn: '先遮住名字',
+  blindHint: '三欄同時遮住姓名與政黨、順序打亂，讀完再揭曉',
+  reveal: '揭曉',
+  maskedLabels: ['甲', '乙', '丙'],
+  maskedName: (label) => `候選人${label}`,
+  maskedNote: '姓名與政黨先遮住',
+  // 每筆政見展開後的複製與朗讀，三人同一格式。
+  copy: '複製',
+  copyHint: '把這筆政見的摘要、原文與出處複製成一段文字',
+  copied: '已複製',
+  copyFailed: '無法自動複製，已選取文字，請自行複製',
+  speak: '朗讀',
+  speakHint: '用瀏覽器內建語音唸出摘要與原文',
+  stopSpeaking: '停止朗讀',
+  // 複製成一段話的各行。
+  copyLines: {
+    heading: (areaName, candidateName) => `【${areaName}】${candidateName}`,
+    summary: (summary) => `摘要：${summary}`,
+    conflict: (note) => `出處說法不一：${note}`,
+    quote: (text) => `原文：「${text}」`,
+    source: (title, date, url) => `出處：${title}（${date} 擷取）${url}`,
+    archive: (url) => `網頁備份：${url}`,
+    footer: (cutoffDate, url) => `資料截止 ${cutoffDate}，整理自台中政見島 ${url}`,
+  },
+  // 朗讀的內容：摘要後接每則原文引述。
+  speechQuote: (text) => `原文：${text}`,
+  // 句尾沒有標點時補句號，語音才會停頓。
+  speechSentence: (text) => (/[。！？!?]$/.test(text) ? text : text + '。'),
+  // 市民補件：空欄位下方的出口，三欄同一句型；只收一手來源連結。
+  report: '你找到這位候選人在這題的公開說法？把連結給我們。',
+  reportHint: '開啟 GitHub 回報頁，已填好議題區與候選人，只需貼上候選人本人或中選會發布的連結',
+  reportTitle: (areaName, candidateName) => `補件：${areaName}／${candidateName}`,
   // 卡片內的篩選，三欄一起套用。
   filtersLabel: '在這個議題區篩選政見',
   searchLabel: '在這個議題區找政見的關鍵字',
