@@ -93,8 +93,9 @@ const SCHEMAS = {
     // 僅建置時加入；正式肖像的完整來源與授權證據在肖像清單，三人全有或全無。
     'portrait?': 'object',
     'portrait.url': 'string',
-    'portrait.sourceId': 'string',
-    'portrait.electionYear': 'int',
+    'portrait.sourceKind': 'string',
+    'portrait.sourceUrl': 'url',
+    'portrait.sourceLabel': 'string',
     'portrait.retrievedAt': 'date',
     // 候選人資料（中選會登記資料），null 表示尚未收錄。學歷與經歷逐字照出處，逐字比對通過才公開。
     profile: 'object?',

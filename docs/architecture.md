@@ -20,7 +20,7 @@ data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
 data/extraction/       政見抽取指示 instructions.md、判準裁決紀錄 judgement-log.md、候選人資料抽取方法 candidate-profiles.md、正式肖像抽取方法 candidate-portraits.md、每位候選人的抽取紀錄 records/、PDF 字型對照檔 glyph-maps/
 data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版；核對報告寫在 report.md（整理方法頁照原文公開，還沒有時顯示「尚未產生」）
 data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256，48 kbps 單聲道，不進版控）與清單 manifest.json（進版控），由 scripts/speak.js 生成
-data/portraits/        正式肖像 PNG 與 manifest.json，來源、原件及影像雜湊、頁面物件與姓名位置核對、授權依據；全部進版控
+data/portraits/        正式肖像 PNG、保留原色的原圖與 manifest.json，中選會公報或立法院委員頁來源、原圖及成品雜湊、姓名位置核對、各站授權依據；全部進版控
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
@@ -61,7 +61,7 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  
 
 ### 開啟候選人資料卡
 
-正式肖像只由 `candidate-card.js` 掛載，索引與對話框共用同一個 `candidate-portraits.js` 批次失敗狀態。每組三張全部解碼、尺寸相符後才一起顯示；任一組失敗時，所有組與之後重畫均回退。公開候選人的 `portrait` 只在建置階段由 `scripts/lib/portraits.js` 核對完整清單後加入；檢視模型沿用該欄位，其他檢視不讀。
+正式肖像只由 `candidate-card.js` 掛載，索引與對話框共用同一個 `candidate-portraits.js` 批次失敗狀態。每組三張全部解碼、尺寸相符後才一起顯示；任一組失敗時，所有組與之後重畫均回退。公開候選人的 `portrait` 只在建置階段由 `scripts/lib/portraits.js` 核對完整清單後加入；照片的 `sourceKind/sourceUrl/sourceLabel` 獨立於學經歷的 `profileSource`，可混用已核對的中選會與立法院照片，保留原色。原圖與成品一起複製，關卡重驗兩者雜湊及各站來源授權。檢視模型沿用該欄位，其他檢視不讀。
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
 

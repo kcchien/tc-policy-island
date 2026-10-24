@@ -69,7 +69,10 @@ function copyPortraits(dataset, datasetDir) {
   const problems = portraitProblems(dataset, manifest, readImage);
   if (problems.length) return `正式肖像不齊全，三人均不公開照片：\n${problems.join('\n')}`;
   mkdirSync(outDir, { recursive: true });
-  for (const item of manifest.items) copyFileSync(join(dir, item.file), join(outDir, item.file));
+  for (const item of manifest.items) {
+    copyFileSync(join(dir, item.file), join(outDir, item.file));
+    copyFileSync(join(dir, item.originalFile), join(outDir, item.originalFile));
+  }
   copyFileSync(manifestPath, join(outDir, PORTRAIT_MANIFEST));
   attachPortraits(dataset, manifest);
   return '三位候選人正式肖像與來源授權紀錄齊全，已全部加入';

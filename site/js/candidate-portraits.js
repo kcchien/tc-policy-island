@@ -4,8 +4,9 @@ export function portraitSet(candidates) {
   if (candidates.length !== 3 || new Set(candidates.map(c => c.id)).size !== 3) return [];
   if (!candidates.every(c => c.profile && c.portrait
     && /^[a-z0-9-]+$/.test(c.id) && c.portrait.url === `data/portraits/${c.id}.png`
-    && c.portrait.sourceId === c.profile.sourceId && c.portrait.electionYear === c.profile.electionYear)) return [];
-  if (new Set(candidates.map(c => c.portrait.electionYear)).size !== 1) return [];
+    && typeof c.portrait.sourceLabel === 'string' && c.portrait.sourceLabel.trim()
+    && ((c.portrait.sourceKind === 'cec-bulletin' && /^https:\/\/([a-z0-9-]+\.)*cec\.gov\.tw\//.test(c.portrait.sourceUrl))
+      || (c.portrait.sourceKind === 'ly-legislator' && /^https:\/\/www\.ly\.gov\.tw\/Pages\/List\.aspx\?nodeid=\d+$/.test(c.portrait.sourceUrl))))) return [];
   return candidates.map(c => c.portrait);
 }
 

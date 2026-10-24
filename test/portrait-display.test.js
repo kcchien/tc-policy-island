@@ -2,13 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { portraitSet, createPortraitBatch } from '../site/js/candidate-portraits.js';
 const candidates = ['a','b','c'].map((id) => ({ id, profile: { sourceId: `src-${id}`, electionYear: 2024 },
-  portrait: { url: `data/portraits/${id}.png`, sourceId: `src-${id}`, electionYear: 2024, retrievedAt: '2026-10-24' } }));
+  portrait: { url: `data/portraits/${id}.png`, sourceKind: 'cec-bulletin', sourceUrl: `https://bulletin.cec.gov.tw/${id}.pdf`,
+    sourceLabel: '中選會 2024 年選舉公報', retrievedAt: '2026-10-24' } }));
 const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => {resolve=a;reject=b;}); return {promise,resolve,reject}; };
 const images = () => candidates.map(() => { const d=deferred(); return { ...d, decode: () => d.promise, naturalWidth:240, naturalHeight:320 }; });
 
-test('肖像只在三人具相符候選人資料與本機出處時可呈現', () => {
+test('肖像只在三人具本機影像與獨立官方出處時可呈現，來源可混合', () => {
   assert.equal(portraitSet(candidates).length,3);
-  for (const change of [c => delete c[0].portrait,c => c[0].portrait.sourceId='src-b',c=>c[0].portrait.url='https://example.org/a.png',c=>c[0].profile=null]) {
+  const mixed = structuredClone(candidates);
+  Object.assign(mixed[0].portrait, { sourceKind: 'ly-legislator', sourceUrl: 'https://www.ly.gov.tw/Pages/List.aspx?nodeid=46764',
+    sourceLabel: '立法院第11屆委員（委員研究室提供）' });
+  assert.equal(portraitSet(mixed).length, 3);
+  for (const change of [c => delete c[0].portrait,c => c[0].portrait.sourceUrl='https://example.org/a',c=>c[0].portrait.url='https://example.org/a.png',c=>c[0].profile=null]) {
     const c=structuredClone(candidates); change(c); assert.deepEqual(portraitSet(c),[]);
   }
 });

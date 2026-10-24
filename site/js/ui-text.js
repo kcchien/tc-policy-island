@@ -181,7 +181,7 @@ export const PROFILE_TEXT = {
   snapshotNoteLabel: '原文存檔說明：',
   markerTitle: '島上標記',
   portraitAlt: (name) => `${name}的正式肖像`,
-  portraitSource: (year) => `照片：中選會 ${year} 年選舉公報`,
+  portraitSource: (sourceLabel) => `照片：${sourceLabel}`,
   portraitMethod: '照片來源與使用說明',
 };
 
