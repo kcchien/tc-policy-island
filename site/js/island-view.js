@@ -1,7 +1,8 @@
 // 島嶼檢視：把島嶼配置畫成 3D 場景。只讀檢視模型（經 island-layout.js），不直接碰公開資料集。
 // 由 main.js 以動態 import 載入，不支援 WebGL 的裝置不會下載 three.js。
 // 控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）、
-// areaScreenRects（議題區名牌與標記在畫面上的範圍，上手導覽用）。
+// areaScreenRects（議題區名牌與標記在畫面上的範圍，上手導覽用）、returnFigures（關閉政見卡片時人物走回廣場）。
+// 選中議題區（focusArea）時三位候選人人物同時走到該格，與鏡頭飛行同時進行。
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -24,7 +25,7 @@ import {
 } from './island-models.js';
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
-import { figurePose, plazaLayout } from './island-plaza.js';
+import { figureDestinations, figurePose, plazaLayout, walkPlan, walkPose } from './island-plaza.js';
 import { placeLabels } from './island-labels.js';
 import { LOD_DISTANCE } from './island-decor.js';
 import { createDecor } from './island-decor-view.js';
@@ -141,21 +142,27 @@ export function createIslandView(stage, {
     scene.add(g);
   }
   const markerFaces = batchMarkerFaces(scene, [...tiles.values()].flatMap((tile) => tile.markers));
-  // 候選人人物：三人同一款，依排序規則並排在廣場。人物不移動，只有待機動畫。
-  // 頭上名牌只有形狀；姓名寫在廣場南端的廣場名牌，三人並列（姓名放頭上會互疊）。
+  // 候選人人物：三人同一款，依排序規則並排在廣場，有待機動畫；讀者點開議題區時三人一起走到該格（走到同一格）。
+  // 頭上名牌只有形狀，跟著人物走；姓名寫在廣場南端的廣場名牌，三人並列（姓名放頭上會互疊），留在廣場。
+  // 腳下的底座留在廣場當三人的位置記號；身體、點選範圍與頭上名牌放在 walker 群組裡移動（相對廣場上的位置）。
   const plate = (info) => [el('b', { class: 'island-label-number' }, info.symbol), el('span', { class: 'island-label-name' }, info.name)];
   const figures = plaza.figures.map((info) => {
     const { model, body, hit } = figureModel(info);
     model.position.set(info.position.x, TILE_SURFACE, info.position.z);
     hit.userData.candidateId = info.candidateId;
+    const walker = new THREE.Group();
+    walker.add(body, hit);
+    model.add(walker);
     const node = el('span', { class: 'island-label island-figure-label' }, el('b', { class: 'island-label-number' }, info.symbol));
     const label = new CSS2DObject(el('span', { class: 'island-label-anchor' }, node));
     label.position.y = info.labelHeight;
     // 三人的頭上名牌同一組：一起顯示或一起隱藏。
     labelEntries.push({ id: `figure:${info.candidateId}`, node, group: 'figures', compact: false, pinned: true });
-    model.add(label);
+    walker.add(label);
     scene.add(model);
-    return { info, body, hit };
+    // 腿與手臂（零件與 body 的子物件同順序），行走時繞髖部與肩膀前後擺。
+    const limbs = info.parts.flatMap((part, i) => (part.part === 'leg' || part.part === 'arm' ? [{ part, mesh: body.children[i] }] : []));
+    return { info, model, body, hit, walker, limbs };
   });
   if (plaza.tile) {
     // 名牌層不接收指標事件，廣場名牌上的姓名另外開放點選，手機上比點人物容易。
@@ -257,14 +264,15 @@ export function createIslandView(stage, {
     const animating = animator.running;
     frame += 1;
     renderer.shadowMap.needsUpdate = !animating || frame % shadowEvery === 0;
+    const walking = stepFigures(now);
     // 標記牌面跟著格子抬高與亮暗：先更新世界矩陣再寫進合批。
     scene.updateMatrixWorld();
     markerFaces.sync();
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
     layoutLabels();
-    // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
-    const continuous = moving || flight.active || shifting || !settled || animating || folding;
+    // 連續重畫（拖曳、鏡頭飛行、時段補間、裝飾動畫、人物行走）時才量 fps；停下來就重新起算，閒置時間不算卡頓。
+    const continuous = moving || flight.active || shifting || !settled || animating || folding || walking;
     if (continuous) {
       const next = governor.frame(now);
       if (next) applyQuality(next);
@@ -439,7 +447,7 @@ export function createIslandView(stage, {
     return { x: position.x, z: position.z };
   };
 
-  function select(areaId) {
+  function select(areaId, { walk = true } = {}) {
     const previous = selectedId;
     selectedId = tiles.has(areaId) ? areaId : null;
     if (previous) paintTile(previous);
@@ -450,7 +458,62 @@ export function createIslandView(stage, {
     // 有選中的議題區時，其他名牌變淡。
     labelRenderer.domElement.classList.toggle('has-selection', Boolean(selectedId));
     labelsDirty = true;
+    if (selectedId && walk) sendFigures(selectedId);
     requestRender();
+  }
+
+  // 走到同一格：三人同時出發、同時抵達（island-plaza.js 的 walkPlan，三人同一份步伐參數）。
+  // standingAt 是三人所在（或正走向）的議題區，null 是廣場；walks 是走在路上時的 { plans, startedAt }。
+  let standingAt = null;
+  let walks = null;
+  const liftOf = (areaId) => (areaId && areaId === selectedId ? SELECTED_LIFT : 0);
+  // 人物腳下目前的位置（場景座標的 x、z，y 是比格子頂面高出的量）。
+  const figureFoot = ({ model, walker }) => ({ x: model.position.x + walker.position.x, z: model.position.z + walker.position.z, y: walker.userData.y ?? 0 });
+  function sendFigures(areaId) {
+    if (figures.length === 0) return;
+    const destinations = areaId ? figureDestinations(layout, areaId) : [];
+    const targets = areaId
+      ? figures.map(({ info }) => ({ ...destinations.find((d) => d.candidateId === info.candidateId).position, y: liftOf(areaId) }))
+      : figures.map(({ info }) => ({ ...info.position, y: 0 }));
+    // 腳下的高度跟著出發的那一格：剛被取消選取的格子已經落下，就從島面出發；
+    // 走到一半改道時，原本要去的格子仍選中才沿用目前的高度。朝向沿用目前的朝向，從那裡轉身。
+    const startY = (current) => (walks ? (standingAt === selectedId ? current : 0) : liftOf(standingAt));
+    const starts = figures.map((figure) => {
+      const foot = figureFoot(figure);
+      return { ...foot, y: startY(foot.y), heading: figure.walker.rotation.y };
+    });
+    // 減少動態或暫停動畫時直接出現在目的地。
+    const instant = reducedMotion() || animator.paused;
+    const plans = figures.map(({ info }, i) => walkPlan(starts[i], targets[i], instant ? { ...info.walk, durationSeconds: 0 } : info.walk));
+    standingAt = areaId;
+    walks = { plans, startedAt: performance.now() };
+    stepFigures(walks.startedAt);
+    requestRender();
+  }
+  // 依出發後經過的時間擺好三人的位置、朝向與步伐；全部抵達後回傳 false。
+  function stepFigures(now) {
+    if (!walks) return false;
+    const elapsed = (now - walks.startedAt) / 1000;
+    let walking = false;
+    figures.forEach((figure, i) => {
+      const { info, model, walker, limbs } = figure;
+      const pose = walkPose(walks.plans[i], info.walk, elapsed);
+      walker.position.set(pose.x - model.position.x, pose.y + pose.bob, pose.z - model.position.z);
+      walker.userData.y = pose.y;
+      walker.rotation.y = pose.heading;
+      for (const { part, mesh } of limbs) {
+        // 左腿與右手同向擺。零件繞上端（髖部、肩膀）轉。
+        const leg = part.part === 'leg';
+        const swing = (leg === (part.at[0] < 0) ? 1 : -1) * (leg ? pose.legSwing : pose.armSwing);
+        const half = part.height / 2;
+        mesh.rotation.x = swing;
+        mesh.position.set(part.at[0], part.at[1] + half - half * Math.cos(swing), part.at[2] - half * Math.sin(swing));
+      }
+      walking ||= !pose.arrived;
+    });
+    labelsDirty = true;
+    if (!walking) walks = null;
+    return walking;
   }
 
   // 射線打到的第一個議題區格子或候選人人物，回傳 { areaId } 或 { candidateId }。
@@ -574,6 +637,8 @@ export function createIslandView(stage, {
     // 暫停按鈕：true 時所有裝飾動畫停在目前畫格。
     setPaused(paused) {
       animator.setPaused(paused);
+      // 走到一半按暫停：三人直接站到目的地。
+      if (paused && walks) walks.startedAt = -Infinity;
       requestRender();
     },
     paused() {
@@ -611,14 +676,18 @@ export function createIslandView(stage, {
       }
       requestRender();
     },
-    // 選中議題區並把鏡頭飛過去，抵達後呼叫 done。
-    focusArea(areaId, done) {
+    // 選中議題區並把鏡頭飛過去，抵達後呼叫 done。figures 為 false 時人物不出發（政見卡片沒開著，例如切回島嶼檢視）。
+    focusArea(areaId, done, { figures: walk = true } = {}) {
       const tile = tiles.get(areaId);
       if (!tile) return false;
-      select(areaId);
+      select(areaId, { walk });
       const target = new THREE.Vector3(tile.group.position.x, TILE_SURFACE, tile.group.position.z);
       flyTo({ target, distance: Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE) }, done);
       return true;
+    },
+    // 政見卡片關閉時：三位候選人人物同時走回候選人廣場，選中的議題區不變。
+    returnFigures() {
+      if (standingAt) sendFigures(null);
     },
     // 工具列的「全景」：回到預設視角，選中的議題區不變。
     showAll() {
