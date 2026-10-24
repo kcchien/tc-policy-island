@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, resolveDocLink } from '../site/js/method-content.js';
-import { REPO_DOCUMENTS } from '../site/js/repo-documents.js';
-import { HITS_TEXT } from '../site/js/ui-text.js';
+import { REPO_DOCUMENTS, repoDocumentByPath } from '../site/js/repo-documents.js';
+import { HITS_TEXT, REPO_DOCUMENT_TEXT } from '../site/js/ui-text.js';
 import { candidate } from './fixtures/make-raw.js';
 
 const page = (name) => readFileSync(new URL(`../site/${name}`, import.meta.url), 'utf8');
@@ -79,6 +79,20 @@ test('整理方法頁為每份引用 repo 文件留一個標了 data-repo-file �
   assert.deepEqual(marked.toSorted(), REPO_DOCUMENTS.map((doc) => doc.path).toSorted());
   assert.match(html, /<a [^>]*href="\.\/data\/dataset\.json"[^>]*download/);
   assert.match(html, /https:\/\/github\.com\/kcchien\/tc-policy-island\/issues/);
+});
+
+test('docs/adr/ 的每份決策紀錄都照原文公開在整理方法頁：列入清單、有白話標題與說明、有容器', () => {
+  const adrs = readdirSync(new URL('../docs/adr/', import.meta.url)).filter((name) => name.endsWith('.md'));
+  const marked = [...page('method.html').matchAll(/data-repo-file="([^"]+)"/g)].map((m) => m[1]);
+
+  assert.ok(adrs.length > 0);
+  for (const name of adrs) {
+    const path = `docs/adr/${name}`;
+    const doc = repoDocumentByPath(path);
+    assert.ok(doc, `${path} 不在 REPO_DOCUMENTS`);
+    assert.ok(REPO_DOCUMENT_TEXT[doc.id]?.title && REPO_DOCUMENT_TEXT[doc.id]?.description, `${doc.id} 缺白話標題或說明`);
+    assert.ok(marked.includes(path), `整理方法頁沒有 ${path} 的容器`);
+  }
 });
 
 test('整理方法頁的揭露聲明列出統計收集什麼、不收集什麼', () => {
