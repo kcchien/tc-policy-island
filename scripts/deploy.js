@@ -1,7 +1,9 @@
 // 部署到 Cloudflare Pages：node scripts/deploy.js [--dry-run] [--wrangler wrangler]
 // 依序跑測試、建置、上線關卡，全過才以 wrangler 部署 site/ 到專案 tc-policy-island 的正式環境（main）；
 // 專案不存在時先建立。任一步失敗即以結束碼 1 退出，不部署。--dry-run 只列出建立與部署指令、不執行。
-// wrangler 須已在本機登入（wrangler login）。
+// wrangler 須已在本機登入（wrangler login 或環境變數 CLOUDFLARE_API_TOKEN）。
+// 前提：Cloudflare 帳號須啟用 Analytics Engine（統計端點的資料集，ADR 0003），否則上傳完才以錯誤碼 10089 失敗；
+// 上傳前會先檢查（--dry-run 也跑），未啟用就印出後台啟用網址後退出。
 import { spawnSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,5 +31,5 @@ function run(command, args, { capture = false } = {}) {
   return { status: result.status ?? 1, stdout: result.stdout ?? '' };
 }
 
-const { ok } = deploy({ run, log: (line) => console.log(line), dryRun: values['dry-run'] });
+const { ok } = await deploy({ run, log: (line) => console.log(line), dryRun: values['dry-run'], env: process.env });
 process.exitCode = ok ? 0 : 1;
