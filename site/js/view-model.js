@@ -31,6 +31,8 @@ export function buildViewModel(dataset) {
   const sources = new Map(dataset.sources.map((s) => [s.id, sourceView(s)]));
   const policyView = (policy) => ({
     ...policy,
+    // 朗讀用的政見音檔；公開資料集沒有音檔（全有或全無的「全無」）時為 null。
+    audioUrl: policy.audioUrl ?? null,
     quotes: policy.quotes.map((quote) => ({ ...quote, source: sources.get(quote.sourceId) })),
   });
   const elements = new Map(dataset.localElements.map((e) => [e.id, e]));

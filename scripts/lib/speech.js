@@ -1,6 +1,7 @@
 // 朗讀（GLOSSARY）：政見語音的固定設定與文字樣板。只給 Node 用。
 // speechScript 把一條政見組成送語音合成服務的文字，三位候選人同一樣板、不帶候選人資訊；
 // speechParts 把超過單次上限的文字依句子拆段。生成指令是 scripts/speak.js，清單格式見 data/audio/manifest.json。
+// audioProblems 對照公開政見與清單找出缺少的音檔，建置指令與上線關卡「音檔」共用。
 
 import { createHash } from 'node:crypto';
 
@@ -72,4 +73,27 @@ function pack(units, limit) {
 // 超過上限時依句子拆段，句子本身超過上限才退到逗號處，仍超過才硬切。合起來等於原文。
 export function speechParts(script, limit = SPEECH_CHAR_LIMIT) {
   return charCount(script) <= limit ? [script] : pack(script.split(SENTENCE_END), limit);
+}
+
+// 網站上的政見音檔與清單放在公開資料集旁的 audio/，公開資料集的 audioUrl 相對網站根目錄。
+export const AUDIO_DIR = 'audio';
+export const AUDIO_MANIFEST = 'manifest.json';
+export const audioUrlOf = (item) => `data/${AUDIO_DIR}/${item.file}`;
+
+// 對照公開政見與清單，回傳缺少的音檔與原因；空陣列表示齊全（全有或全無的「全有」）。
+// fileSha256Of(file) 回傳音檔的 sha256，檔案不存在時回傳 null。
+export function audioProblems(policies, manifest, fileSha256Of) {
+  if (JSON.stringify(manifest.voice) !== JSON.stringify(SPEECH_VOICE)) {
+    return [`清單的語音設定 ${JSON.stringify(manifest.voice)} 與現行設定 ${JSON.stringify(SPEECH_VOICE)} 不同`];
+  }
+  return policies.flatMap((policy) => {
+    const item = manifest.items?.[policy.id];
+    const where = `政見 ${policy.id}`;
+    if (!item) return [`${where}：清單沒有這條`];
+    if (item.textSha256 !== sha256(speechScript(policy))) return [`${where}：文字已變，音檔要重生成`];
+    const actual = fileSha256Of(item.file);
+    if (actual === null) return [`${where}：音檔 ${item.file} 不存在`];
+    if (actual !== item.fileSha256) return [`${where}：音檔與清單的雜湊不符`];
+    return [];
+  });
 }

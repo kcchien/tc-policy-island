@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { buildPublicDataset } from '../site/js/dataset.js';
 import { REPO_DOCUMENTS, repoFileSitePath } from '../site/js/repo-documents.js';
 import { makeRaw, pendingVerification, profileSnapshot } from './fixtures/make-raw.js';
+import { sha256, SPEECH_VOICE, speechScript } from '../scripts/lib/speech.js';
 
 const GATES_SCRIPT = fileURLToPath(new URL('../scripts/gates.js', import.meta.url));
 
@@ -800,7 +801,7 @@ test('網站目錄缺少裝飾配置模組時，裝飾數量固定關卡不通�
   assert.match(output, /js\/island-decor\.js/);
 });
 
-test('網站目錄放了音檔或程式引用音檔時，不載入音檔關卡不通過並指出檔案', () => {
+test('政見語音清單以外的音檔或程式引用音檔時，音檔關卡不通過並指出檔案', () => {
   const site = makeSite(() => {}, {
     ...COMPLIANT_FILES,
     'audio/loop.mp3': 'ID3',
@@ -812,6 +813,112 @@ test('網站目錄放了音檔或程式引用音檔時，不載入音檔關卡�
   assert.notEqual(code, 0);
   assert.match(output, /audio\/loop\.mp3/);
   assert.match(output, /js\/music\.js/);
+});
+
+// 給每條公開政見加上 audioUrl，音檔與政見語音清單寫進網站目錄的 data/audio/（音檔內容是假的位元組）。
+// change(dataset, files, manifest) 在寫檔前改出要驗證的情境。
+function audioSite(change = () => {}) {
+  const files = { ...COMPLIANT_FILES };
+  return makeSite((dataset) => {
+    const items = {};
+    for (const p of dataset.policies) {
+      const text = speechScript(p);
+      const bytes = `FAKE-MP3:${p.id}`;
+      const file = `${sha256(text)}.mp3`;
+      items[p.id] = { textSha256: sha256(text), file, fileSha256: sha256(bytes), chars: [...text].length, quota: 1, generatedAt: '2026-10-24' };
+      files[`data/audio/${file}`] = bytes;
+      p.audioUrl = `data/audio/${file}`;
+    }
+    const manifest = { voice: { ...SPEECH_VOICE }, items };
+    change(dataset, files, manifest);
+    files['data/audio/manifest.json'] = JSON.stringify(manifest);
+  }, files);
+}
+
+const policyOf = (dataset, id) => dataset.policies.find((p) => p.id === id);
+
+test('每條公開政見都有相符音檔、或全部都沒有時，音檔關卡通過；政見卡片模組可以播放 audioUrl', () => {
+  const card = "const player = new Audio(policy.audioUrl);\nconst el = document.createElement('audio');";
+
+  for (const site of [audioSite(), makeSite(() => {}, COMPLIANT_FILES)]) {
+    writeFileSync(join(site, 'js', 'policy-card.js'), card);
+    const { code, output } = runGates(site);
+    assert.equal(code, 0, output);
+  }
+});
+
+test('缺一條政見音檔時，音檔關卡不通過並指出政見', () => {
+  const site = audioSite((dataset, files, manifest) => {
+    const p = policyOf(dataset, 'p-a1');
+    delete files[p.audioUrl];
+    delete manifest.items['p-a1'];
+    delete p.audioUrl;
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /政見 p-a1：沒有 audioUrl/);
+});
+
+test('音檔與清單的雜湊不符、或文字已變時，音檔關卡不通過', () => {
+  const tampered = audioSite((dataset, files) => {
+    files[policyOf(dataset, 'p-b1').audioUrl] = 'FAKE-MP3:別的內容';
+  });
+  const stale = audioSite((dataset) => {
+    policyOf(dataset, 'p-a1').summary = '改過的摘要。';
+  });
+
+  const bad = runGates(tampered);
+  assert.notEqual(bad.code, 0);
+  assert.match(bad.output, /p-b1：音檔與清單的雜湊不符/);
+  const old = runGates(stale);
+  assert.notEqual(old.code, 0);
+  assert.match(old.output, /p-a1：文字已變/);
+});
+
+test('只有一位候選人的政見有音檔時，音檔關卡指出三位候選人的覆蓋率不同', () => {
+  const site = audioSite((dataset, files, manifest) => {
+    for (const p of dataset.policies.filter((x) => x.candidateId !== 'cand-a')) {
+      delete files[p.audioUrl];
+      delete manifest.items[p.id];
+      delete p.audioUrl;
+    }
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /覆蓋率不同.*cand-a 100%.*cand-b 0%/);
+});
+
+test('清單沒有登記的音檔、指向別處的 audioUrl、或資料集沒有 audioUrl 卻放了音檔時，音檔關卡不通過', () => {
+  const extra = audioSite((dataset, files) => {
+    files['data/audio/extra.mp3'] = 'FAKE';
+  });
+  const elsewhere = audioSite((dataset) => {
+    policyOf(dataset, 'p-a1').audioUrl = policyOf(dataset, 'p-b1').audioUrl;
+  });
+  const orphan = audioSite((dataset) => {
+    for (const p of dataset.policies) delete p.audioUrl;
+  });
+
+  assert.match(runGates(extra).output, /data\/audio\/extra\.mp3：不在政見語音清單裡/);
+  assert.match(runGates(elsewhere).output, /p-a1：audioUrl/);
+  assert.match(runGates(orphan).output, /沒有任何政見帶 audioUrl/);
+});
+
+test('政見卡片模組以外播放音檔、或任何程式寫死音檔路徑時，音檔關卡不通過', () => {
+  const site = audioSite((dataset, files) => {
+    files['js/table-view.js'] = 'const player = new Audio(policy.audioUrl);';
+    files['js/policy-card.js'] = "const intro = new Audio('data/audio/intro.mp3');";
+  });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0);
+  assert.match(output, /js\/table-view\.js：只有政見卡片模組可以播放音檔/);
+  assert.match(output, /js\/policy-card\.js：引用音檔「'data\/audio\/intro\.mp3'」/);
 });
 
 test('即時合成的背景音樂程式、叫做 midi 的欄位與文案提到「音檔」兩字不擋', () => {

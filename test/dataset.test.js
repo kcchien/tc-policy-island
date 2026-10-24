@@ -63,6 +63,16 @@ test('政見缺少必要欄位時，錯誤訊息指出政見識別碼與欄位�
   assert.deepEqual(validationErrors(raw), ['政見 p-a1：缺少欄位 summary']);
 });
 
+test('政見的 audioUrl 可以沒有（建置時才加）或為 null，有值時須是非空字串', () => {
+  const raw = makeRaw();
+  raw.policies[0].audioUrl = 'data/audio/a.mp3';
+  raw.policies[1].audioUrl = null;
+  assert.equal(buildPublicDataset(raw).policies.length, 2);
+
+  raw.policies[0].audioUrl = 3;
+  assert.deepEqual(validationErrors(raw), ['政見 p-a1：欄位 audioUrl 應為非空字串或 null，實際為 3']);
+});
+
 test('欄位型別錯誤時，錯誤訊息說明應有的型別與實際值', () => {
   const raw = makeRaw();
   raw.sources[0].sourceType = 'news';

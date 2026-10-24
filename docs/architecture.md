@@ -137,6 +137,6 @@ lib/      archive-queue.js  audience-text.js  brand-terms.js  cdp.js  colors.js 
           pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  speech.js  usage.js  verification.js
 gates/    index.js（關卡清單 GATES）  site.js（讀取網站目錄的入口）
           audience-text.js  brand-terms.js  candidate-columns.js  candidate-profiles.js  dataset-structure.js
-          figure-consistency.js  fixed-decor.js  fixed-motion.js  forbidden-colors.js  no-audio-files.js
+          figure-consistency.js  fixed-decor.js  fixed-motion.js  forbidden-colors.js  audio-files.js
           repo-documents.js  verified-policies.js   每項關卡一個模組
 ```

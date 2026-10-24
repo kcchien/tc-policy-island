@@ -45,7 +45,7 @@ export class DatasetValidationError extends Error {
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SHA256 = /^[0-9a-f]{64}$/;
 
-// 欄位型別。名稱結尾加 ? 表示可為 null。
+// 欄位型別。型別名稱結尾加 ? 表示可為 null；SCHEMAS 的欄位名結尾加 ? 表示可以沒有這個欄位（建置時才加的欄位）。
 const TYPES = {
   string: { desc: '非空字串', ok: (v) => typeof v === 'string' && v.trim() !== '' },
   int: { desc: '正整數', ok: (v) => Number.isInteger(v) && v > 0 },
@@ -146,6 +146,8 @@ const SCHEMAS = {
     quotes: 'array',
     districts: 'strings',
     conflictNote: 'string?',
+    // 政見音檔相對網站根目錄的位置。只在公開資料集，建置時每條公開政見都有相符音檔才全部加上，否則全部沒有（全有或全無）。
+    'audioUrl?': 'string?',
     verification: 'object',
     'verification.layer1': 'object',
     'verification.layer1.status': 'status',
@@ -178,9 +180,15 @@ function lookup(record, path) {
 function checkFields(record, schema, where, errors) {
   const broken = [];
   const empty = [];
-  for (const [path, spec] of Object.entries(schema)) {
+  for (const [key, spec] of Object.entries(schema)) {
+    const omittable = key.endsWith('?');
+    const path = omittable ? key.slice(0, -1) : key;
     if ([...broken, ...empty].some((parent) => path.startsWith(`${parent}.`))) continue;
     const { missing, value } = lookup(record, path);
+    if (missing && omittable) {
+      empty.push(path);
+      continue;
+    }
     if (missing) {
       errors.push(`${where}：缺少欄位 ${path}`);
       broken.push(path);

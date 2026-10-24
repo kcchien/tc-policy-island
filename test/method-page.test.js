@@ -5,6 +5,7 @@ import { brandTermsView, candidateOrderItems, checklistView, dataStatusItems, re
 import { REPO_DOCUMENTS, repoDocumentByPath } from '../site/js/repo-documents.js';
 import { HITS_TEXT, REPO_DOCUMENT_TEXT } from '../site/js/ui-text.js';
 import { candidate } from './fixtures/make-raw.js';
+import { SPEECH_VOICE } from '../scripts/lib/speech.js';
 
 const page = (name) => readFileSync(new URL(`../site/${name}`, import.meta.url), 'utf8');
 
@@ -61,6 +62,19 @@ test('整理方法頁有候選人資料一節，照原文公開候選人資料�
   assert.match(html, /<a href="#profiles">候選人資料<\/a>/);
   assert.match(section, /data-repo-file="data\/extraction\/candidate-profiles\.md"/);
   assert.match(section, /中選會/);
+});
+
+test('整理方法頁揭露政見朗讀的做法，照原文公開語音清單，頁面文字不寫服務名稱與模型代號', () => {
+  const html = page('method.html');
+  const section = html.match(/<section[^>]*id="speech"[\s\S]*?<\/section>/)?.[0] ?? '';
+
+  assert.match(html, /<a href="#speech">政見朗讀<\/a>/);
+  assert.match(section, /語音合成服務依固定設定預先生成，三位候選人同一個聲音與語速/);
+  assert.match(section, /data-repo-file="data\/audio\/manifest\.json"/);
+  assert.ok(REPO_DOCUMENT_TEXT[repoDocumentByPath('data/audio/manifest.json').id]);
+  for (const name of [SPEECH_VOICE.provider, SPEECH_VOICE.model, SPEECH_VOICE.name]) {
+    assert.ok(!html.toLowerCase().includes(name.toLowerCase()), name);
+  }
 });
 
 test('整理方法頁可從首頁的頁首與頁尾進入', () => {
