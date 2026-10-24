@@ -7,6 +7,8 @@ import { buildViewModel } from '../site/js/view-model.js';
 import { islandLayout } from '../site/js/island-layout.js';
 import { makeRaw, policy } from './fixtures/make-raw.js';
 import { forbiddenRangesOf, loadForbiddenColors, rgbToHsl } from '../scripts/lib/colors.js';
+import { internalDetails } from '../scripts/lib/audience-text.js';
+import { HERO_NAMES } from '../site/js/ui-text.js';
 
 const issueAreas = JSON.parse(readFileSync(new URL('../data/raw/issue-areas.json', import.meta.url), 'utf8'));
 
@@ -18,6 +20,24 @@ test('正式資料的每個議題區都有自己的主題場景', () => {
     assert.ok(scene.parts.length >= 20, `${area.id} 的主題場景只有 ${scene.parts.length} 個零件，細節不夠`);
   }
   assert.equal(new Set(Object.keys(HERO_SCENES)).size, 20);
+});
+
+test('每個議題區的主題場景都有名稱（主題場景名稱），名稱放在畫面文案、不含內部術語', () => {
+  for (const area of issueAreas) {
+    const { name } = heroSceneFor(area.id);
+    assert.ok(typeof name === 'string' && name.trim() !== '', `${area.id} 的主題場景沒有名稱`);
+    assert.equal(name, HERO_NAMES[area.id], `${area.id} 的名稱應取自畫面文案的 HERO_NAMES`);
+    assert.deepEqual(internalDetails(name), [], `${area.id} 的名稱「${name}」含內部細節`);
+  }
+  assert.deepEqual(Object.keys(HERO_NAMES).sort(), Object.keys(HERO_SCENES).sort(), 'HERO_NAMES 與主題場景要一一對應');
+  // 對不到專屬場景的議題區（夾具）用通用場景，也有名稱。
+  assert.ok(heroSceneFor('no-such-area').name);
+});
+
+test('主題場景模組不寫中文，名稱都在畫面文案模組', () => {
+  const source = readFileSync(new URL('../site/js/island-heroes.js', import.meta.url), 'utf8');
+  const code = source.split('\n').filter((line) => !/^\s*\/\//.test(line)).map((line) => line.replace(/\/\/.*$/, '')).join('\n');
+  assert.doesNotMatch(code, /[一-鿿]/);
 });
 
 test('零件外框：平移、縮放與繞 y 轉 90 度', () => {

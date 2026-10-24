@@ -1,9 +1,11 @@
 // 島嶼檢視的索引面板：議題區清單與標記圖例（候選人分頁的候選人資料卡在 candidate-card.js）。桌面在畫面右側，800px 以下由 CSS 改為底部抽屜。
 // 清單的編號與標記狀態與島上的名牌、標記同樣來自 island-layout.js，不呈現政見數量。
+// 每列附一句主題場景名稱（「島上這格：⋯」，取自 island-heroes.js 的場景名稱），只依議題區決定。
 
 import { el } from './dom.js';
 import { islandLayout, markerLegend } from './island-layout.js';
-import { MARKER_TEXT, NO_MATCH_TEXT, NO_POLICY_LABEL } from './ui-text.js';
+import { heroSceneFor } from './island-heroes.js';
+import { heroHint, MARKER_TEXT, NO_MATCH_TEXT, NO_POLICY_LABEL } from './ui-text.js';
 
 function markerBadge(marker, offText) {
   const state = marker.lit ? MARKER_TEXT.lit : offText;
@@ -35,7 +37,12 @@ export function renderIslandList(container, vm, filtered, { selectedId, onPick }
         'button',
         { type: 'button', class: 'island-item', 'data-area': tile.id, 'aria-current': tile.id === selectedId ? 'true' : null },
         el('span', { class: 'area-number' }, tile.number),
-        el('span', { class: 'island-item-name' }, tile.name),
+        el(
+          'span',
+          { class: 'island-item-name' },
+          tile.name,
+          el('span', { class: 'island-item-hero' }, heroHint(heroSceneFor(tile.id).name)),
+        ),
         el('span', { class: 'island-item-markers' }, tile.markers.map((m) => markerBadge(m, offText))),
       );
       button.addEventListener('click', () => onPick(tile.id));

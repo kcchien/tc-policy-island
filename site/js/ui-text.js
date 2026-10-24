@@ -132,6 +132,34 @@ export const MARKER_TEXT = {
   spoken: (name, state) => `${name}${state}`,
 };
 
+// 主題場景名稱：島上每個議題區那一格的主題場景是什麼，以議題區識別碼對應（island-heroes.js 的場景名稱取自這裡）。
+// 只依議題區決定，與政見無關；索引面板的議題區列以 heroHint 顯示。
+export const HERO_NAMES = {
+  transportation: '公車站與公車',
+  'public-safety': '消防隊與消防車',
+  economy: '商店街',
+  labor: '工廠與工人',
+  'agriculture-animals': '農田與小動物',
+  tourism: '涼亭與攤位',
+  'social-welfare': '社區照顧中心',
+  health: '診所與救護車',
+  education: '學校與操場',
+  culture: '戶外舞台',
+  'indigenous-affairs': '高架穀倉與織布機',
+  'hakka-affairs': '油紙傘與茶園',
+  environment: '回收站與風車',
+  water: '河道與小橋',
+  'urban-housing': '公寓與住宅',
+  sports: '球場',
+  parks: '公園與遊戲場',
+  'civil-affairs': '區公所與公布欄',
+  digital: '通訊塔與機房',
+  'city-governance': '市政廳與鐘塔',
+};
+// 對不到專屬場景的議題區用的通用場景。
+export const GENERIC_HERO_NAME = '小屋與花園';
+export const heroHint = (name) => `島上這格：${name}`;
+
 // 島嶼檢視與工具列。
 // auto 是「自動」：依台灣時間選時段。
 export const TIME_NAMES = { auto: '自動', dawn: '清晨', day: '白天', dusk: '黃昏', night: '夜晚' };

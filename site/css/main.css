@@ -1135,6 +1135,14 @@ body[data-view="island"] .policy-card::backdrop {
   box-shadow: inset 4px 0 0 var(--laterite);
 }
 
+/* 主題場景名稱：議題區名稱下方一行小字 */
+.island-item-hero {
+  display: block;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .island-item-markers {
   display: inline-flex;
   flex: none;
