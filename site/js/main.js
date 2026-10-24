@@ -12,11 +12,14 @@ import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
 import { pickRandomArea } from './random-area.js';
-import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES } from './ui-text.js';
+import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
+import { createTourView } from './tour-view.js';
+import { ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 
 const DATASET_URL = './data/dataset.json';
-const INTRO_SEEN_KEY = 'policy-island:intro-seen';
+// 上手導覽看過或跳過的紀錄。沿用舊的文字版進站說明的鍵，看過舊說明的人不再自動出現導覽。
+const TOUR_SEEN_KEY = 'policy-island:intro-seen';
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 // 與 main.css 的手機斷點相同：底部膠囊工具列、索引與卡片改為底部抽屜。
 const mobileQuery = window.matchMedia('(max-width: 800px)');
@@ -49,18 +52,8 @@ function writeStorage(key, value) {
   try {
     window.localStorage.setItem(key, value);
   } catch {
-    // 記不住就下次再顯示說明。
+    // 記不住就下次再顯示導覽。
   }
-}
-
-function setupIntro() {
-  const intro = document.getElementById('intro');
-  if (readStorage(INTRO_SEEN_KEY) === '1') return;
-  intro.hidden = false;
-  document.getElementById('intro-dismiss').addEventListener('click', () => {
-    writeStorage(INTRO_SEEN_KEY, '1');
-    intro.hidden = true;
-  });
 }
 
 function showViewNote(text) {
@@ -123,6 +116,8 @@ function startApp(vm, state, initialView) {
   // 目前選中的議題區。關閉卡片後仍保留，切換檢視時沿用。
   let selectedArea = null;
   let island = null;
+  // 載入完成的島嶼檢視（上手導覽每幀同步讀名牌位置用）；還沒載入或載入失敗時是 null。
+  let loadedIsland = null;
   // timeMode 是 'auto' 或手動選的時段；time 是實際套用的時段。
   const hud = { timeMode: AUTO_TIME.id, time: timeOfDayAt(Date.now()), paused: false, labels: true };
 
@@ -174,8 +169,10 @@ function startApp(vm, state, initialView) {
     return { top: bar.bottom, right: Math.max(0, width - panel.getBoundingClientRect().left), bottom: 0, left: 0 };
   };
 
-  // 名牌要避開的浮動元件：標題卡、工具列（桌面是各組按鈕，手機是整條膠囊列）、索引面板、說明文字與開著的卡片。
-  const stageObstacles = () => {
+  // 名牌要避開的浮動元件：標題卡、工具列（桌面是各組按鈕，手機是整條膠囊列）、索引面板、說明文字、開著的卡片，
+  // 以及上手導覽的說明框。
+  const stageObstacles = () => [...panelObstacles(), ...(tourView.element.open ? [tourView.element.getBoundingClientRect()] : [])];
+  const panelObstacles = () => {
     const nodes = [
       titleCard,
       ...(mobileQuery.matches ? [toolbar] : toolbar.querySelectorAll('.tool-group')),
@@ -271,6 +268,7 @@ function startApp(vm, state, initialView) {
         controller.setTimeOfDay?.(hud.time);
         controller.setPaused?.(hud.paused);
         document.getElementById('island-status').remove();
+        loadedIsland = controller;
         return controller;
       })
       .catch((error) => {
@@ -340,6 +338,77 @@ function startApp(vm, state, initialView) {
     return openCard(areaId, null, { unfiltered: true });
   };
 
+  // 上手導覽（tour.js 的狀態機、tour-view.js 的覆蓋層）：第一步框一個議題區的名牌、第二步框同一格的三個標記，
+  // 第三步呼叫隨機一題並框住開好的政見卡片。框哪一格只依畫面位置（pickTourArea），不讀政見。
+  const webgl = document.body.dataset.webgl === 'yes';
+  let tour = initialTour({ seen: readStorage(TOUR_SEEN_KEY) === '1' });
+  // 網址指定要開卡片時，第一次進島嶼檢視不自動出現導覽。
+  let deepLink = Boolean(state.policy || state.area || state.candidate);
+  let tourArea = null;
+  const tourTarget = (step) => {
+    if (step === 'random') {
+      if (!card.element.open) return null;
+      const { left, top, right, bottom } = card.element.getBoundingClientRect();
+      return { left, top, right, bottom };
+    }
+    if (!loadedIsland) return null;
+    const { innerWidth: width, innerHeight: height } = window;
+    const inset = stageInsets();
+    const visible = { left: inset.left, top: inset.top, right: width - inset.right, bottom: height - inset.bottom };
+    const rectsOf = (id) => ({ id, ...loadedIsland.areaScreenRects(id) });
+    // 上一幀框的那一格，標記仍在可見範圍內就不換。名牌可能被說明框擋住而避讓隱藏，不看名牌，
+    // 否則說明框一移動就會換格、來回跳。
+    let rects = tourArea && rectsOf(tourArea);
+    const keep = rects?.markers && pickTourArea([{ ...rects, label: rects.markers }], { visible, obstacles: panelObstacles() });
+    if (!keep) {
+      tourArea = pickTourArea(vm.rows.map((row) => rectsOf(row.issueArea.id)), { visible, obstacles: panelObstacles() });
+      if (!tourArea) return null;
+      rects = rectsOf(tourArea);
+    }
+    return step === 'area' ? rects.label ?? rects.markers : rects.markers;
+  };
+  const setTour = (next) => {
+    if (next === tour) return;
+    const previous = currentTourStep(tour);
+    if (next.seen && !tour.seen) writeStorage(TOUR_SEEN_KEY, '1');
+    tour = next;
+    const step = currentTourStep(tour);
+    if (!step) {
+      tourView.hide();
+    } else {
+      if (previous === null) {
+        // 從第一步開始：收起卡片與抽屜，讓島露出來。
+        tourArea = null;
+        card.close();
+        candidateDialog.close();
+        setPanelOpen(false);
+      }
+      tourView.show(step);
+      if (step === 'random' && previous !== 'random') openRandomArea();
+    }
+    refreshLabels();
+  };
+  const tourView = createTourView({
+    targetOf: tourTarget,
+    onNext: () => setTour(nextTourStep(tour)),
+    onSkip: () => setTour(skipTour(tour)),
+    onMove: refreshLabels,
+  });
+  document.body.append(tourView.element);
+  // 第三步的政見卡片在鏡頭飛到後才開，開在導覽之上；開好後把導覽移回最上層。
+  new MutationObserver(() => {
+    if (card.element.open && currentTourStep(tour) === 'random') tourView.raise();
+  }).observe(card.element, { attributes: true, attributeFilter: ['open'] });
+  const autoStart = () => {
+    setTour(autoStartTour(tour, { view, webgl, deepLink }));
+    deepLink = false;
+  };
+  const tourButton = document.getElementById('tour-open');
+  tourButton.textContent = TOUR_TEXT.open;
+  tourButton.title = TOUR_TEXT.openHint;
+  tourButton.addEventListener('click', () => setTour(reopenTour(tour, { view, webgl })));
+  tourButton.hidden = !webgl;
+
   function setView(next) {
     view = next;
     document.body.dataset.view = next;
@@ -355,6 +424,8 @@ function startApp(vm, state, initialView) {
         if (!controller) return;
         controller.resize();
         if (selectedArea) controller.focusArea(selectedArea);
+        // 載入期間切回表格檢視時不出導覽。
+        if (view === 'island') autoStart();
       });
     } else {
       highlightTableRow();
@@ -438,7 +509,6 @@ async function start() {
   document.body.dataset.view = view;
   document.body.dataset.webgl = webgl ? 'yes' : 'no';
   if (!webgl) disableIsland(ISLAND_TEXT.noWebgl);
-  setupIntro();
   try {
     const response = await fetch(DATASET_URL);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

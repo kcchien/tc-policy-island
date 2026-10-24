@@ -160,7 +160,7 @@ select {
   font-size: 0.75rem;
 }
 
-.title-links :is(a, .random-area-button) {
+.title-links :is(a, .random-area-button, .tour-open-button) {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -191,6 +191,100 @@ select {
 .random-area-button .tool-icon {
   width: 18px;
   height: 18px;
+}
+
+/* 上手導覽的重開按鈕：外觀同頁首連結 */
+.tour-open-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--laterite);
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 上手導覽：對話框本身是說明框，框線固定定位、以大範圍陰影壓暗框外（main.js 與 tour-view.js 定位） */
+.tour {
+  position: fixed;
+  inset: auto;
+  width: min(360px, calc(100vw - 2 * var(--gap)));
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  color: var(--charcoal);
+}
+
+.tour::backdrop {
+  background: transparent;
+}
+
+.tour-frame {
+  position: fixed;
+  border: 3px solid var(--laterite);
+  border-radius: var(--radius-small);
+  box-shadow: 0 0 0 200vmax color-mix(in srgb, var(--charcoal) 42%, transparent);
+  pointer-events: none;
+}
+
+.tour-frame.is-empty {
+  border: 0;
+}
+
+.tour-bubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--rice);
+  border-top: 4px solid var(--laterite);
+  border-radius: var(--radius-brand);
+  box-shadow: var(--float-shadow);
+}
+
+.tour-count {
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.tour-title {
+  margin: 0;
+  color: var(--laterite);
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.tour-body {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tour .tour-skip {
+  border-color: transparent;
+}
+
+.tour .tour-next {
+  background: var(--laterite);
+  color: var(--rice);
+}
+
+.tour .tour-next:hover {
+  background: var(--pressed);
 }
 
 .hud-toolbar {
@@ -323,40 +417,9 @@ select {
   font-size: 0.8125rem;
 }
 
-/* 首次進站說明 */
-
-.intro {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 8px var(--gap);
-  margin-bottom: 12px;
-  padding: 12px var(--gap);
-  background: var(--rice-deep);
-  border-left: 4px solid var(--water);
-  border-radius: var(--radius);
-}
-
-.intro-title {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.intro-list {
-  grid-column: 1;
-  margin: 0;
-  padding-left: 1.2em;
-  font-size: 0.875rem;
-}
-
-.intro-dismiss {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-}
-
 /* 文字按鈕：最小高度 44px、圓角 9px；滑過填主色、按下壓深一階並下沉 1px、鍵盤焦點用外框 */
-.intro-dismiss,
+.tour-skip,
+.tour-next,
 .filter-reset,
 .area-open,
 .card-close,
@@ -373,7 +436,8 @@ select {
   transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 
-.intro-dismiss:hover,
+.tour-skip:hover,
+.tour-next:hover,
 .filter-reset:hover,
 .area-open:hover,
 .card-close:hover,
@@ -384,7 +448,8 @@ select {
   color: var(--rice);
 }
 
-.intro-dismiss:active,
+.tour-skip:active,
+.tour-next:active,
 .filter-reset:active,
 .area-open:active,
 .card-close:active,
@@ -847,18 +912,6 @@ body[data-view="island"] .policy-card::backdrop {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.index-panel .intro {
-  grid-template-columns: 1fr;
-  margin: 0 0 10px;
-  padding: 10px 12px;
-}
-
-.index-panel .intro-dismiss {
-  grid-column: 1;
-  grid-row: auto;
-  justify-self: start;
 }
 
 .index-panel .filters {
@@ -1870,16 +1923,6 @@ body[data-view="island"] .card-height {
     font-size: 1.5rem;
   }
 
-  .intro {
-    grid-template-columns: 1fr;
-  }
-
-  .intro-dismiss {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: start;
-  }
-
   .field-search,
   .field-district {
     flex: 1 1 100%;
@@ -1916,7 +1959,7 @@ body[data-view="island"] .card-height {
     line-height: 1.4;
   }
 
-  body[data-view="island"] .title-links :is(a, .random-area-button) {
+  body[data-view="island"] .title-links :is(a, .random-area-button, .tour-open-button) {
     min-height: 28px;
     font-size: 0.8125rem;
   }

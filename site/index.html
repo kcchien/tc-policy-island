@@ -37,6 +37,8 @@
           <svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="9" cy="9" r="1.2" /><circle cx="15" cy="15" r="1.2" /><circle cx="15" cy="9" r="1.2" /><circle cx="9" cy="15" r="1.2" /></svg>
           <span id="random-area-label"></span>
         </button>
+        <!-- 上手導覽的重開按鈕：只在島嶼檢視顯示，資料載入後 main.js 填文案 -->
+        <button type="button" class="tour-open-button" id="tour-open" data-island-only hidden></button>
         <a href="./method.html">整理方法</a>
         <span>資料截止日 <span data-cutoff-date>載入中</span></span>
       </p>
@@ -110,17 +112,6 @@
 
     <!-- 共用控制區：島嶼檢視時放在索引面板的議題區分頁，表格檢視時放在表格上方（main.js 搬移）。 -->
     <div class="controls" id="controls">
-      <section class="intro" id="intro" aria-labelledby="intro-title" hidden>
-        <h2 class="intro-title" id="intro-title">怎麼看這個網站</h2>
-        <ul class="intro-list">
-          <li>島嶼檢視：拖曳旋轉、滾輪或雙指縮放。每一格是一個議題區，格上的編號與索引相同；三個同尺寸標記 ○ △ □ 依排序代表三位候選人，亮起表示有政見，灰色表示沒有。</li>
-          <li>點島上的議題區或索引裡的議題區，鏡頭會移到該區並開啟政見卡片，可讀原文引述、出處與核對紀錄。</li>
-          <li>表格檢視：每一列是一個議題區，每一欄是一位候選人，三人欄寬與字級相同。</li>
-          <li>用關鍵字或適用行政區找出和你有關的政見，網址可直接分享。</li>
-        </ul>
-        <button type="button" class="intro-dismiss" id="intro-dismiss">知道了</button>
-      </section>
-
       <form class="filters" id="filters" role="search" aria-label="搜尋與篩選政見">
         <div class="field field-search">
           <label for="search">關鍵字</label>

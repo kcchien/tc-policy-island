@@ -40,7 +40,7 @@ site/
 
 ```
 js/dataset.js  js/view-model.js  js/filter.js  js/app-state.js  js/main.js  js/random-area.js
-js/table-view.js  js/policy-card.js  js/candidate-card.js  js/sheet.js
+js/tour.js  js/tour-view.js  js/table-view.js  js/policy-card.js  js/candidate-card.js  js/sheet.js
 js/island-list.js  js/ui-text.js  js/dom.js
 ```
 
@@ -59,6 +59,10 @@ js/island-list.js  js/ui-text.js  js/dom.js
 ### 隨機一題
 
 `main.js` 的 `openRandomArea()`，`startApp` 內的函式（`main.js` 是入口，沒有 export），頁首按鈕呼叫，其他流程在 `startApp` 內直接呼叫或以回呼傳入：以 `random-area.js` 的 `pickRandomArea(vm.rows, random, previousId)` 從未篩選的全部議題區均勻選一個（排除目前選中的議題區），再走 `openCard(areaId, null, { unfiltered: true })`，卡片不帶入全站篩選。表格檢視先捲到該列；島嶼檢視等載入完成、飛到該區再開卡。
+
+### 上手導覽
+
+步驟狀態機與框線位置的純函式在 `tour.js`，覆蓋層在 `tour-view.js`，由 `main.js` 的 `startApp` 接上。島嶼檢視載入完成後自動檢查要不要出現（沒看過、WebGL 可用、網址沒指定要開的卡片）；看過或跳過寫入 localStorage 的 `policy-island:intro-seen`，頁首「怎麼看」重開。覆蓋層是 `showModal` 的對話框，才能疊在政見卡片之上，說明框計入 `stageObstacles`，名牌會避開它。第一步框議題區名牌、第二步框同一格的三個標記，位置由島嶼檢視的 `areaScreenRects(areaId)`（名牌 DOM 與鏡頭投影，不加 3D 物件）每幀提供，框哪一格只看畫面位置（`pickTourArea`）；第三步呼叫 `openRandomArea()`，卡片在鏡頭飛到後開啟，覆蓋層再回到最上層並框住卡片。
 
 ## site/js：島嶼檢視
 
