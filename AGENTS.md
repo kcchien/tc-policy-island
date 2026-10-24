@@ -62,6 +62,7 @@
 - 品牌用語掃描與禁用色檢查讀 `data/rules/` 的正式清單；`site.files()` 列出網站目錄全部檔案，`site.readText(path)` 讀檔。改清單或新增網站文案後跑 `node --test test/rules.test.js`，它會用正式資料檢查本站文案、檔名與專案名。
 - 給市民看的文字（頁面 HTML、`site/js/ui-text.js`、公開資料集中整理者撰寫的欄位）不得外漏內部細節：檔案路徑、副檔名、工具名、字型名、模型代號、程式欄位名、版本識別碼、雜湊值與「出處快照」「存檔網址」這類內部術語，由上線關卡「受眾文案」（`scripts/lib/audience-text.js`）擋下。畫面用白話：出處快照寫「原文存檔」、存檔網址寫「網頁備份」、核對兩層寫「原文逐字比對」「AI 依公開檢核表檢查」。原文引述、候選人資料原文與逐字公開的 repo 文件不掃。
 - 整理方法頁要照原文公開的 repo 檔案加進 `site/js/repo-documents.js` 的 `REPO_DOCUMENTS`、在 `site/js/ui-text.js` 的 `REPO_DOCUMENT_TEXT` 寫白話標題與說明（頁面不顯示檔案路徑），並在 `site/method.html` 放一個 `data-repo-file="<repo 路徑>"` 容器。逐字副本不受品牌用語掃描，由關卡 `repo-documents` 驗證逐字相同，見 `docs/rules/brand-terms.md`「例外：引用 repo 文件」。頁面文案不要寫進這些檔案。
+- 新增 ADR 要同時列入整理方法頁（REPO_DOCUMENTS、REPO_DOCUMENT_TEXT、method.html 容器），test/method-page.test.js 會擋。
 - `test/` 底下的 `.js` 都會被 `node --test` 當成測試檔執行，夾具模組不要有副作用。
 - 無頭 Chrome 的 `--window-size` 有最小寬度，390px 截圖會被裁切，手機版改用可模擬裝置寬度的瀏覽器驗證。
 
