@@ -41,6 +41,11 @@ export const candidateCountText = (areaPolicyCount, rawPolicyItems) =>
 export const NO_POLICY_LABEL = '未提出相關政見';
 export const noPolicyText = (cutoffDate) => `${NO_POLICY_LABEL}（截至 ${cutoffDate}）`;
 export const NO_MATCH_TEXT = '沒有符合篩選條件的政見';
+// 全站篩選的「只看兩說並列」開關（索引面板與表格上方共用）。
+export const FILTER_TEXT = {
+  conflictOnly: '只看出處說法不一的政見',
+  conflictHint: '候選人自己的兩個來源說法不同時，兩說並列，不替候選人選一個。',
+};
 export function resultStatusText(filtered) {
   if (!filtered.filter.active) return '';
   const { matchCount } = filtered.filter;
@@ -160,6 +165,7 @@ export const TABLE_TEXT = {
   ballotNumber: (n) => `${n} 號`,
   policyCount: (n) => `公開政見 ${n} 筆`,
   districts: (names) => `適用行政區：${names.join('、')}`,
+  conflictFlag: POLICY_CARD_TEXT.conflictFlag,
 };
 
 // 索引面板的標記。
@@ -170,6 +176,34 @@ export const MARKER_TEXT = {
   // 螢幕閱讀器念的版本，接在標記符號之後。
   spoken: (name, state) => `${name}${state}`,
 };
+
+// 主題場景名稱：島上每個議題區那一格的主題場景是什麼，以議題區識別碼對應（island-heroes.js 的場景名稱取自這裡）。
+// 只依議題區決定，與政見無關；索引面板的議題區列以 heroHint 顯示。
+export const HERO_NAMES = {
+  transportation: '公車站與公車',
+  'public-safety': '消防隊與消防車',
+  economy: '商店街',
+  labor: '工廠與工人',
+  'agriculture-animals': '農田與小動物',
+  tourism: '涼亭與攤位',
+  'social-welfare': '社區照顧中心',
+  health: '診所與救護車',
+  education: '學校與操場',
+  culture: '戶外舞台',
+  'indigenous-affairs': '高架穀倉與織布機',
+  'hakka-affairs': '油紙傘與茶園',
+  environment: '回收站與風車',
+  water: '河道與小橋',
+  'urban-housing': '公寓與住宅',
+  sports: '球場',
+  parks: '公園與遊戲場',
+  'civil-affairs': '區公所與公布欄',
+  digital: '通訊塔與機房',
+  'city-governance': '市政廳與鐘塔',
+};
+// 對不到專屬場景的議題區用的通用場景。
+export const GENERIC_HERO_NAME = '小屋與花園';
+export const heroHint = (name) => `島上這格：${name}`;
 
 // 島嶼檢視與工具列。
 // auto 是「自動」：依台灣時間選時段。
@@ -188,6 +222,20 @@ export const ISLAND_TEXT = {
 export const RANDOM_AREA_TEXT = {
   button: '隨機看一題',
   hint: '隨機選一個議題區，三位候選人的政見並排',
+};
+
+// 頁首的選舉時程：日期只取中選會或選舉委員會的公告，與候選人無關。投票日後不再顯示天數。
+const monthDay = (date) => `${Number(date.slice(5, 7))}/${Number(date.slice(8, 10))}`;
+export const SCHEDULE_TEXT = {
+  label: '選舉時程',
+  countdown: (days) => `距投票日 ${days} 天`,
+  votingDay: '今天投票',
+  ended: '投票已結束',
+  eventDate: ({ date, endDate }) => (endDate ? monthDay(date) + ' 至 ' + monthDay(endDate) : monthDay(date)),
+  // 接在日期連結之後，給螢幕閱讀器念。
+  announcement: '的公告',
+  states: { past: '已過', ongoing: '進行中', upcoming: '' },
+  note: '日期與連結都是中選會或臺中市選舉委員會的公告。',
 };
 
 // 上手導覽：三步，每一步只以議題區為單位，不提任何候選人。頁首「怎麼看」按鈕可重開。

@@ -417,6 +417,123 @@ select {
   font-size: 0.8125rem;
 }
 
+/* 選舉時程：桌面的表格檢視一行列出全部日期；島嶼檢視與手機只顯示天數，按下展開日期清單 */
+.election-schedule {
+  margin: 2px 0 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+.schedule-summary,
+.schedule-toggle {
+  margin: 0;
+  color: var(--laterite);
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.schedule-summary {
+  display: none;
+}
+
+.schedule-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.schedule-caret {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform 0.15s ease;
+}
+
+.schedule-toggle[aria-expanded="true"] .schedule-caret {
+  transform: rotate(180deg);
+}
+
+.schedule-body {
+  display: none;
+}
+
+.schedule-toggle[aria-expanded="true"] + .schedule-body {
+  display: block;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.schedule-event {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+
+.schedule-date {
+  font-weight: bold;
+}
+
+.schedule-state {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--rice-deep);
+  font-size: 0.6875rem;
+}
+
+.schedule-note {
+  margin: 4px 0 0;
+  font-size: 0.6875rem;
+}
+
+@media (min-width: 801px) {
+  body[data-view="table"] .election-schedule {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 16px;
+  }
+
+  body[data-view="table"] .schedule-summary {
+    display: block;
+  }
+
+  body[data-view="table"] .schedule-toggle {
+    display: none;
+  }
+
+  body[data-view="table"] .schedule-body {
+    display: contents;
+  }
+
+  body[data-view="table"] .schedule-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    margin: 0;
+  }
+
+  body[data-view="table"] .schedule-note {
+    flex-basis: 100%;
+    margin: 0;
+  }
+}
+
 /* 文字按鈕：最小高度 44px、圓角 9px；滑過填主色、按下壓深一階並下沉 1px、鍵盤焦點用外框 */
 .tour-skip,
 .tour-next,
@@ -499,6 +616,40 @@ select {
 
 .field-district {
   flex: 0 1 12rem;
+}
+
+/* 只看兩說並列：勾選框加一句說明，佔滿一列 */
+.field-conflict {
+  flex: 1 1 100%;
+  order: 1;
+  gap: 0;
+}
+
+.conflict-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* 蓋過 .field label 的小字灰色 */
+.field .conflict-toggle {
+  color: var(--charcoal);
+  font-size: 0.9375rem;
+}
+
+.conflict-toggle input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--laterite);
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
 }
 
 /* 16px 避免 iOS 聚焦時自動放大 */
@@ -1015,6 +1166,14 @@ body[data-view="island"] .policy-card::backdrop {
   display: none;
 }
 
+/* 主題場景名稱：議題區名稱下方一行小字 */
+.island-item-hero {
+  display: block;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .island-item-markers {
   display: inline-flex;
   flex: none;
@@ -1172,6 +1331,12 @@ body[data-view="island"] .policy-card::backdrop {
   display: block;
   margin-top: 4px;
   color: var(--charcoal-soft);
+  font-size: 0.75rem;
+}
+
+/* 表格的兩說並列標籤：樣式同政見卡片的 .policy-flag，另起一行 */
+.policy-chip .policy-flag {
+  margin-top: 6px;
   font-size: 0.75rem;
 }
 
@@ -1490,11 +1655,21 @@ body[data-view="island"] .card-height {
   font-size: 0.75rem;
 }
 
+/* 出處說法不一（兩說並列）：實心炭灰膠囊加左右箭頭，一眼可辨；不用主色紅土，避免讀成警示或扣分；三人同樣式 */
 .policy-flag {
-  padding: 0 8px;
-  border: 1px solid var(--laterite-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 10px 1px 8px;
   border-radius: 999px;
-  color: var(--laterite);
+  background: var(--charcoal-soft);
+  color: var(--rice);
+  font-weight: bold;
+}
+
+.policy-flag::before {
+  content: "⇄" / "";
+  font-weight: normal;
 }
 
 .policy-more {

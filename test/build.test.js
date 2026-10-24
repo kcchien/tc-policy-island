@@ -29,6 +29,30 @@ test('建置指令從原始資料目錄產出公開資料集，未核對政見�
     ['sample-jia', 'sample-yi', 'sample-bing'],
   );
   assert.match(dataset.meta.builtAt, /^\d{4}-\d{2}-\d{2}T/);
+  // 夾具沒有選舉時程檔，建置照常，時程為 null。
+  assert.equal(dataset.meta.electionSchedule, null);
+});
+
+test('原始資料目錄有選舉時程檔時，建置進公開資料集的 meta.electionSchedule', () => {
+  const rawDir = mkdtempSync(join(tmpdir(), 'build-raw-'));
+  cpSync(SAMPLE_RAW, rawDir, { recursive: true });
+  const schedule = {
+    votingDate: '2026-11-28',
+    events: [{
+      id: 'voting',
+      name: '投票日',
+      date: '2026-11-28',
+      endDate: null,
+      sourceUrl: 'https://web.cec.gov.tw/central/article/61722',
+      sourceTitle: '測試公告',
+    }],
+  };
+  writeFileSync(join(rawDir, 'election-schedule.json'), JSON.stringify(schedule));
+
+  const { code, output, out } = build(rawDir);
+
+  assert.equal(code, 0, output);
+  assert.deepEqual(JSON.parse(readFileSync(out, 'utf8')).meta.electionSchedule, schedule);
 });
 
 test('建置指令把公開出處的出處快照複製到公開資料集旁的 snapshots/，讓卡片的快照連結可用', () => {

@@ -10,7 +10,7 @@ import { REPO_FILES_DIR } from '../../site/js/repo-documents.js';
 export const UI_TEXT_MODULE = 'js/ui-text.js';
 
 // 掃整理者撰寫的畫面文字：HTML 頁面的文字與說明屬性、畫面文案模組的字串、公開資料集中上畫面的整理者欄位。
-// 不掃：原文引述、候選人資料的學歷與經歷、出處標題（候選人本人的文字）、引用 repo 文件（逐字公開）、
+// 選舉時程的事件名稱也掃。不掃：原文引述、候選人資料的學歷與經歷、出處標題（候選人本人的文字）、選舉時程的公告標題（選委會原文）、引用 repo 文件（逐字公開）、
 // 公開資料集與出處快照檔本身（資料下載檔），以及第三方程式碼。
 const SKIP_PAGE = [THIRD_PARTY, new RegExp(`^data/${REPO_FILES_DIR}/`)];
 const HTML_FILE = /\.html$/;
@@ -52,6 +52,10 @@ export default {
       for (const text of datasetModuleTexts(site)) failures.push(...describe(DATASET_MODULE, text));
     }
     const dataset = site.dataset();
+    // 選舉時程的事件名稱是整理者寫的；公告標題是選委會的原文，不掃。
+    for (const event of dataset.meta?.electionSchedule?.events ?? []) {
+      failures.push(...describe(`${DATASET_PATH} meta.electionSchedule.events[${event.id}].name`, event.name));
+    }
     for (const [key, fieldsOf] of Object.entries(SCREEN_FIELDS)) {
       for (const item of dataset[key] ?? []) {
         for (const [field, text] of fieldsOf(item)) {

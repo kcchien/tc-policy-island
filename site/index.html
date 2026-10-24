@@ -42,6 +42,18 @@
         <a href="./method.html">整理方法</a>
         <span>資料截止日 <span data-cutoff-date>載入中</span></span>
       </p>
+      <!-- 選舉時程：資料載入後 schedule-view.js 填入；沒有時程資料時保持隱藏。 -->
+      <section class="election-schedule" id="election-schedule" aria-label="選舉時程" hidden>
+        <p class="schedule-summary" data-schedule-headline></p>
+        <button type="button" class="schedule-toggle" aria-expanded="false" aria-controls="schedule-body">
+          <span data-schedule-headline></span>
+          <svg class="schedule-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+        </button>
+        <div class="schedule-body" id="schedule-body">
+          <ol class="schedule-list"></ol>
+          <p class="schedule-note"></p>
+        </div>
+      </section>
     </header>
 
     <nav class="hud-toolbar" id="hud-toolbar" aria-label="檢視操作">
@@ -122,6 +134,14 @@
           <select id="district" name="district">
             <option value="">全部行政區</option>
           </select>
+        </div>
+        <!-- 只看兩說並列：文案由 main.js 從畫面文案模組填入 -->
+        <div class="field field-conflict">
+          <label class="conflict-toggle" for="conflict-only">
+            <input id="conflict-only" name="conflict" type="checkbox" aria-describedby="conflict-hint" />
+            <span id="conflict-only-label"></span>
+          </label>
+          <p class="field-hint" id="conflict-hint"></p>
         </div>
         <button type="reset" class="filter-reset">清除</button>
       </form>

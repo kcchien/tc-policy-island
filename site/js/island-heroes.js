@@ -7,6 +7,9 @@
 // 單位空間：底面 x、z 在 ±0.5，高度 0 到 1.5，場景正面朝 +z（南，鏡頭那一側）。
 // 零件 { shape, color, size: [寬, 高, 深], at: [x, y, z]（零件外框中心）, rot?: [x, y, z]（弧度，XYZ 順序）, yaw? }，
 // 最後的變換是「平移 at · 繞 y 轉 yaw · rot · 縮放 size」。每種 shape 的單位幾何都裝在 ±0.5 的立方體裡（見 HERO_SHAPES）。
+// 場景名稱（主題場景名稱）是畫面文字，取自 ui-text.js（同樣不碰 three.js，關卡載入本模組時一併載入）；本檔不寫中文。
+
+import { GENERIC_HERO_NAME, HERO_NAMES } from './ui-text.js';
 
 // 零件形體，對應零件庫的單位幾何（island-kit.js 的 KIT_SHAPES，經 kitShape 取用；新增形體兩邊都要加）。
 // 'glowbox'、'glowsphere' 是發光件（窗、燈），夜裡亮起。
@@ -179,11 +182,10 @@ function fence({ from, to, posts = 5, h = 0.07, color = 'wood' }) {
   return parts;
 }
 
-// 各議題區的主題場景。name 是場景的白話描述（文件與截圖總表用）。
+// 各議題區的主題場景。場景名稱（主題場景名稱）是畫面文字，放在 ui-text.js 的 HERO_NAMES，以議題區識別碼對應。
 const SCENES = {
   // 交通：公車站候車亭、停靠的公車、斑馬線與紅綠燈、腳踏車架。
   transportation: {
-    name: '公車站與公車',
     build: () => [
       ...pad('stone'),
       on('box', 'iron', [0.96, 0.01, 0.32], [0, PAD, 0.18]),
@@ -218,7 +220,6 @@ const SCENES = {
   },
   // 治安與消防：消防隊車庫、消防車與雲梯、瞭望塔、消防栓、交通錐。
   'public-safety': {
-    name: '消防隊與消防車',
     build: () => [
       ...pad('stone'),
       on('rbox', 'cream', [0.6, 0.34, 0.34], [-0.1, PAD, -0.24]),
@@ -251,7 +252,6 @@ const SCENES = {
   },
   // 產業經濟：商店街，條紋遮陽篷的店面、貨箱、推車、招牌。
   economy: {
-    name: '商店街',
     build: () => {
       const shop = (x, wall, awning) => [
         on('rbox', wall, [0.28, 0.4, 0.3], [x, PAD, -0.26]),
@@ -284,7 +284,6 @@ const SCENES = {
   },
   // 勞工：工廠，鋸齒屋頂、煙囪、棧板貨箱、堆高機、戴安全帽的工人。
   labor: {
-    name: '工廠與工人',
     build: () => [
       ...pad('stone'),
       on('rbox', 'wall', [0.66, 0.3, 0.42], [-0.12, PAD, -0.22]),
@@ -315,7 +314,6 @@ const SCENES = {
   },
   // 農業與動物保護：田畦、紅頂穀倉、乳牛與綿羊、圍欄、狗屋。
   'agriculture-animals': {
-    name: '農田與小動物',
     build: () => {
       const cow = (x, z, yaw, color = 'cream') => place([
         on('rbox', color, [0.18, 0.09, 0.09], [0, PAD + 0.06, 0]),
@@ -363,7 +361,6 @@ const SCENES = {
   },
   // 觀光：涼亭、紀念品攤位、指示牌、拖著行李箱的旅客、相機。
   tourism: {
-    name: '涼亭與攤位',
     build: () => [
       ...pad('sand'),
       // 涼亭：台基、四柱、四坡屋頂與寶頂。
@@ -395,7 +392,6 @@ const SCENES = {
   },
   // 社會福利：社區照顧中心，無障礙坡道與扶手、輪椅、拄拐杖的長者、菜圃。
   'social-welfare': {
-    name: '社區照顧中心',
     build: () => [
       ...pad('grass'),
       ...place(house({ w: 0.56, d: 0.32, h: 0.28, wall: 'wall', roof: 'roofDark' }), { x: -0.1, z: -0.26 }),
@@ -430,7 +426,6 @@ const SCENES = {
   },
   // 醫療衛生：診所，十字標誌、雨庇、救護車、候診長椅。
   health: {
-    name: '診所與救護車',
     build: () => [
       ...pad('stone'),
       on('rbox', 'cream', [0.62, 0.4, 0.34], [-0.06, PAD, -0.24]),
@@ -464,7 +459,6 @@ const SCENES = {
   },
   // 教育：學校，鐘面、升旗台、跑道操場、籃框、戴黃帽的學童。
   education: {
-    name: '學校與操場',
     build: () => [
       ...pad('grass'),
       on('rbox', 'cream', [0.72, 0.36, 0.22], [0, PAD, -0.34]),
@@ -502,7 +496,6 @@ const SCENES = {
   },
   // 文化：戶外舞台，背板、燈架、聚光燈、喇叭、觀眾長椅。
   culture: {
-    name: '戶外舞台',
     build: () => [
       ...pad('sand'),
       on('rbox', 'wood', [0.7, 0.1, 0.36], [0, PAD, -0.22]),
@@ -533,7 +526,6 @@ const SCENES = {
   },
   // 原住民族事務：高架穀倉（柱上防鼠板）、織布機、竹籬、小米田。
   'indigenous-affairs': {
-    name: '高架穀倉與織布機',
     build: () => [
       ...pad('grass'),
       // 高架穀倉：四柱、防鼠圓板、倉體、茅草屋頂、梯子。
@@ -567,7 +559,6 @@ const SCENES = {
   },
   // 客家事務：油紙傘攤、茶園、拱門小屋、擂茶碗。
   'hakka-affairs': {
-    name: '油紙傘與茶園',
     build: () => {
       const umbrella = (x, z, color, tilt = 0) => [
         part('cone', color, [0.2, 0.08, 0.2], [x, PAD + 0.24, z], [tilt, 0, 0]),
@@ -606,7 +597,6 @@ const SCENES = {
   },
   // 環境保護：資源回收站（三色回收桶）、風力發電機、太陽能板、樹。
   environment: {
-    name: '回收站與風車',
     build: () => [
       ...pad('grass'),
       // 回收站的頂棚。
@@ -637,7 +627,6 @@ const SCENES = {
   },
   // 水利：河道穿過，兩岸石砌、拱橋、水門、蘆葦、小船。
   water: {
-    name: '河道與小橋',
     build: () => [
       ...pad('grass'),
       on('box', 'stone', [0.96, 0.03, 0.4], [0, PAD, 0.0]),
@@ -669,7 +658,6 @@ const SCENES = {
   },
   // 都市發展與住宅：公寓、透天厝、施工中的鷹架、行道樹。
   'urban-housing': {
-    name: '公寓與住宅',
     build: () => [
       ...pad('stone'),
       // 公寓：四層窗戶、陽台。
@@ -703,7 +691,6 @@ const SCENES = {
   },
   // 運動：籃球場與跑者，看台、球、計分板。
   sports: {
-    name: '球場',
     build: () => [
       ...pad('grass'),
       on('rbox', 'court', [0.84, 0.012, 0.5], [0, PAD, -0.12]),
@@ -737,7 +724,6 @@ const SCENES = {
   },
   // 公園綠地：溜滑梯、鞦韆、蹺蹺板、池塘、步道、大樹與花圃。
   parks: {
-    name: '公園與遊戲場',
     build: () => [
       ...pad('grass'),
       // 步道。
@@ -777,7 +763,6 @@ const SCENES = {
   },
   // 民政：區公所，服務窗口、公布欄、郵筒、排隊的人。
   'civil-affairs': {
-    name: '區公所與公布欄',
     build: () => [
       ...pad('stone'),
       on('rbox', 'wall', [0.7, 0.34, 0.3], [0, PAD, -0.28]),
@@ -811,7 +796,6 @@ const SCENES = {
   },
   // 數位發展：通訊鐵塔、碟形天線、機房（燈號）、拿平板的人。
   digital: {
-    name: '通訊塔與機房',
     build: () => [
       ...pad('stone'),
       // 機房。
@@ -844,7 +828,6 @@ const SCENES = {
   },
   // 市政治理：市政廳加鐘塔，列柱、山牆、台階、草坪。造型是通用的市政廳，不是任何真實建築。
   'city-governance': {
-    name: '市政廳與鐘塔',
     build: () => [
       ...pad('grass'),
       // 台基與台階。
@@ -881,7 +864,6 @@ const SCENES = {
 
 // 對不到專屬場景的議題區（例如測試夾具）用的通用場景：小屋、樹與花圃。仍只依識別碼決定。
 const GENERIC = {
-  name: '小屋與花園',
   build: () => [
     ...pad('grass'),
     ...place(house({ w: 0.44, d: 0.34, h: 0.28 }), { x: -0.08, z: -0.18 }),
@@ -895,9 +877,10 @@ const GENERIC = {
   ],
 };
 
-const build = (id, scene) => Object.freeze({ id, name: scene.name, parts: Object.freeze(scene.build()) });
-export const HERO_SCENES = Object.freeze(Object.fromEntries(Object.entries(SCENES).map(([id, scene]) => [id, build(id, scene)])));
-const GENERIC_SCENE = build('generic', GENERIC);
+// name 是主題場景名稱（畫面文字，取自 ui-text.js），索引面板的議題區列顯示。
+const build = (id, scene, name) => Object.freeze({ id, name, parts: Object.freeze(scene.build()) });
+export const HERO_SCENES = Object.freeze(Object.fromEntries(Object.entries(SCENES).map(([id, scene]) => [id, build(id, scene, HERO_NAMES[id])])));
+const GENERIC_SCENE = build('generic', GENERIC, GENERIC_HERO_NAME);
 
 const rotX = (a, [x, y, z]) => [x, y * Math.cos(a) - z * Math.sin(a), y * Math.sin(a) + z * Math.cos(a)];
 const rotY = (a, [x, y, z]) => [x * Math.cos(a) + z * Math.sin(a), y, -x * Math.sin(a) + z * Math.cos(a)];
