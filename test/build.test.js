@@ -195,10 +195,14 @@ function makePortraits(rawDir) {
     const source = JSON.parse(readFileSync(join(rawDir, 'sources', `${c.id}.json`))).find(s => s.id === c.profile.sourceId);
     const file = `${c.id}.png`;
     writeFileSync(join(portraitDir,file),bytes);
+    writeFileSync(join(portraitDir,`${c.id}-original.png`),bytes);
     return {candidateId:c.id,candidateName:c.name,sourceId:source.id,sourceUrl:source.url,electionYear:2024,
-      retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:'b'.repeat(64),
+      sourceKind:'cec-bulletin',sourceLabel:'中選會 2024 年選舉公報',originalFile:`${c.id}-original.png`,originalSha256:sha256(bytes),
+      position:`${c.name}姓名欄下方`,photographer:null,
+      retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:sha256(bytes),
       extraction:'抽取原始影像',identityCheckedAt:'2026-10-24',
-      rights:{status:'cleared',specialExclusion:false,declarationUrl:'https://web.cec.gov.tw/central/article/21322',licenseUrl:'https://data.gov.tw/license',checkedAt:'2026-10-24'},
+      rights:{status:'cleared',specialExclusion:false,declarationUrl:'https://web.cec.gov.tw/central/article/21322',licenseUrl:'https://data.gov.tw/license',checkedAt:'2026-10-24',
+        evidence:'核對原文無特別排除',limitations:'僅中立辨識，不暗示官方認可'},
       file,fileSha256:sha256(bytes),width:240,height:320};
   });
   writeFileSync(join(portraitDir,'manifest.json'),JSON.stringify({items}));
@@ -218,7 +222,7 @@ test('肖像建置全有全無，缺檔、未清權與來源不符不會洩漏�
   let result=build(rawDir,['--out',out,'--portraits',portraits]);
   assert.equal(result.code,0,result.output);
   assert.ok(JSON.parse(readFileSync(out)).candidates.every(c=>c.portrait));
-  assert.equal(readdirSync(join(dirname(out),'portraits')).length,4);
+  assert.equal(readdirSync(join(dirname(out),'portraits')).length,7);
   for (const mutate of [
     m => m.items[0].rights.status='pending',
     m => m.items[0].sourceId=m.items[1].sourceId,

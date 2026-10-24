@@ -5,7 +5,7 @@ import { THIRD_PARTY } from './site.js';
 const prefix = `data/${PORTRAIT_DIR}/`;
 export default {
   id: 'candidate-portraits',
-  name: '正式肖像只在候選人資料卡，三人同批且來源與授權齊全',
+  name: '正式肖像只在候選人資料卡，三人齊全且各自來源與授權完整',
   check(site) {
     const dataset = site.dataset(), files = site.files();
     const failures = [];
@@ -13,7 +13,7 @@ export default {
       if (!/\.(js|html|css)$/.test(path) || path.startsWith('data/') || THIRD_PARTY.test(path)) continue;
       if (['js/candidate-card.js', 'js/candidate-portraits.js', 'js/dataset.js'].includes(path)) continue;
       // portrait 也用於直式鏡頭設定，只擋肖像資料的具體欄位讀取與影像路徑。
-      if (/data\/portraits\/|(?:\.portrait\??\.|\[['"]portrait['"]\]\??\.)(?:url|sourceId|electionYear|retrievedAt)\b/.test(site.readText(path))) failures.push(`${path}：正式肖像只能由候選人資料卡引用`);
+      if (/data\/portraits\/|(?:\.portrait\??\.|\[['"]portrait['"]\]\??\.)(?:url|sourceKind|sourceUrl|sourceLabel|retrievedAt)\b/.test(site.readText(path))) failures.push(`${path}：正式肖像只能由候選人資料卡引用`);
     }
     const photoFiles = files.filter(p => p.startsWith(prefix));
     const withPortrait = dataset.candidates.filter(c => c.portrait !== undefined);
@@ -29,8 +29,8 @@ export default {
       const item = manifest.items?.find(i => i.candidateId === c.id);
       const url = `${prefix}${c.id}.png`;
       expected.add(url);
-      if (!item || c.portrait.url !== url || c.portrait.sourceId !== item.sourceId
-        || c.portrait.electionYear !== item.electionYear || c.portrait.retrievedAt !== item.retrievedAt) failures.push(`${c.id}：正式肖像的公開欄位與清單不符`);
+      if (item) expected.add(`${prefix}${item.originalFile}`);
+      if (!item || c.portrait.url !== url || ['sourceKind', 'sourceUrl', 'sourceLabel', 'retrievedAt'].some(key => c.portrait[key] !== item[key])) failures.push(`${c.id}：正式肖像的公開欄位與清單不符`);
     }
     for (const path of photoFiles) if (!expected.has(path)) failures.push(`${path}：正式肖像未登記`);
     return failures;

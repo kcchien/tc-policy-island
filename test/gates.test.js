@@ -947,11 +947,16 @@ function portraitSite(tamper = () => {}) {
   return makeSite(dataset => {
     const bytes=Buffer.from('89504e470d0a1a0a0000000d49484452000000f0000001400802000000','hex');
     const items=dataset.candidates.map(c=>{
-      c.portrait={url:`data/portraits/${c.id}.png`,sourceId:c.profile.sourceId,electionYear:2024,retrievedAt:'2026-10-24'};
+      c.portrait={url:`data/portraits/${c.id}.png`,sourceKind:'cec-bulletin',sourceUrl:dataset.sources.find(s=>s.id===c.profile.sourceId).url,
+        sourceLabel:'中選會 2024 年選舉公報',retrievedAt:'2026-10-24'};
       files[c.portrait.url]=bytes;
+      files[`data/portraits/${c.id}-original.png`]=bytes;
       return {candidateId:c.id,candidateName:c.name,sourceId:c.profile.sourceId,sourceUrl:dataset.sources.find(s=>s.id===c.profile.sourceId).url,
-        electionYear:2024,retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:'b'.repeat(64),
+        sourceKind:'cec-bulletin',sourceLabel:'中選會 2024 年選舉公報',originalFile:`${c.id}-original.png`,originalSha256:sha256(bytes),
+        position:`${c.name}姓名欄下方`,photographer:null,
+        electionYear:2024,retrievedAt:'2026-10-24',page:1,imageObject:'10 0',pdfSha256:'a'.repeat(64),extractedSha256:sha256(bytes),
         extraction:'抽取原始黑白影像',identityCheckedAt:'2026-10-24',rights:{status:'cleared',specialExclusion:false,
+          evidence:'核對原文無特別排除',limitations:'僅中立辨識，不暗示官方認可',
           declarationUrl:'https://web.cec.gov.tw/central/article/21322',licenseUrl:'https://data.gov.tw/license',checkedAt:'2026-10-24'},
         file:`${c.id}.png`,fileSha256:sha256(bytes),width:240,height:320};
     });
@@ -964,10 +969,36 @@ test('三人正式肖像與授權清單齊全可通過關卡',()=>{
   const result=runGates(portraitSite());assert.equal(result.code,0,result.output);
 });
 
+test('混合官方照片通過關卡，原圖遭改、漏署名或公開出處與清單不同均擋下',()=>{
+  const mixed = (change = () => {}) => portraitSite((dataset, files, items) => {
+    for (const [i, item] of items.entries()) {
+      if (i === 2) continue;
+      delete files[`data/portraits/${item.originalFile}`];
+      delete item.sourceId;
+      Object.assign(item, { sourceKind:'ly-legislator', sourceLabel:'立法院第11屆委員（委員研究室提供）',
+        sourceUrl:`https://www.ly.gov.tw/Pages/List.aspx?nodeid=${46764+i}`,
+        imageUrl:`https://www.ly.gov.tw/Images/Legislators/${110009+i}.jpg`, imageAlt:`${item.candidateName}委員照片`,
+        legislature:11, sourceCredit:'委員研究室提供', originalFile:`${item.candidateId}-original.jpg`,
+        rights:{...item.rights,declarationUrl:'https://www.ly.gov.tw/Pages/List.aspx?nodeid=10772',licenseUrl:null} });
+      files[`data/portraits/${item.originalFile}`]=files[`data/portraits/${item.file}`];
+      Object.assign(dataset.candidates[i].portrait, {sourceKind:item.sourceKind,sourceLabel:item.sourceLabel,sourceUrl:item.sourceUrl});
+    }
+    change(dataset,files,items);
+  });
+  const pass=runGates(mixed()); assert.equal(pass.code,0,pass.output);
+  for (const change of [
+    (d,f,m)=>f[`data/portraits/${m[0].originalFile}`]=Buffer.from('broken'),
+    (d,f,m)=>m[0].sourceCredit=null,
+    d=>d.candidates[0].portrait.sourceUrl='https://www.ly.gov.tw/Pages/List.aspx?nodeid=46765',
+  ]) {
+    const result=runGates(mixed(change));assert.notEqual(result.code,0,result.output);assert.match(result.output,/正式肖像/);
+  }
+});
+
 test('肖像缺檔、來源不符、只放一人、無公開欄位卻遺留檔案與資料卡以外引用皆擋下',()=>{
   for (const tamper of [
     (d,f)=>delete f[d.candidates[0].portrait.url],
-    d=>d.candidates[0].portrait.sourceId=d.candidates[1].profile.sourceId,
+    d=>d.candidates[0].portrait.sourceUrl=d.candidates[1].portrait.sourceUrl,
     d=>delete d.candidates[0].portrait,
     d=>d.candidates.forEach(c=>delete c.portrait),
     (d,f)=>f['js/table-view.js']='const image = candidate.portrait.url;',

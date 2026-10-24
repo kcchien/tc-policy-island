@@ -62,7 +62,7 @@ function mountPortraits(container, candidates) {
     img.addEventListener('error', batch.fail);
     const portrait = el('div', { class: 'profile-portrait', hidden: true }, img);
     const credit = el('p', { class: 'profile-portrait-source', hidden: true },
-      el('a', { href: candidate.profileSource.url, target: '_blank', rel: 'noopener noreferrer' }, T.portraitSource(photo.electionYear)),
+      el('a', { href: photo.sourceUrl, target: '_blank', rel: 'noopener noreferrer' }, T.portraitSource(photo.sourceLabel)),
       el('br'), el('a', { href: './method.html#candidate-portraits' }, T.portraitMethod));
     const head = container.children[i].querySelector('.profile-head');
     head.querySelector('.profile-heading').prepend(portrait);
