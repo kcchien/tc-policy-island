@@ -86,6 +86,27 @@ export const POLICY_CARD_TEXT = {
   maskedLabels: ['甲', '乙', '丙'],
   maskedName: (label) => `候選人${label}`,
   maskedNote: '姓名與政黨先遮住',
+  // 每筆政見展開後的複製與朗讀，三人同一格式。
+  copy: '複製',
+  copyHint: '把這筆政見的摘要、原文與出處複製成一段文字',
+  copied: '已複製',
+  copyFailed: '無法自動複製，已選取文字，請自行複製',
+  speak: '朗讀',
+  speakHint: '用瀏覽器內建語音唸出摘要與原文',
+  stopSpeaking: '停止朗讀',
+  // 複製成一段話的各行。
+  copyLines: {
+    heading: (areaName, candidateName) => `【${areaName}】${candidateName}`,
+    summary: (summary) => `摘要：${summary}`,
+    conflict: (note) => `出處說法不一：${note}`,
+    quote: (text) => `原文：「${text}」`,
+    source: (title, date, url) => `出處：${title}（${date} 擷取）${url}`,
+    archive: (url) => `網頁備份：${url}`,
+    footer: (cutoffDate, url) => `資料截止 ${cutoffDate}，整理自台中政見島 ${url}`,
+  },
+  // 朗讀的內容：摘要後接每則原文引述。
+  speechQuote: (text) => `原文：${text}`,
+  sentenceEnd: '。',
   // 卡片內的篩選，三欄一起套用。
   filtersLabel: '在這個議題區篩選政見',
   searchLabel: '在這個議題區找政見的關鍵字',
