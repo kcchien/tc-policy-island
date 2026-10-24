@@ -1,15 +1,5 @@
-// 擷取一個出處：node scripts/fetch-source.js --candidate <id> --id <sourceId> --url <url> --type <來源類型>
-//   [--title <頁面標題>] [--html <本機 HTML 檔>] [--pdf <本機 PDF 檔> [--page 1] [--glyph-map <字型對照檔>] [--pdftotext pdftotext]]
-//   [--no-archive] [--raw data/raw] [--snapshots data/snapshots] [--date YYYY-MM-DD]
-// 抓取頁面存成出處快照 <snapshots>/<sourceId>.txt，送 Wayback Machine 存檔，
-// 再把出處紀錄寫進 <raw>/sources/<candidateId>.json（同識別碼取代，否則加在最後）。
-// 頁面要登入或由瀏覽器渲染時，先在瀏覽器另存 HTML，用 --html 指定，--url 仍填原網址。
-// PDF 出處（例如選舉公報）先下載，用 --pdf 指定，以 pdftotext 轉出 --page 那一頁的文字；
-// 有字形抽不出文字時，用 --glyph-map 指定字型對照檔還原（見 scripts/lib/pdf-text.js），出處紀錄的 snapshotNote 會註明。
-// 存檔失敗先依 60、120、240、480 秒退避重試，仍失敗只記錄原因，不中止；--no-archive 不送存檔（已有存檔網址時保留原紀錄的存檔欄位）。
-// 存檔流程以跨程序鎖檔排隊，同一時間只有一個在送，兩次送出至少隔 20 秒（scripts/lib/archive-queue.js）。
-// 補送存檔：node scripts/fetch-source.js --retry-archive [--candidate <id>] [--raw data/raw]
-// 對 <raw>/sources/*.json 中 archiveUrl 為 null 的出處逐一補送並寫回；仍有失敗時結束碼 1。
+// 擷取一個出處：存出處快照、送 Wayback Machine 存檔、寫出處紀錄；或補送先前失敗的存檔。參數與注意事項見 USAGE（--help）。
+// 網頁轉文字見 lib/source-capture.js、PDF 與字形還原見 lib/pdf-text.js、存檔的退避與跨程序鎖見 lib/archive-queue.js。
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -34,9 +24,9 @@ const USAGE = formatUsage({
   ],
   sections: [
     {
-      title: '必填',
+      title: '擷取時必填',
       rows: [
-        ['--candidate <id>', '候選人識別碼；補送存檔時改為只補這位（可省略）'],
+        ['--candidate <id>', '候選人識別碼；補送存檔時可省略，給了就只補這位'],
         ['--id <sourceId>', '出處識別碼，小寫英數與連字號'],
         ['--url <url>', '原網址（http 或 https）；用 --html 或 --pdf 時仍填原網址'],
         ['--type <來源類型>', `來源類型：${Object.keys(SOURCE_TYPES).join('、')}`],

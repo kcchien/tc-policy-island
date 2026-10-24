@@ -1,5 +1,4 @@
-// 本機預覽：node scripts/preview.js [--port 8000] [--dir site]
-// 只供本機開發，不是正式部署用的伺服器。開啟前請先執行建置指令產生公開資料集。
+// 本機預覽：靜態檔案伺服器，只供本機開發。參數與注意事項見 USAGE（--help）。
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';

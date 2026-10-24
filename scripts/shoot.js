@@ -1,7 +1,4 @@
-// 截圖與版面量測：node scripts/shoot.js [shot|measure] [--device desktop|laptop|phone] [--motion reduce|full] [--time auto|dawn|day|dusk|night]
-//   [--path /] [--view island|table] [--area <id>] [--policy <id>] [--candidate <id>] [--q <關鍵字>] [--district <行政區>]
-//   [--click <x,y 或 CSS 選擇器>]... [--wait 0] [--out shot.png] [--url <網址>] [--dir site] [--port 0] [--chrome <執行檔>] [--timeout 60000] [--strict]
-// --help、-h 或不給任何參數時印出說明（scripts/lib/shoot.js 的 USAGE）。
+// 截圖與版面量測。參數見 --help（-h 或不給任何參數也一樣，內容是 scripts/lib/shoot.js 的 USAGE）。
 // 以 Chrome DevTools Protocol 驅動本機無頭 Chrome。沒給 --url 時自動以 scripts/preview.js 開本機預覽（網站目錄 --dir，要先建置）。
 // shot 存 PNG；measure 印出名牌與浮動元件重疊數、名牌彼此重疊數與水平捲動（JSON），--out 另存檔，--strict 有問題時結束碼 1。
 // 過去手寫截圖腳本踩過的坑，這裡是預設行為：

@@ -1,5 +1,4 @@
-// 上線關卡：node scripts/gates.js [網站目錄，預設 site]
-// 任一關卡失敗即以結束碼 1 退出。部署前與 CI 都要跑。
+// 上線關卡：對網站目錄跑 gates/index.js 的 GATES，印出每項結果。參數與注意事項見 USAGE（--help）。
 import { resolve } from 'node:path';
 import { runGates } from './gates/index.js';
 import { exitWithUsage, formatUsage, wantsHelp } from './lib/usage.js';

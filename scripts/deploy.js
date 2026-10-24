@@ -1,7 +1,4 @@
-// 部署到 Cloudflare Pages：node scripts/deploy.js [--dry-run] [--wrangler wrangler]
-// 依序跑測試、建置、上線關卡，全過才以 wrangler 部署 site/ 到專案 tc-policy-island 的正式環境（main）；
-// 專案不存在時先建立。任一步失敗即以結束碼 1 退出，不部署。--dry-run 只列出建立與部署指令、不執行。
-// wrangler 須已在本機登入（wrangler login）。
+// 部署到 Cloudflare Pages：指令入口，流程在 lib/deploy.js。參數與注意事項見 USAGE（--help）。
 import { spawnSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -1,9 +1,5 @@
-// 核對政見：node scripts/verify.js [--raw data/raw] [--candidate <id>]... [--skip-passed] [--profiles-only] [--jobs 1]
-//   [--model claude-opus-5-5] [--claude claude] [--brand-terms data/rules/brand-terms.json] [--date YYYY-MM-DD]
-// 先對候選人資料跑逐字比對（只有第一層），結果寫回 <raw>/candidates.json；--profiles-only 到此為止。
-// 再對每筆政見先跑第一層（逐字比對出處快照），通過才送第二層（claude -p 全新 session 依檢核表判定），
-// 結果寫回 <raw>/policies/<candidateId>.json 的 verification。見 ADR 0002。
-// --jobs 是第二層同時執行的 session 數，每筆仍各開一個全新 session。
+// 核對政見：候選人資料跑第一層，政見跑兩層核對（第二層每筆開一個全新 claude -p session），結果寫回原始資料。見 ADR 0002。
+// 參數與注意事項見 USAGE（--help）。
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';

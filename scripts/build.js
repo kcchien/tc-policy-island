@@ -1,5 +1,4 @@
-// 建置公開資料集：node scripts/build.js [--raw data/raw] [--out site/data/dataset.json]
-// 原始資料驗證失敗時列出全部錯誤，以結束碼 1 退出，不寫出檔案。
+// 建置公開資料集：原始資料 → 公開資料集。參數與注意事項見 USAGE（--help）。
 // 公開出處的出處快照一併複製到資料集旁，位置規則見 view-model.js 的 SNAPSHOT_DIR；
 // 整理方法頁的引用 repo 文件也逐字複製到資料集旁，見 repo-documents.js。
 import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';

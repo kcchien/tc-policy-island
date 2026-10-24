@@ -46,6 +46,12 @@ test('--help 不執行腳本本身：不寫檔、不部署、不開伺服器', (
     assert.equal(deploy.status, 0);
     assert.doesNotMatch(deploy.stdout, /▶/);
 
+    // verify.js 往下跑會讀原始資料，目錄不存在就失敗；fetch-source.js 往下跑會連網與寫出處紀錄。
+    assert.equal(runScript('verify.js', ['--help', '--raw', join(dir, 'missing'), '--claude', join(dir, 'missing-claude')]).status, 0);
+    const fetch = ['--help', '--candidate', 'x', '--id', 'x', '--url', 'http://127.0.0.1:9/', '--type', 'official-website', '--raw', dir, '--snapshots', dir];
+    assert.equal(runScript('fetch-source.js', fetch).status, 0);
+    assert.deepEqual(readdirSync(dir), [], 'fetch-source.js --help 不應寫出任何檔案');
+
     // preview.js 若啟動伺服器就不會自己結束，會撞上逾時。
     const preview = runScript('preview.js', ['--help', '--port', '0']);
     assert.equal(preview.status, 0);
