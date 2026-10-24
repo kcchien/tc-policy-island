@@ -447,7 +447,7 @@ export function createIslandView(stage, {
     return { x: position.x, z: position.z };
   };
 
-  function select(areaId) {
+  function select(areaId, { walk = true } = {}) {
     const previous = selectedId;
     selectedId = tiles.has(areaId) ? areaId : null;
     if (previous) paintTile(previous);
@@ -458,7 +458,7 @@ export function createIslandView(stage, {
     // 有選中的議題區時，其他名牌變淡。
     labelRenderer.domElement.classList.toggle('has-selection', Boolean(selectedId));
     labelsDirty = true;
-    if (selectedId) sendFigures(selectedId);
+    if (selectedId && walk) sendFigures(selectedId);
     requestRender();
   }
 
@@ -475,8 +475,13 @@ export function createIslandView(stage, {
     const targets = areaId
       ? figures.map(({ info }) => ({ ...destinations.find((d) => d.candidateId === info.candidateId).position, y: liftOf(areaId) }))
       : figures.map(({ info }) => ({ ...info.position, y: 0 }));
-    // 從廣場或上一格出發時，腳下的高度跟著那一格（剛被取消選取的格子已經落下）；走到一半改道則從目前的位置出發。
-    const starts = figures.map((figure) => (walks ? figureFoot(figure) : { ...figureFoot(figure), y: liftOf(standingAt) }));
+    // 腳下的高度跟著出發的那一格：剛被取消選取的格子已經落下，就從島面出發；
+    // 走到一半改道時，原本要去的格子仍選中才沿用目前的高度。朝向沿用目前的朝向，從那裡轉身。
+    const startY = (current) => (walks ? (standingAt === selectedId ? current : 0) : liftOf(standingAt));
+    const starts = figures.map((figure) => {
+      const foot = figureFoot(figure);
+      return { ...foot, y: startY(foot.y), heading: figure.walker.rotation.y };
+    });
     // 減少動態或暫停動畫時直接出現在目的地。
     const instant = reducedMotion() || animator.paused;
     const plans = figures.map(({ info }, i) => walkPlan(starts[i], targets[i], instant ? { ...info.walk, durationSeconds: 0 } : info.walk));
@@ -632,6 +637,8 @@ export function createIslandView(stage, {
     // 暫停按鈕：true 時所有裝飾動畫停在目前畫格。
     setPaused(paused) {
       animator.setPaused(paused);
+      // 走到一半按暫停：三人直接站到目的地。
+      if (paused && walks) walks.startedAt = -Infinity;
       requestRender();
     },
     paused() {
@@ -669,11 +676,11 @@ export function createIslandView(stage, {
       }
       requestRender();
     },
-    // 選中議題區並把鏡頭飛過去，抵達後呼叫 done。
-    focusArea(areaId, done) {
+    // 選中議題區並把鏡頭飛過去，抵達後呼叫 done。figures 為 false 時人物不出發（政見卡片沒開著，例如切回島嶼檢視）。
+    focusArea(areaId, done, { figures: walk = true } = {}) {
       const tile = tiles.get(areaId);
       if (!tile) return false;
-      select(areaId);
+      select(areaId, { walk });
       const target = new THREE.Vector3(tile.group.position.x, TILE_SURFACE, tile.group.position.z);
       flyTo({ target, distance: Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE) }, done);
       return true;

@@ -21,10 +21,10 @@ export default {
     const path = join(site.dir, PLAZA_MODULE);
     if (!existsSync(path)) return [`找不到人物配置模組 ${PLAZA_MODULE}`];
     // Node 24 可以同步 require ES 模組；關卡介面是同步的。
-    const module = createRequire(import.meta.url)(path);
-    const { plazaLayout } = module;
+    const plazaModule = createRequire(import.meta.url)(path);
     const dataset = site.dataset();
-    const plaza = plazaLayout(islandLayout(buildViewModel(dataset)));
+    const layout = islandLayout(buildViewModel(dataset));
+    const plaza = plazaModule.plazaLayout(layout);
     if (!plaza.tile) return ['島上沒有候選人廣場（需要至少一個裝飾格）'];
     if (plaza.figures.length === 0) return ['候選人廣場上沒有候選人人物'];
 
@@ -50,10 +50,12 @@ export default {
     if (!sameRow || gaps.some((gap) => gap <= 0 || Math.abs(gap - gaps[0]) > 1e-9)) {
       failures.push(`人物沒有由西到東同一列等距並排：${figures.map((f) => `${f.candidateId} (${f.position.x.toFixed(3)}, ${f.position.z.toFixed(3)})`).join('、')}`);
     }
-    return [...failures, ...walkFailures(module, dataset, plaza)];
+    return [...failures, ...walkFailures(plazaModule, { dataset, layout, plaza })];
   },
 };
 
+// 選中格抬高的高度（island-selection.js 的 SELECTED_LIFT；該模組載入 three.js，Node 不載）。
+const SELECTED_LIFT = 0.12;
 const near = (a, b) => Math.abs(a - b) < 1e-9;
 // 姿勢的每個欄位都相同；數字容許浮點誤差。
 const samePose = (a, b) => Object.keys(a).length === Object.keys(b).length
@@ -61,13 +63,12 @@ const samePose = (a, b) => Object.keys(a).length === Object.keys(b).length
 
 // 走到同一格（ADR 0001）：對每個議題區，三人都有目的地、與自己標記的相對位置相同；去程與回程同時出發、同時抵達，
 // 途中每一刻相對起點的位移、朝向與步伐都相同；目的地不隨政見資料改變。
-function walkFailures({ figureDestinations, walkPlan, walkPose }, dataset, plaza) {
+function walkFailures({ figureDestinations, walkPlan, walkPose }, { dataset, layout, plaza }) {
   if (![figureDestinations, walkPlan, walkPose].every((fn) => typeof fn === 'function')) {
     return [`人物配置模組 ${PLAZA_MODULE} 缺少走到同一格的 figureDestinations、walkPlan 或 walkPose`];
   }
   const { figures } = plaza;
   const ids = figures.map((f) => f.candidateId);
-  const layout = islandLayout(buildViewModel(dataset));
   const areas = layout.tiles.filter((t) => t.kind === 'area');
   // 每類問題記下出錯的候選人與議題區，最後各合成一條訊息。
   const problems = new Map();
@@ -89,8 +90,10 @@ function walkFailures({ figureDestinations, walkPlan, walkPose }, dataset, plaza
     const relative = ends.map((p, i) => ({ x: p.x - (tile.position.x + tile.markers[i].offset.x), z: p.z - (tile.position.z + tile.markers[i].offset.z) }));
     report('目的地與自己標記的相對位置和其他人不同', differing(relative, (a, b) => near(a.x, b.x) && near(a.z, b.z)), tile.id);
 
-    // 去程從廣場到目的地，回程從目的地回廣場。
-    for (const [trip, starts, targets] of [['去程', figures.map((f) => f.position), ends], ['回程', ends, figures.map((f) => f.position)]]) {
+    // 去程從廣場走上抬高的選中格，回程從選中格走回廣場。
+    const home = figures.map((f) => ({ ...f.position, y: 0 }));
+    const lifted = ends.map((p) => ({ ...p, y: SELECTED_LIFT }));
+    for (const [trip, starts, targets] of [['去程', home, lifted], ['回程', lifted, home]]) {
       const plans = figures.map((f, i) => walkPlan(starts[i], targets[i], f.walk));
       report(`${trip}出發或抵達時間和其他人不同`, differing(plans, (a, b) => a.departSeconds === b.departSeconds && a.arriveSeconds === b.arriveSeconds), tile.id);
       const last = Math.max(...plans.map((p) => p.arriveSeconds));

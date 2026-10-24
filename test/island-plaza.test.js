@@ -166,6 +166,16 @@ test('行走路徑固定時長：遠近都在同一個時間抵達，起訖是�
   assert.ok(swings.some((s) => Math.abs(s) > 0.1), JSON.stringify(swings));
 });
 
+test('走到一半改道時從當下的朝向轉身，不先跳回面向南方', () => {
+  const [figure] = plazaLayout(layoutOf(withDecorativeTiles())).figures;
+  // 原本往東走（朝向 π/2），改道往北。
+  const plan = walkPlan({ x: 0, z: 0, heading: Math.PI / 2 }, { x: 0, z: -6 }, figure.walk);
+
+  assert.equal(walkPose(plan, figure.walk, 0).heading, Math.PI / 2);
+  assert.ok(Math.abs(Math.abs(walkPose(plan, figure.walk, plan.arriveSeconds / 2).heading) - Math.PI) < 1e-9);
+  assert.equal(walkPose(plan, figure.walk, plan.arriveSeconds).heading, 0);
+});
+
 test('行走路徑的高度：走上抬高的選中格時在接近終點才踏上去，離開時一出發就踏下來', () => {
   const [figure] = plazaLayout(layoutOf(withDecorativeTiles())).figures;
   const up = walkPlan({ x: 0, z: 0, y: 0 }, { x: 0, z: -6, y: 0.12 }, figure.walk);

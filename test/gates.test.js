@@ -621,6 +621,7 @@ const WALK_CHANGES = [
   // 夾具的廣場在 [0, 1]，格心 x 約 1.2225，cand-b 站在中間，從廣場出發的那一趟被竄改。
   ['抵達時間不同（有人先到）', 'walkPlan', (plan, from) => (Math.abs(from.x - 1.2225) < 0.01 ? { ...plan, arriveSeconds: plan.arriveSeconds * 0.8 } : plan)],
   ['出發時間不同', 'walkPlan', (plan, from) => (Math.abs(from.x - 1.2225) < 0.01 ? { ...plan, departSeconds: 0.2 } : plan)],
+  ['踏上抬高的選中格的時機不同', 'walkPose', (pose, plan) => (Math.abs(plan.from.x - 1.2225) < 0.01 && plan.to.y > 0 && !pose.arrived ? { ...pose, y: plan.to.y } : pose)],
   ['路徑不同（繞路）', 'walkPose', (pose, plan) => (Math.abs(plan.from.x - 1.2225) < 0.01 && !pose.arrived ? { ...pose, z: pose.z + 0.3 } : pose)],
 ];
 for (const [what, name, wrap] of WALK_CHANGES) {

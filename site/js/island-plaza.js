@@ -101,6 +101,7 @@ export function figureDestinations(layout, areaId) {
 }
 
 // 一趟行走：從 from 直線走到 to（{ x, z, y? }，y 是腳下比格子頂面高出的量，例如選中格抬高），固定 durationSeconds。
+// from.heading 是出發時的朝向（走到一半改道時沿用當下的朝向），省略時是面向南方。
 // 三人的起點列與終點列都依排序等距並排，三條直線是同一條線平移，長度與每一刻的姿勢都相同。
 // 不走步道與橋：橋容不下三人並排，只能重疊或排成一列，就會有人走在前面。高度貼島面，越過水道時不另外跳，
 // 三人才不會在不同時刻跳起來。
@@ -108,7 +109,7 @@ export function walkPlan(from, to, { durationSeconds }) {
   const [dx, dz] = [to.x - from.x, to.z - from.z];
   const distance = Math.hypot(dx, dz);
   return {
-    from: { x: from.x, z: from.z, y: from.y ?? 0 },
+    from: { x: from.x, z: from.z, y: from.y ?? 0, heading: from.heading ?? 0 },
     to: { x: to.x, z: to.z, y: to.y ?? 0 },
     distance,
     // 行進方向（繞 y 軸的角度，0 是面向南方 +z，與 three.js 的 rotation.y 相同）。
@@ -119,13 +120,17 @@ export function walkPlan(from, to, { durationSeconds }) {
 }
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const smoothstep = (v) => v * v * (3 - 2 * v);
+// 從角度 a 轉到 b 取不超過半圈的那一邊，回傳要轉的量（-π 到 π）。
+const angleBetween = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 const ramp = (v, from, to) => (to > from ? clamp01((v - from) / (to - from)) : Number(v >= to));
 
 // 出發後 elapsed 秒的姿勢：位置 x、z、y，朝向 heading，腿與手臂的擺角 legSwing、armSwing（左腿與右手同向），上下彈跳 bob。
 // 起訖放慢、中途最快；出發與抵達都是靜止姿勢並面向南方（鏡頭）。抵達後 arrived 為 true，停在目的地。
 export function walkPose(plan, walk, elapsed) {
   const { from, to, distance } = plan;
-  const u = plan.arriveSeconds > 0 ? clamp01((elapsed - plan.departSeconds) / plan.arriveSeconds) : 1;
+  const span = plan.arriveSeconds - plan.departSeconds;
+  const u = span > 0 ? clamp01((elapsed - plan.departSeconds) / span) : 1;
   if (u >= 1) return { ...to, heading: 0, legSwing: 0, armSwing: 0, bob: 0, arrived: true };
   const s = (1 - Math.cos(Math.PI * u)) / 2;
   const travelled = s * distance;
@@ -133,15 +138,17 @@ export function walkPose(plan, walk, elapsed) {
   const k = to.y >= from.y
     ? ramp(travelled, distance - walk.liftReach - walk.liftStep, distance - walk.liftReach)
     : ramp(travelled, walk.liftReach, walk.liftReach + walk.liftStep);
-  const turning = distance > 1e-9 ? Math.min(1, u / walk.turn, (1 - u) / walk.turn) : 0;
+  // 前半段從出發時的朝向轉到行進方向，後半段從行進方向轉回面向南方，都取不超過半圈的那一邊。
+  const turnIn = smoothstep(Math.min(1, u / walk.turn));
+  const turnOut = smoothstep(Math.min(1, (1 - u) / walk.turn));
+  const heading = u < 0.5 ? from.heading + angleBetween(from.heading, plan.heading) * turnIn : plan.heading * turnOut;
   const envelope = distance > 1e-9 ? Math.sin(Math.PI * u) : 0;
   const step = Math.sin((2 * Math.PI * (elapsed - plan.departSeconds)) / walk.stepSeconds);
   return {
     x: from.x + (to.x - from.x) * s,
     z: from.z + (to.z - from.z) * s,
     y: from.y + (to.y - from.y) * k,
-    // 面向南方與行進方向之間取不超過半圈的那一邊（plan.heading 在 -π 到 π 之間）。
-    heading: plan.heading * (turning * turning * (3 - 2 * turning)),
+    heading,
     legSwing: walk.legSwing * step * envelope,
     armSwing: walk.armSwing * step * envelope,
     bob: walk.bob * Math.abs(step) * envelope,
