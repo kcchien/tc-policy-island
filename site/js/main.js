@@ -389,9 +389,11 @@ function startApp(vm, state, initialView) {
     if (view === 'island') {
       setPanelOpen(false);
       renderIslandPanel();
-      // 鏡頭飛到該區後才開卡片；減少動態時沒有飛行，立即開啟。
+      // 走到同一格：卡片還沒開時，等鏡頭到位且三位候選人人物都抵達才開；卡片已開著換題時鏡頭到位就換，
+      // 人物在後面走。減少動態時沒有飛行與步行，立即開啟。
+      const waitForFigures = !card.element.open;
       ensureIsland().then((controller) => {
-        if (!controller || !controller.focusArea(areaId, show)) show();
+        if (!controller || !controller.focusArea(areaId, show, { waitForFigures })) show();
       });
     } else {
       highlightTableRow();

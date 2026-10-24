@@ -38,6 +38,7 @@ const OPTIONS = {
   click: { type: 'string', multiple: true, default: [] },
   drag: { type: 'string', multiple: true, default: [] },
   wait: { type: 'string', default: '0' },
+  'no-settle': { type: 'boolean', default: false },
   out: { type: 'string' },
   url: { type: 'string' },
   dir: { type: 'string', default: 'site' },
@@ -116,6 +117,7 @@ export const USAGE = formatUsage({
         ['--click <x,y 或 CSS 選擇器>', '點擊畫面座標或元素中心，可重複，依序執行'],
         ['--drag <x1,y1-x2,y2>', '從起點拖到終點（滑鼠左鍵；手機用一指觸控），可重複，與 --click 依命令列順序執行'],
         ['--wait <毫秒>', '最後再多等的時間（預設 0）'],
+        ['--no-settle', '最後一個操作之後不等動畫到位，--wait 從操作完成起算（截動畫途中的畫面）'],
       ],
     },
     {
@@ -168,6 +170,7 @@ export function parseShootArgs(argv) {
       district: values.district ?? '',
     },
     actions: actionsOf(tokens),
+    settleLast: !values['no-settle'],
     waitMs: nonNegativeInt('wait', values.wait),
     out: values.out ?? (command === 'shot' ? 'shot.png' : null),
     url: values.url ?? null,
@@ -187,7 +190,10 @@ export function buildScenario(options, baseUrl) {
   const settle = { type: 'settle', ms: SETTLE_MS[options.motion], frames: SETTLE_FRAMES };
   const steps = [{ type: 'ready' }, settle];
   if (options.time !== 'auto') steps.push({ type: 'time', time: options.time }, settle);
-  for (const action of options.actions) steps.push(action, settle);
+  options.actions.forEach((action, i) => {
+    steps.push(action);
+    if (options.settleLast || i < options.actions.length - 1) steps.push(settle);
+  });
   if (options.waitMs > 0) steps.push({ type: 'wait', ms: options.waitMs });
   // 列印樣式在點擊與等待之後才套用（列印樣式常把按鈕藏起來，先套用就點不到）。
   if (options.media !== 'screen') steps.push({ type: 'media', media: options.media }, settle);

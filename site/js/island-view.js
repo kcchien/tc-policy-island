@@ -2,14 +2,17 @@
 // 由 main.js 以動態 import 載入，不支援 WebGL 的裝置不會下載 three.js。
 // 控制介面含 setTimeOfDay、setPaused、addAnimation、stats、setCover（政見卡片遮住的範圍，main.js 依卡片大小呼叫）、
 // areaScreenRects（議題區名牌與標記在畫面上的範圍，上手導覽用）、returnFigures（關閉政見卡片時人物走回廣場）。
-// 選中議題區（focusArea）時三位候選人人物同時走到該格，與鏡頭飛行同時進行。
+// 選中議題區（focusArea）時三位候選人人物同時走到該格，與鏡頭飛行同時進行；政見卡片還沒開時，
+// 鏡頭途中框住三人的出發點與終點，鏡頭到位且三人都抵達才開卡片。
+// 鏡頭操作照一般地圖（拖曳平移、右鍵或兩指旋轉），旋轉中心夾在島內。
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { cameraLimits, clampTarget, islandLayout, islandPoints, orbitCenter, viewOffset } from './island-layout.js';
+import { cameraLimits, clampTarget, frameIsland, islandLayout, islandPoints, orbitCenter, viewOffset } from './island-layout.js';
 import {
-  approachInsets, combineInsets, coverInsets, createCameraFlight, createTapTracker, flightDuration, homeView, sameInsets,
+  approachInsets, combineInsets, coverInsets, createCameraFlight, createTapTracker, flightDuration, homeView, joinArrivals,
+  sameInsets,
 } from './island-camera.js';
 import { createSelection, SELECTED_LIFT } from './island-selection.js';
 import { createFpsGovernor, initialQuality } from './island-quality.js';
@@ -41,6 +44,8 @@ const FOCUS_DISTANCE = 14;
 // 窄畫面的直書名牌往上長，錨點放在格心正北，名牌落在南北兩列格子的標記之間，不蓋住標記。
 const LABEL_WIDE = new THREE.Vector3(0, TILE_SURFACE + 1.35, -0.45);
 const LABEL_NARROW = new THREE.Vector3(0, TILE_SURFACE + 0.9, -0.2);
+// 走到同一格時，中途視角裡三人的出發點與終點占可視區的比例，四周留邊。
+const WALK_FILL = 0.6;
 // 構圖時算進的高度：格子頂面加上元素模型的最高高度（island-models.js 的元素區）。
 const MODEL_TOP = TILE_SURFACE + 1.1;
 
@@ -390,6 +395,8 @@ export function createIslandView(stage, {
 
   // 依畫面大小決定預設視角（島置中、占畫布約 80%）與距離限制。平移的範圍由 clampToIsland 限制在島內。
   let home = null;
+  // 沒被浮動元件遮住的區域的垂直視角與長寬比（不含卡片），走到同一格的中途視角用它構圖。
+  let visibleFrame = null;
   // 投影中心移到沒被遮住的區域正中（浮動元件加上卡片）。只移投影中心，鏡頭位置與畫面縮放都不變。
   function applyOffset() {
     const { width, height } = stageSize;
@@ -416,6 +423,7 @@ export function createIslandView(stage, {
     // 預設視角只看浮動元件遮住的範圍，不看卡片：卡片開關時不重新構圖。
     const base = viewOffset({ width, height, insets: baseInsets, canvasFov: FOV });
     const view = homeView(outline, { fov: base.visibleFov, aspect: base.visibleAspect });
+    visibleFrame = { fov: base.visibleFov, aspect: base.visibleAspect };
     Object.assign(controls, cameraLimits(bounds, view.distance));
     home = { ...view, target: new THREE.Vector3(view.target.x, 0, view.target.z) };
     // 使用者還沒轉動、縮放或選過議題區時，畫布尺寸一變就重新構圖。
@@ -434,16 +442,31 @@ export function createIslandView(stage, {
     settledTarget.copy(target);
   }
 
-  // 鏡頭飛到 target，距離為 distance；沒給 polar 與 azimuth 時保持目前的俯角與方位角。
-  // 減少動態時直接切過去。
-  function flyTo({ target, distance, polar, azimuth }, done = () => {}) {
-    const offset = camera.position.clone().sub(controls.target);
-    const spherical = new THREE.Spherical().setFromVector3(offset);
-    spherical.phi = polar ?? spherical.phi;
+  // 目前的俯角與方位角下，鏡頭看 target、距離 distance（夾在距離上下限內）時的位置。
+  const poseAt = (target, distance, { polar, azimuth } = {}) => {
+    const spherical = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));
+    spherical.phi = THREE.MathUtils.clamp(polar ?? spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
     spherical.theta = azimuth ?? spherical.theta;
     spherical.radius = THREE.MathUtils.clamp(distance, controls.minDistance, controls.maxDistance);
-    spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
-    const toPosition = target.clone().add(new THREE.Vector3().setFromSpherical(spherical));
+    return { target: target.clone(), position: target.clone().add(new THREE.Vector3().setFromSpherical(spherical)), spherical };
+  };
+
+  // 走到同一格的中途視角：目前的俯角與方位角下，框住三人的出發點與議題區 areaId 的終點（含人物身高），
+  // 占可視區 WALK_FILL；距離至少是 minDistance（飛到議題區的距離），兩端很近時不會拉得比終點還近。
+  function walkFraming(starts, areaId, minDistance) {
+    if (!visibleFrame) return null;
+    const { phi, theta } = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));
+    const top = TILE_SURFACE + (figures[0]?.info.labelHeight ?? 0);
+    const feet = [...starts, ...figureDestinations(layout, areaId).map((d) => d.position)];
+    const points = feet.flatMap(({ x, z }) => [{ x, y: TILE_SURFACE, z }, { x, y: top, z }]);
+    const framed = frameIsland(points, { ...visibleFrame, polar: phi, fill: WALK_FILL, azimuth: theta });
+    return { target: new THREE.Vector3(framed.target.x, TILE_SURFACE, framed.target.z), distance: Math.max(framed.distance, minDistance) };
+  }
+
+  // 鏡頭飛到 target，距離為 distance；沒給 polar 與 azimuth 時保持目前的俯角與方位角。
+  // via 是中途視角 { target, distance }（可省略），durationMs 是飛行時間（省略為 FLIGHT_MS）。減少動態時直接切過去。
+  function flyTo({ target, distance, polar, azimuth, via = null, durationMs }, done = () => {}) {
+    const toPosition = poseAt(target, distance, { polar, azimuth }).position;
     focus = { x: target.x, z: target.z };
     // 飛往議題區或回到全景後，縮遠時旋轉中心又會回到島中心。
     panned = false;
@@ -452,9 +475,10 @@ export function createIslandView(stage, {
     // 飛行途中又選了別的議題區：新的飛行取代前一段，前一段抵達後的動作不再執行。
     flight.start({
       from: { target: controls.target.clone(), position: camera.position.clone() },
+      via: via && poseAt(via.target, via.distance),
       to: { target: target.clone(), position: toPosition },
       now: performance.now(),
-      durationMs: flightDuration({ reducedMotion: reducedMotion() }),
+      durationMs: flightDuration({ reducedMotion: reducedMotion(), durationMs }),
       onArrive: done,
     });
     // 減少動態時飛行時間為 0：立刻落在目的地。
@@ -484,7 +508,8 @@ export function createIslandView(stage, {
     return { x: position.x, z: position.z };
   };
 
-  function select(areaId, { walk = true } = {}) {
+  // onWalked 在三人都抵達時呼叫（人物沒出發時不呼叫）。
+  function select(areaId, { walk = true, onWalked } = {}) {
     const previous = selectedId;
     selectedId = tiles.has(areaId) ? areaId : null;
     if (previous) paintTile(previous);
@@ -495,19 +520,23 @@ export function createIslandView(stage, {
     // 有選中的議題區時，其他名牌變淡。
     labelRenderer.domElement.classList.toggle('has-selection', Boolean(selectedId));
     labelsDirty = true;
-    if (selectedId && walk) sendFigures(selectedId);
+    if (selectedId && walk) sendFigures(selectedId, onWalked);
     requestRender();
   }
 
   // 走到同一格：三人同時出發、同時抵達（island-plaza.js 的 walkPlan，三人同一份步伐參數）。
-  // standingAt 是三人所在（或正走向）的議題區，null 是廣場；walks 是走在路上時的 { plans, startedAt }。
+  // standingAt 是三人所在（或正走向）的議題區，null 是廣場；walks 是走在路上時的 { plans, startedAt, onArrive }。
+  // 走到一半改道時新的一趟取代前一趟，前一趟的 onArrive 不再呼叫。
   let standingAt = null;
   let walks = null;
   const liftOf = (areaId) => (areaId && areaId === selectedId ? SELECTED_LIFT : 0);
   // 人物腳下目前的位置（場景座標的 x、z，y 是比格子頂面高出的量）。
   const figureFoot = ({ model, walker }) => ({ x: model.position.x + walker.position.x, z: model.position.z + walker.position.z, y: walker.userData.y ?? 0 });
-  function sendFigures(areaId) {
-    if (figures.length === 0) return;
+  function sendFigures(areaId, onArrive) {
+    if (figures.length === 0) {
+      onArrive?.();
+      return;
+    }
     const destinations = areaId ? figureDestinations(layout, areaId) : [];
     const targets = areaId
       ? figures.map(({ info }) => ({ ...destinations.find((d) => d.candidateId === info.candidateId).position, y: liftOf(areaId) }))
@@ -523,7 +552,7 @@ export function createIslandView(stage, {
     const instant = reducedMotion() || animator.paused;
     const plans = figures.map(({ info }, i) => walkPlan(starts[i], targets[i], instant ? { ...info.walk, durationSeconds: 0 } : info.walk));
     standingAt = areaId;
-    walks = { plans, startedAt: performance.now() };
+    walks = { plans, startedAt: performance.now(), onArrive };
     stepFigures(walks.startedAt);
     requestRender();
   }
@@ -549,7 +578,11 @@ export function createIslandView(stage, {
       walking ||= !pose.arrived;
     });
     labelsDirty = true;
-    if (!walking) walks = null;
+    if (!walking) {
+      const { onArrive } = walks;
+      walks = null;
+      onArrive?.();
+    }
     return walking;
   }
 
@@ -703,12 +736,25 @@ export function createIslandView(stage, {
       requestRender();
     },
     // 選中議題區並把鏡頭飛過去，抵達後呼叫 done。figures 為 false 時人物不出發（政見卡片沒開著，例如切回島嶼檢視）。
-    focusArea(areaId, done, { figures: walk = true } = {}) {
+    // waitForFigures（政見卡片還沒開）時走到同一格要看得完整：鏡頭到位且三人都抵達才呼叫 done，
+    // 飛行與步行同長，途中經過框住三人出發點與終點的視角，出發段也在畫面裡。卡片已開著換題時只等鏡頭。
+    focusArea(areaId, done, { figures: walk = true, waitForFigures = false } = {}) {
       const tile = tiles.get(areaId);
       if (!tile) return false;
-      select(areaId, { walk });
       const target = new THREE.Vector3(tile.group.position.x, TILE_SURFACE, tile.group.position.z);
-      flyTo({ target, distance: Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE) }, done);
+      const distance = Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE);
+      // 暫停動畫時人物直接出現在目的地，不必等。
+      if (!walk || !waitForFigures || animator.paused) {
+        select(areaId, { walk });
+        flyTo({ target, distance }, done);
+        return true;
+      }
+      const arrivals = joinArrivals(['flight', 'walk'], done ?? (() => {}));
+      const starts = figures.map(figureFoot);
+      select(areaId, { walk, onWalked: () => arrivals.arrive('walk') });
+      flyTo({
+        target, distance, via: walkFraming(starts, areaId, distance), durationMs: (figures[0]?.info.walk.durationSeconds ?? 0) * 1000,
+      }, () => arrivals.arrive('flight'));
       return true;
     },
     // 政見卡片關閉時：三位候選人人物同時走回候選人廣場，選中的議題區不變。

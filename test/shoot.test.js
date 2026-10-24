@@ -24,7 +24,7 @@ test('說明：指令印出子指令與每個參數並以結束碼 0 結束', ()
     assert.equal(result.stdout, USAGE);
   }
   for (const name of ['shot', 'measure', '--device', '--motion', '--time', '--path', '--view', '--area', '--policy', '--candidate',
-    '--q', '--district', '--click', '--drag', '--wait', '--out', '--strict', '--url', '--dir', '--port', '--chrome', '--timeout']) {
+    '--q', '--district', '--click', '--drag', '--no-settle', '--wait', '--out', '--strict', '--url', '--dir', '--port', '--chrome', '--timeout']) {
     assert.ok(USAGE.includes(name), `說明缺少 ${name}`);
   }
 });
@@ -68,6 +68,17 @@ test('拖曳參數：--drag x1,y1-x2,y2 解析成起訖座標，與 --click 依�
   for (const bad of ['700,450', '#tool-index', '1,2-3', 'a,b-c,d', '']) {
     assert.throws(() => parseShootArgs(['--drag', bad]), /--drag/);
   }
+});
+
+test('場景：--no-settle 只省略最後一個操作之後的等待，--wait 從操作完成起算（截動畫途中的畫面）', () => {
+  const options = parseShootArgs(['--motion', 'full', '--click', '#tool-index', '--click', '.island-list button', '--wait', '400', '--no-settle']);
+  assert.equal(options.settleLast, false);
+  assert.equal(parseShootArgs(['shot']).settleLast, true);
+
+  const { steps } = buildScenario(options, 'http://localhost:8123/');
+
+  assert.deepEqual(steps.map((s) => s.type), ['ready', 'settle', 'time', 'settle', 'click', 'settle', 'click', 'wait']);
+  assert.equal(steps.at(-1).ms, 400);
 });
 
 test('場景：拖曳和點擊一樣是一個步驟，之後等動畫到位', () => {
