@@ -33,20 +33,21 @@ export const MOTION_LEVELS = {
 
 // 循環道具的位置（相對格心）：格子東西兩側、外側標記的西邊與東邊，左右對稱，與三個標記的距離對稱。
 // 放在主題場景南邊偏外，手機預設視角（鏡頭轉到西南或東南）看過去也不擋主題場景；
-// 放大後底座不進北側的主題場景與元素區（見 island-body.js 的 TILE_SLOTS）、不碰標記與市民路線，測試會檢查。
+// 乘倍率後底座不進北側的主題場景與元素區（見 island-body.js 的 TILE_SLOTS）、不碰標記與市民路線，測試會檢查。
 export const LOOP_SPOTS = [{ x: -0.62, z: 0.46 }, { x: 0.62, z: 0.46 }];
 // 市民走的路線：沿自己那座島的步道環，走在中線內側 CITIZEN_INSET（車輛走外側車道）。值是格心到邊的距離。
 const CITIZEN_INSET = 0.075;
 export const CITIZEN_APOTHEM = WALKWAY_APOTHEM - CITIZEN_INSET;
 
-// 道具與市民的放大倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率，讓全景第一眼就看得到動態。
+// 道具與市民的倍率：模型在 island-motion-view.js 以原尺寸組好，放上格子時乘這個倍率。
 // 倍率是動態強度的一部分，每格相同（motionSignature 會比對）。
-// 道具再高或會動零件再寬，選中議題區時就會在手機的預設視角擋住主題場景，所以道具不放大，比原尺寸略小。
+// 道具再高或會動零件再寬，選中議題區時就會在手機的預設視角擋住主題場景，所以道具比原尺寸略小。
+// 市民放大，讓全景第一眼就看得到動態。
 // 市民沿格子南緣走過外側標記前方，再高就會在手機的預設視角擋住標記；身寬受步道上的車道限制（市民走內側，公車靠中線）。
 // 市民另隨鏡頭距離放大（citizenZoom），放大到上限時仍要守住這兩個限制。
 export const LOOP_SCALE = 0.9;
 export const CITIZEN_SCALE = 1.05;
-// 放大後的外形（場景單位），測試用來確認不擋住標記、不進元素區、不碰市民。道具：半徑 LOOP_CORE 的柱子高到 LOOP_HEIGHT，
+// 乘倍率後的外形（場景單位），測試用來確認不擋住標記與主題場景、不進元素區、不碰市民。道具：半徑 LOOP_CORE 的柱子高到 LOOP_HEIGHT，
 // 會動零件（風車葉、旗、吊臂）只在 LOOP_REACH_FROM 以上，掃過半徑 LOOP_REACH。
 // 原尺寸見 island-motion-view.js 的 LOOP_PROPS，改形狀時要守住這些範圍。市民的外形範圍在 CITIZEN_FIGURE 之後。
 export const LOOP_HEIGHT = 0.45 * LOOP_SCALE;
