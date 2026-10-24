@@ -550,6 +550,8 @@ const FIGURE_CHANGES = [
   ['動畫相位', (plaza) => { plaza.figures[1].idle.phase = 0.5; }],
   ['底座', (plaza) => { plaza.figures[1].pad.size *= 1.2; }],
   ['點選範圍', (plaza) => { plaza.figures[1].hitRadius = 0.3; }],
+  ['行走時長', (plaza) => { plaza.figures[1].walk.durationSeconds = 1.2; }],
+  ['步伐', (plaza) => { plaza.figures[1].walk.legSwing *= 1.5; }],
 ];
 for (const [what, change] of FIGURE_CHANGES) {
   test(`某位候選人人物的${what}與其他人不同時，人物一致關卡不通過並指出候選人`, () => {
@@ -595,6 +597,56 @@ test('人物順序不依排序規則或沒有等距並排時，人物一致關�
   assert.match(first.output, /人物順序應為 cand-a、cand-b、cand-c/);
   assert.notEqual(second.code, 0);
   assert.match(second.output, /等距/);
+});
+
+// 走到同一格的替身：把網站模組裡的 export function name( 包一層，由 wrap 竄改原本的結果。
+const walkModule = (name, wrap) => `${repoFile('site/js/island-plaza.js').replace(`export function ${name}(`, `function real_${name}(`)}
+export function ${name}(...args) {
+  return (${wrap})(real_${name}(...args), ...args);
+}
+`;
+
+test('走到同一格合規時，人物一致關卡通過', () => {
+  const { output } = runGates(makeSite(() => {}, COMPLIANT_FILES));
+
+  assert.match(output, /✓ 人物一致：/, output);
+});
+
+const WALK_CHANGES = [
+  ['目的地與標記的相對位置不同', 'figureDestinations', (destinations) => {
+    if (destinations[1]) destinations[1].position.z += 0.3;
+    return destinations;
+  }],
+  ['只有有政見的人有目的地', 'figureDestinations', (destinations) => destinations.filter((d) => d.candidateId !== 'cand-b')],
+  // 夾具的廣場在 [0, 1]，格心 x 約 1.2225，cand-b 站在中間，從廣場出發的那一趟被竄改。
+  ['抵達時間不同（有人先到）', 'walkPlan', (plan, from) => (Math.abs(from.x - 1.2225) < 0.01 ? { ...plan, arriveSeconds: plan.arriveSeconds * 0.8 } : plan)],
+  ['出發時間不同', 'walkPlan', (plan, from) => (Math.abs(from.x - 1.2225) < 0.01 ? { ...plan, departSeconds: 0.2 } : plan)],
+  ['路徑不同（繞路）', 'walkPose', (pose, plan) => (Math.abs(plan.from.x - 1.2225) < 0.01 && !pose.arrived ? { ...pose, z: pose.z + 0.3 } : pose)],
+];
+for (const [what, name, wrap] of WALK_CHANGES) {
+  test(`走到同一格${what}時，人物一致關卡不通過並指出候選人`, () => {
+    const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'js/island-plaza.js': walkModule(name, wrap) });
+
+    const { code, output } = runGates(site);
+
+    assert.notEqual(code, 0, output);
+    assert.match(output, /✗ 人物一致：/);
+    assert.match(output, /cand-b/);
+  });
+}
+
+test('目的地依政見資料而變時，人物一致關卡不通過', () => {
+  // 有政見的格子目的地往南移：換一份政見資料後目的地不同。
+  const tampered = walkModule('figureDestinations', (destinations, layout, areaId) => {
+    const tile = layout.tiles.find((t) => t.id === areaId);
+    return destinations.map((d, i) => (tile.markers[i].lit ? { ...d, position: { ...d.position, z: d.position.z + 0.01 } } : d));
+  });
+  const site = makeSite(() => {}, { ...COMPLIANT_FILES, 'js/island-plaza.js': tampered });
+
+  const { code, output } = runGates(site);
+
+  assert.notEqual(code, 0, output);
+  assert.match(output, /政見/);
 });
 
 test('沒有候選人廣場或網站目錄缺少人物配置模組時，人物一致關卡不通過', () => {

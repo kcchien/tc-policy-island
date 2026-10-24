@@ -267,6 +267,8 @@ function startApp(vm, state, initialView) {
         const syncCover = () => controller.setCover(card.element.open ? card.element.getBoundingClientRect() : null);
         new ResizeObserver(syncCover).observe(card.element);
         card.element.addEventListener('close', syncCover);
+        // 走到同一格：關閉政見卡片時三位候選人人物同時走回候選人廣場。
+        card.element.addEventListener('close', () => controller.returnFigures());
         controller.setTimeOfDay?.(hud.time);
         controller.setPaused?.(hud.paused);
         document.getElementById('island-status').remove();
