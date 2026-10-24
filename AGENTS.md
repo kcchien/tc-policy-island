@@ -19,6 +19,7 @@
 | `node scripts/preview.js` | 本機預覽網站目錄。參數與注意事項看 `--help` |
 | `node scripts/verify.js` | 核對候選人資料與政見（ADR 0002），第二層會花費用。參數與注意事項看 `--help` |
 | `node scripts/fetch-source.js` | 擷取一個出處（出處快照、存檔、出處紀錄），或補送存檔。參數與注意事項看 `--help` |
+| `node scripts/speak.js` | 生成政見語音音檔與清單（`data/audio/`），會花點數，正式資料先跑 `--dry-run`。參數與注意事項看 `--help` |
 | `node scripts/shoot.js` | 截圖與版面量測，手機版驗證用這個。參數與注意事項看 `--help` |
 | `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
 | `node scripts/deploy.js`（`npm run deploy`） | 檢查後部署到 Cloudflare Pages，真的部署只由維護者執行。參數與注意事項看 `--help` |

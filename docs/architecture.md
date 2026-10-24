@@ -19,6 +19,7 @@ data/raw/              原始資料（建置輸入）
 data/snapshots/        出處的文字快照，檔名 <sourceId>.txt
 data/extraction/       政見抽取指示 instructions.md、判準裁決紀錄 judgement-log.md、候選人資料抽取方法 candidate-profiles.md、每位候選人的抽取紀錄 records/、PDF 字型對照檔 glyph-maps/
 data/verification/     檢核表 checklist.json 與第二層提示詞 layer2-prompt.md，同一版本號，改內容就升版；核對報告寫在 report.md（整理方法頁照原文公開，還沒有時顯示「尚未產生」）
+data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256）與清單 manifest.json，由 scripts/speak.js 生成
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
 scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
@@ -131,9 +132,9 @@ js/repo-documents.js  js/markdown.js  js/method-content.js  js/method.js
 ## scripts
 
 ```
-build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  verify.js   指令入口，參數看各腳本的 --help
+build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  speak.js  verify.js   指令入口，參數看各腳本的 --help
 lib/      archive-queue.js  audience-text.js  brand-terms.js  cdp.js  colors.js  deploy.js
-          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  usage.js  verification.js
+          pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  speech.js  usage.js  verification.js
 gates/    index.js（關卡清單 GATES）  site.js（讀取網站目錄的入口）
           audience-text.js  brand-terms.js  candidate-columns.js  candidate-profiles.js  dataset-structure.js
           figure-consistency.js  fixed-decor.js  fixed-motion.js  forbidden-colors.js  no-audio-files.js
