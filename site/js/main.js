@@ -267,6 +267,8 @@ function startApp(vm, state, initialView) {
         const syncCover = () => controller.setCover(card.element.open ? card.element.getBoundingClientRect() : null);
         new ResizeObserver(syncCover).observe(card.element);
         card.element.addEventListener('close', syncCover);
+        // 走到同一格：關閉政見卡片時三位候選人人物同時走回候選人廣場。
+        card.element.addEventListener('close', () => controller.returnFigures());
         controller.setTimeOfDay?.(hud.time);
         controller.setPaused?.(hud.paused);
         document.getElementById('island-status').remove();
@@ -426,7 +428,8 @@ function startApp(vm, state, initialView) {
       ensureIsland().then((controller) => {
         if (!controller) return;
         controller.resize();
-        if (selectedArea) controller.focusArea(selectedArea);
+        // 人物只在政見卡片開著時走到該格（走到同一格）。
+        if (selectedArea) controller.focusArea(selectedArea, undefined, { figures: card.element.open });
         // 載入期間切回表格檢視時不出導覽。
         if (view === 'island') autoStart();
       });
