@@ -160,7 +160,7 @@ select {
   font-size: 0.75rem;
 }
 
-.title-links :is(a, .random-area-button, .tour-open-button) {
+.title-links :is(a, .random-area-button, .tour-open-button, .shortlist-open) {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -202,6 +202,22 @@ select {
   font-family: inherit;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* 我的對照單：有勾選時才出現在頁首連結列，外框膠囊，與隨機一題同高 */
+.shortlist-open {
+  padding: 2px 12px;
+  border: 1px solid var(--laterite);
+  border-radius: 999px;
+  background: var(--rice);
+  color: var(--laterite);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.shortlist-open:hover {
+  background: var(--laterite);
+  color: var(--rice);
 }
 
 /* 上手導覽：對話框本身是說明框，框線固定定位、以大範圍陰影壓暗框外（main.js 與 tour-view.js 定位） */
@@ -543,6 +559,9 @@ select {
 .card-height,
 .card-blind,
 .card-expand,
+.card-step,
+.reading-clear,
+.shortlist-action,
 .index-close {
   min-height: var(--button-height);
   padding: 6px 14px;
@@ -561,6 +580,9 @@ select {
 .card-height:hover,
 .card-blind:hover,
 .card-expand:hover,
+.card-step:hover,
+.reading-clear:hover,
+.shortlist-action:hover,
 .index-close:hover {
   background: var(--laterite);
   color: var(--rice);
@@ -574,6 +596,9 @@ select {
 .card-height:active,
 .card-blind:active,
 .card-expand:active,
+.card-step:active,
+.reading-clear:active,
+.shortlist-action:active,
 .index-close:active {
   background: var(--pressed);
   border-color: var(--pressed);
@@ -1138,6 +1163,28 @@ body[data-view="island"] .policy-card::backdrop {
   box-shadow: inset 4px 0 0 var(--laterite);
 }
 
+/* 閱讀進度的淡勾：看過的議題區名稱旁，淡色、不搶名稱 */
+.seen-mark {
+  margin-left: 6px;
+  color: var(--charcoal-soft);
+  font-size: 0.8125em;
+  opacity: 0.6;
+}
+
+.reading-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 10px 0;
+  color: var(--charcoal-soft);
+  font-size: 0.8125rem;
+}
+
+.reading-progress[hidden] {
+  display: none;
+}
+
 /* 主題場景名稱：議題區名稱下方一行小字 */
 .island-item-hero {
   display: block;
@@ -1461,6 +1508,23 @@ body[data-view="island"] .card-height {
   flex: 1 1 14rem;
 }
 
+/* 只看出處說法不一：與全站篩選同一個條件，開卡片時帶入 */
+.card-conflict {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--button-height);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.card-conflict input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--laterite);
+}
+
 .card-filters input,
 .card-filters select {
   min-height: var(--button-height);
@@ -1508,6 +1572,16 @@ body[data-view="island"] .card-height {
   gap: 12px;
   min-height: 0;
   padding: 12px 20px 20px;
+}
+
+/* 上一題、下一題：卡片右下角 */
+.card-steps {
+  display: flex;
+  flex: none;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: -8px;
+  padding: 0 20px 16px;
 }
 
 .card-column {
@@ -1634,6 +1708,23 @@ body[data-view="island"] .card-height {
   font-weight: normal;
 }
 
+/* 我的對照單的勾選框：摘要列標籤行的最右側，三欄同一位置 */
+.policy-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: var(--laterite);
+  cursor: pointer;
+}
+
+.policy-pick input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--laterite);
+}
+
 .policy-more {
   padding: 0 12px 12px;
 }
@@ -1740,6 +1831,13 @@ body[data-view="island"] .card-height {
   color: var(--rice);
 }
 
+/* 朗讀播放中：音檔與瀏覽器語音同一個按下狀態，不顯示時間軸 */
+.policy-action[aria-pressed="true"] {
+  background: var(--laterite);
+  border-color: var(--laterite);
+  color: var(--rice);
+}
+
 .policy-action-status {
   color: var(--charcoal-soft);
   font-size: 0.75rem;
@@ -1749,6 +1847,156 @@ body[data-view="island"] .card-height {
 .policy-copy-text {
   flex: 1 1 100%;
   font-size: 0.8125rem;
+}
+
+/* 我的對照單：每個議題區一段，三欄依排序規則並排，同寬同字級 */
+.shortlist-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shortlist-area-title {
+  margin: 0 0 8px;
+  font-size: 1.0625rem;
+}
+
+.shortlist-area-title .area-number {
+  margin-right: 6px;
+  color: var(--laterite);
+}
+
+.shortlist-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shortlist-column {
+  padding: 10px 12px;
+  background: var(--rice-deep);
+  border-radius: var(--radius);
+}
+
+.shortlist-column .candidate-name {
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 3px solid var(--candidate);
+}
+
+.shortlist-policies {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortlist-policy {
+  padding: 6px 8px;
+  background: var(--rice);
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+}
+
+.shortlist-policy.is-picked {
+  border-color: var(--laterite);
+}
+
+.shortlist-summary {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.shortlist-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+}
+
+.shortlist-meta .policy-pick {
+  margin-left: 0;
+}
+
+.shortlist-picked {
+  color: var(--laterite);
+  font-weight: bold;
+}
+
+.shortlist-footer {
+  margin: 16px 0 0;
+  color: var(--charcoal-soft);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.shortlist-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* 列印：只印對照單，一頁 A4 為目標，按鈕與勾選框不印 */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  /* 只在對照單開著時改成只印對照單，平常直接列印照原樣 */
+  body:has(> .shortlist-dialog[open]) > :not(.shortlist-dialog) {
+    display: none !important;
+  }
+
+  /* 紙本看不到連結，出處網址印在連結文字後面 */
+  .shortlist-meta a[href]::after {
+    content: " " attr(href);
+    overflow-wrap: anywhere;
+  }
+
+  .shortlist-dialog {
+    position: static;
+    width: auto;
+    max-height: none;
+    box-shadow: none;
+    background: none;
+  }
+
+  .shortlist-dialog::backdrop {
+    display: none;
+  }
+
+  .shortlist-dialog .card-inner,
+  .shortlist-dialog .card-body {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .shortlist-dialog :is(.card-handle, .card-actions, .policy-pick) {
+    display: none !important;
+  }
+
+  .shortlist-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+
+  .shortlist-area {
+    break-inside: avoid;
+  }
+
+  .shortlist-summary {
+    font-size: 9pt;
+  }
+
+  .shortlist-meta,
+  .shortlist-footer {
+    font-size: 8pt;
+  }
 }
 
 /* 候選人資料卡：三張同尺寸、同字級。格線本身不設高度（捲動放在外層），1fr 的列或欄才會撐成最高那張的大小。 */
@@ -2190,7 +2438,7 @@ body[data-view="island"] .card-height {
     line-height: 1.4;
   }
 
-  body[data-view="island"] .title-links :is(a, .random-area-button, .tour-open-button) {
+  body[data-view="island"] .title-links :is(a, .random-area-button, .tour-open-button, .shortlist-open) {
     min-height: 28px;
     font-size: 0.8125rem;
   }
@@ -2465,6 +2713,10 @@ body[data-view="island"] .card-height {
     margin-left: 0;
   }
 
+  .card-conflict {
+    flex: 1 1 100%;
+  }
+
   .card-filter-status {
     margin: 6px var(--gap) 0;
   }
@@ -2483,7 +2735,11 @@ body[data-view="island"] .card-height {
   .card-columns {
     grid-auto-flow: row;
     grid-auto-columns: auto;
-    padding: 10px var(--gap) calc(var(--gap) + env(safe-area-inset-bottom));
+    padding: 10px var(--gap) var(--gap);
+  }
+
+  .card-steps {
+    padding: 0 var(--gap) calc(10px + env(safe-area-inset-bottom));
   }
 
   .card-column:not(.is-active) {
@@ -2497,6 +2753,20 @@ body[data-view="island"] .card-height {
   /* 手機的候選人資料卡對話框改為單欄堆疊，三張仍同高 */
   .candidate-dialog .profile-cards {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 手機的對照單：三欄改為上下堆疊，順序仍依排序規則；按鈕換到說明下方 */
+  .shortlist-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shortlist-dialog .card-head {
+    flex-wrap: wrap;
+  }
+
+  .shortlist-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .candidate-strip {

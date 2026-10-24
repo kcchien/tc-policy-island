@@ -1,5 +1,6 @@
 // 進站流程：選檢視、載入資料、接上篩選與卡片、檢視切換、時段（預設自動依台灣時間，每分鐘檢查；點時段改手動）、
-// 頁首的選舉時程（與自動時段同一節奏重算）、隨機一題、上手導覽與統計（資料載入後送一次頁面瀏覽，旁聽出處連結的點擊）。
+// 頁首的選舉時程（與自動時段同一節奏重算）、隨機一題、下一題與閱讀進度、上手導覽與統計（資料載入後送一次頁面瀏覽，
+// 旁聽出處連結的點擊）。
 // 島嶼檢視（island-view.js）第一次進入時才動態載入。只在瀏覽器使用。
 
 import { TAICHUNG_DISTRICTS } from './dataset.js';
@@ -13,10 +14,16 @@ import { createCandidateDialog, renderProfileCards } from './candidate-card.js';
 import { el } from './dom.js';
 import { timeOfDayAt } from './island-daylight.js';
 import { pickRandomArea } from './random-area.js';
+import { markSeen, nextAreaId, parseSeen, SEEN_KEY, serializeSeen } from './reading-progress.js';
+import { knownPicks, parsePicks, PICKS_KEY, serializePicks } from './shortlist.js';
+import { createShortlistDialog } from './shortlist-dialog.js';
 import { autoStartTour, currentTourStep, initialTour, nextTourStep, pickTourArea, reopenTour, skipTour } from './tour.js';
 import { createTourView } from './tour-view.js';
 import { pageviewHit, sendHit, sourceIdsBySnapshot, trackSourceClicks } from './hits.js';
-import { FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, resultStatusText, TIME_NAMES, TOUR_TEXT } from './ui-text.js';
+import {
+  FILTER_TEXT, ISLAND_TEXT, LOAD_TEXT, PROFILE_TEXT, RANDOM_AREA_TEXT, READING_TEXT, resultStatusText, SHORTLIST_TEXT, TIME_NAMES,
+  TOUR_TEXT,
+} from './ui-text.js';
 import { setupMusicToggle } from './bgm-control.js';
 import { scheduleView, taipeiDate } from './election-schedule.js';
 import { renderSchedule, setupScheduleToggle } from './schedule-view.js';
@@ -134,8 +141,50 @@ function startApp(vm, state, initialView) {
       state.policy = null;
       updateUrl();
     },
+    onStep: (step) => stepArea(step),
+    picks: () => picks,
+    onPick: (policyId, checked) => togglePick(policyId, checked),
   });
-  document.body.append(card.element);
+
+  // 我的對照單：勾選存在讀者的瀏覽器；網址帶 pick 時以網址為準並寫回，之後從網址拿掉（分享網址由「複製網址」產生）。
+  // 頁首按鈕只顯示勾選總數，不依候選人分，沒有勾選時不出現。
+  const fromUrl = knownPicks(vm, state.pick);
+  let picks = fromUrl.size > 0 ? fromUrl : knownPicks(vm, parsePicks(readStorage(PICKS_KEY)));
+  if (fromUrl.size > 0) writeStorage(PICKS_KEY, serializePicks(picks));
+  state.pick = [];
+  const shortlistButton = el('button', { type: 'button', class: 'shortlist-open', title: SHORTLIST_TEXT.buttonHint });
+  const shortlistUrl = () => `${location.origin}${location.pathname}${formatSearch({ pick: [...picks] })}`;
+  const shortlist = createShortlistDialog({ onPick: (policyId, checked) => togglePick(policyId, checked) });
+  const syncShortlistButton = () => {
+    shortlistButton.textContent = SHORTLIST_TEXT.button(picks.size);
+    shortlistButton.hidden = picks.size === 0;
+  };
+  const togglePick = (policyId, checked) => {
+    picks = new Set(picks);
+    if (checked) picks.add(policyId);
+    else picks.delete(policyId);
+    writeStorage(PICKS_KEY, serializePicks(picks));
+    syncShortlistButton();
+    if (shortlist.element.open) shortlist.open(vm, picks, shortlistUrl());
+  };
+  shortlistButton.addEventListener('click', () => shortlist.open(vm, picks, shortlistUrl()));
+  syncShortlistButton();
+
+  // 閱讀進度：看過的議題區只記在讀者的瀏覽器，索引與表格打淡勾；有紀錄時才出現說明與「清除紀錄」。
+  // 已不存在的議題區（舊紀錄）略過，否則只剩舊識別碼時會出現說明卻沒有任何淡勾。
+  const areaIds = new Set(vm.rows.map((row) => row.issueArea.id));
+  let seen = new Set([...parseSeen(readStorage(SEEN_KEY))].filter((id) => areaIds.has(id)));
+  const clearSeenButton = el('button', { type: 'button', class: 'reading-clear' }, READING_TEXT.clear);
+  const readingProgress = el('p', { class: 'reading-progress' }, el('span', {}, READING_TEXT.note), clearSeenButton);
+  const setSeen = (next) => {
+    seen = next;
+    writeStorage(SEEN_KEY, serializeSeen(seen));
+    readingProgress.hidden = seen.size === 0;
+    renderLists();
+  };
+  readingProgress.hidden = seen.size === 0;
+  clearSeenButton.addEventListener('click', () => setSeen(new Set()));
+  document.body.append(card.element, shortlist.element);
 
   const candidateDialog = createCandidateDialog({
     onClose() {
@@ -263,7 +312,7 @@ function startApp(vm, state, initialView) {
   });
 
   const renderIslandPanel = () => {
-    renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null) });
+    renderIslandList(islandList, vm, filtered, { selectedId: selectedArea, onPick: (areaId) => openCard(areaId, null), seen });
   };
 
   // 第一次進入島嶼檢視時才載入 three.js。載入或建立場景失敗就改用表格檢視。
@@ -331,10 +380,11 @@ function startApp(vm, state, initialView) {
     candidateDialog.close();
     state.candidate = null;
     selectedArea = areaId;
+    if (!seen.has(areaId)) setSeen(markSeen(seen, areaId));
     state.area = policyId ? null : areaId;
     state.policy = policyId;
     updateUrl();
-    const filter = unfiltered ? {} : { query: state.query, district: state.district };
+    const filter = unfiltered ? {} : { query: state.query, district: state.district, conflictOnly: state.conflict };
     const show = () => card.open(row, vm, { focusPolicyId: policyId, filter });
     if (view === 'island') {
       setPanelOpen(false);
@@ -359,12 +409,19 @@ function startApp(vm, state, initialView) {
     return openCard(areaId, null, { unfiltered: true });
   };
 
+  // 下一題與上一題：依全部議題區的編號（不看篩選），與隨機一題同樣不帶篩選開卡。
+  const stepArea = (step) => {
+    const areaId = nextAreaId(vm.rows, selectedArea, step);
+    if (view === 'table') scrollToTableRow(areaId);
+    return openCard(areaId, null, { unfiltered: true });
+  };
+
   // 上手導覽（tour.js 的狀態機、tour-view.js 的覆蓋層）：第一步框一個議題區的名牌、第二步框同一格的三個標記，
   // 第三步呼叫隨機一題並框住開好的政見卡片。框哪一格只依畫面位置（pickTourArea），不讀政見。
   const webgl = document.body.dataset.webgl === 'yes';
   let tour = initialTour({ seen: readStorage(TOUR_SEEN_KEY) === '1' });
   // 網址指定要開卡片時，第一次進島嶼檢視不自動出現導覽（島嶼檢視的卡片要等鏡頭飛到才開，所以另外記）。
-  let deepLink = Boolean(state.policy || state.area || state.candidate);
+  let deepLink = Boolean(state.policy || state.area || state.candidate || fromUrl.size > 0);
   let tourArea = null;
   const tourTarget = (step) => {
     if (step === 'random') {
@@ -439,6 +496,9 @@ function startApp(vm, state, initialView) {
     }
     // 搜尋與篩選：島嶼檢視放在索引面板，表格檢視放在表格上方。
     document.getElementById(next === 'island' ? 'panel-controls-slot' : 'table-controls-slot').append(controls);
+    // 閱讀進度的說明與清除鈕：島嶼檢視放在議題區清單下方，表格檢視放在表格上方。
+    if (next === 'island') islandList.after(readingProgress);
+    else tableRoot.before(readingProgress);
     if (next === 'island') {
       setPanelOpen(false);
       renderIslandPanel();
@@ -465,11 +525,16 @@ function startApp(vm, state, initialView) {
     });
   }
 
-  const render = () => {
-    filtered = filterViewModel(vm, { query: state.query, district: state.district, conflictOnly: state.conflict });
-    renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard });
+  // 表格與索引清單（看過紀錄改變時也重畫，淡勾才跟著更新）。
+  function renderLists() {
+    renderTable(tableRoot, filtered, { onOpenCard: openCard, onOpenCandidate: openCandidateCard, seen });
     highlightTableRow();
     renderIslandPanel();
+  }
+
+  const render = () => {
+    filtered = filterViewModel(vm, { query: state.query, district: state.district, conflictOnly: state.conflict });
+    renderLists();
     withIsland((controller) => controller.update(filtered));
     status.textContent = resultStatusText(filtered);
   };
@@ -500,6 +565,7 @@ function startApp(vm, state, initialView) {
   randomButton.title = RANDOM_AREA_TEXT.hint;
   randomButton.addEventListener('click', openRandomArea);
   randomButton.hidden = false;
+  randomButton.after(shortlistButton);
 
   document.getElementById('candidate-order-note').textContent = vm.candidateOrderNote;
   document.getElementById('panel-order-note').textContent = vm.candidateOrderNote;
@@ -528,6 +594,9 @@ function startApp(vm, state, initialView) {
   } else if (state.candidate && !openCandidateCard(state.candidate)) {
     state.candidate = null;
     updateUrl();
+  } else if (!state.candidate && fromUrl.size > 0) {
+    // 別人分享的對照單網址：沒有指定其他卡片時直接打開對照單。
+    shortlist.open(vm, picks, shortlistUrl());
   }
 }
 

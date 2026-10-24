@@ -4,8 +4,10 @@
 // 點開才顯示原文引述、出處與核對紀錄。欄內篩選用 filter.js 的 policyMatcher。畫面文字取自 ui-text.js。
 // 遮名閱讀（blind-reading.js）：讀者按下才開啟，三欄的姓名、政黨、政見筆數、資料狀態與出處標題同時遮住、
 // 帶得出候選人的政見連結、複製鈕與市民補件連結先不放，順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
-// 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（瀏覽器內建語音，一次一筆，
-// 換議題區或關卡片即停止）。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
+// 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（createPolicyReader：有 audioUrl 播預先生成的音檔，
+// 沒有時用瀏覽器內建語音；一次一筆，換議題區或關卡片即停止）。本模組是唯一引用音檔的畫面模組，只用公開資料集給的 audioUrl。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
+// 右下角的「上一題」「下一題」只通知呼叫端（onStep），換哪一區由呼叫端決定。
+// 每筆政見的摘要列有「加入對照單」勾選框（pickBox），勾選狀態由呼叫端保管（picks、onPick）。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
@@ -15,7 +17,7 @@ import { policySpeech, policyText } from './policy-text.js';
 import { sourceReportHref } from './report-link.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 import {
-  candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
+  candidateCountText, DIALOG_TEXT, FILTER_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
 } from './ui-text.js';
 
 // 桌面島嶼檢視的卡片高度偏好：預設接近全高，使用者按「縮小卡片」改停靠在下方後記住。
@@ -49,6 +51,69 @@ export const sourceLinks = (source) => [
   source.archiveUrl && el('a', { href: source.archiveUrl, target: '_blank', rel: 'noopener noreferrer' }, SOURCE_TEXT.archive),
 ];
 
+// 朗讀的播放器（Node 可測，依賴由呼叫端注入）：政見帶 audioUrl 時播放預先生成的音檔（播放時才建立、不預先載入），
+// 沒有時退回瀏覽器內建語音（speech 為 null 表示沒有語音功能）。一次只播一條，再按同一條停止，開始另一條先停掉前一條。
+// 音檔只來自公開資料集給的 audioUrl，不在程式裡寫任何音檔路徑。onChange(policyId) 在播放狀態改變時呼叫（停止時為 null）。
+export function createPolicyReader({ createAudio, speech, createUtterance, onChange = () => {} }) {
+  // playing 是目前這一次播放；結束事件只結束發出它的那一次，同一條政見重播時舊事件不影響新的一次。
+  let playing = null;
+  const finish = (session) => {
+    if (playing !== session) return;
+    playing = null;
+    onChange(null);
+  };
+  const stop = () => {
+    if (!playing) return;
+    const { halt } = playing;
+    playing = null;
+    halt();
+    onChange(null);
+  };
+  const start = (policy) => {
+    stop();
+    const session = { id: policy.id };
+    const done = () => finish(session);
+    playing = session;
+    if (policy.audioUrl) {
+      const audio = createAudio(policy.audioUrl);
+      audio.preload = 'none';
+      audio.addEventListener('ended', done);
+      audio.addEventListener('error', done);
+      session.halt = () => audio.pause();
+      // 瀏覽器擋下播放（例如沒有使用者手勢）時回到未播放。
+      audio.play().catch(done);
+    } else {
+      const utterance = createUtterance(policySpeech(policy));
+      utterance.addEventListener('end', done);
+      utterance.addEventListener('error', done);
+      session.halt = () => speech.cancel();
+      speech.speak(utterance);
+    }
+    onChange(policy.id);
+  };
+  return {
+    get playingId() {
+      return playing?.id ?? null;
+    },
+    // 有音檔或有瀏覽器語音才放朗讀鈕。音檔全有或全無（上線關卡檢查），所以三欄的按鈕同時出現或同時不出現。
+    canRead: (policy) => Boolean(policy.audioUrl) || Boolean(speech),
+    toggle(policy) {
+      if (playing?.id === policy.id) stop();
+      else start(policy);
+    },
+    stop,
+  };
+}
+
+// 我的對照單的勾選框，政見卡片與對照單共用；變更由外層以事件委派（data-pick）處理。
+// 放在政見的摘要列裡：點勾選框只切換勾選，不會展開或收合政見。
+export const pickBox = (policyId, checked) => el(
+  'label',
+  { class: 'policy-pick' },
+  el('input', { type: 'checkbox', 'data-pick': policyId, checked }),
+  el('span', {}, T.pick),
+);
+
 // masked 表示遮名閱讀中：出處標題常含候選人姓名，跟著姓名一起遮住，來源類型與連結照常顯示。
 function quoteBlock(quote, masked) {
   const { source } = quote;
@@ -67,7 +132,7 @@ function quoteBlock(quote, masked) {
 }
 
 // 一筆政見：摘要列（摘要、適用行政區、出處說法不一的提示）可點開，展開後才是原文引述、出處與核對紀錄。
-function policyArticle(policy, { focused, open, masked, canSpeak }) {
+function policyArticle(policy, { focused, open, masked, canRead, picked }) {
   const districts = policy.districts.length > 0 ? policy.districts.join('、') : T.noDistricts;
   return el(
     'article',
@@ -84,6 +149,7 @@ function policyArticle(policy, { focused, open, masked, canSpeak }) {
           { class: 'policy-tags' },
           el('span', { class: 'policy-districts' }, T.districtsLine(districts)),
           policy.conflictNote && el('span', { class: 'policy-flag' }, T.conflictFlag),
+          pickBox(policy.id, picked),
         ),
       ),
       el(
@@ -104,7 +170,11 @@ function policyArticle(policy, { focused, open, masked, canSpeak }) {
           { class: 'policy-actions' },
           !masked && el('a', { class: 'policy-link', href: policyHref(policy.id) }, T.policyLink),
           !masked && el('button', { type: 'button', class: 'policy-action', 'data-action': 'copy', 'data-policy': policy.id, title: T.copyHint }, T.copy),
-          canSpeak && el('button', { type: 'button', class: 'policy-action', 'data-action': 'speak', 'data-policy': policy.id, title: T.speakHint }, T.speak),
+          canRead(policy) && el(
+            'button',
+            { type: 'button', class: 'policy-action', 'data-action': 'speak', 'data-policy': policy.id, 'aria-pressed': 'false', title: T.speakHint },
+            T.speak,
+          ),
           el('span', { class: 'policy-action-status', role: 'status' }),
         ),
       ),
@@ -116,7 +186,7 @@ function policyArticle(policy, { focused, open, masked, canSpeak }) {
 // openIds 是重畫前已展開的政見，篩選時保留；tabbed 表示手機分頁模式（欄位才是分頁面板）。
 // masked 是遮名閱讀中這一欄的代號（不遮名時為 null）：欄頭改成代號與同一句說明，三欄欄頭同高。
 function candidateColumn(candidate, cell, policies, {
-  vm, areaName, matcher, focusPolicyId, expanded, openIds, active, index, tabbed, masked, canSpeak,
+  vm, areaName, matcher, focusPolicyId, expanded, openIds, active, index, tabbed, masked, canRead, picks,
 }) {
   let empty = null;
   if (cell.policies.length === 0) empty = vm.noPolicyText;
@@ -160,12 +230,14 @@ function candidateColumn(candidate, cell, policies, {
       T.report,
     ),
     !empty && el('div', { class: 'policy-stack' }, policies.map((policy) =>
-      policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id), masked, canSpeak }))),
+      policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id), masked, canRead, picked: picks.has(policy.id) }))),
   );
 }
 
 // 回傳卡片控制器。onClose 在使用者關閉卡片後呼叫（例如清掉網址參數）。
-export function createPolicyCard({ onClose = () => {} } = {}) {
+// onStep(step) 在按「上一題」（-1）或「下一題」（1）時呼叫，由呼叫端決定開哪個議題區（reading-progress.js 的 nextAreaId）。
+// picks() 回傳目前勾選進對照單的政見識別碼集合；勾選框改變時呼叫 onPick(policyId, checked)。
+export function createPolicyCard({ onClose = () => {}, onStep = () => {}, picks = () => new Set(), onPick = () => {} } = {}) {
   const number = el('span', { class: 'card-number' });
   const title = el('h2', { class: 'card-title', id: 'policy-card-title' });
   const description = el('p', { class: 'card-description' });
@@ -186,6 +258,8 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     el('option', { value: '' }, T.allDistricts),
     TAICHUNG_DISTRICTS.map((name) => el('option', { value: name }, name)),
   );
+  // 只看出處說法不一：與全站篩選同一個條件，開卡片時帶入，讀者可在卡片內取消。
+  const conflict = el('input', { id: 'card-conflict', type: 'checkbox' });
   const filterStatus = el('p', { class: 'card-filter-status', role: 'status' });
   const filters = el(
     'form',
@@ -193,11 +267,18 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     // 欄位名稱只給輔助科技讀，畫面上用提示文字與預設選項說明，省下卡片高度。
     el('div', { class: 'card-field card-field-search' }, el('label', { for: 'card-search', class: 'visually-hidden' }, T.searchLabel), search),
     el('div', { class: 'card-field' }, el('label', { for: 'card-district', class: 'visually-hidden' }, T.districts), district),
+    el('label', { class: 'card-conflict', for: 'card-conflict' }, conflict, el('span', {}, FILTER_TEXT.conflictOnly)),
     blindButton,
     expandButton,
   );
   // 手機抽屜的把手：拖曳在一半、全螢幕、關閉三段之間吸附，點一下在一半與全螢幕之間切換。桌面由 CSS 隱藏。
   const handle = el('button', { type: 'button', class: 'card-handle', 'aria-label': DIALOG_TEXT.handle });
+  // 下一題：卡片右下角，依議題區編號換區，頭尾相接。
+  const previousButton = el('button', { type: 'button', class: 'card-step' }, T.previous);
+  const nextButton = el('button', { type: 'button', class: 'card-step' }, T.next);
+  previousButton.addEventListener('click', () => onStep(-1));
+  nextButton.addEventListener('click', () => onStep(1));
+  const steps = el('nav', { class: 'card-steps', 'aria-label': T.stepsLabel }, previousButton, nextButton);
   const dialog = el(
     'dialog',
     { class: 'sheet-dialog policy-card', 'aria-labelledby': 'policy-card-title', 'data-snap': 'half', 'data-height': 'tall' },
@@ -221,6 +302,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       filterStatus,
       tabs,
       body,
+      steps,
     ),
   );
   bindSheetDialog(dialog, {
@@ -228,7 +310,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     closeButton,
     onClose: () => {
       setBlind(null);
-      stopSpeaking();
+      reader.stop();
       onClose();
     },
   });
@@ -240,37 +322,26 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
   // 遮名閱讀中的欄位順序（畫面位置 → 排序規則的位置），不遮名時為 null。
   let order = null;
 
-  // 朗讀：瀏覽器內建語音，一次只唸一筆。三人同一個 zh-TW 聲音、預設語速；沒有語音功能時不放朗讀鈕。
+  // 朗讀：有音檔播音檔，沒有時用瀏覽器內建語音（三人同一個 zh-TW 聲音、預設語速）。
+  // 按鈕名稱固定為「朗讀」，播放中以按下狀態表示（同背景音樂開關的做法）。
   const speech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window ? window.speechSynthesis : null;
-  const canSpeak = Boolean(speech);
-  let speakingId = null;
   const syncSpeakButtons = () => {
     for (const button of body.querySelectorAll('[data-action="speak"]')) {
-      button.textContent = button.dataset.policy === speakingId ? T.stopSpeaking : T.speak;
+      button.setAttribute('aria-pressed', String(button.dataset.policy === reader.playingId));
     }
   };
-  const stopSpeaking = () => {
-    speakingId = null;
-    speech?.cancel();
-    syncSpeakButtons();
-  };
-  const speak = (policy) => {
-    stopSpeaking();
-    const utterance = new SpeechSynthesisUtterance(policySpeech(policy));
-    utterance.lang = 'zh-TW';
-    const voice = speech.getVoices().find((v) => v.lang.replace('_', '-') === 'zh-TW');
-    if (voice) utterance.voice = voice;
-    const done = () => {
-      if (speakingId !== policy.id) return;
-      speakingId = null;
-      syncSpeakButtons();
-    };
-    utterance.addEventListener('end', done);
-    utterance.addEventListener('error', done);
-    speakingId = policy.id;
-    speech.speak(utterance);
-    syncSpeakButtons();
-  };
+  const reader = createPolicyReader({
+    createAudio: (url) => new Audio(url),
+    speech,
+    createUtterance: (text) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-TW';
+      const voice = speech.getVoices().find((v) => v.lang.replace('_', '-') === 'zh-TW');
+      if (voice) utterance.voice = voice;
+      return utterance;
+    },
+    onChange: syncSpeakButtons,
+  });
 
   // 複製成一段話：成功顯示兩秒的提示；剪貼簿不能用時在同一列放出文字並選取，讓讀者自己複製。
   const copyPolicy = async (policy, button) => {
@@ -299,14 +370,18 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     }
   };
 
+  body.addEventListener('change', (event) => {
+    const box = event.target.closest('[data-pick]');
+    if (box) onPick(box.dataset.pick, box.checked);
+  });
+
   body.addEventListener('click', (event) => {
     const button = event.target.closest('.policy-action');
     if (!button || !current) return;
     const policy = current.row.cells.flatMap((cell) => cell.policies).find((p) => p.id === button.dataset.policy);
     if (!policy) return;
     if (button.dataset.action === 'copy') copyPolicy(policy, button);
-    else if (speakingId === policy.id) stopSpeaking();
-    else speak(policy);
+    else reader.toggle(policy);
   });
   // 與 main.css 的手機斷點相同：800px 以下三欄改為分頁。在函式內讀，Node 載入本模組時不碰 window。
   const tabbedQuery = window.matchMedia('(max-width: 800px)');
@@ -326,7 +401,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
 
   const render = ({ focusPolicyId = null } = {}) => {
     const { row, vm } = current;
-    const matcher = policyMatcher({ query: search.value, district: district.value });
+    const matcher = policyMatcher({ query: search.value, district: district.value, conflictOnly: conflict.checked });
     // 重畫前讀者自己點開的政見，重畫後照樣展開。
     const openIds = new Set([...body.querySelectorAll('.policy-details[open]')].map((d) => d.closest('.policy').id.slice('card-policy-'.length)));
     const tabbed = tabbedQuery.matches;
@@ -355,7 +430,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     body.replaceChildren(
       ...columns.map(({ candidate, cell, policies }, index) =>
         candidateColumn(candidate, cell, policies, {
-          vm, areaName: row.issueArea.name, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed, masked: masked(index), canSpeak,
+          vm, areaName: row.issueArea.name, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed, masked: masked(index), canRead: reader.canRead, picks: picks(),
         })),
     );
     syncSpeakButtons();
@@ -405,7 +480,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
 
   return {
     element: dialog,
-    // filter 是全站的篩選條件 { query, district }，開卡片時帶進欄內篩選；指定政見時清空，那筆政見才一定看得到。
+    // filter 是全站的篩選條件 { query, district, conflictOnly }，開卡片時帶進欄內篩選；指定政見時清空，那筆政見才一定看得到。
     open(row, vm, { focusPolicyId = null, filter = {} } = {}) {
       const { issueArea } = row;
       const sameArea = current?.row.issueArea.id === issueArea.id && dialog.open;
@@ -418,9 +493,10 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       if (!dialog.open) setBlind(null);
       else if (order && !sameArea) setBlind(shuffledOrder());
       if (!sameArea) {
-        stopSpeaking();
+        reader.stop();
         search.value = filter.query ?? '';
         district.value = TAICHUNG_DISTRICTS.includes(filter.district) ? filter.district : '';
+        conflict.checked = Boolean(filter.conflictOnly);
         // 換議題區時清掉上一區的展開狀態。
         body.replaceChildren();
         setExpanded(false);
@@ -429,6 +505,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
       if (focusPolicyId) {
         search.value = '';
         district.value = '';
+        conflict.checked = false;
       }
       // 指定政見時分頁切到那位候選人。
       const focusIndex = focusPolicyId
