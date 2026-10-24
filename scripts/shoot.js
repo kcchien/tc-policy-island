@@ -180,6 +180,9 @@ async function runStep(page, step, { options, scenario }) {
       return evaluate(page, framesExpression(step.frames));
     case 'wait':
       return sleep(step.ms);
+    case 'media':
+      // 列印樣式常把操作用的元素藏起來，所以點擊都做完才切換媒體類型。
+      return page.send('Emulation.setEmulatedMedia', { media: step.media, features: scenario.media });
     default:
       throw new Error(`未知的步驟 ${step.type}`);
   }
