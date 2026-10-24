@@ -218,4 +218,5 @@ export const REPO_DOCUMENT_TEXT = {
   'forbidden-colors': { title: '禁用色範圍', description: '本站配色不得使用的政黨色與候選人識別色範圍。' },
   'adr-neutrality': { title: '中立規則（決策紀錄）', description: '本站中立規則的完整原文與理由。' },
   'adr-verification': { title: '以 AI 核對取代人工審查（決策紀錄）', description: '為什麼不靠人工逐筆審查，改用兩道核對與公開流程。' },
+  'adr-hit-counter': { title: '統計頁面瀏覽與出處點擊（決策紀錄）', description: '為什麼網站會統計頁面瀏覽與出處點擊，以及為什麼只記次數、不記讀者是誰。' },
 };

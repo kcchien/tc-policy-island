@@ -29,6 +29,7 @@ export const REPO_DOCUMENTS = [
   { id: 'forbidden-colors', path: 'docs/rules/forbidden-colors.md', format: 'markdown' },
   { id: 'adr-neutrality', path: 'docs/adr/0001-neutrality-rules.md', format: 'markdown' },
   { id: 'adr-verification', path: 'docs/adr/0002-ai-verification-instead-of-human-review.md', format: 'markdown' },
+  { id: 'adr-hit-counter', path: 'docs/adr/0003-hit-counter-on-pages-function.md', format: 'markdown' },
 ];
 
 export const repoDocumentByPath = (path) => REPO_DOCUMENTS.find((doc) => doc.path === path);
