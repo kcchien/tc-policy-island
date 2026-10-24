@@ -28,7 +28,7 @@ import {
 } from './island-models.js';
 import { TILE_SLOTS } from './island-body.js';
 import { createIslandBody } from './island-body-view.js';
-import { figureDestinations, figurePose, plazaLayout, walkPlan, walkPose } from './island-plaza.js';
+import { FIGURE_WALK, figureDestinations, figurePose, plazaLayout, walkPlan, walkPose } from './island-plaza.js';
 import { placeLabels } from './island-labels.js';
 import { LOD_DISTANCE } from './island-decor.js';
 import { createDecor } from './island-decor-view.js';
@@ -44,6 +44,8 @@ const FOCUS_DISTANCE = 14;
 // 窄畫面的直書名牌往上長，錨點放在格心正北，名牌落在南北兩列格子的標記之間，不蓋住標記。
 const LABEL_WIDE = new THREE.Vector3(0, TILE_SURFACE + 1.35, -0.45);
 const LABEL_NARROW = new THREE.Vector3(0, TILE_SURFACE + 0.9, -0.2);
+// 旋轉中心移動超過這個距離（場景單位）才算讀者平移過。
+const PAN_EPSILON = 1e-3;
 // 走到同一格時，中途視角裡三人的出發點與終點占可視區的比例，四周留邊。
 const WALK_FILL = 0.6;
 // 構圖時算進的高度：格子頂面加上元素模型的最高高度（island-models.js 的元素區）。
@@ -239,7 +241,8 @@ export function createIslandView(stage, {
   let panned = false;
   const settledTarget = new THREE.Vector3();
   const noticePan = () => {
-    if (!flight.active && !controls.target.equals(settledTarget)) panned = true;
+    // 平移的慣性每幀乘上衰減係數，永遠不會剛好歸零，殘量小於 PAN_EPSILON 不算平移。
+    if (!flight.active && controls.target.distanceToSquared(settledTarget) > PAN_EPSILON ** 2) panned = true;
   };
   // 鏡頭與旋轉中心一起水平移動 (dx, dz)，視角不變。
   const shiftView = (dx, dz) => {
@@ -395,6 +398,8 @@ export function createIslandView(stage, {
 
   // 依畫面大小決定預設視角（島置中、占畫布約 80%）與距離限制。平移的範圍由 clampToIsland 限制在島內。
   let home = null;
+  // 走到同一格正在等開卡的議題區與報到狀態（focusArea）；沒在等時是 null。
+  let pendingArrivals = null;
   // 沒被浮動元件遮住的區域的垂直視角與長寬比（不含卡片），走到同一格的中途視角用它構圖。
   let visibleFrame = null;
   // 投影中心移到沒被遮住的區域正中（浮動元件加上卡片）。只移投影中心，鏡頭位置與畫面縮放都不變。
@@ -743,17 +748,28 @@ export function createIslandView(stage, {
       if (!tile) return false;
       const target = new THREE.Vector3(tile.group.position.x, TILE_SURFACE, tile.group.position.z);
       const distance = Math.min(FOCUS_DISTANCE, home?.distance ?? FOCUS_DISTANCE);
-      // 暫停動畫時人物直接出現在目的地，不必等。
-      if (!walk || !waitForFigures || animator.paused) {
+      // 暫停動畫時人物直接出現在目的地、沒有候選人廣場時沒有人物，都不必等。
+      if (!walk || !waitForFigures || animator.paused || figures.length === 0) {
+        // 等待開卡途中又飛向同一格（例如切到表格檢視再切回來）：新的飛行取代原本那段，抵達時替它報到，卡片照樣會開。
+        const waiting = pendingArrivals?.areaId === areaId ? pendingArrivals.arrivals : null;
+        pendingArrivals = null;
         select(areaId, { walk });
-        flyTo({ target, distance }, done);
+        flyTo({ target, distance }, () => {
+          done?.();
+          waiting?.arrive('flight');
+        });
         return true;
       }
-      const arrivals = joinArrivals(['flight', 'walk'], done ?? (() => {}));
+      const arrivals = joinArrivals(['flight', 'walk'], () => {
+        pendingArrivals = null;
+        done?.();
+      });
+      pendingArrivals = { areaId, arrivals };
       const starts = figures.map(figureFoot);
       select(areaId, { walk, onWalked: () => arrivals.arrive('walk') });
+      // 三人同一份步伐參數（FIGURE_WALK，上線關卡「人物一致」檢查），飛行與步行同長。
       flyTo({
-        target, distance, via: walkFraming(starts, areaId, distance), durationMs: (figures[0]?.info.walk.durationSeconds ?? 0) * 1000,
+        target, distance, via: walkFraming(starts, areaId, distance), durationMs: FIGURE_WALK.durationSeconds * 1000,
       }, () => arrivals.arrive('flight'));
       return true;
     },
