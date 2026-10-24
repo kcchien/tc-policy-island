@@ -107,6 +107,10 @@ export const POLICY_CARD_TEXT = {
   // 朗讀的內容：摘要後接每則原文引述。
   speechQuote: (text) => `原文：${text}`,
   sentenceEnd: '。',
+  // 市民補件：空欄位下方的出口，三欄同一句型；只收一手來源連結。
+  report: '你找到他在這題的公開說法？把連結給我們。',
+  reportHint: '開啟 GitHub 回報頁，已填好議題區與候選人，只需貼上候選人本人或中選會發布的連結',
+  reportTitle: (areaName, candidateName) => `補件：${areaName}／${candidateName}`,
   // 卡片內的篩選，三欄一起套用。
   filtersLabel: '在這個議題區篩選政見',
   searchLabel: '在這個議題區找政見的關鍵字',

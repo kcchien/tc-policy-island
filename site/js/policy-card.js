@@ -5,13 +5,14 @@
 // 遮名閱讀（blind-reading.js）：讀者按下才開啟，三欄的姓名、政黨、政見筆數、資料狀態與出處標題同時遮住、
 // 順序隨機打亂；揭曉時同時揭開並回到排序規則。狀態只在卡片開著時有效，關卡片即還原，不記錄也不存。
 // 每筆政見展開後可複製成一段話（policy-text.js 組字、放進剪貼簿）與朗讀（瀏覽器內建語音，一次一筆，
-// 換議題區或關卡片即停止）。
+// 換議題區或關卡片即停止）。本議題區沒有政見的欄位，下方放市民補件的回報連結（report-link.js）。
 
 import { el } from './dom.js';
 import { bindSheetDialog } from './sheet.js';
 import { policyMatcher } from './filter.js';
 import { maskedColumnLabel, revealedIndex, shuffleColumns } from './blind-reading.js';
 import { policySpeech, policyText } from './policy-text.js';
+import { sourceReportHref } from './report-link.js';
 import { TAICHUNG_DISTRICTS } from './dataset.js';
 import {
   candidateCountText, DIALOG_TEXT, NO_MATCH_TEXT, POLICY_CARD_TEXT as T, SOURCE_TEXT, verificationText,
@@ -114,7 +115,7 @@ function policyArticle(policy, { focused, open, masked, canSpeak }) {
 // openIds 是重畫前已展開的政見，篩選時保留；tabbed 表示手機分頁模式（欄位才是分頁面板）。
 // masked 是遮名閱讀中這一欄的代號（不遮名時為 null）：欄頭改成代號與同一句說明，三欄欄頭同高。
 function candidateColumn(candidate, cell, policies, {
-  vm, matcher, focusPolicyId, expanded, openIds, active, index, tabbed, masked, canSpeak,
+  vm, areaName, matcher, focusPolicyId, expanded, openIds, active, index, tabbed, masked, canSpeak,
 }) {
   let empty = null;
   if (cell.policies.length === 0) empty = vm.noPolicyText;
@@ -142,10 +143,21 @@ function candidateColumn(candidate, cell, policies, {
     ),
     // 資料狀態說明放在欄標題下方，三欄標題的高度才一致。遮名時跟著姓名一起遮住。
     !masked && candidate.dataStatus && el('p', { class: 'data-status' }, candidate.dataStatus),
-    empty
-      ? el('p', { class: 'no-policy' }, empty)
-      : el('div', { class: 'policy-stack' }, policies.map((policy) =>
-        policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id), masked, canSpeak }))),
+    empty && el('p', { class: 'no-policy' }, empty),
+    // 市民補件：這一欄在本議題區完全沒有政見時（不是篩選後才沒有），三欄同一句、同一位置。
+    cell.policies.length === 0 && el(
+      'a',
+      {
+        class: 'source-report',
+        href: sourceReportHref({ areaName, candidateName: candidate.name }),
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        title: T.reportHint,
+      },
+      T.report,
+    ),
+    !empty && el('div', { class: 'policy-stack' }, policies.map((policy) =>
+      policyArticle(policy, { focused: policy.id === focusPolicyId, open: expanded || openIds.has(policy.id), masked, canSpeak }))),
   );
 }
 
@@ -340,7 +352,7 @@ export function createPolicyCard({ onClose = () => {} } = {}) {
     body.replaceChildren(
       ...columns.map(({ candidate, cell, policies }, index) =>
         candidateColumn(candidate, cell, policies, {
-          vm, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed, masked: masked(index), canSpeak,
+          vm, areaName: row.issueArea.name, matcher, focusPolicyId, expanded, openIds, active: index === active, index, tabbed, masked: masked(index), canSpeak,
         })),
     );
     syncSpeakButtons();
