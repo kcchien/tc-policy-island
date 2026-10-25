@@ -22,7 +22,7 @@
 | `node scripts/speak.js` | 生成政見語音音檔與清單（`data/audio/`），會花點數，正式資料先跑 `--dry-run`。參數與注意事項看 `--help` |
 | `node scripts/shoot.js` | 截圖與版面量測，手機版驗證用這個。參數與注意事項看 `--help` |
 | `npm run check` | 完整測試 → 建置 → 關卡；依下方分級規則安排，不在交件時一律執行 |
-| `bash scripts/land.sh <branch> <issue 或 -> <comment> [--check <命令>] [--release] [--dry-run]` | 包裝既有 Herdr land，從主 worktree 整合；release 必填針對性 check，非 release 固定完整 check |
+| `bash scripts/land.sh` | 包裝既有 Herdr land，從主 worktree 整合。參數與注意事項看 `--help`，驗證規則見下方說明 |
 | `node scripts/deploy.js`（`npm run deploy`） | 檢查後部署到 Cloudflare Pages，真的部署只由維護者執行。參數與注意事項看 `--help` |
 
 看夾具資料的畫面：`node scripts/build.js --raw test/fixtures/raw-sample` 後開預覽；看完再跑一次 `node scripts/build.js` 換回正式資料。CI（`.github/workflows/check.yml`）每次 push 跑測試、建置、關卡，不部署。
