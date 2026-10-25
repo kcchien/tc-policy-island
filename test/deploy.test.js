@@ -31,7 +31,8 @@ test('檢查全過且專案已存在時，部署 site 到正式環境', async ()
   const result = await deploy({ run, log: () => {} });
 
   assert.equal(result.ok, true);
-  assert.deepEqual(calls.slice(3), [
+  assert.deepEqual(calls, [
+    'node --test', 'node scripts/build.js', 'node scripts/gates.js',
     'wrangler pages project list --json',
     'wrangler pages deploy site --project-name tc-policy-island --branch main',
   ]);
@@ -80,7 +81,10 @@ test('試跑時跑完檢查與專案查詢，只列出建立與部署指令、�
   const result = await deploy({ run, log: (line) => logs.push(line), dryRun: true });
 
   assert.equal(result.ok, true);
-  assert.deepEqual(calls.slice(3), ['wrangler pages project list --json']);
+  assert.deepEqual(calls, [
+    'node --test', 'node scripts/build.js', 'node scripts/gates.js',
+    'wrangler pages project list --json',
+  ]);
   assert.ok(logs.some((line) => line.includes('wrangler pages project create tc-policy-island --production-branch main')));
   assert.ok(logs.some((line) => line.includes('wrangler pages deploy site --project-name tc-policy-island --branch main')));
 });
