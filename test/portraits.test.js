@@ -41,6 +41,52 @@ function mixedFixture() {
   return f;
 }
 
+// 指定照片例外須核對真實姓名；不建立掛真實姓名的示範政見。
+function permittedFixture() {
+  const f = mixedFixture();
+  const candidate = f.dataset.candidates[2];
+  candidate.id = 'hung-li-hua'; candidate.name = '洪麗華';
+  f.manifest.items[2] = {
+    ...f.manifest.items[2], candidateId: candidate.id, candidateName: candidate.name,
+    sourceKind: 'ltn-permitted-portrait', sourceId: undefined,
+    sourceUrl: 'https://news.ltn.com.tw/news/politics/breakingnews/5599336',
+    imageUrl: 'https://img.ltn.com.tw/Upload/news/600/2026/10/08/5599336_3_1.jpg',
+    caption: '洪麗華競選形象照。（記者張軒哲翻攝）', sourceCredit: '記者張軒哲翻攝',
+    sourceLabel: '自由時報（記者張軒哲翻攝）',
+    file: 'hung-li-hua.png', originalFile: 'hung-li-hua-original.jpg',
+    originalWidth: 415, originalHeight: 512,
+    rights: { status: 'cleared', checkedAt: '2026-10-25',
+      evidence: '維護者於2026-10-25確認已取得使用許可',
+      limitations: '僅此指定照片作中立辨識，不推論其他素材授權' },
+  };
+  return f;
+}
+
+test('指定照片僅憑維護者明確確認使用許可放行，照片來源與學經歷分開', () => {
+  const f = permittedFixture();
+  assert.deepEqual(portraitProblems(f.dataset, f.manifest, f.readImage), []);
+  attachPortraits(f.dataset, f.manifest);
+  assert.equal(f.dataset.candidates[2].portrait.sourceUrl, 'https://news.ltn.com.tw/news/politics/breakingnews/5599336');
+  assert.notEqual(f.dataset.candidates[2].profile.sourceId, undefined);
+});
+
+for (const [name, change] of [
+  ['未確認許可', i => i.rights.status = 'pending'],
+  ['沒有確認紀錄', i => i.rights.evidence = '公開上網'],
+  ['冒用開放授權', i => i.rights.licenseUrl = 'https://data.gov.tw/license'],
+  ['其他新聞頁', i => i.sourceUrl = 'https://news.ltn.com.tw/news/politics/breakingnews/5599337'],
+  ['活動照片', i => i.imageUrl = 'https://img.ltn.com.tw/Upload/news/600/2026/10/08/5599336_1_1.jpg'],
+  ['姓名不符', i => i.candidateName = '候選人乙'],
+  ['漏翻攝署名', i => i.caption = '洪麗華競選形象照。'],
+  ['翻攝者冒充原攝影者', i => i.photographer = '張軒哲'],
+  ['原圖尺寸不符', i => i.originalWidth = 600],
+  ['原圖雜湊不符', i => i.originalSha256 = 'a'.repeat(64)],
+  ['成品雜湊不符', i => i.fileSha256 = 'a'.repeat(64)],
+]) test(`指定照片遇${name}拒絕整組`, () => {
+  const f = permittedFixture(); change(f.manifest.items[2]);
+  assert.ok(portraitProblems(f.dataset, f.manifest, f.readImage).length > 0);
+});
+
 test('可用官方肖像個別更新，立法院與公報混用，照片出處獨立於學經歷', () => {
   const f = mixedFixture();
   assert.deepEqual(portraitProblems(f.dataset, f.manifest, f.readImage), []);

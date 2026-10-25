@@ -56,6 +56,8 @@
 - 排序規則的欄位與說明文字只定義在 `CANDIDATE_ORDER_RULES`，判斷用 `candidateOrderOf`。
 - **正式肖像** `portrait?`：只在公開候選人，建置時全部核對完成才三人一起加入 `{ url, sourceKind, sourceUrl, sourceLabel, retrievedAt }`，否則全部沒有此欄位。`sourceKind` 只收 `cec-bulletin`（中選會選舉公報）或 `ly-legislator`（立法院第11屆委員頁）；`sourceUrl` 是實際照片來源頁，`sourceLabel` 是含必要署名的白話來源名稱，與學經歷的公報出處分開。可依可用素材個別更新，不要求同年同站同色，保留原色。`url` 只指向本站 `data/portraits/<candidateId>.png`。原始照片及完整來源授權清單放 `data/portraits/`，以 `scripts/lib/portraits.js` 核對姓名、兩類官方來源及各站宣告、日期、原圖與成品雜湊、尺寸；原圖亦隨建置複製供關卡重驗。僅 `candidate-card.js` 共用資料卡可呈現，任一載入失敗全頁三人均回退。見 ADR 0001 正式肖像有限例外。
 
+正式肖像另收 `sourceKind: ltn-permitted-portrait`，只限 ADR 0001 明列的洪麗華單張照片許可例外：自由時報 5599336 頁、5599336_3_1.jpg 與完整圖說、翻攝署名須逐一相符；原圖415×512及成品240×320、雜湊均核對。使用依據僅記「維護者於2026-10-25確認已取得使用許可」，不冒稱已獨立核實或網站開放授權，不套官方來源宣告。政見與學經歷來源不變。公開 `portrait` 欄位形狀及三人完整、全組回退規則不變。
+
 檢視模型的輸出、網址參數與候選人資料卡的開啟流程見 `docs/architecture.md`。
 
 ### 資料與夾具

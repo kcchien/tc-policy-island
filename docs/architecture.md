@@ -61,6 +61,8 @@ js/island-list.js  js/ui-text.js  js/dom.js  js/collection-note.js  js/hits.js  
 
 ### 開啟候選人資料卡
 
+照片來源另支持 ADR 0001 明列的 `ltn-permitted-portrait` 單張許可例外，僅洪麗華指定頁、圖、姓名與翻攝圖說。維護者確認使用許可與官方網站開放宣告分別驗證，不改學經歷與政見來源。公開欄位、顯示流程與全組回退相同。
+
 正式肖像只由 `candidate-card.js` 掛載，索引與對話框共用同一個 `candidate-portraits.js` 批次失敗狀態。每組三張全部解碼、尺寸相符後才一起顯示；任一組失敗時，所有組與之後重畫均回退。公開候選人的 `portrait` 只在建置階段由 `scripts/lib/portraits.js` 核對完整清單後加入；照片的 `sourceKind/sourceUrl/sourceLabel` 獨立於學經歷的 `profileSource`，可混用已核對的中選會與立法院照片，保留原色。原圖與成品一起複製，關卡重驗兩者雜湊及各站來源授權。檢視模型沿用該欄位，其他檢視不讀。
 
 `main.js` 的 `openCandidateCard(candidateId)`，開啟對話框（手機為底部抽屜），三張卡片依排序規則並排，捲到並標示該候選人那張，網址寫入 `candidate`；候選人不存在時回傳 `false`。不要只放一張卡片，三人篇幅須相同（ADR 0001）。`main.js` 把它以 `onSelectCandidate` 傳給 `createIslandView`，點候選人人物或廣場名牌上的姓名時呼叫。進站時網址的優先順序是 `policy`、`area`、`candidate`，開其中一種卡片會清掉另外兩個參數。
