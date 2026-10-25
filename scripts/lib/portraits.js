@@ -1,4 +1,4 @@
-// 候選人正式肖像：核對中選會公報或立法院委員頁、姓名對應、原圖與成品、各站授權，建置與關卡共用。
+// 候選人正式肖像：核對官方來源或 ADR 指定單張許可例外、姓名、原圖與成品、使用依據，建置與關卡共用。
 // Node 專用；不依臉部推斷身分，姓名欄與影像物件的對應由抽取者目視核對並記錄。
 import { createHash } from 'node:crypto';
 
@@ -44,14 +44,25 @@ export function portraitProblems(dataset, manifest, readImage) {
         || item.imageAlt !== `${candidate.name}委員照片` || item.sourceCredit !== '委員研究室提供'
         || item.sourceLabel !== '立法院第11屆委員（委員研究室提供）' || item.sourceId !== undefined) fail('立法院委員頁、原圖、姓名對應或來源署名不符');
       if (rights?.declarationUrl !== LY_PORTRAIT_DECLARATION || rights?.licenseUrl !== null) fail('立法院授權依據不符');
+    } else if (item.sourceKind === 'ltn-permitted-portrait') {
+      if (candidate.id !== 'hung-li-hua' || candidate.name !== '洪麗華'
+        || item.sourceUrl !== 'https://news.ltn.com.tw/news/politics/breakingnews/5599336'
+        || item.imageUrl !== 'https://img.ltn.com.tw/Upload/news/600/2026/10/08/5599336_3_1.jpg'
+        || item.caption !== '洪麗華競選形象照。（記者張軒哲翻攝）'
+        || item.sourceCredit !== '記者張軒哲翻攝' || item.sourceLabel !== '自由時報（記者張軒哲翻攝）'
+        || item.photographer !== null || item.sourceId !== undefined
+        || item.originalWidth !== 415 || item.originalHeight !== 512) fail('指定照片、姓名、尺寸或翻攝署名不符');
+      if (rights?.evidence !== '維護者於2026-10-25確認已取得使用許可' || rights?.checkedAt !== '2026-10-25'
+        || rights?.declarationUrl !== undefined || rights?.licenseUrl !== undefined
+        || rights?.specialExclusion !== undefined) fail('指定照片的維護者許可確認不符，不得冒用開放授權');
     } else fail('不支援的肖像來源');
     if (!date(item.retrievedAt) || !date(item.identityCheckedAt) || !text(item.position) || !text(item.extraction)
       || !(item.photographer === null || text(item.photographer))) fail('抽取或姓名位置核對紀錄不完整');
-    if (rights?.status !== 'cleared' || rights.specialExclusion !== false || !date(rights.checkedAt)
+    if (rights?.status !== 'cleared' || (item.sourceKind !== 'ltn-permitted-portrait' && rights.specialExclusion !== false) || !date(rights.checkedAt)
       || !text(rights.evidence) || !text(rights.limitations)) fail('授權依據未確認或有特別排除');
     if (item.width !== PORTRAIT_SIZE.width || item.height !== PORTRAIT_SIZE.height) fail('肖像尺寸不一致');
     if (!/^[a-z0-9-]+$/.test(candidate.id) || item.file !== `${candidate.id}.png`) { fail('肖像檔名不符'); continue; }
-    const originalExtension = item.sourceKind === 'ly-legislator' ? 'jpg' : 'png';
+    const originalExtension = item.sourceKind === 'cec-bulletin' ? 'png' : 'jpg';
     if (item.originalFile !== `${candidate.id}-original.${originalExtension}`) fail('原圖檔名不符');
     else {
       const original = readImage(item.originalFile);

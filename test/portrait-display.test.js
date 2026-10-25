@@ -7,6 +7,25 @@ const candidates = ['a','b','c'].map((id) => ({ id, profile: { sourceId: `src-${
 const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => {resolve=a;reject=b;}); return {promise,resolve,reject}; };
 const images = () => candidates.map(() => { const d=deferred(); return { ...d, decode: () => d.promise, naturalWidth:240, naturalHeight:320 }; });
 
+test('指定許可肖像與官方照片一起呈現，錯誤候選人或其他新聞頁仍全退回', () => {
+  const mixed = structuredClone(candidates);
+  Object.assign(mixed[2], { id: 'hung-li-hua', name: '洪麗華', portrait: {
+    url: 'data/portraits/hung-li-hua.png', sourceKind: 'ltn-permitted-portrait',
+    sourceUrl: 'https://news.ltn.com.tw/news/politics/breakingnews/5599336',
+    sourceLabel: '自由時報（記者張軒哲翻攝）', retrievedAt: '2026-10-25',
+  } });
+  assert.equal(portraitSet(mixed).length, 3);
+  for (const change of [
+    c => c[2].name = '候選人乙',
+    c => { c[2].id = 'other'; c[2].portrait.url = 'data/portraits/other.png'; },
+    c => c[2].portrait.sourceUrl = 'https://news.ltn.com.tw/news/politics/breakingnews/5599337',
+    c => c[2].portrait.sourceLabel = '自由時報',
+  ]) {
+    const copy = structuredClone(mixed); change(copy);
+    assert.deepEqual(portraitSet(copy), []);
+  }
+});
+
 test('肖像只在三人具本機影像與獨立官方出處時可呈現，來源可混合', () => {
   assert.equal(portraitSet(candidates).length,3);
   const mixed = structuredClone(candidates);

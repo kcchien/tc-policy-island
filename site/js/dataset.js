@@ -90,7 +90,8 @@ const SCHEMAS = {
     'rawPolicyItems.total': 'count?',
     'rawPolicyItems.sourceIds': 'strings',
     dataStatus: 'string?',
-    // 僅建置時加入；正式肖像的完整來源與授權證據在肖像清單，三人全有或全無。
+    // 僅建置時加入；來源為 cec-bulletin、ly-legislator 或 ADR 單張例外 ltn-permitted-portrait。
+    // 完整來源與使用依據在肖像清單，三人全有或全無；照片不借指學經歷來源。
     'portrait?': 'object',
     'portrait.url': 'string',
     'portrait.sourceKind': 'string',
