@@ -164,13 +164,34 @@ npm run deploy -- --dry-run  # 跑完全部檢查，只列出建立專案與部�
 
 任一步失敗就以結束碼 1 退出，不部署。Cloudflare Pages 專案不存在時會先建立。
 
+代理交件依 [按風險驗證](AGENTS.md#按風險驗證跨-session-適用)，只跑受影響測試與必要畫面驗證。維護者從主 worktree 使用 repo 的落地入口，沿用 Herdr land 的 hub-and-spoke 流程：
+
+```sh
+# 先試跑：只列出計畫及檢查合併衝突，不執行 check、push 或部署
+bash scripts/land.sh feat/example - '變更摘要' --check 'node --test test/land.test.js test/deploy.test.js' --release --dry-run
+# 落地並發布：針對性檢查 → push integration → main 快轉並 push → deploy 跑全套後部署
+bash scripts/land.sh feat/example - '變更摘要' --check 'node --test test/land.test.js test/deploy.test.js' --release
+# 只落地：固定完整 npm run check，不接受 --check，保留整合檢查
+bash scripts/land.sh feat/example 123 '變更摘要'
+```
+
+三個位置參數固定是 branch、票號（沒有票用 `-`）、留言。選項只有 `--check <命令>`、`--release`、`--dry-run`；單獨 `--help` 顯示用法，未知或重複參數會被拒絕。release 必須明確指定非空的 `--check`，上例測試僅適用本次工具修改，請依改動選擇命令。純素材或文案若沒有適用測試，可明確指定 `--check 'git diff --check HEAD^ HEAD'`，並另記必要的人工檢視與畫面驗證。這項 diff 檢查不等於來源校驗或功能測試。
+
+release 的票號一律用 `-`：既有 land 若收到票號，會在部署前自動關票。請在確認發布成功、驗證線上結果後，再由維護者另行關票。上方非 release 範例的票號只適用不含發布的落地。
+
+包裝腳本從目前 repo 找主 worktree，交給 `$HOME/.codex/skills/herdr-dispatch/scripts/land.sh` 執行；可用 `HERDR_LAND_SCRIPT` 指定其他腳本路徑。腳本不存在會清楚失敗。檢查命令以單一引號參數傳入，包裝腳本不使用 `eval`；既有 land 會用 Bash 執行該命令，因此只提供維護者信任的命令。
+
+release 顯式傳入 `--check` 與 `--release 'npm run deploy'`，不觸發既有 land 預設的完整 check。完整測試、建置與全部上線關卡集中在 deploy，沒有略過開關。非 release 若稍後另行發布，deploy 仍會跑全套。CI 每次 push 仍獨立跑完整檢查，不能宣稱所有環境總共只跑一次。
+
+land 的結束碼 3 表示整合檢查失敗、尚未 push；結束碼 4 表示 push、關票或 main 快轉失敗，需確認停在哪一步。結束碼 5 表示部署失敗，此時 main 已快轉並 push，不能當成未落地。若 deploy 的測試、建置或關卡失敗，線上仍是舊版；若在上傳階段失敗，另行確認線上狀態。回報必須分開說明分支、push、實際執行的檢查與線上版本。
+
 </details>
 
 ## 回報更正與參與
 
 發現錯誤，請到 [GitHub Issues](https://github.com/kcchien/tc-policy-island/issues) 附上政見卡片上的政見連結、你認為有誤的地方，以及可供核對的一手來源。修正後的政見仍須重新通過兩層核對才會公開。
 
-若要修改程式碼或整理資料，請先閱讀 [專案慣例](AGENTS.md)、[詞彙表](GLOSSARY.md) 與 [中立規則](docs/adr/0001-neutrality-rules.md)，送出變更前執行 `npm run check`。示範與測試資料請使用虛構候選人，放在 `test/fixtures/`。
+若要修改程式碼或整理資料，請先閱讀 [專案慣例](AGENTS.md)、[詞彙表](GLOSSARY.md) 與 [中立規則](docs/adr/0001-neutrality-rules.md)，依按風險驗證規則交件，完整檢查由發布執行。示範與測試資料請使用虛構候選人，放在 `test/fixtures/`。
 
 ## 授權
 

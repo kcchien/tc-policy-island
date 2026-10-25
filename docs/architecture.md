@@ -23,7 +23,7 @@ data/audio/            政見語音的 mp3（檔名是朗讀文字的 sha256，4
 data/portraits/        正式肖像 PNG、保留原色的原圖與 manifest.json，中選會公報或立法院委員頁來源、原圖及成品雜湊、姓名位置核對、各站授權依據；全部進版控
 data/rules/            品牌用語清單 brand-terms.json、禁用色範圍 forbidden-colors.json（關卡與核對讀這裡）
 docs/rules/            公開的分類規則、政見與議題區對照表、品牌用語、元素清單、禁用色、島嶼格子配置說明
-scripts/               Node 工具；scripts/gates/ 每項關卡一個模組
+scripts/               Node 工具與 land.sh 落地入口；scripts/gates/ 每項關卡一個模組
 test/                  node:test 測試；test/fixtures/ 放夾具
 ```
 
@@ -148,6 +148,7 @@ js/repo-documents.js  js/markdown.js  js/method-content.js  js/method.js
 
 ```
 build.js  deploy.js  fetch-source.js  gates.js  preview.js  shoot.js  speak.js  verify.js   指令入口，參數看各腳本的 --help
+land.sh   repo 的 Herdr land 包裝入口，參數看 --help；從主 worktree 整合，release 針對性檢查後由 deploy 全套驗證
 lib/      archive-queue.js  audience-text.js  brand-terms.js  cdp.js  colors.js  deploy.js
           pdf-text.js  policy-variants.js  raw-data.js  shoot.js  source-capture.js  speech.js  usage.js  verification.js  portraits.js
 gates/    index.js（關卡清單 GATES）  site.js（讀取網站目錄的入口）

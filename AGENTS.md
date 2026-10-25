@@ -21,10 +21,23 @@
 | `node scripts/fetch-source.js` | 擷取一個出處（出處快照、存檔、出處紀錄），或補送存檔。參數與注意事項看 `--help` |
 | `node scripts/speak.js` | 生成政見語音音檔與清單（`data/audio/`），會花點數，正式資料先跑 `--dry-run`。參數與注意事項看 `--help` |
 | `node scripts/shoot.js` | 截圖與版面量測，手機版驗證用這個。參數與注意事項看 `--help` |
-| `npm run check` | 測試 → 建置 → 關卡，交件前跑這個 |
+| `npm run check` | 完整測試 → 建置 → 關卡；依下方分級規則安排，不在交件時一律執行 |
+| `bash scripts/land.sh <branch> <issue 或 -> <comment> [--check <命令>] [--release] [--dry-run]` | 包裝既有 Herdr land，從主 worktree 整合；release 必填針對性 check，非 release 固定完整 check |
 | `node scripts/deploy.js`（`npm run deploy`） | 檢查後部署到 Cloudflare Pages，真的部署只由維護者執行。參數與注意事項看 `--help` |
 
 看夾具資料的畫面：`node scripts/build.js --raw test/fixtures/raw-sample` 後開預覽；看完再跑一次 `node scripts/build.js` 換回正式資料。CI（`.github/workflows/check.yml`）每次 push 跑測試、建置、關卡，不部署。
+
+### 按風險驗證（跨 session 適用）
+
+- 素材、文案、局部 CSS 且不改資料結構或流程，屬小改。代理交件只跑受影響的既有測試與改動處必要畫面驗證；純素材或文案不強加新測試。沒有使用者畫面差異的工具或文件修改，不做瀏覽器截圖驗收。
+- 程式、資料結構、來源校驗的變更不能稱為純素材。依受影響流程選測試、保留必要校驗；失敗、相依或未解疑慮才擴大驗證。
+- 同一提交的本機完整測試、建置與全部上線關卡，留給發布時的 `npm run deploy` 一次執行。代理交件與 release 落地不先重跑全套。不新增略過測試或關卡的開關，也不關閉任何上線關卡。
+- 維護者用 repo 的 `scripts/land.sh` 維持 hub-and-spoke：release 明確傳入 `--check '<針對性命令>'`，腳本交給既有 land 先檢查再 push，並顯式傳入 `--release 'npm run deploy'`。非 release 落地仍固定跑 `npm run check`，不能用針對性 check 縮減整合檢查；若稍後另行發布，deploy 仍保留全套。
+- 同一提交已有的驗證結果可跨 session 沿用，交接記下提交、命令、結果與未驗項目。失敗修正或基底改變才重跑受影響驗證；只有相關疑慮才擴大，不能因交件、落地或換 session 就重跑全套。發布仍保留上述完整檢查，CI 是每次 push 的獨立遠端防線，不宣稱所有環境總共只跑一次。
+- release 會先 push 整合分支與 main，再由 deploy 執行全套。若部署檢查失敗，main 可能已 push，但線上仍是舊版；如實回報 Git 與線上狀態，不能把 push 成功稱為部署成功。只報實際執行的檢查，不能用「全部通過」冒充未跑的檢查。
+- release 的票號用 `-`，避免既有 land 在部署前自動關票；維護者確認發布成功並驗證線上結果後，再另行關票。
+
+用法與發布失敗狀態見 `README.md`「部署到 Cloudflare Pages」。
 
 ### 目錄與模組
 
