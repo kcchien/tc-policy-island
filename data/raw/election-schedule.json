@@ -2,6 +2,14 @@
   "votingDate": "2026-11-28",
   "events": [
     {
+      "id": "ballot-draw",
+      "name": "市長候選人號次抽籤",
+      "date": "2026-10-27",
+      "endDate": null,
+      "sourceUrl": "https://web.cec.gov.tw/tcec/article/65353",
+      "sourceTitle": "臺中市第5屆市長選舉候選人姓名號次抽籤結果"
+    },
+    {
       "id": "candidate-list",
       "name": "公告市長候選人名單",
       "date": "2026-11-12",
