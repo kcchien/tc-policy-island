@@ -3,7 +3,7 @@
     "id": "chiang-chi-chen",
     "name": "江啟臣",
     "party": "中國國民黨",
-    "ballotNumber": null,
+    "ballotNumber": 3,
     "nameStrokes": 6,
     "rawPolicyItems": {
       "total": 117,
@@ -47,7 +47,7 @@
     "id": "ho-hsin-chun",
     "name": "何欣純",
     "party": "民主進步黨",
-    "ballotNumber": null,
+    "ballotNumber": 1,
     "nameStrokes": 7,
     "rawPolicyItems": {
       "total": 153,
@@ -87,7 +87,7 @@
     "id": "hung-li-hua",
     "name": "洪麗華",
     "party": "司法正義黨",
-    "ballotNumber": null,
+    "ballotNumber": 2,
     "nameStrokes": 9,
     "rawPolicyItems": {
       "total": null,
